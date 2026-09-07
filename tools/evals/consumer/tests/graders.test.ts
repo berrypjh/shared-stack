@@ -150,6 +150,7 @@ describe('public import grader', () => {
           content: [
             `import { Button } from '@berrypjh/react-ui/src/components/button';`,
             `import type { ButtonProps } from '@berrypjh/ui-core';`,
+            `import { themes } from '@berrypjh/design-tokens';`,
             `import { cx } from '@berrypjh/react-ui/internal';`,
             `import x from '../../libs/react-ui/src/index';`,
             `const y = require('libs/react-native-ui/src/components/box');`,
@@ -163,9 +164,17 @@ describe('public import grader', () => {
       'deep-source-import',
       'deep-source-import',
       'private-package-import',
+      'private-package-import',
       'relative-lib-escape',
       'unknown-subpath',
     ]);
+    // 두 internal 패키지가 모두 걸려야 한다 — 하나만 막히면 경계가 반쪽이다.
+    expect(
+      g.violations
+        .filter((v) => v.kind === 'private-package-import')
+        .map((v) => v.specifier)
+        .sort(),
+    ).toEqual(['@berrypjh/design-tokens', '@berrypjh/ui-core']);
   });
 
   it('ignores specifier-shaped text inside comments and strings', () => {
