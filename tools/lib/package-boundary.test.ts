@@ -130,3 +130,52 @@ describe('internal 패키지는 게시되지 않는다', () => {
     expect(meta.private).toBe(true);
   });
 });
+
+/**
+ * RN Button 계열의 공개 표면 회귀 게이트.
+ *
+ * 소스가 아니라 빌드된 선언과 소비자 카탈로그를 봅니다 — npm 소비자가 실제로 받는 것입니다.
+ */
+describe('@berrypjh/react-native-ui 공개 Button 계열', () => {
+  const declaration = () =>
+    fs.readFile(path.join(REPO_ROOT, 'libs/react-native-ui/dist/index.d.ts'), 'utf8');
+  const catalog = async () =>
+    JSON.parse(
+      await fs.readFile(path.join(REPO_ROOT, 'libs/react-native-ui/dist/llm-catalog.json'), 'utf8'),
+    ) as { platform: string; symbols: Record<string, { kind: string; props?: object }> };
+
+  it.each(['Button', 'Fab', 'IconButton'])('%s 가 선언에 공개된다', async (name) => {
+    expect(await declaration()).toMatch(new RegExp(`^export declare const ${name}:`, 'm'));
+  });
+
+  it('내부 ButtonBase 는 공개되지 않는다', async () => {
+    const text = await declaration();
+    // 주석 안의 설명은 API가 아니므로 선언 줄만 봅니다.
+    const declarations = text.split('\n').filter((l) => /^(export |declare )/.test(l));
+
+    expect(declarations.filter((l) => /\bButtonBase\b/.test(l))).toEqual([]);
+  });
+
+  it('web 전용 API 가 RN 선언에 새지 않는다', async () => {
+    const text = await declaration();
+    const declarations = text.split('\n').filter((l) => /^(export |declare )/.test(l));
+
+    for (const banned of ['edge?:', 'href?:', 'component?:', 'className?:']) {
+      expect(declarations.filter((l) => l.includes(banned))).toEqual([]);
+    }
+  });
+
+  it.each(['Button', 'Fab', 'IconButton'])('%s 가 카탈로그에서 발견된다', async (name) => {
+    const { symbols, platform } = await catalog();
+
+    expect(platform).toBe('react-native');
+    expect(symbols[name]?.kind).toBe('component');
+    expect(Object.keys(symbols[name]?.props ?? {}).length).toBeGreaterThan(0);
+  });
+
+  it('카탈로그에 내부 ButtonBase 가 없다', async () => {
+    const { symbols } = await catalog();
+
+    expect(Object.keys(symbols).filter((s) => /ButtonBase/.test(s))).toEqual([]);
+  });
+});
