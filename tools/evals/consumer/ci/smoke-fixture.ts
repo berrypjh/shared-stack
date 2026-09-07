@@ -12,6 +12,8 @@ import type { ConsumerEvalTask } from '../runner/schema';
 export const SMOKE_TASK_IDS = [
   'web-button-loading',
   'web-button-polymorphic',
+  // harness 자기 검증용 고정 fixture입니다 — `ci.test.ts`가 이 조합이 만드는 성공/실패
+  // 비율(0.5)과 실패 종류를 검증합니다. 통과하는 task를 더하면 그 불변식이 희석됩니다.
   'negative-deep-source-import',
   'no-ui-date-format',
 ];
