@@ -50,8 +50,8 @@ import { Box, ThemeProvider } from '@berrypjh/react-native-ui';
 ## 테마와 토큰
 
 - `ThemeProvider`, `useTheme` — 라이트/다크 테마 컨텍스트
-- `themes`, `Web`, `Native` — 토큰 정적 객체
-- `cx` — className merge 유틸
+- `themes`, `Native` — 토큰 정적 객체 (`Web`은 deprecated, 값이 CSS 문자열이라 RN에서 못 쓴다)
+- `cx` — **deprecated**. className 유틸이라 RN에서 쓸 곳이 없다. 다음 major에서 제거. style은 배열/`StyleSheet.flatten` 사용
 - `getColor` — 토큰 색 lookup
 
 타입은 `BoxProps`, `ColorToken`, `RadiusToken`, `SpacingToken`, `RNTokens`, `Theme`, `ThemeName` 등 함께 export됩니다.

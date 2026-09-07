@@ -29,7 +29,7 @@ function Screen() {
    요구가 설치 상태와 어긋나면 추측하지 말고 되묻는다.
 2. **패키지** — 웹은 `@berrypjh/react-ui`, React Native는 `@berrypjh/react-native-ui`.
    `@berrypjh/ui-core`와 `@berrypjh/design-tokens`는 private이다. 소비자가 직접 import하지 않는다 —
-   필요한 토큰·유틸(`cx`, `getColor`, `createTheme`, `themes`, `Web`, `Native`)은
+   필요한 토큰·유틸(`getColor`, `createTheme`, `themes`, `Web`, `Native`)은
    플랫폼 패키지가 전부 re-export한다.
 3. **후보 심볼** — `llm-catalog.json`의 `symbols` 키를 훑어 후보를 좁힌다.
 4. **정확한 API** — 그 심볼 하나의 항목만 읽는다 (`kind`, `importFrom`, `props`).
@@ -72,25 +72,32 @@ npx @berrypjh/react-native-ui token color.primary
 
 ### 테마
 
-| 심볼               | 용도                                                   |
-| ------------------ | ------------------------------------------------------ |
-| `ThemeProvider`    | RN context 기반 테마. `mode` prop (기본 `light`)       |
-| `useTheme`         | 현재 theme 객체 반환. `getColor(theme, ...)` 등에 사용 |
-| `themes`           | `[{ name: 'light', ... }, ...]` namespace 배열         |
-| `ThemeName` (type) | `'light' \| 'dark' \| 'sepia'`                         |
+| 심볼               | 용도                                                                        |
+| ------------------ | --------------------------------------------------------------------------- |
+| `ThemeProvider`    | RN context 기반 테마. `mode` prop (기본 `light`)                            |
+| `useTheme`         | 현재 theme 객체 반환. `getColor(theme, ...)` 등에 사용                      |
+| `themes`           | `[{ name: 'light', ... }, ...]` namespace 배열                              |
+| `ThemeName` (type) | 'light' \| 'dark' \| 'sepia' \| 'amber' \| 'ember' \| 'frost' \| 'midnight' |
 
 ### 토큰 / 유틸 (정적 객체)
 
-| 심볼            | 용도                                                                   |
-| --------------- | ---------------------------------------------------------------------- |
-| `Web`, `Native` | 정적 토큰 트리. `Native.Light.tokens.color.primary.pr500` 같은 값 참조 |
-| `cx`            | className merge — RN에선 style array 사용이 일반적이라 보조 용도       |
-| `getColor`      | 토큰 색 lookup (`getColor(theme, 'primary.pr500')`)                    |
-| `createTheme`   | 런타임 theme 객체 생성                                                 |
+| 심볼          | 용도                                                                   |
+| ------------- | ---------------------------------------------------------------------- |
+| `Native`      | 정적 토큰 트리. `Native.Light.tokens.color.primary.pr500` 같은 값 참조 |
+| `themes`      | 등록된 테마 목록 (`ThemeInfo[]`)                                       |
+| `getColor`    | 토큰 색 lookup (`getColor(theme, 'primary.pr500')`)                    |
+| `createTheme` | 런타임 theme 객체 생성                                                 |
 
 ### Type alias (재export)
 
-`ColorToken`, `RadiusToken`, `SpacingToken`, `RNTokens`, `Theme<T>`, `ThemeDef`
+`ColorToken`, `RadiusToken`, `SpacingToken`, `RNTokens`, `Theme<T>`, `ThemeInfo`, `ThemeName`
+
+### deprecated — 다음 major에서 제거
+
+| 심볼  | 이유 / 대신 쓸 것                                               |
+| ----- | --------------------------------------------------------------- |
+| `Web` | 값이 CSS 문자열(`"0.75rem"`)이라 RN 스타일에 못 쓴다 → `Native` |
+| `cx`  | className은 web 개념 → style 배열 / `StyleSheet.flatten`        |
 
 ## ⚠️ 정적 객체 vs 런타임 테마
 

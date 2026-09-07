@@ -17,6 +17,9 @@ src/
     box/Box.tsx               유일 컴포넌트
     box/index.ts
     index.ts
+  utils/
+    cx.ts                     deprecated — 공개 API였던 className 유틸. 다음 major에서 제거
+    index.ts
   theme/
     ThemeProvider.tsx         RN context 기반 테마
     useTheme.ts               useContext 훅
@@ -30,12 +33,13 @@ RN 컴포넌트 테스트는 jsdom에서 돌지 않는다 — `react-native`가 
 
 ## 작업 매트릭스
 
-| 작업               | 수정 파일                                                                 |
-| ------------------ | ------------------------------------------------------------------------- |
-| 새 컴포넌트        | `components/<name>/{<Name>.tsx, index.ts}` + `components/index.ts`        |
-| 컴포넌트 prop 변경 | 해당 `<Name>.tsx`의 props 정의 (ui-core contracts 변경 필요 시 거기 먼저) |
-| 토큰 사용          | `getColor(theme, 'path')` (JSX) — `useTheme()` 통해 theme 획득            |
-| 테마 동작 변경     | `theme/ThemeProvider.tsx` (`createTheme(...)` 정책)                       |
+| 작업                    | 수정 파일                                                                             |
+| ----------------------- | ------------------------------------------------------------------------------------- |
+| 새 컴포넌트             | `components/<name>/{<Name>.tsx, index.ts}` + `components/index.ts`                    |
+| 컴포넌트 prop 변경      | 해당 `<Name>.tsx`의 props 정의 (ui-core contracts 변경 필요 시 거기 먼저)             |
+| 토큰 사용               | `getColor(theme, 'path')` (JSX) — `useTheme()` 통해 theme 획득                        |
+| 테마 동작 변경          | `theme/ThemeProvider.tsx` (`createTheme(...)` 정책)                                   |
+| design-tokens 테마 추가 | `theme/ThemeProvider.tsx`의 `DEFAULT_TOKENS_BY_MODE`에 한 줄 (누락 시 typecheck 실패) |
 
 ## 빌드 / 테스트
 
@@ -51,6 +55,7 @@ pnpm nx build @berrypjh/react-native-ui          # rollup(JS) + dts-bundle-gener
 
 - **dts-bundle-generator + composite**: build 시 loose `dist/src/**/*.d.ts`가 생기지만 project.json의 cleanup 단계가 정리. 새 빌드 단계 추가 시 cleanup 순서 유지.
 - **ui-core 직접 import 금지**: 외부에 `@berrypjh/ui-core`를 import하라고 안내 X. react-native-ui가 캡슐화 — ui-core export는 react-native-ui index를 통해 패스스루.
+- **테마 맵은 손으로 채운다**: `DEFAULT_TOKENS_BY_MODE`는 `satisfies Record<ThemeName, RNTokens>`다. design-tokens에 테마가 늘면 여기서 컴파일이 깨지는 것이 정상 — `Partial`이나 `Record<string, …>`로 넓혀 에러를 지우지 말 것. 빠진 테마는 `mode`로 선택 가능하고 그러면 `tokens`가 `undefined`가 되어 렌더에서 터진다.
 - **`Native` namespace**: 정적 토큰 트리. RN-specific transforms(예: shadow → boxShadow object) 적용된 값. 런타임 테마 전환은 `ThemeProvider` + CSS 변수 대안인 context value 사용.
 - **demo-mobile typecheck**: composite project + dts-bundle-generator 조합으로 nx typecheck가 TS6305 발생 가능. 직접 `tsc --noEmit -p tsconfig.app.json`은 통과.
 
