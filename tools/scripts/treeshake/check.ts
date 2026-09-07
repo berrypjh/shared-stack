@@ -11,7 +11,7 @@
  *   pnpm treeshake react-ui Button
  *   pnpm treeshake react-ui Button TextField
  *   pnpm treeshake react-ui            # 전체 export 베이스라인만
- *   pnpm treeshake ui-core cx getColor
+ *   pnpm treeshake ui-core getColor createTheme
  *   pnpm treeshake design-tokens themes
  */
 

@@ -51,6 +51,8 @@ export const symbolSchema = z.object({
   /** 비컴포넌트 value의 선언 타입 텍스트. */
   type: z.string().nullable().optional(),
   typeOmitted: z.literal(true).optional(),
+  /** 선언에 `@deprecated`가 붙어 있으면 true — 소비자에게 추천하지 않는다. */
+  deprecated: z.literal(true).optional(),
 });
 
 export const catalogSchema = z.object({

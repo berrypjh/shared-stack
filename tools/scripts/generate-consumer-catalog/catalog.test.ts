@@ -1,6 +1,8 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
+import { themes } from '@berrypjh/design-tokens';
+
 import { describe, expect, it } from 'vitest';
 
 import { publicSpecifiers } from '../../lib/package-exports';
@@ -168,7 +170,20 @@ describe('web catalog contents', () => {
   });
 
   it('states an omitted type explicitly rather than emitting a fake one', () => {
-    expect(web.symbols.themes).toMatchObject({ type: null, typeOmitted: true });
+    // 어느 심볼이 잘리는지는 선언 크기에 달렸으므로 이름을 박지 않고 규칙 자체를 검사한다.
+    const omitted = Object.entries(web.symbols).filter(([, symbol]) => symbol.typeOmitted);
+
+    expect(omitted.length).toBeGreaterThan(0);
+    for (const [, symbol] of omitted) {
+      expect(symbol.type).toBeNull();
+    }
+  });
+
+  it('테마 레지스트리는 소비자용 형태라 타입이 그대로 실린다', () => {
+    // 예전에는 테마별 리터럴이 길어 잘려 나갔다. ui-core가 `ThemeInfo[]`로 좁힌 뒤로는 실린다.
+    expect(web.symbols.themes.typeOmitted).toBeUndefined();
+    expect(web.symbols.themes.type).toBe('readonly ThemeInfo[]');
+    expect(web.symbols.ThemeInfo.kind).toBe('type');
   });
 });
 
@@ -190,7 +205,11 @@ describe('react-native catalog contents', () => {
   });
 
   it('extracts theme symbols with their literal modes', () => {
-    expect(native.symbols.ThemeProvider.props?.mode?.values).toEqual(['dark', 'light', 'sepia']);
+    // 목록을 박아 두면 테마가 늘 때마다 낡는다. 레지스트리에서 유도해
+    // "ThemeProvider가 등록된 테마 전부를 받는다"는 사실 자체를 검사한다.
+    const registered = themes.map((theme) => theme.name).sort();
+
+    expect(native.symbols.ThemeProvider.props?.mode?.values).toEqual(registered);
     expect(native.symbols.ThemeProvider.props?.children?.required).toBe(true);
     expect(native.symbols.useTheme.kind).toBe('hook');
     expect(native.symbols.getColor.kind).toBe('function');

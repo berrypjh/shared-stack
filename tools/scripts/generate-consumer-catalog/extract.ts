@@ -172,6 +172,12 @@ export const extractSymbols = (options: ExtractOptions): Record<string, CatalogS
     const kind = kindOf(ctx, symbol, signatures);
     const record: CatalogSymbol = { kind, importFrom };
 
+    // alias(재export)와 원 선언 양쪽을 본다 — `@deprecated`는 보통 원 선언에 붙는다.
+    const deprecated = [entry, symbol].some((s) =>
+      s.getJsDocTags(checker).some((tag) => tag.name === 'deprecated'),
+    );
+    if (deprecated) record.deprecated = true;
+
     if (kind === 'component') {
       const parameter = signatures[0]?.getParameters()[0];
       if (parameter) {
