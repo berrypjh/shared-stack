@@ -28,7 +28,11 @@
       "executor": "nx:run-commands",
       "outputs": ["{projectRoot}/out-tsc"],
       "options": {
-        "command": "tsc -p libs/ui-core/tsconfig.lib.json"
+        "commands": [
+          "tsc -p libs/ui-core/tsconfig.lib.json",
+          "tsc -p libs/ui-core/tsconfig.spec.json --noEmit"
+        ],
+        "parallel": false
       }
     },
     "test": {

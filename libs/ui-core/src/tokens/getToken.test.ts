@@ -25,18 +25,37 @@ describe('getToken', () => {
     expect(getToken(tokens, 'spacing.sm')).toBe('8px');
     expect(getToken(tokens, 'spacing.md')).toBe('16px');
   });
+});
 
-  it('존재하지 않는 경로는 undefined를 반환한다', () => {
-    expect(getToken(tokens as any, 'color.unknown' as any)).toBeUndefined();
+/**
+ * 반환 타입이 값을 약속하므로 결손은 전부 던진다.
+ * `undefined` 를 돌려주면 정적 타입이 거짓이 되고 실패가 렌더까지 지연된다.
+ */
+describe('getToken 은 결손을 조용히 넘기지 않는다', () => {
+  it('마지막 leaf 가 없으면 던진다', () => {
+    expect(() => getToken(tokens as any, 'color.unknown' as any)).toThrow(
+      '"color.unknown" is not in the token tree — "unknown" is missing',
+    );
   });
 
-  it('중간 노드가 null이면 에러를 던진다', () => {
-    const obj = { a: null };
-    expect(() => getToken(obj as any, 'a.b' as any)).toThrow('getToken');
+  it('중간 노드가 없으면 던진다', () => {
+    expect(() => getToken(tokens as any, 'typography.body.medium' as any)).toThrow(
+      '"typography" is missing',
+    );
   });
 
-  it('중간 노드가 primitive이면 에러를 던진다', () => {
-    const obj = { a: 42 };
-    expect(() => getToken(obj as any, 'a.b' as any)).toThrow('getToken');
+  it('중간 노드가 null 이면 던진다', () => {
+    expect(() => getToken({ a: null } as any, 'a.b' as any)).toThrow(
+      'cannot read "a.b" — "b" has no object to read from',
+    );
+  });
+
+  it('중간 노드가 primitive 이면 던진다', () => {
+    expect(() => getToken({ a: 42 } as any, 'a.b' as any)).toThrow('has no object to read from');
+  });
+
+  it('값이 명시적으로 undefined 여도 키가 있으면 읽는다', () => {
+    // 결손(키 없음)과 값이 `undefined` 인 것을 구분한다.
+    expect(getToken({ a: undefined } as any, 'a' as any)).toBeUndefined();
   });
 });
