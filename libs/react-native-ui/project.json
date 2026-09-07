@@ -36,6 +36,17 @@
         "command": "dts-bundle-generator --project libs/react-native-ui/tsconfig.rollup.json --no-banner --no-check --external-imports=react --external-imports=react-native --external-imports=react/jsx-runtime -o libs/react-native-ui/dist/index.d.ts libs/react-native-ui/src/index.ts"
       }
     },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "jest -c libs/react-native-ui/jest.config.cjs"
+      },
+      "configurations": {
+        "ci": {
+          "args": ["--ci"]
+        }
+      }
+    },
     "nx-release-publish": {
       "executor": "@nx/js:release-publish",
       "dependsOn": ["build"]

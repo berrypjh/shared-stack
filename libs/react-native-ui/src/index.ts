@@ -1,4 +1,5 @@
-// 컴포넌트 prop 계약(BoxProps 등)은 react-native-ui 자체 props에서 wrap되어 있어 제외.
+// 공개 컴포넌트. 내부 ButtonBase 는 배럴이 없어서 여기 오지 않는다 — 세 컴포넌트가
+// 공유하는 Pressable 동작 원시일 뿐 소비자 API 가 아니다.
 export * from './components';
 export * from './theme';
 
@@ -6,7 +7,12 @@ export * from './theme';
 export * from './deprecated';
 export { cx } from './utils';
 export type {
+  ButtonColor,
+  ButtonLoadingPosition,
+  ButtonSize,
+  ButtonVariant,
   ColorToken,
+  FabShape,
   RadiusToken,
   RNTokens,
   SpacingToken,

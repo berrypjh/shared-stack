@@ -66,9 +66,45 @@ npx @berrypjh/react-native-ui token color.primary
 
 ### 컴포넌트
 
-정확한 컴포넌트 목록과 prop은 `llm-catalog.json`의 `symbols`에서 읽는다
-(`kind: "component"`). `Box`가 토큰 기반 레이아웃 prop(padding/margin/background/radius)을
-받는 기본 컴포넌트다.
+정확한 컴포넌트 목록과 prop은 `llm-catalog.json`의 `symbols`에서 읽는다 (`kind: "component"`).
+
+| 컴포넌트     | 요약                                                                  |
+| ------------ | --------------------------------------------------------------------- |
+| `Box`        | 토큰 기반 레이아웃 (padding·margin·background·radius)                 |
+| `Button`     | 라벨 버튼. `variant`·`size`·`color`·`fullWidth`·`loading`·아이콘 슬롯 |
+| `Fab`        | 플로팅 액션 버튼. `shape="circular" \| "extended"`                    |
+| `IconButton` | 아이콘 전용 버튼. `accessibilityLabel` **필수**                       |
+
+#### Button 계열 공통
+
+- 누름 처리는 RN `Pressable` 이다 — `onPress`·`onLongPress`·`onPressIn/Out`·`hitSlop` 을 받는다.
+  web 의 `onClick`·`href`·`component`·`className` 은 **없다**.
+- `disabled` 는 누름을 막고 `accessibilityState.disabled` 로 알린다. 소비자가
+  `accessibilityState` 로 뒤집을 수 없다.
+- `loading` 은 평범한 boolean 이다 (web `IconButton` 의 `boolean | null` 3-상태를 옮기지 않았다).
+  `true` 면 누름이 막히고 `busy` + `disabled` 를 함께 알리며 기본 `ActivityIndicator` 가 뜬다.
+  `loadingIndicator` 로 교체할 수 있다.
+- 아이콘 슬롯은 받은 노드를 **그대로** 렌더한다. `cloneElement` 로 색·크기를 주입하지 않는다.
+  토큰 색이 필요하면 `IconButton` 의 `icon` 에 함수를 넘긴다:
+  `icon={({ color, size }) => <MyIcon color={color} size={size} />}`.
+- 모든 컨트롤은 시각 크기와 무관하게 최소 터치 타깃(48)을 지킨다. `Fab size="sm"` 의 원판은
+  40 이지만 누를 수 있는 영역은 48 이다.
+
+#### 접근 가능한 이름
+
+| 컴포넌트               | 이름의 출처                                                 |
+| ---------------------- | ----------------------------------------------------------- |
+| `Button`               | 보이는 라벨(children). `accessibilityLabel` 로 덮을 수 있다 |
+| `Fab shape="extended"` | 보이는 라벨(children). `accessibilityLabel` 로 덮을 수 있다 |
+| `Fab` (circular)       | `accessibilityLabel` **필수** — 타입에서 강제한다           |
+| `IconButton`           | `accessibilityLabel` **필수** — 타입에서 강제한다           |
+
+`loading` 중에도 이름은 유지된다.
+
+#### 없는 것 (web 에만 있다)
+
+`href`, `component`(다형성), `className`, `IconButton` 의 `edge`. RN 에 대응 개념이 없어서
+옮기지 않았다 — 카탈로그에도 없으므로 있다고 가정하지 말 것.
 
 ### 테마
 
@@ -91,6 +127,9 @@ npx @berrypjh/react-native-ui token color.primary
 ### Type alias (재export)
 
 `ColorToken`, `RadiusToken`, `SpacingToken`, `RNTokens`, `Theme<T>`, `ThemeInfo`, `ThemeName`
+
+두 렌더러가 같은 뜻으로 구현한 Button 계열 어휘도 함께 나온다 (ui-core 소유):
+`ButtonVariant`, `ButtonSize`, `ButtonColor`, `ButtonLoadingPosition`, `FabShape`
 
 ### deprecated — 다음 major에서 제거
 

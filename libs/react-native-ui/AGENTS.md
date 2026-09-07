@@ -14,9 +14,13 @@
 src/
   index.ts                    public re-export (components/theme + ui-core 패스스루)
   components/
-    box/Box.tsx               유일 컴포넌트
-    box/index.ts
-    index.ts
+    box/{Box.tsx, index.ts}
+    button-base/              내부 Pressable 동작 원시 — 배럴 없음(비공개)
+      {ButtonBase.tsx, ButtonBase.types.ts, ButtonBase.test.tsx}
+    button/{Button.tsx, Button.types.ts, Button.styles.ts, index.ts}
+    fab/{Fab.tsx, Fab.types.ts, Fab.styles.ts, index.ts}
+    icon-button/{IconButton.tsx, IconButton.types.ts, IconButton.styles.ts, index.ts}
+    index.ts                  공개 배럴 (box·button·fab·icon-button)
   utils/
     cx.ts                     deprecated — 공개 API였던 className 유틸. 다음 major에서 제거
     index.ts
@@ -24,18 +28,25 @@ src/
     ThemeProvider.tsx         RN context 기반 테마
     useTheme.ts               useContext 훅
     index.ts
+  test/rn-test-harness.test.tsx   러너 자체를 검증하는 스모크
 ```
 
-`*.test.tsx`는 같은 폴더 (현재 없음). storybook 없음.
+`*.test.tsx`는 같은 폴더. storybook 없음.
 
-RN 컴포넌트 테스트는 jsdom에서 돌지 않는다 — `react-native`가 트랜스파일되지 않은 소스를
-배포해서 vite가 파싱하지 못한다. 테스트를 추가하려면 RN babel preset을 태운 러너가 먼저 필요하다.
+**`components/<name>/index.ts` 는 "공개 컴포넌트" 표시다.** `tools/scripts/generate-consumer-catalog`
+의 테스트가 그 배럴의 export 가 전부 소비자 카탈로그에 실렸는지 검사한다. 그래서 내부
+`ButtonBase` 에는 배럴이 없다 — 만드는 순간 공개 API 로 승격되거나 그 테스트가 깨진다.
+
+RN 컴포넌트 테스트는 jsdom이 아니라 **jest + RN preset**에서 돈다 (`jest.config.cjs`).
+`react-native`가 Flow 소스를 그대로 배포해서 vite/jsdom으로는 파싱되지 않기 때문이다.
 
 ## 작업 매트릭스
 
 | 작업                    | 수정 파일                                                                             |
 | ----------------------- | ------------------------------------------------------------------------------------- |
-| 새 컴포넌트             | `components/<name>/{<Name>.tsx, index.ts}` + `components/index.ts`                    |
+| 새 공개 컴포넌트        | `components/<name>/{<Name>.tsx, index.ts}` + `components/index.ts` (+ 카탈로그 등재)  |
+| 새 내부 원시            | `components/<name>/` 에 배럴 **없이** 둔다 (ButtonBase 참고)                          |
+| Button 계열 동작 변경   | `button-base/ButtonBase.tsx` (누름·접근성·터치 타깃 공통) 또는 각 `*.styles.ts`       |
 | 컴포넌트 prop 변경      | 해당 `<Name>.tsx`의 props 정의 (ui-core contracts 변경 필요 시 거기 먼저)             |
 | 토큰 사용               | `getColor(theme, 'path')` (JSX) — `useTheme()` 통해 theme 획득                        |
 | 테마 동작 변경          | `theme/ThemeProvider.tsx` (`createTheme(...)` 정책)                                   |
@@ -45,9 +56,12 @@ RN 컴포넌트 테스트는 jsdom에서 돌지 않는다 — `react-native`가 
 
 ```bash
 pnpm nx build @berrypjh/react-native-ui          # rollup(JS) + dts-bundle-generator(d.ts) + llm-catalog
+pnpm nx test @berrypjh/react-native-ui           # jest + RN preset (jsdom 아님)
+pnpm nx typecheck @berrypjh/react-native-ui      # tsc --build (lib + spec)
 ```
 
-`test` target은 **없다** — 테스트 파일도 vitest 설정도 아직 없어서 `pnpm nx test @berrypjh/react-native-ui`는 실행되지 않는다. typecheck는 `tsc -p libs/react-native-ui/tsconfig.lib.json`으로 가능.
+**build 성공이 typecheck 성공을 대신하지 않는다.** `build-types`는 `--no-check`로 돌아서
+타입 에러를 잡지 못한다. 타입 수준 계약(계약 테스트·`@ts-expect-error`)은 typecheck에서만 깨진다.
 
 빌드 산출물: `dist/{index.esm.js, index.d.ts, AGENTS.md, tokens.json, llm-catalog.json, README.md}`. d.ts는 `dts-bundle-generator`로 단일 파일, ui-core/design-tokens 타입을 inline. `llm-catalog.json`은 build 마지막 단계가 만든다 (`tools/scripts/generate-consumer-catalog`).
 

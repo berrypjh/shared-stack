@@ -41,9 +41,17 @@ import { Box, ThemeProvider } from '@berrypjh/react-native-ui';
 
 ## 제공 컴포넌트
 
-| 컴포넌트 | 설명                                                      |
-| -------- | --------------------------------------------------------- |
-| `Box`    | 기본 레이아웃 컴포넌트 (padding·margin·background·radius) |
+| 컴포넌트     | 설명                                                       |
+| ------------ | ---------------------------------------------------------- |
+| `Box`        | 기본 레이아웃 컴포넌트 (padding·margin·background·radius)  |
+| `Button`     | 라벨 버튼 (`variant`·`size`·`color`·`fullWidth`·`loading`) |
+| `Fab`        | 플로팅 액션 버튼 (`shape="circular" \| "extended"`)        |
+| `IconButton` | 아이콘 전용 버튼 (`accessibilityLabel` 필수)               |
+
+Button 계열은 RN `Pressable` 위에 있습니다 — `onPress` 를 쓰고, web 의 `href`·`component`·
+`className`·`edge` 는 없습니다. `disabled`/`loading` 은 누름을 막고 접근성 상태로 알립니다.
+아이콘만 있는 컨트롤(`IconButton`, circular `Fab`)은 `accessibilityLabel` 을 **타입에서**
+요구합니다.
 
 > 정확한 심볼·prop 목록은 빌드 산출물 `dist/llm-catalog.json`이 정답입니다.
 
