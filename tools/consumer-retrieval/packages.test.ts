@@ -33,14 +33,40 @@ describe('package resolution', () => {
     expect(decision.reason).toContain('ambiguous');
   });
 
-  it('confirms the platform packages re-export everything a consumer needs from ui-core', () => {
+  it('confirms each platform package re-exports what its own consumers need from ui-core', () => {
     // ui-core를 직접 import하지 않아도 되는 근거 — 생성 카탈로그로 검증한다.
-    const passthrough = ['cx', 'getColor', 'createTheme', 'themes', 'Web', 'Native'];
-    const types = ['ColorToken', 'RadiusToken', 'SpacingToken', 'RNTokens', 'Theme', 'ThemeDef'];
-    for (const pkg of Object.values(PLATFORM_PACKAGES)) {
-      for (const symbol of [...passthrough, ...types]) {
+    const shared = [
+      'themes',
+      'ThemeName',
+      'ThemeInfo',
+      'ColorToken',
+      'SpacingToken',
+      'RadiusToken',
+    ];
+    const perPlatform: Record<string, string[]> = {
+      [WEB_PACKAGE]: [...shared, 'Web', 'cx'],
+      [NATIVE_PACKAGE]: [...shared, 'Native', 'getColor', 'createTheme', 'Theme', 'RNTokens'],
+    };
+
+    for (const [pkg, symbols] of Object.entries(perPlatform)) {
+      for (const symbol of symbols) {
         expect(catalogs[pkg].symbols[symbol]).toBeDefined();
+        expect(catalogs[pkg].symbols[symbol].deprecated).toBeUndefined();
       }
+    }
+  });
+
+  it('does not present the other platform token tree as a live API', () => {
+    // 아직 export는 되지만 deprecated라 카탈로그가 추천하지 않는다.
+    expect(catalogs[WEB_PACKAGE].symbols.Native?.deprecated).toBe(true);
+    expect(catalogs[NATIVE_PACKAGE].symbols.Web?.deprecated).toBe(true);
+  });
+
+  it('stops promoting build composition metadata to consumers', () => {
+    // `ThemeDef.sourceDirs`는 토큰 파이프라인 내부 값이다. 소비자는 `ThemeInfo`를 쓴다.
+    for (const pkg of Object.values(PLATFORM_PACKAGES)) {
+      expect(catalogs[pkg].symbols.ThemeDef).toBeUndefined();
+      expect(catalogs[pkg].symbols.ThemeInfo).toBeDefined();
     }
   });
 });

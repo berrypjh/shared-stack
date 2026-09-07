@@ -26,6 +26,8 @@ export type DiscoverHit = {
   kind: SymbolKind;
   importFrom: string;
   matchedBy: MatchTier;
+  /** 선언에 `@deprecated`가 붙은 심볼 — 뒤로 밀고 표시한다. */
+  deprecated?: true;
 };
 
 export type DiscoverResult = {
@@ -76,13 +78,16 @@ export const discover = (
         kind: entry.kind,
         importFrom: entry.importFrom,
         matchedBy,
+        ...(entry.deprecated ? { deprecated: true as const } : {}),
       });
     }
   }
 
+  // deprecated는 같은 tier 안에서 뒤로 민다 — 플랫폼이 안 맞는 잔재가 먼저 보이면 안 된다.
   hits.sort(
     (a, b) =>
       MATCH_TIERS.indexOf(a.matchedBy) - MATCH_TIERS.indexOf(b.matchedBy) ||
+      Number(a.deprecated ?? false) - Number(b.deprecated ?? false) ||
       a.package.localeCompare(b.package) ||
       a.symbol.localeCompare(b.symbol),
   );
