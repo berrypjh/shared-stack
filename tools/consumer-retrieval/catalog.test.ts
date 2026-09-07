@@ -8,7 +8,9 @@ const catalogs = await loadCatalogs();
 
 describe('catalog discovery', () => {
   it('finds an exact component and reports the match tier', () => {
-    const r = discover(catalogs, 'Button', { kinds: ['component'] });
+    // 실제 흐름은 `resolvePlatform`이 package를 정하고 discover가 그 안에서 찾는 것입니다.
+    // 좁히지 않은 `Button`은 이제 양 플랫폼에 다 있습니다.
+    const r = discover(catalogs, 'Button', { kinds: ['component'], packages: [WEB_PACKAGE] });
     expect(r.hits[0]).toMatchObject({
       package: WEB_PACKAGE,
       symbol: 'Button',
@@ -17,6 +19,32 @@ describe('catalog discovery', () => {
       matchedBy: 'exact',
     });
   });
+
+  it('같은 이름이 양 플랫폼에 있으면 좁히기 전에는 둘 다 돌려준다', () => {
+    // 플랫폼 근거가 없는 질의에서 한쪽을 임의로 고르면 RN 소비자에게 web 컴포넌트를 주게 됩니다.
+    const unscoped = discover(catalogs, 'Button', { kinds: ['component'] });
+    const exact = unscoped.hits.filter((h) => h.matchedBy === 'exact' && h.symbol === 'Button');
+
+    expect(exact.map((h) => h.package).sort()).toEqual([NATIVE_PACKAGE, WEB_PACKAGE]);
+  });
+
+  it.each(['Button', 'Fab', 'IconButton'])(
+    'RN 으로 좁히면 %s 는 react-native-ui 만 나온다',
+    (symbol) => {
+      const r = discover(catalogs, symbol, {
+        kinds: ['component'],
+        packages: [NATIVE_PACKAGE],
+      });
+
+      expect(r.hits[0]).toMatchObject({
+        package: NATIVE_PACKAGE,
+        symbol,
+        importFrom: NATIVE_PACKAGE,
+        matchedBy: 'exact',
+      });
+      expect(r.hits.every((h) => h.package === NATIVE_PACKAGE)).toBe(true);
+    },
+  );
 
   it('matches case and kebab/Pascal variants deterministically', () => {
     for (const query of ['searchfield', 'search-field', 'search_field', 'Search Field']) {
