@@ -1,17 +1,13 @@
-import type { ButtonColor, ButtonSize } from './button';
+import type { IconButtonSemanticProps } from '@berrypjh/ui-core';
 
 /**
- * IconButton 의 시맨틱 계약.
+ * IconButton의 시맨틱 계약 = 공유 계약 + web 전용 확장.
  *
- * `edge` 는 컨테이너 가장자리에 아이콘 광학 정렬을 맞추려고 자체 패딩을 상쇄하는
- * 웹 레이아웃 관용구다 — RN 에는 대응 개념이 없다.
+ * `size`·`color`·`disabled`만 ui-core로 올라갔습니다. `edge`는 RN에 대응 개념이 없어
+ * 여기 남습니다 — 공유 계약을 느슨하게 만드는 대신 렌더러가 확장합니다.
  */
 export type IconButtonEdge = 'start' | 'end' | false;
 
-export interface IconButtonProps {
-  color?: ButtonColor;
-  size?: ButtonSize;
+export interface IconButtonProps extends IconButtonSemanticProps {
   edge?: IconButtonEdge;
-
-  disabled?: boolean;
 }

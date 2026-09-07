@@ -1,12 +1,5 @@
-import type { ButtonColor, ButtonSize } from './button';
-
-/** Fab 의 시맨틱 계약. Button 계열의 `color`·`size` 어휘를 그대로 쓴다. */
-export type FabShape = 'circular' | 'extended';
-
-export interface FabProps {
-  color?: ButtonColor;
-  size?: ButtonSize;
-  shape?: FabShape;
-
-  disabled?: boolean;
-}
+/**
+ * Fab의 시맨틱 계약은 `@berrypjh/ui-core`가 가집니다.
+ * 기존 import 경로와 이름을 유지하기 위한 재수출입니다.
+ */
+export type { FabSemanticProps as FabProps, FabShape } from '@berrypjh/ui-core';
