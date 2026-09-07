@@ -53,9 +53,14 @@ tokens/
    { name: 'acme', selector: '[data-theme="acme"]', sourceDirs: ['light', 'acme'] }
    ```
 3. `pnpm tokens:gen`
+4. `libs/react-native-ui/src/theme/ThemeProvider.tsx`의 `DEFAULT_TOKENS_BY_MODE`에 한 줄
 
 `themes.ts`가 단일 진실이라 CSS 블록·Web/RN 토큰 객체·Tailwind preset·namespace 진입점이
 함께 생성되고, `themes`를 읽는 화면(데모의 Theme 전환)에도 자동으로 나타난다.
+
+4번만 자동이 아니다 — RN은 CSS 캐스케이드가 없어 런타임에 토큰 객체를 골라야 하기 때문이다.
+빠뜨리면 `satisfies Record<ThemeName, RNTokens>`가 react-native-ui typecheck를 깨뜨린다
+(웹은 `pages.spec.tsx`가, 경로 어휘는 ui-core `parity.test.ts`가 같은 드리프트를 잡는다).
 
 ### 등록된 테마
 
