@@ -1,6 +1,6 @@
-import { cx } from '@berrypjh/ui-core';
-
 import type { ReactNode } from 'react';
+
+import { cx } from '../../utils';
 
 import { iconButtonClasses } from './IconButton.constants';
 import type { IconButtonAutoAnchorProps, IconButtonRenderableProps } from './IconButton.types';

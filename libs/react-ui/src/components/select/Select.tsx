@@ -2,22 +2,22 @@
 
 import { useEffect, useId, useMemo, useRef, useState } from 'react';
 
+import { assignRef, cx } from '../../utils';
+import { useFormControl } from '../form-control';
+
+import { selectClasses } from './Select.constants';
 import {
-  cx,
   getFirstEnabledIndex,
   getInitialHighlightedIndex,
   getLastEnabledIndex,
   getNextEnabledIndex,
+} from './Select.navigation';
+import {
   hasDisplayValue,
   isOptionSelected,
   isValueEqual,
   stringifyValue,
-} from '@berrypjh/ui-core';
-
-import { assignRef } from '../../utils';
-import { useFormControl } from '../form-control';
-
-import { selectClasses } from './Select.constants';
+} from './Select.selection';
 import type { SelectOpenCloseEvent, SelectOptionElement, SelectProps } from './Select.types';
 import {
   createSyntheticChangeEvent,

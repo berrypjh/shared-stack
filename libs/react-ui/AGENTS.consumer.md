@@ -82,24 +82,35 @@ npx @berrypjh/react-ui token color.primary
 
 ### 테마
 
-| 심볼               | 용도                                                      |
-| ------------------ | --------------------------------------------------------- |
-| `ThemeProvider`    | `<div data-theme="...">` 적용. `mode` prop (기본 `light`) |
-| `themes`           | `[{ name: 'light', ... }, ...]` namespace 배열            |
-| `ThemeName` (type) | `'light' \| 'dark' \| 'sepia'`                            |
+| 심볼               | 용도                                                                        |
+| ------------------ | --------------------------------------------------------------------------- |
+| `ThemeProvider`    | `<div data-theme="...">` 적용. `mode` prop (기본 `light`)                   |
+| `themes`           | `readonly ThemeInfo[]` — `{ name, selector }` 배열                          |
+| `ThemeName` (type) | 'light' \| 'dark' \| 'sepia' \| 'amber' \| 'ember' \| 'frost' \| 'midnight' |
 
 ### 토큰 / 유틸 (정적 객체)
 
-| 심볼            | 용도                                                                |
-| --------------- | ------------------------------------------------------------------- |
-| `Web`, `Native` | 정적 토큰 트리. `Web.Light.tokens.color.primary.pr500` 같은 값 참조 |
-| `cx`            | className merge — `cx('a', { b: cond }, c && 'd')`                  |
-| `getColor`      | 토큰 색 lookup (path 기반)                                          |
-| `createTheme`   | 런타임 theme 객체 생성                                              |
+| 심볼     | 용도                                                                |
+| -------- | ------------------------------------------------------------------- |
+| `Web`    | 정적 토큰 트리. `Web.Light.tokens.color.primary.pr500` 같은 값 참조 |
+| `themes` | 등록된 테마 목록 (`ThemeInfo[]`)                                    |
+| `cx`     | className merge — `cx('a', { b: cond }, c && 'd')`                  |
 
 ### Type alias (재export)
 
-`ColorToken`, `RadiusToken`, `SpacingToken`, `RNTokens`, `Theme<T>`, `ThemeDef`
+`ColorToken`, `RadiusToken`, `SpacingToken`, `ThemeInfo`, `ThemeName`
+
+### deprecated — 다음 major에서 제거
+
+RN 전용이라 web에서는 쓸 수 없다. `getColor`는 `Theme<RNTokens>`를 요구하고 `Native`는
+RN transform을 거친 숫자 트리다. web은 CSS 변수와 `Web` 네임스페이스를 쓴다.
+
+| 심볼                          | 대신 쓸 것                           |
+| ----------------------------- | ------------------------------------ |
+| `Native`                      | `Web`                                |
+| `getColor`                    | CSS 변수 (`var(--ds-...)`) 또는 SCSS |
+| `createTheme`                 | `<ThemeProvider mode>`               |
+| `Theme<T>`, `RNTokens` (type) | (web 대응 없음)                      |
 
 ## ⚠️ 정적 객체 vs 런타임 테마
 

@@ -1,13 +1,13 @@
 import type { ReactNode } from 'react';
 
 import type {
-  CoreTextFieldProps,
   InputLikeChangeEventHandler,
   InputLikeFocusEventHandler,
+  TextFieldProps as TextFieldSemanticProps,
 } from '../../types';
 import type { FormControlProps } from '../form-control';
 
-export type TextFieldOwnProps = CoreTextFieldProps & {
+export type TextFieldOwnProps = TextFieldSemanticProps & {
   autoComplete?: string;
   children?: ReactNode;
   defaultValue?: unknown;

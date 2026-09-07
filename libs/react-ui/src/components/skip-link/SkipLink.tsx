@@ -1,4 +1,4 @@
-import { cx } from '@berrypjh/ui-core';
+import { cx } from '../../utils';
 
 import { skipLinkClasses } from './SkipLink.constants';
 import type { SkipLinkProps } from './SkipLink.types';

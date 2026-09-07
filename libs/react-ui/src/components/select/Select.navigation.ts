@@ -1,3 +1,9 @@
+/**
+ * Select 의 키보드 이동 규칙 (옵션 인덱스 계산).
+ *
+ * `<Select>` 하나만 쓰는 도메인 로직이라 컴포넌트 폴더가 소유한다.
+ * 순수 제네릭이지만 "비활성 옵션을 건너뛰며 순환한다"는 것은 web 리스트박스의 의미론이다.
+ */
 type IsOptionDisabled<T> = (option: T) => boolean;
 type IsOptionSelected<T> = (option: T) => boolean;
 
@@ -38,16 +44,13 @@ export const getLastEnabledIndex = <T>(
 };
 
 /**
- * 현재 선택된 옵션의 인덱스를 찾습니다.
+ * 현재 선택된 옵션의 인덱스를 찾습니다. `getInitialHighlightedIndex` 전용이라 export 하지 않는다.
  *
  * @param options 옵션 배열
  * @param isSelected 선택 여부 판별 함수
  * @returns 선택된 옵션 인덱스, 없으면 -1
  */
-export const getSelectedIndex = <T>(
-  options: readonly T[],
-  isSelected: IsOptionSelected<T>,
-): number => {
+const getSelectedIndex = <T>(options: readonly T[], isSelected: IsOptionSelected<T>): number => {
   return options.findIndex((option) => isSelected(option));
 };
 

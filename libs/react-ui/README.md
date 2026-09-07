@@ -66,9 +66,9 @@ polymorphic입니다 — `<Button component="a" href="...">`처럼 다른 elemen
 ## 테마와 토큰
 
 - `ThemeProvider` — 라이트/다크/세피아 테마 컨텍스트
-- `themes`, `Web`, `Native` — 토큰 정적 객체
-- `cx` — className merge 유틸
-- `getColor` — 토큰 색 lookup
+- `themes`, `Web` — 토큰 정적 객체 (`Native`는 deprecated, RN 전용)
+- `cx` — className merge 유틸 (react-ui 구현)
+- `getColor`, `createTheme` — **deprecated**. RN 전용이다. web은 CSS 변수와 `<ThemeProvider mode>`를 쓴다
 
 타입은 `BoxProps`, `ButtonProps`, `ColorToken`, `RadiusToken`, `SpacingToken`, `Theme`, `ThemeName` 등 함께 export됩니다.
 

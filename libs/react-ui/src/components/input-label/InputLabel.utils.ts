@@ -1,5 +1,4 @@
-import { cx } from '@berrypjh/ui-core';
-
+import { cx } from '../../utils';
 import { FormControlContextValue } from '../form-control';
 
 import { inputLabelClasses } from './InputLabel.constants';

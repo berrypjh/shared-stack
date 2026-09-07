@@ -1,6 +1,5 @@
-import { cx, hasFormValue } from '@berrypjh/ui-core';
-
 import type { InputLikeElement } from '../../types';
+import { cx, hasFormValue } from '../../utils';
 import { assignRef } from '../../utils';
 import type { FormControlContextValue } from '../form-control';
 

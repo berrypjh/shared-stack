@@ -1,6 +1,6 @@
-import { cx } from '@berrypjh/ui-core';
-
 import type { KeyboardEventHandler, MouseEventHandler } from 'react';
+
+import { cx } from '../../utils';
 
 import { buttonBaseClasses } from './ButtonBase.constants';
 import type {

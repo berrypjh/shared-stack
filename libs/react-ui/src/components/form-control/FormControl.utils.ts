@@ -1,6 +1,6 @@
 import { Children, isValidElement, type ReactElement, type ReactNode } from 'react';
 
-import { cx, hasFormValue } from '@berrypjh/ui-core';
+import { cx, hasFormValue } from '../../utils';
 
 import { formControlClasses } from './FormControl.constants';
 import type {

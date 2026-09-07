@@ -1,8 +1,11 @@
 import type { ElementType, FocusEventHandler, ReactNode, Ref } from 'react';
 
-import type { CoreFormControlProps, PolymorphicComponentPropsWithRef } from '../../types';
+import type {
+  FormControlProps as FormControlSemanticProps,
+  PolymorphicComponentPropsWithRef,
+} from '../../types';
 
-export type FormControlOwnProps = CoreFormControlProps & {
+export type FormControlOwnProps = FormControlSemanticProps & {
   children?: ReactNode;
   className?: string;
   focused?: boolean;

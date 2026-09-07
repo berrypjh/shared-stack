@@ -1,12 +1,11 @@
-import type { IconButtonEdge, IconButtonProps as CoreIconButtonProps } from '@berrypjh/ui-core';
-
 import type { ElementType, ReactNode } from 'react';
 
+import type { IconButtonEdge, IconButtonProps as IconButtonSemanticProps } from '../../types';
 import type { ButtonBaseAutoAnchorProps, ButtonBaseProps } from '../button-base';
 
 export type { IconButtonEdge };
 
-export type IconButtonOwnProps = CoreIconButtonProps & {
+export type IconButtonOwnProps = IconButtonSemanticProps & {
   children?: ReactNode;
   className?: string;
   loading?: boolean | null;

@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 
-import { cx } from '@berrypjh/ui-core';
+import { cx } from '../../utils';
 
 import { popoverClasses } from './Popover.constants';
 import type { PopoverPanelProps } from './Popover.types';

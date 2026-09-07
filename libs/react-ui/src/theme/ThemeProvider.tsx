@@ -1,4 +1,4 @@
-import { cx } from '@berrypjh/ui-core';
+import { cx } from '../utils';
 
 import { themeProviderClasses } from './ThemeProvider.constants';
 import type { ThemeProviderProps } from './ThemeProvider.types';

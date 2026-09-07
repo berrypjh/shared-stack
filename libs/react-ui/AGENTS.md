@@ -3,10 +3,11 @@
 ## 절대 원칙
 
 - **웹 전용**: DOM API · CSS · React DOM이 전제. RN API 금지. 양 플랫폼이 쓸 코드는 ui-core로 올린다.
-- **ui-core 캡슐화**: react-ui 소비자는 `@berrypjh/ui-core`·`@berrypjh/design-tokens`를 모른다. 컴포넌트 prop은 ui-core contracts를 wrap해 노출 (`BoxProps` 등이 ui-core에서 와도 react-ui 자체 props로 한 번 감싼다).
+- **ui-core 캡슐화**: react-ui 소비자는 `@berrypjh/ui-core`·`@berrypjh/design-tokens`를 모른다. 컴포넌트 prop은 시맨틱 계약을 wrap해 노출한다.
+- **시맨틱 계약의 소유자**: 양 렌더러가 같은 불변식을 실제로 구현하는 계약만 ui-core에 있다 (현재 `BoxProps` 하나). web 전용 계약(button/field/fab/icon-button/menu-item)은 `src/types/`가 소유한다. RN 구현이 생기기 전에 ui-core로 올리지 않는다.
 - **accessibility는 필수**: keyboard/focus/aria 동작은 변경 시 보존. `describeConformance` 기반 conformance 테스트는 회귀 방지용.
 - **토큰만 사용**: 색·spacing·radius 하드코딩 금지. SCSS는 CSS 변수, JSX는 `getColor`/Tailwind class 활용.
-- **단일 사용처면 react-ui가 아님**: 양 플랫폼이 쓸 로직은 ui-core, 한 컴포넌트 안에서만 쓰면 그 컴포넌트 폴더로.
+- **단일 사용처면 `src/utils`가 아님**: 한 컴포넌트만 쓰면 그 컴포넌트 폴더로 (`Select.navigation.ts`·`Select.selection.ts`·`SearchField.utils.ts`가 그 예). 양 플랫폼이 **실제로** 같은 의미로 쓸 때만 ui-core.
 
 ## 파일 (요약)
 
@@ -26,11 +27,18 @@ src/
     ThemeProvider.tsx      <html data-theme=...> 적용
     ThemeProvider.types.ts
     index.ts
-  types/
-    field.ts               Field* 재export, InputLikeElement 등 DOM 한정 alias
+  types/                   web 시맨틱 계약 (ui-core가 아니라 여기가 소유)
+    button.ts              ButtonProps, ButtonVariant/Size/Color, ButtonLoadingPosition
+    fab.ts                 FabProps, FabShape
+    field.ts               FieldProps, FormControlProps, InputFieldProps, TextFieldProps + 4 enums, InputLike* alias
+    icon-button.ts         IconButtonProps, IconButtonEdge
+    menu-item.ts           MenuItemProps
     polymorphic.ts         PropsOf, PolymorphicComponentProps* (component prop 패턴)
     index.ts
-  utils/                   internal 전용 (form/input/react). src/index.ts에 노출 안 됨
+  utils/                   여러 컴포넌트가 함께 쓰는 web 헬퍼
+    cx.ts                  className 결합 (react-ui가 소유. src/index.ts로 공개)
+    form-value.ts          hasFormValue — InputBase·FormControl의 filled 판정
+    react/                 nodes, refs (internal)
 ```
 
 `*.test.tsx`는 같은 폴더, `*.stories.tsx`는 storybook용.
@@ -40,7 +48,7 @@ src/
 | 작업               | 수정 파일                                                                                          |
 | ------------------ | -------------------------------------------------------------------------------------------------- |
 | 새 컴포넌트        | `components/<name>/{<Name>.tsx, .types.ts, .scss, index.ts}` + `components/index.ts` + `styles.ts` |
-| 컴포넌트 prop 변경 | 해당 `<Name>.types.ts` (ui-core contracts 변경 필요 시 거기 먼저)                                  |
+| 컴포넌트 prop 변경 | 해당 `<Name>.types.ts` (시맨틱 계약 변경이면 `src/types/<name>.ts` 먼저)                           |
 | 새 SCSS 파일       | 해당 컴포넌트 폴더 + `src/styles.ts` import 추가                                                   |
 | 토큰 사용          | `getColor` (JSX) / Tailwind class / SCSS의 `var(--color-...)`                                      |
 | 테마 동작 변경     | `theme/ThemeProvider.tsx` (`data-theme` 적용 정책)                                                 |

@@ -1,12 +1,11 @@
-import type { FabProps as CoreFabProps, FabShape } from '@berrypjh/ui-core';
-
 import type { ElementType, ReactNode } from 'react';
 
+import type { FabProps as FabSemanticProps, FabShape } from '../../types';
 import type { ButtonBaseAutoAnchorProps, ButtonBaseProps } from '../button-base';
 
 export type { FabShape };
 
-export type FabOwnProps = CoreFabProps & {
+export type FabOwnProps = FabSemanticProps & {
   children?: ReactNode;
   className?: string;
   icon?: ReactNode;

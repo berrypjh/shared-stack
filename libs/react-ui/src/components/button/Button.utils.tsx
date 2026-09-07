@@ -1,6 +1,6 @@
-import { cx } from '@berrypjh/ui-core';
-
 import type { ReactNode } from 'react';
+
+import { cx } from '../../utils';
 
 import { buttonClasses } from './Button.constants';
 import type {

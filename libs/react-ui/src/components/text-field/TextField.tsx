@@ -2,8 +2,7 @@
 
 import { useId } from 'react';
 
-import { cx } from '@berrypjh/ui-core';
-
+import { cx } from '../../utils';
 import { FormControl } from '../form-control';
 import { FormHelperText } from '../form-helper-text';
 import { InputLabel } from '../input-label';
