@@ -12,8 +12,10 @@ import type { ChangeEventHandler, FocusEventHandler } from 'react';
  * `variant`·`size`·`color`·`disabled`·`error`·`fullWidth`·`autoFocus`·`readOnly`·`multiline` 은
  * RN 렌더러가 같은 불변식을 구현해서 ui-core 로 올라갔다. 아래 남은 것은 web 전용이다:
  *
- * - `required`: RN TextInput 에 HTML `required` 에 해당하는 폼 검증도 접근성 고지도 없고,
- *   그것을 담당할 FormControl/label 합성도 아직 없다.
+ * - `required`: RN 에도 FormControl·InputLabel·TextField 합성이 생겼지만 불변식이 다르다.
+ *   web 은 `<input required>` 로 제약 검증과 암묵 `aria-required` 를 얻고 라벨의 `*` 를
+ *   `aria-hidden` 으로 감춘다. RN 은 폼 검증이 없고 `AccessibilityState` 에 `required` 가 없어
+ *   TextInput 에 닿는 것이 없으며, `*` 가 라벨 텍스트의 일부로 읽힌다.
  * - `margin`·`hiddenLabel`: 웹 폼 밀도/레이블 규약이다.
  * - `InputLike*`: DOM 요소와 DOM 이벤트 타입이다.
  */
