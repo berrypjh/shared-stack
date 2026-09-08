@@ -11,7 +11,10 @@
  * - `fullWidth` — 뜻이 같고 수단만 다릅니다 (web `width: 100%`, RN `alignSelf: 'stretch'`)
  *
  * 승격하지 않은 것:
- * - `required` — RN에 폼 검증도 접근성 고지도 없습니다. react-ui가 가집니다
+ * - `required` — RN에도 구현이 **생겼지만 의미가 다릅니다**. web은 실제 `<input required>`를
+ *   달아 제약 검증과 암묵 `aria-required`를 얻고 라벨의 `*`는 `aria-hidden`으로 감춥니다.
+ *   RN은 FormControl 메타데이터 + 라벨의 시각 `*`뿐이고, 폼 검증도 없고 `AccessibilityState`에
+ *   `required` 필드도 없으며 `*`는 라벨 텍스트의 일부로 읽힙니다. react-ui가 가집니다
  * - `margin`·`hiddenLabel` — web 폼 밀도/레이블 규약
  * - `value`·`defaultValue` — 도메인이 다릅니다. RN TextInput은 문자열 편집기입니다
  *
