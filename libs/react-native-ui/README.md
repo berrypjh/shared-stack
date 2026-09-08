@@ -64,6 +64,13 @@ Input 계열은 RN `TextInput` 하나를 래퍼 `View` 안에 둡니다 — `val
 `error`는 시각 상태일 뿐입니다 — RN에는 오류 메시지를 입력에 연결할 수단이 아직 없습니다
 (`required`·FormControl·헬퍼 텍스트는 web 전용).
 
+`FormControl`은 `color`·`size`·`disabled`·`error`·`fullWidth`를 자손에게 내려보내고, 입력의
+focus/blur를 받아 라벨·테두리를 함께 움직입니다. **보이는 라벨은 입력의 접근 가능한 이름이
+아닙니다** — RN에 교차 플랫폼 연결 수단이 없어(`accessibilityLabelledBy`는 Android 전용)
+입력마다 `accessibilityLabel`을 따로 줘야 합니다. 헬퍼도 입력의 설명으로 자동 연결되지 않고,
+오류가 자동으로 읽히지도 않습니다. `required`는 시각 표시일 뿐입니다. `TextField`는 아직
+없습니다.
+
 > 정확한 심볼·prop 목록은 빌드 산출물 `dist/llm-catalog.json`이 정답입니다.
 
 ## 테마와 토큰

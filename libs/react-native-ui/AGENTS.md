@@ -20,6 +20,10 @@ src/
     button/{Button.tsx, Button.types.ts, Button.styles.ts, index.ts}
     fab/{Fab.tsx, Fab.types.ts, Fab.styles.ts, index.ts}
     icon-button/{IconButton.tsx, IconButton.types.ts, IconButton.styles.ts, index.ts}
+    form-control/             FormControl + 비공개 Context/hook
+      {FormControl.tsx, FormControl.types.ts, FormControlContext.ts, useFormControl.ts, index.ts}
+    form-helper-text/{FormHelperText.tsx, .types.ts, .styles.ts, index.ts}
+    input-label/{InputLabel.tsx, .types.ts, .styles.ts, index.ts}
     input-base/               내부 TextInput 동작 원시 — 배럴 없음(비공개)
       {InputBase.tsx, InputBase.types.ts, InputBase.styles.ts, InputBase.test.tsx}
     plain-input/{PlainInput.tsx, PlainInput.types.ts, index.ts}
@@ -40,7 +44,7 @@ src/
 
 **`components/<name>/index.ts` 는 "공개 컴포넌트" 표시다.** `tools/scripts/generate-consumer-catalog`
 의 테스트가 그 배럴의 export 가 전부 소비자 카탈로그에 실렸는지 검사한다. 그래서 내부
-`ButtonBase`·`InputBase` 에는 배럴이 없다 — 만드는 순간 공개 API 로 승격되거나 그 테스트가 깨진다.
+`ButtonBase`·`InputBase` 와 `FormControlContext`·`useFormControl` 에는 배럴이 없다 — 만드는 순간 공개 API 로 승격되거나 그 테스트가 깨진다.
 
 RN 컴포넌트 테스트는 jsdom이 아니라 **jest + RN preset**에서 돈다 (`jest.config.cjs`).
 `react-native`가 Flow 소스를 그대로 배포해서 vite/jsdom으로는 파싱되지 않기 때문이다.

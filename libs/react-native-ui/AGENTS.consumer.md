@@ -119,6 +119,49 @@ npx @berrypjh/react-native-ui token color.primary
   접근·조작된다. 장식을 눌러도 입력에 자동으로 포커스가 가지 않는다.
 - **`error` 는 시각 상태일 뿐이다.** 아래 "지금 없는 것" 을 볼 것.
 
+#### Form 구조 (FormControl · InputLabel · FormHelperText)
+
+`FormControl` 이 자손에게 내려보내는 값: `color`·`size`·`disabled`·`error`·`fullWidth`,
+그리고 입력이 알려준 `focused`. 해석 순서는 언제나 **명시 prop → FormControl → 기본값** 이다.
+
+- **focus 조정**: 입력의 `onFocus`/`onBlur` 가 FormControl 에 알리면 라벨과 테두리가 함께
+  움직인다. `focused` prop 을 주면 소비자가 통제하고, `disabled` 는 그보다도 우선이다.
+  web 처럼 루트에서 focus 를 버블링해 받지 않는다 — RN View 는 포커스를 버블링하지 않는다.
+- **상속하지 않는 것**: `readOnly`·`multiline`·`autoFocus`·값·키보드 prop·장식.
+  입력 하나하나의 관심사다.
+- **`variant` 는 상속되지 않는다** — Plain/Filled/Boxed 가 각자 고정한다.
+- **`margin`·`hiddenLabel` 은 없다** (web 폼 규약), **`filled`·`adornedStart` 도 없다**:
+  web 에서조차 읽는 곳이 없어 옮기지 않았다.
+- `InputLabel` 은 **정적**이다. 뜨거나(float) 줄어들지(shrink) 않고 애니메이션도 없다.
+- `FormHelperText` 에는 `size` 가 없다 — web 의 `--size-sm`/`--size-md` 가 시각적으로 완전히
+  같아서 아무 일도 하지 않을 prop 이기 때문이다.
+
+#### ⚠️ 라벨·헬퍼의 접근성 한계 (중요)
+
+**보이는 라벨은 입력의 접근 가능한 이름이 아니다.** RN 에는 교차 플랫폼 라벨 연결 수단이
+없다 — `accessibilityLabelledBy`/`aria-labelledby` 는 **Android 전용**이다. 그래서:
+
+```tsx
+<FormControl>
+  <InputLabel>이메일</InputLabel>
+  <BoxedInput accessibilityLabel="이메일" /> {/* 이름은 여기서 온다 */}
+  <FormHelperText>회사 주소만 됩니다</FormHelperText>
+</FormControl>
+```
+
+`InputLabel` 을 썼다고 `accessibilityLabel` 을 빼면 안 된다. 라벨은 입력의
+`accessibilityLabel` 을 건드리지 않는다. Android 한정으로 직접 연결하고 싶으면 라벨의
+`nativeID` 와 입력의 `accessibilityLabelledBy` 를 소비자가 짝지어야 한다.
+
+- **헬퍼는 입력의 설명이 아니다.** `aria-describedby` 에 해당하는 교차 플랫폼 수단이 없다.
+- **오류는 자동으로 읽히지 않는다.** 헬퍼는 live region 이 아니다 — 모든 헬퍼를 live region
+  으로 만들면 화면의 오류들이 서로를 덮어쓰고, `accessibilityLiveRegion` 은 Android 전용이라
+  교차 플랫폼 답도 아니다. 정책이 필요하면 `accessibilityLiveRegion`·`accessibilityRole` 을
+  직접 넘기거나 `AccessibilityInfo.announceForAccessibility` 를 쓴다(둘 다 그대로 전달된다).
+- **`required` 는 시각 표시일 뿐이다.** 별표는 라벨 텍스트의 일부로 읽히고, RN
+  `AccessibilityState` 에는 `required` 필드 자체가 없다. HTML 의 폼 검증도 없다.
+- `FormControl` 루트는 접근성 집합체가 아니다 — 라벨·입력·헬퍼는 각각 조작된다.
+
 #### 접근 가능한 이름
 
 | 컴포넌트               | 이름의 출처                                                 |
@@ -152,7 +195,9 @@ Input 계열에서 특히 없는 것: `inputProps`/`textareaProps` 분리, HTML 
   `aria-describedby` 에 해당하는 수단이 없고, FormControl·헬퍼 텍스트·레이블 합성 컴포넌트가
   아직 없다. **오류 사유를 스크린 리더가 읽게 하려면 지금은 소비자가 별도 `Text` 로 안내해야
   한다.** 입력과 자동으로 연결되지는 않는다.
-- **`FormControl`·`InputLabel`·`FormHelperText`·`TextField`**: web 에만 있다. RN 에는 없다.
+- **`TextField`**: 아직 없다. web 에서는 TextField 가 `htmlFor`·`aria-describedby` 로 라벨·
+  헬퍼를 입력에 연결하는데, RN 에는 그 수단이 없어서 합성 컴포넌트가 무엇을 보장할 수 있는지
+  부터 정해야 한다. 지금은 `FormControl` 로 직접 조립한다.
 
 ### 테마
 
@@ -182,6 +227,9 @@ Input 계열에서 특히 없는 것: `inputProps`/`textareaProps` 분리, HTML 
 
 Input 계열 prop 타입: `PlainInputProps`, `FilledInputProps`, `BoxedInputProps`,
 `InputState`, `InputContainerStyle`(`containerStyle` 콜백이 받는 상태/스타일)
+
+Form 구조 prop 타입: `FormControlProps`, `InputLabelProps`, `FormHelperTextProps`.
+`FormControlContext`·`useFormControl` 은 **비공개**다 — 선언에도 카탈로그에도 없다.
 
 ### deprecated — 다음 major에서 제거
 

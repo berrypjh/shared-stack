@@ -166,7 +166,7 @@ export const resolveInputBaseStyles = ({
       minHeight: Math.max(fieldHeight, tokens.spacing['4xl']),
       ...chrome,
     },
-    // error·disabled는 소비자가 지울 수 없는 피드백입니다. focus는 평범한 상태라 제외합니다.
+    // error·disabled는 소비자가 지울 수 없는 피드백이다. focus는 평범한 상태라 제외한다.
     containerStateCritical: chrome && (error || disabled) ? chrome : null,
     input: {
       // 가로 여백은 래퍼가 가집니다. TextInput은 남은 폭만 채웁니다.
