@@ -68,19 +68,19 @@ npx @berrypjh/react-native-ui token color.primary
 
 정확한 컴포넌트 목록과 prop은 `llm-catalog.json`의 `symbols`에서 읽는다 (`kind: "component"`).
 
-| 컴포넌트         | 요약                                                                  |
-| ---------------- | --------------------------------------------------------------------- |
-| `Box`            | 토큰 기반 레이아웃 (padding·margin·background·radius)                 |
-| `Button`         | 라벨 버튼. `variant`·`size`·`color`·`fullWidth`·`loading`·아이콘 슬롯 |
-| `Fab`            | 플로팅 액션 버튼. `shape="circular" \| "extended"`                    |
-| `IconButton`     | 아이콘 전용 버튼. `accessibilityLabel` **필수**                       |
-| `PlainInput`     | 밑줄만 있는 텍스트 필드. `accessibilityLabel` **필수**                |
-| `FilledInput`    | 채워진 표면 + 사방 테두리. `accessibilityLabel` **필수**              |
-| `BoxedInput`     | 윤곽선만 있는 필드(표면 투명). `accessibilityLabel` **필수**          |
-| `TextField`      | 라벨·입력·헬퍼 합성. 문자열 `label` 이 입력의 이름이 된다             |
-| `SearchField`    | 검색 입력 + 지우기 + 제안 목록. `accessibilityLabel` **필수**         |
-| `Select`         | 데이터 `options` 기반 단일 선택. `accessibilityLabel` **필수**        |
-| `SegmentControl` | 상호배타 선택. **controlled 전용**                                    |
+| 컴포넌트         | 요약                                                                          |
+| ---------------- | ----------------------------------------------------------------------------- |
+| `Box`            | 토큰 기반 레이아웃 (padding·margin·background·radius). `ref` 는 호스트 `View` |
+| `Button`         | 라벨 버튼. `variant`·`size`·`color`·`fullWidth`·`loading`·아이콘 슬롯         |
+| `Fab`            | 플로팅 액션 버튼. `shape="circular" \| "extended"`                            |
+| `IconButton`     | 아이콘 전용 버튼. `accessibilityLabel` **필수**                               |
+| `PlainInput`     | 밑줄만 있는 텍스트 필드. `accessibilityLabel` **필수**                        |
+| `FilledInput`    | 채워진 표면 + 사방 테두리. `accessibilityLabel` **필수**                      |
+| `BoxedInput`     | 윤곽선만 있는 필드(표면 투명). `accessibilityLabel` **필수**                  |
+| `TextField`      | 라벨·입력·헬퍼 합성. 문자열 `label` 이 입력의 이름이 된다                     |
+| `SearchField`    | 검색 입력 + 지우기 + 제안 목록. `accessibilityLabel` **필수**                 |
+| `Select`         | 데이터 `options` 기반 단일 선택. `accessibilityLabel` **필수**                |
+| `SegmentControl` | 상호배타 선택. **controlled 전용**                                            |
 
 #### Button 계열 공통
 
@@ -309,6 +309,14 @@ Input 계열에서 특히 없는 것: `inputProps`/`textareaProps` 분리, HTML 
 - **`multiple` Select**: 없다. 단일 선택뿐이다.
 - **`MenuItem`**: 없다. `Select` 는 `options` 데이터를 받는다.
 - **하드웨어 키보드 목록 이동**: `SearchField`·`Select` 모두 없다.
+- **`SkipLink`**: 없고, 만들 계획도 없다. web 의 SkipLink 는 `<a href="#id">` **문서 fragment
+  이동** + 포커스 전까지 숨기는 CSS 로 만들어지는데, RN 에는 fragment 도 landmark 도 없다.
+  `nativeID` 는 이동 대상이 아니다 — RN 문서가 "네이티브 코드에서 뷰를 참조하는 용도"라고
+  명시한다. RN 에서 반복 구간을 건너뛰는 **네이티브 수단은 제목 시맨틱**이다:
+  구역 제목에 `accessibilityRole="header"` 를 주면 VoiceOver 로터·TalkBack 제목 이동으로
+  건너뛸 수 있다. 화면 단위 포커스 이동이 필요하면 그것은 앱/라우터의 관심사이고,
+  `AccessibilityInfo.sendAccessibilityEvent(ref, 'focus')` 로 앱이 직접 한다 —
+  **스크린 리더 포커스일 뿐 하드웨어 키보드 포커스가 아니다.**
 
 ### 테마
 
