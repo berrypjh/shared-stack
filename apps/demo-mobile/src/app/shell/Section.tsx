@@ -23,7 +23,14 @@ export const Section = ({
 
   return (
     <View style={[styles.card, { backgroundColor: p.card, borderColor: p.border }]}>
-      <Text style={[styles.title, { color: p.title }]}>{title}</Text>
+      {/*
+        RN 이 반복 구간을 건너뛰는 네이티브 수단은 **제목 시맨틱**입니다 — VoiceOver 로터의
+        "제목", TalkBack 의 제목 이동이 이 역할을 읽습니다. web 의 SkipLink(`<a href="#id">`)
+        는 문서 fragment 이동이라 RN 에 대응물이 없고, 그 대신 여기가 진입점입니다.
+      */}
+      <Text accessibilityRole="header" style={[styles.title, { color: p.title }]}>
+        {title}
+      </Text>
       {description ? (
         <Text style={[styles.description, { color: p.body }]}>{description}</Text>
       ) : null}

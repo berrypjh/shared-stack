@@ -28,7 +28,9 @@ const Body = ({ mode }: { mode: ThemeName; onChange: (m: ThemeName) => void }) =
   return (
     <>
       <View style={[styles.header, { backgroundColor: p.card, borderBottomColor: p.border }]}>
-        <Text style={[styles.title, { color: p.title }]}>React Native UI</Text>
+        <Text accessibilityRole="header" style={[styles.title, { color: p.title }]}>
+          React Native UI
+        </Text>
         <Text style={[styles.subtitle, { color: p.body }]}>
           @berrypjh/react-native-ui · 토큰과 컴포넌트 데모
         </Text>
