@@ -1,18 +1,12 @@
 import { StyleSheet } from 'react-native';
 
 /**
- * 여러 섹션이 함께 쓰는 스타일만 둡니다.
- * 한 섹션에서만 쓰는 스타일은 그 섹션 파일이 가집니다.
+ * 여러 섹션이 함께 쓰는 **레이아웃**만 둡니다.
+ * 색은 `palette.ts` 가 단독으로 가집니다 — 여기에 color 를 넣지 마세요.
  */
 export const demoStyles = StyleSheet.create({
-  sectionLabel: {
-    fontSize: 11,
-    fontWeight: '600',
-    textTransform: 'uppercase',
-    letterSpacing: 0.6,
-    marginTop: 8,
-    marginBottom: 6,
-    opacity: 0.6,
-  },
-  tokenLabel: { fontSize: 13 },
+  /** 예시를 세로로 쌓을 때. */
+  stack: { gap: 12 },
+  /** 예시를 가로로 흘릴 때. */
+  row: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 10 },
 });

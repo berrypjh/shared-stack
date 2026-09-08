@@ -1,14 +1,10 @@
 import { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'react-native';
 
-import {
-  BoxedInput,
-  FilledInput,
-  IconButton,
-  PlainInput,
-  useTheme,
-} from '@berrypjh/react-native-ui';
+import { BoxedInput, FilledInput, IconButton, PlainInput } from '@berrypjh/react-native-ui';
 
+import { useDemoPalette } from '../shell/palette';
+import { Caption, Label } from '../shell/Section';
 import { demoStyles } from '../shell/styles';
 
 /**
@@ -18,21 +14,21 @@ import { demoStyles } from '../shell/styles';
  * `defaultValue`. 레이블은 `accessibilityLabel`로 줍니다 (placeholder는 이름이 되지 못합니다).
  */
 export const InputFamilySection = () => {
-  const theme = useTheme();
-  const fg = theme.tokens.color.text.default;
+  const p = useDemoPalette();
   const [email, setEmail] = useState('');
   const [memo, setMemo] = useState('');
+  const [search, setSearch] = useState('');
 
   return (
     <View>
-      <Text style={demoStyles.sectionLabel}>PlainInput — 밑줄만. size sm / md</Text>
-      <View style={styles.demoStack}>
-        <PlainInput accessibilityLabel="이름 (small)" placeholder="이름" size="sm" />
-        <PlainInput accessibilityLabel="이름 (medium)" placeholder="이름" size="md" />
+      <Label>PlainInput — 밑줄만</Label>
+      <View style={demoStyles.stack}>
+        <PlainInput accessibilityLabel="이름 (small)" placeholder="이름 · size sm" size="sm" />
+        <PlainInput accessibilityLabel="이름 (medium)" placeholder="이름 · size md" size="md" />
       </View>
 
-      <Text style={demoStyles.sectionLabel}>FilledInput — controlled value, color, disabled</Text>
-      <View style={styles.demoStack}>
+      <Label>FilledInput — 채워진 표면</Label>
+      <View style={demoStyles.stack}>
         <FilledInput
           accessibilityLabel="이메일"
           placeholder="you@example.com"
@@ -41,22 +37,28 @@ export const InputFamilySection = () => {
           keyboardType="email-address"
           autoCapitalize="none"
         />
-        <FilledInput accessibilityLabel="보조 색 필드" placeholder="secondary" color="secondary" />
+        <FilledInput
+          accessibilityLabel="보조 색 필드"
+          placeholder="focus 하면 secondary 색"
+          color="secondary"
+        />
         <FilledInput accessibilityLabel="비활성 필드" placeholder="disabled" disabled />
       </View>
-      <Text style={[demoStyles.tokenLabel, { color: fg }]}>
-        controlled 값: {email || '(비어 있음)'}
-      </Text>
+      <Caption>controlled 값: {email || '(비어 있음)'}</Caption>
 
-      <Text style={demoStyles.sectionLabel}>BoxedInput — defaultValue, readOnly, error</Text>
-      <View style={styles.demoStack}>
-        <BoxedInput accessibilityLabel="닉네임 (uncontrolled)" defaultValue="berry" />
+      <Label>BoxedInput — 윤곽선만</Label>
+      <View style={demoStyles.stack}>
+        <BoxedInput accessibilityLabel="닉네임" defaultValue="berry" />
         <BoxedInput accessibilityLabel="읽기 전용 사용자명" defaultValue="berrypjh" readOnly />
         <BoxedInput accessibilityLabel="쿠폰 코드" placeholder="코드를 확인해 주세요" error />
       </View>
+      <Caption>
+        위에서부터 uncontrolled(defaultValue) · readOnly · error 입니다. readOnly 는 편집만 막고
+        비활성으로 알리지 않습니다.
+      </Caption>
 
-      <Text style={demoStyles.sectionLabel}>multiline · 장식(adornment)</Text>
-      <View style={styles.demoStack}>
+      <Label>multiline · 장식</Label>
+      <View style={demoStyles.stack}>
         <BoxedInput
           accessibilityLabel="메모"
           placeholder="여러 줄 입력"
@@ -67,26 +69,33 @@ export const InputFamilySection = () => {
         <FilledInput
           accessibilityLabel="검색어"
           placeholder="검색"
+          value={search}
+          onChangeText={setSearch}
           startAdornment={
-            // 장식이라 접근성 트리에서 감춥니다.
-            <Text accessibilityElementsHidden importantForAccessibility="no" style={{ color: fg }}>
+            // 장식이라 접근성 트리에서 감춥니다 — 이름은 accessibilityLabel 이 줍니다.
+            <Text
+              accessibilityElementsHidden
+              importantForAccessibility="no"
+              style={{ color: p.muted }}
+            >
               ⌕
             </Text>
           }
           endAdornment={
-            <IconButton
-              accessibilityLabel="검색어 지우기"
-              size="sm"
-              icon={<Text style={{ color: fg }}>×</Text>}
-              onPress={() => undefined}
-            />
+            search ? (
+              <IconButton
+                accessibilityLabel="검색어 지우기"
+                size="sm"
+                icon={({ color }) => <Text style={{ color }}>✕</Text>}
+                onPress={() => setSearch('')}
+              />
+            ) : undefined
           }
         />
       </View>
+      <Caption>
+        장식은 받은 노드를 그대로 렌더합니다. 상호작용 가능한 장식은 입력과 별개로 눌리고 읽힙니다.
+      </Caption>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  demoStack: { gap: 12, marginBottom: 8 },
-});
