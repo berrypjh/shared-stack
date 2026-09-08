@@ -179,3 +179,114 @@ describe('@berrypjh/react-native-ui 공개 Button 계열', () => {
     expect(Object.keys(symbols).filter((s) => /ButtonBase/.test(s))).toEqual([]);
   });
 });
+
+/**
+ * RN Input 계열의 공개 표면 회귀 게이트.
+ *
+ * Button 계열과 같은 규칙입니다 — 소스가 아니라 빌드된 선언과 소비자 카탈로그를 봅니다.
+ */
+describe('@berrypjh/react-native-ui 공개 Input 계열', () => {
+  const INPUTS = ['PlainInput', 'FilledInput', 'BoxedInput'];
+
+  const declaration = () =>
+    fs.readFile(path.join(REPO_ROOT, 'libs/react-native-ui/dist/index.d.ts'), 'utf8');
+  const catalog = async () =>
+    JSON.parse(
+      await fs.readFile(path.join(REPO_ROOT, 'libs/react-native-ui/dist/llm-catalog.json'), 'utf8'),
+    ) as { platform: string; symbols: Record<string, { kind: string; props?: object }> };
+  const declarationLines = async () =>
+    (await declaration()).split('\n').filter((l) => /^(export |declare )/.test(l));
+
+  it.each(INPUTS)('%s 가 선언에 공개된다', async (name) => {
+    expect(await declaration()).toMatch(new RegExp(`^export declare const ${name}:`, 'm'));
+  });
+
+  it('내부 InputBase 는 공개되지 않는다', async () => {
+    // 세 variant 가 공유하는 TextInput 동작 원시일 뿐 소비자 API 가 아닙니다.
+    expect((await declarationLines()).filter((l) => /\bInputBase\b/.test(l))).toEqual([]);
+  });
+
+  it('web input 아키텍처가 RN 선언에 새지 않는다', async () => {
+    const text = await declaration();
+
+    for (const banned of [
+      'HTMLInputElement',
+      'HTMLTextAreaElement',
+      'HTMLSelectElement',
+      'inputProps',
+      'textareaProps',
+      'InputLikeElement',
+    ]) {
+      expect(text).not.toContain(banned);
+    }
+  });
+
+  it.each(INPUTS)('%s 가 카탈로그에서 발견된다', async (name) => {
+    const { symbols } = await catalog();
+
+    expect(symbols[name]?.kind).toBe('component');
+    expect(Object.keys(symbols[name]?.props ?? {}).length).toBeGreaterThan(0);
+  });
+
+  it('카탈로그에 내부 InputBase 가 없다', async () => {
+    const { symbols } = await catalog();
+
+    expect(Object.keys(symbols).filter((s) => /^InputBase/.test(s))).toEqual([]);
+  });
+
+  it.each(INPUTS)('%s 의 카탈로그가 시맨틱 prop 을 보여준다', async (name) => {
+    const { symbols } = await catalog();
+    const props = Object.keys(symbols[name]?.props ?? {});
+
+    // 카탈로그는 **디자인 시스템 prop** 을 싣습니다. 상속된 렌더러 prop(RN `value`·
+    // `onChangeText`, Button 의 `onPress`)은 싣지 않는 것이 기존 규약입니다 — 네이티브 표면은
+    // AGENTS.consumer.md 가 설명합니다.
+    expect(props).toEqual(
+      expect.arrayContaining([
+        'accessibilityLabel',
+        'color',
+        'disabled',
+        'error',
+        'fullWidth',
+        'multiline',
+        'readOnly',
+        'size',
+      ]),
+    );
+    // web 전용 추상이 카탈로그로 새면 소비자가 그것을 쓰려 합니다.
+    expect(props).not.toEqual(
+      expect.arrayContaining(['inputProps', 'textareaProps', 'type', 'variant']),
+    );
+  });
+});
+
+/**
+ * 소비자가 받는 선언이 private 워크스페이스 패키지를 요구하지 않아야 합니다.
+ *
+ * `dts-bundle-generator` 가 ui-core/design-tokens 타입을 inline 하는 것이 전제입니다 —
+ * 남아 있으면 소비자가 설치할 수 없는 패키지를 import 하게 됩니다.
+ */
+describe('게시되는 선언은 private 패키지를 요구하지 않는다', () => {
+  it.each([
+    ['@berrypjh/react-native-ui', 'libs/react-native-ui/dist/index.d.ts'],
+    ['@berrypjh/react-ui', 'libs/react-ui/dist/types/index.d.ts'],
+  ])('%s 선언에 private import 가 없다', async (_id, relative) => {
+    const text = await fs.readFile(path.join(REPO_ROOT, relative), 'utf8');
+    const offenders = text
+      .split('\n')
+      .filter((line) => /^\s*(import|export)\b/.test(line))
+      .filter((line) => /@berrypjh\/(ui-core|design-tokens)/.test(line));
+
+    expect(offenders).toEqual([]);
+  });
+
+  it.each([
+    ['@berrypjh/react-native-ui', 'libs/react-native-ui/dist/index.d.ts'],
+    ['@berrypjh/react-ui', 'libs/react-ui/dist/types/index.d.ts'],
+  ])('%s 선언에 로컬 절대 경로가 없다', async (_id, relative) => {
+    const text = await fs.readFile(path.join(REPO_ROOT, relative), 'utf8');
+
+    expect(text).not.toMatch(/\/(Users|home)\//);
+    expect(text).not.toContain('workspace:');
+  });
+});
