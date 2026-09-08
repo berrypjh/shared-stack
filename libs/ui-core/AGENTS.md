@@ -5,7 +5,7 @@
 `react-ui`(web)와 `react-native-ui`(RN)가 **같은 디자인 결정을 공유**하되 렌더러 코드는 섞지 않기 위한
 경계다. 두 가지만 한다.
 
-1. **공유 계약** — 두 렌더러가 같은 불변식으로 구현하는 prop 계약 (지금은 `BoxProps` 하나).
+1. **공유 계약** — 두 렌더러가 같은 불변식으로 구현하는 prop 계약 (`box`·`button`·`fab`·`icon-button`·`field`).
 2. **토큰 façade** — design-tokens 산출물을 타입과 함께 통과시킨다. 생성은 하지 않는다.
 
 `private: true`라서 소비자는 이 패키지를 설치하지도, import하지도 않는다. 렌더러 패키지가
@@ -14,9 +14,9 @@
 ## 절대 원칙
 
 - **플랫폼 독립**: web/native 렌더링 가정·DOM API·RN-only API 금지. `src/boundary.test.ts`가 소스를 훑어 강제한다.
-- **"쓸 수 있다"가 아니라 "쓰고 있다"**: 두 렌더러가 같은 불변식을 **실제로 구현**해야 계약이 ui-core에 들어온다. 이름이 같다·UI가 비슷하다·순수 TypeScript다·언젠가 재사용한다는 근거가 아니다. button/field/fab/icon-button/menu-item 계약이 `react-ui/src/types`로 간 이유가 그것이다.
+- **"쓸 수 있다"가 아니라 "쓰고 있다"**: 두 렌더러가 같은 불변식을 **실제로 구현**해야 계약이 ui-core에 들어온다. 이름이 같다·UI가 비슷하다·순수 TypeScript다·언젠가 재사용한다는 근거가 아니다. RN 구현이 생긴 뒤에야 button·fab·icon-button·field 계약이 올라왔고, RN 구현이 없는 `menu-item`은 아직 `react-ui/src/types`에 남아 있다. 같은 계약 안에서도 한쪽에만 있는 키는 승격하지 않는다 — `IconButtonSemanticProps`의 `edge`·`loading`, `FieldSemanticProps`의 `required`·`margin`·`hiddenLabel`이 그 예다.
 - **design-tokens 캡슐화**: ui-core가 design-tokens를 wrap. 다운스트림(`react-ui`/`react-native-ui`/apps)은 **design-tokens를 직접 import하지 않는다**. `Web`, `Native`, `themes`, `/tailwind`, `/css`는 ui-core에서 패스스루.
-- **공개 surface는 안정**: `getColor`, `createTheme`, `BoxProps`, 토큰 타입·패스스루는 다운스트림이 의존. 변경 시 reverse-search로 영향 확인 필수.
+- **공개 surface는 안정**: `getColor`, `createTheme`, `contracts/*`의 계약 타입, 토큰 타입·패스스루는 다운스트림이 의존. 변경 시 reverse-search로 영향 확인 필수.
 - **단일 사용처면 ui-core가 아님**: 한 컴포넌트만 쓰면 그 컴포넌트 폴더로 옮겨라.
 - **순수함은 소유 근거가 아니다**: `cx`는 순수 함수지만 className은 web 렌더링 개념이다. "어디서든 돌아간다"와 "양 플랫폼이 같은 의미로 쓴다"는 다른 질문이다.
 
@@ -28,9 +28,13 @@ src/
   tailwind.ts       design-tokens/tailwind 패스스루
   boundary.test.ts  렌더러 타입·패키지가 src에 들어왔는지 훑는 검사
   packageSurface.test.ts  exports map ↔ dist 산출물 대조 (subpath 해석·side effect·복사 여부)
-  contracts/
-    box.ts          BoxProps, BoxSpacingValue, BoxRadiusValue (양 렌더러가 구현하는 유일한 계약)
-    box.test.ts     계약의 타입 수준 검증 (@ts-expect-error)
+  contracts/       양 렌더러가 같은 불변식으로 구현하는 계약만. 각 `*.test.ts`는 타입 수준 검증(@ts-expect-error)
+    box.ts          BoxProps, BoxSpacingValue, BoxRadiusValue
+    button.ts       ButtonVariant/Size/Color/LoadingPosition, ButtonSemanticProps
+    fab.ts          FabShape, FabSemanticProps
+    icon-button.ts  IconButtonSemanticProps (size·color·disabled 뿐 — edge·loading은 승격 안 함)
+    field.ts        FieldVariant/Size/Color, FieldSemanticProps, InputFieldSemanticProps
+                    (required·margin·hiddenLabel은 RN 구현이 없어 react-ui가 가진다)
     index.ts
   tokens/
     types.ts        ColorToken, SpacingToken, RadiusToken, RNTokens, Theme<T>, ThemeName

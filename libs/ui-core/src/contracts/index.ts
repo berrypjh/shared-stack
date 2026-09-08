@@ -14,4 +14,11 @@ export type {
   ButtonVariant,
 } from './button';
 export type { FabSemanticProps, FabShape } from './fab';
+export type {
+  FieldColor,
+  FieldSemanticProps,
+  FieldSize,
+  FieldVariant,
+  InputFieldSemanticProps,
+} from './field';
 export type { IconButtonSemanticProps } from './icon-button';
