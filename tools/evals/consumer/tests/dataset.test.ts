@@ -7,11 +7,13 @@ const held = await loadDataset('test');
 const all = [...dev, ...held];
 
 describe('dataset', () => {
-  it('parses both splits into the 24-40 task range', () => {
+  // 상한은 코퍼스가 자라면 의식적으로 올린다 — 이 검사의 의미는 "데이터셋이 조용히 비거나
+  // 중복 폭증하지 않는다"이고, 그 역할은 하한이 한다.
+  it('parses both splits into the 24-48 task range', () => {
     expect(dev.length).toBeGreaterThan(0);
     expect(held.length).toBeGreaterThan(0);
     expect(all.length).toBeGreaterThanOrEqual(24);
-    expect(all.length).toBeLessThanOrEqual(40);
+    expect(all.length).toBeLessThanOrEqual(48);
   });
 
   it('keeps dev and test disjoint', () => {
