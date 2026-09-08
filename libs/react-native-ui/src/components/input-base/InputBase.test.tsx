@@ -502,3 +502,60 @@ export const rejectsInvalidValue = () => [
   // @ts-expect-error editable은 disabled·readOnly에서 파생됩니다.
   <InputBase accessibilityLabel="probe" editable={false} />,
 ];
+
+/**
+ * `radius`는 내부 seam입니다. SearchField가 rounded 필드를 그리려면 필요하고,
+ * `containerStyle`로는 불가능합니다 — error·disabled일 때 state-critical chrome이
+ * radius를 포함해 다시 얹혀 소비자 값을 덮기 때문입니다.
+ */
+describe('radius seam', () => {
+  it('상자형 variant의 기본 radius를 대신한다', async () => {
+    await renderWithTheme(
+      <InputBase accessibilityLabel="probe" variant="boxed" radius={T.radius.rounded} />,
+    );
+
+    expect(getWrapper()).toHaveStyle({ borderRadius: T.radius.rounded });
+  });
+
+  it('생략하면 canonical 기본값을 그대로 쓴다', async () => {
+    await renderWithTheme(<InputBase accessibilityLabel="probe" variant="boxed" />);
+
+    expect(getWrapper()).toHaveStyle({ borderRadius: T.radius.md });
+  });
+
+  it('error일 때도 유지된다 — containerStyle이 못 하는 지점이다', async () => {
+    await renderWithTheme(
+      <InputBase
+        accessibilityLabel="probe"
+        variant="boxed"
+        error
+        radius={T.radius.rounded}
+        containerStyle={{ borderRadius: 1 }}
+      />,
+    );
+
+    expect(getWrapper()).toHaveStyle({ borderRadius: T.radius.rounded });
+  });
+
+  it('disabled일 때도 유지된다', async () => {
+    await renderWithTheme(
+      <InputBase
+        accessibilityLabel="probe"
+        variant="filled"
+        disabled
+        radius={T.radius.rounded}
+        containerStyle={{ borderRadius: 1 }}
+      />,
+    );
+
+    expect(getWrapper()).toHaveStyle({ borderRadius: T.radius.rounded });
+  });
+
+  it('plain은 밑줄이라 radius를 받지 않는다', async () => {
+    await renderWithTheme(
+      <InputBase accessibilityLabel="probe" variant="plain" radius={T.radius.rounded} />,
+    );
+
+    expect(getWrapper()).toHaveStyle({ borderRadius: 0 });
+  });
+});

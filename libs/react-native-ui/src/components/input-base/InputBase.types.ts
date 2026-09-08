@@ -39,6 +39,14 @@ export type InputBaseProps = InputFieldSemanticProps &
     startAdornment?: ReactNode;
     endAdornment?: ReactNode;
 
+    /**
+     * variant 기본 radius를 대신하는 내부 seam이다 — 공개 prop이 아니다.
+     *
+     * `containerStyle`로는 안 된다: error·disabled일 때 state-critical chrome이 radius까지
+     * 다시 얹어 소비자 값을 덮는다. plain은 밑줄이라 무시된다.
+     */
+    radius?: number;
+
     /** 래퍼 View의 style. 상태에 따라 달라지면 콜백을 쓴다. */
     containerStyle?: InputContainerStyle;
 

@@ -29,7 +29,15 @@ src/
     plain-input/{PlainInput.tsx, PlainInput.types.ts, index.ts}
     filled-input/{FilledInput.tsx, FilledInput.types.ts, index.ts}
     boxed-input/{BoxedInput.tsx, BoxedInput.types.ts, index.ts}
-    index.ts                  공개 배럴 (box·button·fab·icon-button·plain/filled/boxed-input)
+    text-field/               합성 계층 — 상태를 갖지 않는다
+      {TextField.tsx, TextField.types.ts, index.ts}
+    search-field/             검색 입력 + 지우기 + 제안 목록
+      {SearchField.tsx, .types.ts, .styles.ts, .suggestions.ts, index.ts}
+    select/                   Pressable 트리거 + 코어 Modal
+      {Select.tsx, .types.ts, .styles.ts, .selection.ts, index.ts}
+    segment-control/          controlled 전용 상호배타 선택
+      {SegmentControl.tsx, .types.ts, .styles.ts, index.ts}
+    index.ts                  공개 배럴 (위 컴포넌트 전부)
   utils/
     cx.ts                     deprecated — 공개 API였던 className 유틸. 다음 major에서 제거
     index.ts
@@ -51,17 +59,19 @@ RN 컴포넌트 테스트는 jsdom이 아니라 **jest + RN preset**에서 돈�
 
 ## 작업 매트릭스
 
-| 작업                    | 수정 파일                                                                             |
-| ----------------------- | ------------------------------------------------------------------------------------- |
-| 새 공개 컴포넌트        | `components/<name>/{<Name>.tsx, index.ts}` + `components/index.ts` (+ 카탈로그 등재)  |
-| 새 내부 원시            | `components/<name>/` 에 배럴 **없이** 둔다 (ButtonBase 참고)                          |
-| Button 계열 동작 변경   | `button-base/ButtonBase.tsx` (누름·접근성·터치 타깃 공통) 또는 각 `*.styles.ts`       |
-| Input 계열 동작 변경    | `input-base/InputBase.tsx` (편집·포커스·접근성·장식 공통)                             |
-| Input variant 시각 변경 | `input-base/InputBase.styles.ts` 의 `chromeSpec`/`surfaceFor` — variant 분기가 한 곳  |
-| 컴포넌트 prop 변경      | 해당 `<Name>.tsx`의 props 정의 (ui-core contracts 변경 필요 시 거기 먼저)             |
-| 토큰 사용               | `getColor(theme, 'path')` (JSX) — `useTheme()` 통해 theme 획득                        |
-| 테마 동작 변경          | `theme/ThemeProvider.tsx` (`createTheme(...)` 정책)                                   |
-| design-tokens 테마 추가 | `theme/ThemeProvider.tsx`의 `DEFAULT_TOKENS_BY_MODE`에 한 줄 (누락 시 typecheck 실패) |
+| 작업                    | 수정 파일                                                                              |
+| ----------------------- | -------------------------------------------------------------------------------------- |
+| 새 공개 컴포넌트        | `components/<name>/{<Name>.tsx, index.ts}` + `components/index.ts` (+ 카탈로그 등재)   |
+| 새 내부 원시            | `components/<name>/` 에 배럴 **없이** 둔다 (ButtonBase 참고)                           |
+| Button 계열 동작 변경   | `button-base/ButtonBase.tsx` (누름·접근성·터치 타깃 공통) 또는 각 `*.styles.ts`        |
+| Input 계열 동작 변경    | `input-base/InputBase.tsx` (편집·포커스·접근성·장식 공통)                              |
+| Input variant 시각 변경 | `input-base/InputBase.styles.ts` 의 `chromeSpec`/`surfaceFor` — variant 분기가 한 곳   |
+| 합성 컴포넌트 동작 변경 | `text-field/TextField.tsx` (상태 없음 — 소유권은 FormControl·Input 에 있다)            |
+| 제안/선택 목록 동작     | `search-field/SearchField.tsx` · `select/Select.tsx` (공유 프레임워크 없음, 각자 소유) |
+| 컴포넌트 prop 변경      | 해당 `<Name>.tsx`의 props 정의 (ui-core contracts 변경 필요 시 거기 먼저)              |
+| 토큰 사용               | `getColor(theme, 'path')` (JSX) — `useTheme()` 통해 theme 획득                         |
+| 테마 동작 변경          | `theme/ThemeProvider.tsx` (`createTheme(...)` 정책)                                    |
+| design-tokens 테마 추가 | `theme/ThemeProvider.tsx`의 `DEFAULT_TOKENS_BY_MODE`에 한 줄 (누락 시 typecheck 실패)  |
 
 ## 빌드 / 테스트
 

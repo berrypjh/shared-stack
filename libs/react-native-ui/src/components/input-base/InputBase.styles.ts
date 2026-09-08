@@ -107,6 +107,7 @@ const chromeSpec = (
   tokens: RNTokens,
   variant: FieldVariant | undefined,
   state: ChromeState,
+  radius: number | undefined,
 ): ViewStyle | null => {
   if (!variant) {
     return null;
@@ -124,7 +125,7 @@ const chromeSpec = (
     };
   }
 
-  return { backgroundColor, borderRadius: tokens.radius.md, borderWidth, borderColor };
+  return { backgroundColor, borderRadius: radius ?? tokens.radius.md, borderWidth, borderColor };
 };
 
 /** plain은 밑줄이 필드 폭을 채워야 해서 가로 여백이 없습니다. */
@@ -145,6 +146,7 @@ export const resolveInputBaseStyles = ({
   focused,
   error,
   disabled,
+  radius,
 }: {
   tokens: RNTokens;
   variant: FieldVariant | undefined;
@@ -153,9 +155,10 @@ export const resolveInputBaseStyles = ({
   focused: boolean;
   error: boolean;
   disabled: boolean;
+  radius?: number;
 }): Resolved => {
   const { paddingHorizontal, paddingVertical, fieldHeight, typography } = sizeSpec(tokens, size);
-  const chrome = chromeSpec(tokens, variant, { focused, error, disabled, color });
+  const chrome = chromeSpec(tokens, variant, { focused, error, disabled, color }, radius);
 
   return {
     container: {

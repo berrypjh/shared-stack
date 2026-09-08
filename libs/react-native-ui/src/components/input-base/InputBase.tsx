@@ -26,6 +26,7 @@ export const InputBase = ({
   size,
   color,
   fullWidth,
+  radius,
   startAdornment,
   endAdornment,
   containerStyle,
@@ -61,6 +62,7 @@ export const InputBase = ({
     focused,
     error: errorValue,
     disabled: disabledValue,
+    radius,
   });
   const state: InputState = {
     focused,

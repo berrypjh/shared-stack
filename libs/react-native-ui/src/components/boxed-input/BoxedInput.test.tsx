@@ -392,7 +392,8 @@ type HasProp<K extends string> = K extends keyof BoxedInputProps ? true : false;
 type Assignable<A, B> = A extends B ? true : false;
 type Equal<A, B> =
   (<T>() => T extends A ? 1 : 2) extends <T>() => T extends B ? 1 : 2 ? true : false;
-type BaseWithoutVariant = Omit<InputBaseProps, 'variant'>;
+// `radius` 는 SearchField 전용 내부 seam 이라 공개 variant prop 이 아닙니다.
+type BaseWithoutVariant = Omit<InputBaseProps, 'variant' | 'radius'>;
 
 export type BoxedMatchesBase = [
   Expect<Equal<keyof BoxedInputProps, keyof BaseWithoutVariant>>,
