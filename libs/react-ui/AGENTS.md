@@ -30,7 +30,8 @@ src/
   types/                   web 시맨틱 계약 (ui-core가 아니라 여기가 소유)
     button.ts              ButtonProps, ButtonVariant/Size/Color, ButtonLoadingPosition
     fab.ts                 FabProps, FabShape
-    field.ts               FieldProps, FormControlProps, InputFieldProps, TextFieldProps + 4 enums, InputLike* alias
+    field.ts               FieldProps, FormControlProps, InputFieldProps, TextFieldProps + FieldMargin, InputLike* alias
+                           (FieldVariant/Size/Color와 시맨틱 키는 ui-core 계약을 re-export/확장. web 전용은 required·margin·hiddenLabel)
     icon-button.ts         IconButtonProps, IconButtonEdge
     menu-item.ts           MenuItemProps
     polymorphic.ts         PropsOf, PolymorphicComponentProps* (component prop 패턴)
