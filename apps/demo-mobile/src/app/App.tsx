@@ -8,7 +8,11 @@ import { ButtonFamilySection } from './sections/ButtonFamilySection';
 import { ColorScaleSection } from './sections/ColorScaleSection';
 import { FormArchitectureSection } from './sections/FormArchitectureSection';
 import { InputFamilySection } from './sections/InputFamilySection';
+import { SearchFieldSection } from './sections/SearchFieldSection';
+import { SegmentControlSection } from './sections/SegmentControlSection';
+import { SelectSection } from './sections/SelectSection';
 import { SemanticColorSection } from './sections/SemanticColorSection';
+import { TextFieldSection } from './sections/TextFieldSection';
 import { ThemeTokensSection } from './sections/ThemeTokensSection';
 import { useDemoPalette } from './shell/palette';
 import { Section } from './shell/Section';
@@ -42,6 +46,34 @@ const Body = ({ mode }: { mode: ThemeName; onChange: (m: ThemeName) => void }) =
         description="FormControl · InputLabel · FormHelperText. FormControl 이 상태를 내려보내고 focus 를 조정합니다. 보이는 라벨은 입력의 접근 가능한 이름이 아니라서 입력마다 accessibilityLabel 을 따로 줍니다."
       >
         <FormArchitectureSection />
+      </Section>
+
+      <Section
+        title="TextField"
+        description="FormControl · InputLabel · Input · FormHelperText 를 한 번에 세우는 합성 계층입니다. 문자열 label 은 입력의 접근 가능한 이름이 되지만, 헬퍼는 보이는 텍스트까지만 보장합니다."
+      >
+        <TextFieldSection />
+      </Section>
+
+      <Section
+        title="SearchField"
+        description="검색 입력 + 지우기 + 제안 목록. 후보는 소비자가 좁혀서 넘기고, 목록은 blur 로 닫히지 않습니다 — RN 에는 web 의 포커스 봉쇄가 없기 때문입니다."
+      >
+        <SearchFieldSection />
+      </Section>
+
+      <Section
+        title="Select"
+        description="데이터 options 기반 단일 선택. 값과 개폐 상태가 독립이고, 해제는 배경 탭 · Android back · iOS 스크린리더 escape 입니다."
+      >
+        <SelectSection />
+      </Section>
+
+      <Section
+        title="SegmentControl"
+        description="상호배타 선택. controlled 전용이라 value 가 유일한 권한이고, 세그먼트는 button 역할 + selected 상태입니다."
+      >
+        <SegmentControlSection />
       </Section>
 
       <Section
