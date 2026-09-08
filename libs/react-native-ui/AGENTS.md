@@ -20,7 +20,12 @@ src/
     button/{Button.tsx, Button.types.ts, Button.styles.ts, index.ts}
     fab/{Fab.tsx, Fab.types.ts, Fab.styles.ts, index.ts}
     icon-button/{IconButton.tsx, IconButton.types.ts, IconButton.styles.ts, index.ts}
-    index.ts                  공개 배럴 (box·button·fab·icon-button)
+    input-base/               내부 TextInput 동작 원시 — 배럴 없음(비공개)
+      {InputBase.tsx, InputBase.types.ts, InputBase.styles.ts, InputBase.test.tsx}
+    plain-input/{PlainInput.tsx, PlainInput.types.ts, index.ts}
+    filled-input/{FilledInput.tsx, FilledInput.types.ts, index.ts}
+    boxed-input/{BoxedInput.tsx, BoxedInput.types.ts, index.ts}
+    index.ts                  공개 배럴 (box·button·fab·icon-button·plain/filled/boxed-input)
   utils/
     cx.ts                     deprecated — 공개 API였던 className 유틸. 다음 major에서 제거
     index.ts
@@ -35,7 +40,7 @@ src/
 
 **`components/<name>/index.ts` 는 "공개 컴포넌트" 표시다.** `tools/scripts/generate-consumer-catalog`
 의 테스트가 그 배럴의 export 가 전부 소비자 카탈로그에 실렸는지 검사한다. 그래서 내부
-`ButtonBase` 에는 배럴이 없다 — 만드는 순간 공개 API 로 승격되거나 그 테스트가 깨진다.
+`ButtonBase`·`InputBase` 에는 배럴이 없다 — 만드는 순간 공개 API 로 승격되거나 그 테스트가 깨진다.
 
 RN 컴포넌트 테스트는 jsdom이 아니라 **jest + RN preset**에서 돈다 (`jest.config.cjs`).
 `react-native`가 Flow 소스를 그대로 배포해서 vite/jsdom으로는 파싱되지 않기 때문이다.
@@ -47,6 +52,8 @@ RN 컴포넌트 테스트는 jsdom이 아니라 **jest + RN preset**에서 돈�
 | 새 공개 컴포넌트        | `components/<name>/{<Name>.tsx, index.ts}` + `components/index.ts` (+ 카탈로그 등재)  |
 | 새 내부 원시            | `components/<name>/` 에 배럴 **없이** 둔다 (ButtonBase 참고)                          |
 | Button 계열 동작 변경   | `button-base/ButtonBase.tsx` (누름·접근성·터치 타깃 공통) 또는 각 `*.styles.ts`       |
+| Input 계열 동작 변경    | `input-base/InputBase.tsx` (편집·포커스·접근성·장식 공통)                             |
+| Input variant 시각 변경 | `input-base/InputBase.styles.ts` 의 `chromeSpec`/`surfaceFor` — variant 분기가 한 곳  |
 | 컴포넌트 prop 변경      | 해당 `<Name>.tsx`의 props 정의 (ui-core contracts 변경 필요 시 거기 먼저)             |
 | 토큰 사용               | `getColor(theme, 'path')` (JSX) — `useTheme()` 통해 theme 획득                        |
 | 테마 동작 변경          | `theme/ThemeProvider.tsx` (`createTheme(...)` 정책)                                   |

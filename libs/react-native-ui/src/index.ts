@@ -1,5 +1,5 @@
-// 공개 컴포넌트. 내부 ButtonBase 는 배럴이 없어서 여기 오지 않는다 — 세 컴포넌트가
-// 공유하는 Pressable 동작 원시일 뿐 소비자 API 가 아니다.
+// 공개 컴포넌트. 내부 ButtonBase·InputBase 는 배럴이 없어서 여기 오지 않는다 — 각각 Button
+// 계열과 Input 계열이 공유하는 동작 원시일 뿐 소비자 API 가 아니다.
 export * from './components';
 export * from './theme';
 
@@ -13,6 +13,9 @@ export type {
   ButtonVariant,
   ColorToken,
   FabShape,
+  FieldColor,
+  FieldSize,
+  FieldVariant,
   RadiusToken,
   RNTokens,
   SpacingToken,

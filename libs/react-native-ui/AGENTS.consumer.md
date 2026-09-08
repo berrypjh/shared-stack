@@ -68,12 +68,15 @@ npx @berrypjh/react-native-ui token color.primary
 
 정확한 컴포넌트 목록과 prop은 `llm-catalog.json`의 `symbols`에서 읽는다 (`kind: "component"`).
 
-| 컴포넌트     | 요약                                                                  |
-| ------------ | --------------------------------------------------------------------- |
-| `Box`        | 토큰 기반 레이아웃 (padding·margin·background·radius)                 |
-| `Button`     | 라벨 버튼. `variant`·`size`·`color`·`fullWidth`·`loading`·아이콘 슬롯 |
-| `Fab`        | 플로팅 액션 버튼. `shape="circular" \| "extended"`                    |
-| `IconButton` | 아이콘 전용 버튼. `accessibilityLabel` **필수**                       |
+| 컴포넌트      | 요약                                                                  |
+| ------------- | --------------------------------------------------------------------- |
+| `Box`         | 토큰 기반 레이아웃 (padding·margin·background·radius)                 |
+| `Button`      | 라벨 버튼. `variant`·`size`·`color`·`fullWidth`·`loading`·아이콘 슬롯 |
+| `Fab`         | 플로팅 액션 버튼. `shape="circular" \| "extended"`                    |
+| `IconButton`  | 아이콘 전용 버튼. `accessibilityLabel` **필수**                       |
+| `PlainInput`  | 밑줄만 있는 텍스트 필드. `accessibilityLabel` **필수**                |
+| `FilledInput` | 채워진 표면 + 사방 테두리. `accessibilityLabel` **필수**              |
+| `BoxedInput`  | 윤곽선만 있는 필드(표면 투명). `accessibilityLabel` **필수**          |
 
 #### Button 계열 공통
 
@@ -90,6 +93,32 @@ npx @berrypjh/react-native-ui token color.primary
 - 모든 컨트롤은 시각 크기와 무관하게 최소 터치 타깃(48)을 지킨다. `Fab size="sm"` 의 원판은
   40 이지만 누를 수 있는 영역은 48 이다.
 
+#### Input 계열 공통
+
+세 variant 는 시각 표현만 다르고 동작·접근성 계약은 같다. 내부적으로 RN `TextInput` 하나를
+래퍼 `View` 안에 두며, chrome(표면·테두리·radius)은 래퍼가 그린다.
+
+- **값은 RN 네이티브 계약이다.** `value` 는 `string`(web 의 `number | readonly string[]` 없음),
+  `defaultValue` 는 uncontrolled 초기값이다. 컴포넌트는 텍스트 상태를 들지 않는다 —
+  `value` 를 주면 그 값이 그대로 유지되고, 안 주면 네이티브가 소유한다.
+- **값 콜백은 `onChangeText(text: string)` 이다.** RN 네이티브 `onChange` 도 그대로 받지만
+  그것은 RN 이벤트이지 DOM 이벤트가 아니다 — `event.target.value` 는 **없다**.
+- **네이티브 TextInput prop 이 살아 있다**: `keyboardType`·`inputMode`·`secureTextEntry`·
+  `autoComplete`·`maxLength`·`selectTextOnFocus`·`numberOfLines`·`placeholder` 등.
+  카탈로그는 디자인 시스템 prop 만 싣는다(Button 의 `onPress` 도 없다) — 네이티브 표면은 여기다.
+- **`ref` 는 `TextInput` 을 가리킨다.** 래퍼 View 가 아니라서 `focus()`·`blur()`·`isFocused()`
+  를 바로 부를 수 있다.
+- **`disabled` 와 `readOnly` 는 다르다.** 둘 다 편집을 막지만 `disabled` 만
+  `accessibilityState.disabled` 로 알리고 disabled 토큰 색을 쓴다. `readOnly` 는 평범한 외형에
+  비활성으로 알리지 않는다. `readOnly` 를 `TextInput` 에 직접 넘기지 않는다 — RN 이 그것으로
+  `editable` 을 되계산해 우리가 만든 `disabled` 를 덮어쓰기 때문이다.
+- **`multiline`** 은 네이티브 `TextInput` 그대로다. textarea 같은 별도 요소로 갈라지지 않고,
+  윤곽선은 래퍼가 유지한다.
+- **`startAdornment`/`endAdornment`** 는 받은 노드를 그대로 렌더한다(Button 아이콘 슬롯과 같은
+  규약). 래퍼는 `accessible` 이 아니라서 상호작용 가능한 장식(예: `IconButton`)은 독립적으로
+  접근·조작된다. 장식을 눌러도 입력에 자동으로 포커스가 가지 않는다.
+- **`error` 는 시각 상태일 뿐이다.** 아래 "지금 없는 것" 을 볼 것.
+
 #### 접근 가능한 이름
 
 | 컴포넌트               | 이름의 출처                                                 |
@@ -98,13 +127,32 @@ npx @berrypjh/react-native-ui token color.primary
 | `Fab shape="extended"` | 보이는 라벨(children). `accessibilityLabel` 로 덮을 수 있다 |
 | `Fab` (circular)       | `accessibilityLabel` **필수** — 타입에서 강제한다           |
 | `IconButton`           | `accessibilityLabel` **필수** — 타입에서 강제한다           |
+| Input 3종              | `accessibilityLabel` **필수** — 타입에서 강제한다           |
 
 `loading` 중에도 이름은 유지된다.
+
+**placeholder 는 레이블이 아니다.** RN `TextInput` 은 placeholder 로 접근 가능한 이름을 만들지
+않고(`accessibilityLabelledBy` 는 Android 전용이다), 그래서 Input 3종은 `accessibilityLabel` 을
+타입에서 필수로 요구한다.
 
 #### 없는 것 (web 에만 있다)
 
 `href`, `component`(다형성), `className`, `IconButton` 의 `edge`. RN 에 대응 개념이 없어서
 옮기지 않았다 — 카탈로그에도 없으므로 있다고 가정하지 말 것.
+
+Input 계열에서 특히 없는 것: `inputProps`/`textareaProps` 분리, HTML `type`(대신
+`keyboardType`·`inputMode`·`secureTextEntry`), `rows`(대신 `numberOfLines`), `name`·`id`,
+`event.target.value`, DOM ref 타입.
+
+#### 지금 없는 것 (Input, 아직 만들지 않았다)
+
+- **`required`**: RN 에 HTML `required` 에 해당하는 폼 검증도 접근성 고지도 없다.
+  타입에도 없다.
+- **오류 메시지 연결**: `error` 는 테두리 색만 바꾼다. RN 에는 `aria-invalid`·
+  `aria-describedby` 에 해당하는 수단이 없고, FormControl·헬퍼 텍스트·레이블 합성 컴포넌트가
+  아직 없다. **오류 사유를 스크린 리더가 읽게 하려면 지금은 소비자가 별도 `Text` 로 안내해야
+  한다.** 입력과 자동으로 연결되지는 않는다.
+- **`FormControl`·`InputLabel`·`FormHelperText`·`TextField`**: web 에만 있다. RN 에는 없다.
 
 ### 테마
 
@@ -128,8 +176,12 @@ npx @berrypjh/react-native-ui token color.primary
 
 `ColorToken`, `RadiusToken`, `SpacingToken`, `RNTokens`, `Theme<T>`, `ThemeInfo`, `ThemeName`
 
-두 렌더러가 같은 뜻으로 구현한 Button 계열 어휘도 함께 나온다 (ui-core 소유):
-`ButtonVariant`, `ButtonSize`, `ButtonColor`, `ButtonLoadingPosition`, `FabShape`
+두 렌더러가 같은 뜻으로 구현한 어휘도 함께 나온다 (ui-core 소유):
+`ButtonVariant`, `ButtonSize`, `ButtonColor`, `ButtonLoadingPosition`, `FabShape`,
+`FieldVariant`, `FieldSize`, `FieldColor`
+
+Input 계열 prop 타입: `PlainInputProps`, `FilledInputProps`, `BoxedInputProps`,
+`InputState`, `InputContainerStyle`(`containerStyle` 콜백이 받는 상태/스타일)
 
 ### deprecated — 다음 major에서 제거
 
