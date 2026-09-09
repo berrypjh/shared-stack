@@ -37,7 +37,7 @@ export const FabPage = () => (
   <Page title="FAB" lead="화면의 주된 액션을 표현하는 버튼">
     <Section title="Shapes" note="원형과 확장형">
       <Preview>
-        <Fab shape="circular" icon={<PlusIcon />} />
+        <Fab shape="circular" icon={<PlusIcon />} aria-label="추가 (circular)" />
         <Fab shape="extended" icon={<PlusIcon />}>
           Create New
         </Fab>
@@ -46,16 +46,16 @@ export const FabPage = () => (
 
     <Section title="Sizes" note="Small, Medium, Large">
       <Preview>
-        <Fab size="sm" shape="circular" icon={<PlusIcon />} />
-        <Fab size="md" shape="circular" icon={<PlusIcon />} />
-        <Fab size="lg" shape="circular" icon={<PlusIcon />} />
+        <Fab size="sm" shape="circular" icon={<PlusIcon />} aria-label="추가 (small)" />
+        <Fab size="md" shape="circular" icon={<PlusIcon />} aria-label="추가 (medium)" />
+        <Fab size="lg" shape="circular" icon={<PlusIcon />} aria-label="추가 (large)" />
       </Preview>
     </Section>
 
     <Section title="Colors" note="Primary와 Secondary 컬러">
       <Preview>
-        <Fab color="primary" icon={<PlusIcon />} />
-        <Fab color="secondary" icon={<PlusIcon />} />
+        <Fab color="primary" icon={<PlusIcon />} aria-label="추가 (primary)" />
+        <Fab color="secondary" icon={<PlusIcon />} aria-label="추가 (secondary)" />
         <Fab color="primary" shape="extended" icon={<EditIcon />}>
           Edit
         </Fab>
@@ -67,7 +67,7 @@ export const FabPage = () => (
 
     <Section title="Disabled">
       <Preview>
-        <Fab disabled icon={<PlusIcon />} />
+        <Fab disabled icon={<PlusIcon />} aria-label="추가 (비활성)" />
         <Fab disabled shape="extended" icon={<PlusIcon />}>
           Disabled
         </Fab>

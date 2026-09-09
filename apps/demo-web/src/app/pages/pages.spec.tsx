@@ -30,6 +30,27 @@ describe('라우팅', () => {
   });
 });
 
+/**
+ * 아이콘만 있는 컨트롤은 보이는 글자가 없어 이름을 빠뜨리기 쉽다 — 실제로 이 페이지의
+ * IconButton 15개가 전부 이름 없이 렌더되고 있었다 (WCAG 4.1.2). 타입이 TypeScript 소비자를
+ * 막지만, 렌더 결과에서도 한 번 더 확인한다.
+ */
+describe('접근 가능한 이름', () => {
+  it.each([['/components/icon-button'], ['/components/fab'], ['/components/button']])(
+    '%s 의 모든 버튼이 이름을 갖는다',
+    (path) => {
+      at(path);
+
+      const all = screen.getAllByRole('button');
+      // 이름 매처는 dom-accessibility-api 로 실제 접근 가능한 이름을 계산한다.
+      const named = screen.getAllByRole('button', { name: /\S/ });
+
+      expect(all.length).toBeGreaterThan(0);
+      expect(named).toHaveLength(all.length);
+    },
+  );
+});
+
 describe('전역 컨트롤', () => {
   it('어느 페이지에서든 같은 자리에 있다', () => {
     at('/tokens');

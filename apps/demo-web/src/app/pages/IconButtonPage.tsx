@@ -58,13 +58,13 @@ export const IconButtonPage = () => (
   >
     <Section title="Size" note="Small, Medium, Large">
       <Preview>
-        <IconButton size="sm">
+        <IconButton size="sm" aria-label="즐겨찾기 (small)">
           <HeartIcon />
         </IconButton>
-        <IconButton size="md">
+        <IconButton size="md" aria-label="즐겨찾기 (medium)">
           <HeartIcon />
         </IconButton>
-        <IconButton size="lg">
+        <IconButton size="lg" aria-label="즐겨찾기 (large)">
           <HeartIcon />
         </IconButton>
       </Preview>
@@ -72,16 +72,16 @@ export const IconButtonPage = () => (
 
     <Section title="Colors" note="Primary와 Secondary 컬러">
       <Preview>
-        <IconButton color="primary">
+        <IconButton color="primary" aria-label="즐겨찾기 (primary)">
           <HeartIcon />
         </IconButton>
-        <IconButton color="secondary">
+        <IconButton color="secondary" aria-label="즐겨찾기 (secondary)">
           <HeartIcon />
         </IconButton>
-        <IconButton color="primary">
+        <IconButton color="primary" aria-label="별점 주기 (primary)">
           <StarIcon />
         </IconButton>
-        <IconButton color="secondary">
+        <IconButton color="secondary" aria-label="별점 주기 (secondary)">
           <StarIcon />
         </IconButton>
       </Preview>
@@ -89,10 +89,10 @@ export const IconButtonPage = () => (
 
     <Section title="Loading State">
       <Preview>
-        <IconButton loading>
+        <IconButton loading aria-label="즐겨찾기 저장 중">
           <HeartIcon />
         </IconButton>
-        <IconButton loading size="lg">
+        <IconButton loading size="lg" aria-label="별점 저장 중">
           <StarIcon />
         </IconButton>
       </Preview>
@@ -100,13 +100,13 @@ export const IconButtonPage = () => (
 
     <Section title="Disabled">
       <Preview>
-        <IconButton disabled>
+        <IconButton disabled aria-label="즐겨찾기 (비활성)">
           <HeartIcon />
         </IconButton>
-        <IconButton disabled>
+        <IconButton disabled aria-label="별점 주기 (비활성)">
           <StarIcon />
         </IconButton>
-        <IconButton disabled>
+        <IconButton disabled aria-label="공유 (비활성)">
           <ShareIcon />
         </IconButton>
       </Preview>
@@ -115,13 +115,13 @@ export const IconButtonPage = () => (
     <Section title="Edge Alignment" note="edge='start'와 edge='end'는 각 면의 패딩을 줄입니다">
       <Preview>
         <div style={{ display: 'flex', gap: 4 }}>
-          <IconButton edge="start">
+          <IconButton edge="start" aria-label="즐겨찾기 (edge start)">
             <HeartIcon />
           </IconButton>
-          <IconButton>
+          <IconButton aria-label="별점 주기 (edge 없음)">
             <StarIcon />
           </IconButton>
-          <IconButton edge="end">
+          <IconButton edge="end" aria-label="공유 (edge end)">
             <ShareIcon />
           </IconButton>
         </div>
