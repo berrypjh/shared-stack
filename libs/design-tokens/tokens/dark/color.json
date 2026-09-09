@@ -297,6 +297,22 @@
     "borderHover": {
       "$value": "{neutral.ne100}",
       "$type": "color"
+    },
+    "borderStrong": {
+      "$value": "{neutral.ne100}",
+      "$type": "color"
+    },
+    "surface": {
+      "$value": "{neutral.ne800}",
+      "$type": "color"
+    },
+    "surfaceSubtle": {
+      "$value": "{neutral.ne900}",
+      "$type": "color"
+    },
+    "focusRingPrimary": {
+      "$value": "{primary.pr300}",
+      "$type": "color"
     }
   }
 }

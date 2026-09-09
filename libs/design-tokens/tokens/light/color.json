@@ -330,6 +330,10 @@
       "$value": "{secondary.se100}",
       "$type": "color"
     },
+    "focusRingPrimary": {
+      "$value": "{primary.pr100}",
+      "$type": "color"
+    },
     "focusRingError": {
       "$value": "{error.er100}",
       "$type": "color"

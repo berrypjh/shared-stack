@@ -30,6 +30,7 @@
     },
     "test": {
       "executor": "@nx/vitest:test",
+      "dependsOn": ["build"],
       "options": {
         "configFile": "libs/design-tokens/vitest.config.mts",
         "watch": false,

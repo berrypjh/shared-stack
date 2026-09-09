@@ -87,18 +87,18 @@ tokens/
 (`['light', 'dark', 'ember']`) `dark`의 시맨틱 재지정을 재사용하고 램프만 갈아끼우면 된다.
 
 새 테마는 `contrast.test.ts`의 대비 가드를 **자동으로 함께 받는다** — 텍스트 4.5:1,
-UI 경계 3:1, 구분선 1.2:1을 모든 테마에 대해 검사한다. 팔레트를 넣고 테스트를 돌리면
-어느 조합이 모자란지 정확히 짚어 준다.
+UI 경계 3:1, 구분선 1.2:1을 모든 테마에 대해 검사하고, Input 은 페이지·카드·filled 세 표면
+전부에서 다시 검사한다. 팔레트를 넣고 테스트를 돌리면 어느 조합이 모자란지 정확히 짚어 준다.
 color 램프 같은 primitive도 테마에서 자유롭게 덮어쓴다 — 이 저장소가 토큰의 소유자다.
 
 ### 시맨틱 패밀리 구성
 
 컴포넌트가 primitive를 직접 참조하지 않도록, 역할별로 패밀리를 맞춰 둔다.
 
-| 패밀리                                                         | 용도                                                                                                                           | 소비처                                                                               |
-| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------ |
-| `color.primaryBtn.*` `color.secondaryBtn.*` `color.errorBtn.*` | 버튼 색 역할 3종. 각각 `default`/`hover`/`disabled`/`focusRipple`/`outlinedHover`/`outlinedFocusRipple`                        | `button-base`, `fab`, `icon-button`                                                  |
-| `color.field.*`                                                | 폼 컨트롤 표면·테두리·포커스 링 (`border`/`borderHover`/`borderStrong`/`surface`/`surfaceSubtle`/`focusRing`/`focusRingError`) | `input-base`, `boxed-input`, `filled-input`, `plain-input`, `search-field`, `select` |
+| 패밀리                                                         | 용도                                                                                                                                              | 소비처                                                                               |
+| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| `color.primaryBtn.*` `color.secondaryBtn.*` `color.errorBtn.*` | 버튼 색 역할 3종. 각각 `default`/`hover`/`disabled`/`focusRipple`/`outlinedHover`/`outlinedFocusRipple`                                           | `button-base`, `fab`, `icon-button`                                                  |
+| `color.field.*`                                                | 폼 컨트롤 표면·테두리·포커스 링 (`border`/`borderHover`/`borderStrong`/`surface`/`surfaceSubtle`/`focusRing`/`focusRingPrimary`/`focusRingError`) | `input-base`, `boxed-input`, `filled-input`, `plain-input`, `search-field`, `select` |
 
 세 버튼 패밀리는 **같은 shape**를 갖는다 — 새 색 역할을 추가할 때 이 6개 키를 그대로 따른다.
 
@@ -124,16 +124,35 @@ path 단위 opt-in이다.
 ### 접근성 (WCAG) 보장
 
 토큰 **기본값**은 WCAG 2.1 AA 대비를 충족한다. `lib/contrast.ts`의 순수 함수로 계산하고
-`contrast.test.ts`가 3테마 × 실제 컴포넌트 조합을 검사한다 — 색을 바꿔 대비가 내려가면 실패한다.
+`contrast.test.ts`가 등록된 **모든 테마** × 실제 컴포넌트 조합을 검사한다 — 색을 바꿔 대비가
+내려가면 실패한다.
 
-| 대상                                              | 기준  | 근거                  |
-| ------------------------------------------------- | ----- | --------------------- |
-| 본문·보조·placeholder·링크·오류 텍스트, 버튼 라벨 | 4.5:1 | WCAG 1.4.3            |
-| 필드 테두리(평소/hover)                           | 3:1   | WCAG 1.4.11 (UI 경계) |
+| 대상                                                 | 기준  | 근거                                    |
+| ---------------------------------------------------- | ----- | --------------------------------------- |
+| 본문·보조·링크·오류 텍스트, 버튼 라벨                | 4.5:1 | WCAG 1.4.3                              |
+| Input 의 값·장식 아이콘 (페이지·카드·filled 세 표면) | 4.5:1 | WCAG 1.4.3                              |
+| Input 테두리 평소/hover/strong/error (세 표면)       | 3:1   | WCAG 1.4.11 (UI 경계)                   |
+| 구분선                                               | 1.2:1 | 장식이라 기준 밖. 안 보이는 것만 막는다 |
+
+**Input 은 표면을 세 가지로 본다.** plain·boxed 는 배경이 투명해서 뒤의 페이지나 카드가
+그대로 인접색이 되고, filled 만 자기 표면(`field.surface`)을 가진다. 한 표면에서만 재면
+나머지 두 경우를 놓친다.
+
+`disabled` 는 WCAG 가 비활성 컨트롤을 **명시적으로 면제**하므로 AA 실패로 적지 않는다 —
+배경에 완전히 묻히는 것만 막는다. focus **halo** 도 기준 대상이 아니다: 포커스 고지는
+테두리 색 변화가 담당하고 halo 는 그 위의 보조 장식이며, Focus Appearance(2.4.13)는 AAA 다.
+
+아직 AA 에 못 미치는 조합은 `BELOW_AA` 에 현재 값을 바닥으로 못 박아 두었다 — 원인이
+`text.placeholder`·`border.primary.color`·`stroke.secondary` 처럼 field 밖 토큰이라
+여기서 고치면 버튼·링크까지 함께 움직이기 때문이다. **면제가 아니라 미해결 결함이다.**
 
 **테마마다 값이 달라야 한다.** `dark`는 `neutral` 램프를 재정의하지 않는데 표면만 뒤집히므로,
 한 값이 세 테마를 동시에 만족하지 못한다 — 시맨틱 토큰에서 테마별로 잡는다.
 예: `field.border` = light/sepia `ne500`, dark `ne300`.
+
+`field` 는 **표면까지 테마별로 잡아야 한다.** `dark`가 `surface`·`surfaceSubtle`·`borderStrong`
+을 빠뜨리면 light 의 밝은 램프 단계를 그대로 물려받아, dark 계열에서 흰 배경에 흰 글자가 된다
+(`dark`를 중간 단계로 끼우는 `ember`·`midnight`도 같이 무너진다).
 
 새 색을 넣을 때는 `contrastRatio()`로 먼저 재고, 통과하는 **최소 단계**를 고른다
 (디자인 의도에서 최소한으로 벗어나기 위함).
@@ -231,7 +250,7 @@ pnpm nx run @berrypjh/design-tokens:build          # 둘 다
 
 ## Gotcha
 
-- **TS 증분 캐시**: `dist/`만 지우고 빌드하면 `tsconfig.lib.tsbuildinfo`(`libs/design-tokens/`에 위치)가 stale 상태로 남아 d.ts가 누락될 수 있다. 클린 빌드 시 tsbuildinfo도 같이 삭제.
+- **TS 증분 캐시**: `tsBuildInfoFile`을 `dist/.tsbuildinfo`로 두어 `rm -rf dist`가 곧 클린 빌드가 된다 (react-native-ui 와 같은 관례). 밖에 두면 `dist`만 지웠을 때 tsc가 "최신"으로 판단해 **exit 0 인데 아무것도 emit 하지 않는다** — 산출물이 조용히 사라진다.
 - **path 매핑 금지**: `tsconfig.base.json`의 `paths`에 `@berrypjh/design-tokens` 추가하지 말 것. composite project + rootDir 제약과 충돌해 ui-core 빌드가 깨진다. node_modules workspace 심링크로 해결되는 게 정상 경로.
 - **`.generated/` 손대지 말 것**: 빌드 중간 산출물. 직접 편집해도 다음 build에서 덮어써짐.
 - **base가 첫 항목**: `themes` 배열 순서는 의미가 있다. `baseTheme = themes[0]`을 import해 사용.
