@@ -256,12 +256,10 @@ export const A11y: Story = {
       >
         Delete
       </Button>
-      <Button loading aria-busy="true" aria-label="Submitting form, please wait">
-        Submit
-      </Button>
-      <Button disabled aria-disabled="true">
-        Unavailable Action
-      </Button>
+      {/* loading 의 고지 수단은 라벨로 이름 붙은 progressbar 다. aria-busy 를 덧붙이면
+          같은 상태가 두 번 읽힌다. 라벨을 aria-label 로 덮으면 progressbar 와 이름이 갈린다. */}
+      <Button loading>Submit</Button>
+      <Button disabled>Unavailable Action</Button>
     </div>
   ),
   parameters: {

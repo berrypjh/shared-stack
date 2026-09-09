@@ -139,7 +139,6 @@
   --ui-btn-bg-disabled: var(--ds-primary-btn-disabled);
   --ui-btn-fg: var(--ds-text-contrast-text);
   --ui-btn-fg-disabled: var(--ds-text-disable);
-  --ui-btn-focus-color: var(--ds-primary-btn-focus-ripple);
 }
 
 .ui-fab--color-secondary {
@@ -148,7 +147,6 @@
   --ui-btn-bg-disabled: var(--ds-secondary-btn-disabled);
   --ui-btn-fg: var(--ds-text-contrast-text);
   --ui-btn-fg-disabled: var(--ds-text-disable);
-  --ui-btn-focus-color: var(--ds-stroke-secondary);
 }
 
 @media (prefers-reduced-motion: reduce) {

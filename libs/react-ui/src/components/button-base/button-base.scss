@@ -289,3 +289,21 @@ $colors: (
   --ui-btn-focus-ring-color: var(--ui-focus-ring-color);
   --ui-btn-focus-halo-color: var(--ui-text-focus-halo);
 }
+
+/* =========================
+   Reduced motion
+========================= */
+
+/*
+ * 루트 전환은 base가 끈다. Button·IconButton의 reduced-motion 블록은 자식(label·icon·spinner)만
+ * 다뤄서, 여기가 없으면 6개 속성을 전환하는 루트만 정책에서 빠진다.
+ *
+ * 끄는 것은 전환뿐이다. `:focus-visible`의 outline·halo 선언은 그대로 남아 포커스 표시가
+ * 사라지지 않는다. `:active`의 translateY(1px)도 유지한다 — 전환 없이 즉시 적용되는 눌림
+ * 위치이지 애니메이션이 아니다.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .ui-button {
+    transition: none;
+  }
+}

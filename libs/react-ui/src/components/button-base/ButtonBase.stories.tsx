@@ -203,17 +203,13 @@ export const A11y: Story = {
       >
         Delete
       </ButtonBase>
-      <ButtonBase
-        component="div"
-        variant="text"
-        role="button"
-        aria-label="Custom interactive element"
-      >
+      {/* 비네이티브 host 는 ButtonBase 가 role="button"·tabIndex·키보드 활성화를 스스로 붙인다. */}
+      <ButtonBase component="div" variant="text" aria-label="Custom interactive element">
         Custom Element
       </ButtonBase>
-      <ButtonBase disabled aria-disabled="true">
-        Unavailable
-      </ButtonBase>
+      {/* 네이티브 button 은 `disabled` 만으로 충분하다 — ButtonBase 는 button host 에
+          aria-disabled 를 의도적으로 붙이지 않는다. 링크 host 에서만 붙인다. */}
+      <ButtonBase disabled>Unavailable</ButtonBase>
     </div>
   ),
   parameters: {

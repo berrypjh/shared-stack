@@ -1,3 +1,4 @@
+export type * from './a11y';
 export type * from './button';
 export type * from './fab';
 export type * from './field';

@@ -10,6 +10,9 @@ const meta = {
     layout: 'centered',
   },
   args: {
+    // 아이콘 전용 컨트롤은 접근 가능한 이름이 타입 요구사항이다. meta 에 두면 모든 스토리가
+    // 물려받고 Playground 의 control 로도 노출된다.
+    'aria-label': 'Search',
     size: 'md',
     color: 'primary',
     edge: false,
@@ -92,7 +95,7 @@ const ShareIcon = () => (
 
 export const Playground: Story = {
   render: (args) => (
-    <IconButton {...args} aria-label="Search">
+    <IconButton {...args}>
       <SearchIcon />
     </IconButton>
   ),
@@ -152,19 +155,25 @@ export const Loading: Story = {
   render: () => (
     <div style={columnStyle}>
       <div style={rowStyle}>
-        <span style={{ fontSize: '12px', color: '#666', minWidth: '120px' }}>loading: null</span>
+        <span style={{ fontSize: '12px', color: 'var(--ds-text-light)', minWidth: '120px' }}>
+          loading: null
+        </span>
         <IconButton loading={null} aria-label="Search">
           <SearchIcon />
         </IconButton>
       </div>
       <div style={rowStyle}>
-        <span style={{ fontSize: '12px', color: '#666', minWidth: '120px' }}>loading: false</span>
+        <span style={{ fontSize: '12px', color: 'var(--ds-text-light)', minWidth: '120px' }}>
+          loading: false
+        </span>
         <IconButton loading={false} aria-label="Search">
           <SearchIcon />
         </IconButton>
       </div>
       <div style={rowStyle}>
-        <span style={{ fontSize: '12px', color: '#666', minWidth: '120px' }}>loading: true</span>
+        <span style={{ fontSize: '12px', color: 'var(--ds-text-light)', minWidth: '120px' }}>
+          loading: true
+        </span>
         <IconButton loading={true} aria-label="Saving...">
           <BookmarkIcon />
         </IconButton>
@@ -182,7 +191,7 @@ export const WithEdge: Story = {
           justifyContent: 'space-between',
           alignItems: 'center',
           padding: '8px 16px',
-          border: '1px dashed #ccc',
+          border: '1px dashed var(--ds-stroke-default)',
           borderRadius: '4px',
           minWidth: '320px',
         }}
@@ -240,13 +249,14 @@ export const A11y: Story = {
       </div>
       {/* 비활성화 상태 */}
       <div style={rowStyle}>
-        <IconButton disabled aria-label="Share (unavailable)" aria-disabled="true">
+        <IconButton disabled aria-label="Share (unavailable)">
           <ShareIcon />
         </IconButton>
       </div>
-      {/* 로딩 상태 — aria-busy 명시 */}
+      {/* 로딩 상태 — 고지는 컴포넌트가 그리는 progressbar 가 맡는다. aria-busy 를 덧붙이면
+          같은 상태를 두 번 읽는다. */}
       <div style={rowStyle}>
-        <IconButton loading={true} aria-label="Saving bookmark" aria-busy="true">
+        <IconButton loading={true} aria-label="Saving bookmark">
           <BookmarkIcon />
         </IconButton>
       </div>

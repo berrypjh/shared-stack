@@ -118,13 +118,11 @@
 .ui-icon-button--color-primary {
   --ui-btn-fg: var(--ds-text-primary);
   --ui-btn-bg-hover: var(--ds-primary-btn-outlined-hover);
-  --ui-btn-focus-color: var(--ds-primary-btn-focus-ripple);
 }
 
 .ui-icon-button--color-secondary {
   --ui-btn-fg: var(--ds-text-secondary);
   --ui-btn-bg-hover: var(--ds-secondary-btn-outlined-hover);
-  --ui-btn-focus-color: var(--ds-stroke-secondary);
 }
 
 .ui-icon-button--disabled,

@@ -1,4 +1,5 @@
 import { screen, within } from '@testing-library/react';
+import { spy } from 'sinon';
 import { describe, expect, it } from 'vitest';
 
 import { createRenderer, describeConformance } from '../../../test';
@@ -33,6 +34,97 @@ describe('<Button />', () => {
       render(<Button href="/docs">Docs</Button>);
 
       expect(screen.getByRole('link', { name: 'Docs' })).toHaveAttribute('href', '/docs');
+    });
+  });
+
+  /**
+   * Button은 자체 prop만 구조분해하고 나머지를 ButtonBase로 흘린다. 시맨틱 어휘가 그 목록에
+   * 잘못 들어가면 ButtonBase 테스트는 그대로 통과하고 Button만 조용히 prop을 삼킨다.
+   * conformance `propsSpread`는 임의의 `data-*` 하나만 보므로 이 경로를 덮지 않는다.
+   */
+  describe('시맨틱 prop 전달', () => {
+    it('variant·size·color·fullWidth를 ButtonBase 루트까지 전달한다', () => {
+      render(
+        <Button variant="outlined" size="lg" color="secondary" fullWidth>
+          Hello
+        </Button>,
+      );
+
+      const button = screen.getByRole('button');
+
+      expect(button).toHaveClass('ui-button--variant-outlined');
+      expect(button).toHaveClass('ui-button--size-lg');
+      expect(button).toHaveClass('ui-button--color-secondary');
+      expect(button).toHaveClass('ui-button--fullWidth');
+    });
+
+    it('Button 자체 class와 ButtonBase class가 함께 적용된다', () => {
+      render(<Button>Hello</Button>);
+
+      const button = screen.getByRole('button');
+
+      expect(button).toHaveClass(buttonClasses.root);
+      expect(button).toHaveClass('ui-button');
+    });
+  });
+
+  describe('prop: disabled', () => {
+    it('네이티브 button을 비활성화해야 한다', () => {
+      render(<Button disabled>Hello</Button>);
+
+      expect(screen.getByRole('button')).toBeDisabled();
+    });
+
+    it('disabled면 onClick이 호출되지 않아야 한다', async () => {
+      const onClick = spy();
+      const { user } = render(
+        <Button disabled onClick={onClick}>
+          Hello
+        </Button>,
+      );
+
+      await user.click(screen.getByRole('button'));
+
+      expect(onClick.callCount).toBe(0);
+    });
+
+    it('링크 host에는 aria-disabled를 설정해야 한다', () => {
+      render(
+        <Button href="/docs" disabled>
+          Docs
+        </Button>,
+      );
+
+      expect(screen.getByRole('link')).toHaveAttribute('aria-disabled', 'true');
+    });
+  });
+
+  describe('loading이 활성화를 막는다', () => {
+    it('loading이면 네이티브 button의 onClick이 호출되지 않아야 한다', async () => {
+      const onClick = spy();
+      const { user } = render(
+        <Button loading onClick={onClick}>
+          Hello
+        </Button>,
+      );
+
+      await user.click(screen.getByRole('button'));
+
+      expect(onClick.callCount).toBe(0);
+    });
+
+    it('loading이면 링크 host의 onClick도 호출되지 않아야 한다', async () => {
+      // 링크는 native disabled가 없다 — ButtonBase의 핸들러 억제가 유일한 방어선이라 따로 본다.
+      const onClick = spy();
+      const { user } = render(
+        <Button href="/docs" loading onClick={onClick}>
+          Docs
+        </Button>,
+      );
+
+      await user.click(screen.getByRole('link'));
+
+      expect(onClick.callCount).toBe(0);
     });
   });
 

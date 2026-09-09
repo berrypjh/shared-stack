@@ -1,10 +1,12 @@
 import { screen, within } from '@testing-library/react';
+import type { ReactNode, Ref } from 'react';
 import { describe, expect, it } from 'vitest';
 
 import { createRenderer, describeConformance } from '../../../test';
 
 import { IconButton } from './IconButton';
 import { iconButtonClasses } from './IconButton.constants';
+import type { IconButtonRenderableProps } from './IconButton.types';
 
 describe('<IconButton />', () => {
   const { render } = createRenderer();
@@ -44,6 +46,62 @@ describe('<IconButton />', () => {
       );
 
       expect(screen.getByRole('link', { name: 'docs' })).toHaveAttribute('href', '/docs');
+    });
+  });
+
+  describe('접근 가능한 이름', () => {
+    it('aria-label이 접근 가능한 이름이 되어야 한다', () => {
+      render(
+        <IconButton aria-label="즐겨찾기에 추가">
+          <span aria-hidden="true">★</span>
+        </IconButton>,
+      );
+
+      expect(screen.getByRole('button', { name: '즐겨찾기에 추가' })).toBeInTheDocument();
+    });
+
+    it('aria-labelledby가 참조하는 텍스트가 접근 가능한 이름이 되어야 한다', () => {
+      render(
+        <>
+          <span id="fav-label">즐겨찾기에 추가</span>
+          <IconButton aria-labelledby="fav-label">
+            <span aria-hidden="true">★</span>
+          </IconButton>
+        </>,
+      );
+
+      expect(screen.getByRole('button', { name: '즐겨찾기에 추가' })).toBeInTheDocument();
+    });
+
+    it('보이지 않는 요소를 참조해도 이름이 만들어져야 한다', () => {
+      render(
+        <>
+          <span id="hidden-label" hidden>
+            공유
+          </span>
+          <IconButton aria-labelledby="hidden-label">
+            <span aria-hidden="true">↗</span>
+          </IconButton>
+        </>,
+      );
+
+      expect(screen.getByRole('button', { name: '공유' })).toBeInTheDocument();
+    });
+
+    it('loading 중에도 aria-labelledby로 만든 이름이 유지되어야 한다', () => {
+      render(
+        <>
+          <span id="save-label">저장</span>
+          <IconButton aria-labelledby="save-label" loading>
+            <span aria-hidden="true">⚙</span>
+          </IconButton>
+        </>,
+      );
+
+      const button = screen.getByRole('button', { name: '저장' });
+
+      expect(button).toBeDisabled();
+      expect(within(button).getByRole('progressbar')).toBeInTheDocument();
     });
   });
 
@@ -259,3 +317,45 @@ describe('<IconButton />', () => {
     });
   });
 });
+
+/**
+ * 타입 수준 계약. `tsc -p tsconfig.spec.json` 이 검증합니다.
+ *
+ * `@ts-expect-error` 대신 조건부 `Expect<>` 를 쓰는 것은 RN 쪽 컴포넌트 테스트와 같은 규약입니다 —
+ * `@ts-expect-error` 는 엉뚱한 이유로도 만족되지만 이 방식은 **왜** 거부되는지를 고정합니다.
+ */
+type Expect<T extends true> = T;
+type Accepts<T> = T extends IconButtonRenderableProps ? true : false;
+
+/**
+ * 아이콘만 있는 컨트롤이라 보이는 글자가 없다. DOM 이 주는 접근 가능한 이름 통로는
+ * `aria-label` 과 `aria-labelledby` 둘뿐이고, 둘 다 없으면 스크린리더에서 정체불명이 된다.
+ * RN 은 `accessibilityLabel: string` 으로 같은 불변식을 이미 타입에서 강제한다.
+ */
+export type AccessibleNameIsRequired = [
+  Expect<Accepts<{ 'aria-label': 'Add to favorites' }>>,
+  Expect<Accepts<{ 'aria-labelledby': 'profile-heading' }>>,
+  // 둘을 함께 주는 것도 유효하다 — 배타적 union 이 아니다.
+  Expect<Accepts<{ 'aria-label': 'Share'; 'aria-labelledby': 'share-hint' }>>,
+
+  // 이름이 없으면 거부된다.
+  Expect<Accepts<{ children: ReactNode }> extends false ? true : false>,
+  Expect<Accepts<Record<string, never>> extends false ? true : false>,
+  Expect<Accepts<{ edge: 'start'; loading: true }> extends false ? true : false>,
+];
+
+/** 이름 요구가 기존 다형성·auto-anchor·ref·web 전용 prop 을 깨뜨리지 않는다. */
+export type KeepsExistingWebContract = [
+  Expect<Accepts<{ 'aria-label': 'Docs'; href: '/docs' }>>,
+  Expect<Accepts<{ 'aria-label': 'Docs'; component: 'a'; href: '/docs' }>>,
+  Expect<Accepts<{ 'aria-label': 'Save'; ref: Ref<HTMLButtonElement> }>>,
+  Expect<Accepts<{ 'aria-label': 'Back'; edge: 'start' }>>,
+  Expect<Accepts<{ 'aria-label': 'Save'; loading: null }>>,
+  Expect<Accepts<{ 'aria-label': 'Save'; loading: false }>>,
+  Expect<Accepts<{ 'aria-label': 'Menu'; children: ReactNode; className: 'x'; disabled: true }>>,
+];
+
+/** RN 의 `accessibilityLabel` 은 DOM 이름 통로가 아니라 web 요구를 만족시키지 못한다. */
+export type RnNamingPropDoesNotSatisfyWebContract = [
+  Expect<Accepts<{ accessibilityLabel: 'star' }> extends false ? true : false>,
+];

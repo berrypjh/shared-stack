@@ -65,6 +65,117 @@ describe('<ButtonBase />', () => {
     });
   });
 
+  /**
+   * 시각 어휘 클래스는 공개 스타일 계약이다 — `dist/index.css` 가 이 이름으로 팔레트를 싣고
+   * 소비자가 같은 이름으로 덮어쓴다. 그래서 상수가 아니라 문자열 리터럴로 고정한다.
+   *
+   * `getButtonBaseClassNames` 가 세 호스트 분기 모두에서 이 클래스를 만드는 유일한 지점인데
+   * 지금까지 어느 테스트도 결과를 검사하지 않았다.
+   */
+  describe('prop: variant', () => {
+    it('기본값은 contained다', () => {
+      render(<ButtonBase>Hello</ButtonBase>);
+
+      expect(screen.getByText('Hello')).toHaveClass('ui-button--variant-contained');
+    });
+
+    it.each(['contained', 'outlined', 'text'] as const)(
+      '%s variant class를 적용한다',
+      (variant) => {
+        render(<ButtonBase variant={variant}>Hello</ButtonBase>);
+
+        expect(screen.getByText('Hello')).toHaveClass(`ui-button--variant-${variant}`);
+      },
+    );
+  });
+
+  describe('prop: size', () => {
+    it('기본값은 md다', () => {
+      render(<ButtonBase>Hello</ButtonBase>);
+
+      expect(screen.getByText('Hello')).toHaveClass('ui-button--size-md');
+    });
+
+    it.each(['sm', 'md', 'lg'] as const)('%s size class를 적용한다', (size) => {
+      render(<ButtonBase size={size}>Hello</ButtonBase>);
+
+      expect(screen.getByText('Hello')).toHaveClass(`ui-button--size-${size}`);
+    });
+  });
+
+  describe('prop: color', () => {
+    it('기본값은 primary다', () => {
+      render(<ButtonBase>Hello</ButtonBase>);
+
+      expect(screen.getByText('Hello')).toHaveClass('ui-button--color-primary');
+    });
+
+    it.each(['primary', 'secondary'] as const)('%s color class를 적용한다', (color) => {
+      render(<ButtonBase color={color}>Hello</ButtonBase>);
+
+      expect(screen.getByText('Hello')).toHaveClass(`ui-button--color-${color}`);
+    });
+  });
+
+  describe('prop: fullWidth', () => {
+    it('기본적으로 fullWidth class를 붙이지 않는다', () => {
+      render(<ButtonBase>Hello</ButtonBase>);
+
+      expect(screen.getByText('Hello')).not.toHaveClass('ui-button--fullWidth');
+    });
+
+    it('fullWidth class를 적용한다', () => {
+      render(<ButtonBase fullWidth>Hello</ButtonBase>);
+
+      expect(screen.getByText('Hello')).toHaveClass('ui-button--fullWidth');
+    });
+  });
+
+  describe('시각 어휘와 호스트 분기', () => {
+    it('anchor host에도 같은 어휘 클래스를 적용한다', () => {
+      render(
+        <ButtonBase href="/docs" variant="outlined" size="lg" color="secondary" fullWidth>
+          Hello
+        </ButtonBase>,
+      );
+
+      const link = screen.getByRole('link');
+
+      expect(link).toHaveClass('ui-button--variant-outlined');
+      expect(link).toHaveClass('ui-button--size-lg');
+      expect(link).toHaveClass('ui-button--color-secondary');
+      expect(link).toHaveClass('ui-button--fullWidth');
+    });
+
+    it('custom host에도 같은 어휘 클래스를 적용한다', () => {
+      render(
+        <ButtonBase component="div" variant="text" size="sm" color="secondary">
+          Hello
+        </ButtonBase>,
+      );
+
+      const host = screen.getByRole('button');
+
+      expect(host).toHaveClass('ui-button--variant-text');
+      expect(host).toHaveClass('ui-button--size-sm');
+      expect(host).toHaveClass('ui-button--color-secondary');
+    });
+
+    it('시각 어휘 prop을 DOM 속성으로 흘리지 않는다', () => {
+      render(
+        <ButtonBase variant="outlined" size="lg" color="secondary" fullWidth>
+          Hello
+        </ButtonBase>,
+      );
+
+      const button = screen.getByRole('button');
+
+      for (const prop of ['variant', 'size', 'color', 'fullwidth']) {
+        expect(button).not.toHaveAttribute(prop);
+      }
+    });
+  });
+
   describe('prop: type', () => {
     it('기본값은 button이다', () => {
       render(<ButtonBase />);
