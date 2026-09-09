@@ -8,7 +8,7 @@
  * web InputBase의 DOM 구조는 옮기지 않습니다 — input/textarea 분기도, event.target.value도,
  * root click→focus도 없습니다.
  */
-import { Pressable, Text, TextInput } from 'react-native';
+import { Pressable, StyleSheet, Text, TextInput } from 'react-native';
 
 import { Native } from '@berrypjh/ui-core';
 
@@ -16,6 +16,7 @@ import { fireEvent, render, screen } from '@testing-library/react-native';
 import type { ReactElement } from 'react';
 
 import { ThemeProvider } from '../../theme';
+import * as componentsBarrel from '../index';
 
 import { InputBase } from './InputBase';
 import type { InputBaseProps } from './InputBase.types';
@@ -439,6 +440,53 @@ describe('size 토큰', () => {
     expect(getInput()).toHaveStyle({ fontSize: T.typography.body.small.fontSize });
     // canonical `field.height.sm`(40)은 모바일 최소 터치 타깃(48)보다 작습니다.
     expect(getWrapper()).toHaveStyle({ minHeight: T.spacing['4xl'] });
+  });
+});
+
+/**
+ * 글자 크기 확대(OS 접근성 설정)를 막지 않는지 고정합니다.
+ *
+ * `minHeight` 값은 위에서 이미 확인하지만, 그것만으로는 **높이를 고정하지 않는다**는 사실이
+ * 지켜지지 않습니다 — `height` 로 바꿔도 위 검사는 그대로 통과하고, 확대된 글자만 잘립니다.
+ */
+describe('글자 크기 확대', () => {
+  it('allowFontScaling을 건드리지 않는다 — RN 기본값(확대 허용)이 남는다', async () => {
+    await renderWithTheme(<InputBase accessibilityLabel="probe" />);
+
+    expect(getInput().props.allowFontScaling).toBeUndefined();
+  });
+
+  it('소비자가 확대를 끌 수 있다', async () => {
+    await renderWithTheme(<InputBase accessibilityLabel="probe" allowFontScaling={false} />);
+
+    expect(getInput().props.allowFontScaling).toBe(false);
+  });
+
+  it('래퍼도 입력도 높이를 고정하지 않는다', async () => {
+    await renderWithTheme(<InputBase accessibilityLabel="probe" variant="boxed" />);
+
+    expect(StyleSheet.flatten(getWrapper().props.style)).not.toHaveProperty('height');
+    expect(StyleSheet.flatten(getInput().props.style)).not.toHaveProperty('height');
+  });
+});
+
+/**
+ * InputBase 는 Plain·Filled·Boxed 가 공유하는 **내부** 동작 원시입니다.
+ *
+ * 지금은 배럴을 만들지 않는 것만으로 비공개가 유지되는데, 주석 말고는 이를 지키는 것이 없습니다.
+ * `components/index.ts` 에 한 줄만 더해도 공개 API 가 되고, 그러면 `InputBaseProps` 의 내부
+ * seam(`variant`·`radius`)까지 소비자 계약이 됩니다. FormControl 이 Context·hook 에 대해
+ * 같은 가드를 두고 있습니다.
+ */
+describe('공개 경계', () => {
+  it('컴포넌트 배럴이 InputBase를 내보내지 않는다', () => {
+    expect(Object.keys(componentsBarrel)).not.toContain('InputBase');
+  });
+
+  it('배럴이 내보내는 것은 공개 variant 쪽이다', () => {
+    expect(Object.keys(componentsBarrel)).toEqual(
+      expect.arrayContaining(['PlainInput', 'FilledInput', 'BoxedInput']),
+    );
   });
 });
 
