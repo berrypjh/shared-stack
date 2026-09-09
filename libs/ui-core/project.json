@@ -37,6 +37,7 @@
     },
     "test": {
       "executor": "@nx/vitest:test",
+      "dependsOn": ["build"],
       "options": {
         "configFile": "libs/ui-core/vitest.config.mts",
         "watch": false,
