@@ -14,8 +14,11 @@ import type { ColorToken, RadiusToken, SpacingToken } from '../tokens';
  *   (web = px, RN = density-independent pixel). 두 렌더러 모두 "숫자는 원시 길이"로 읽는다.
  * - **축약 우선순위**: 방향값 > 축 값 > 공통값 (`pt ?? py ?? p`). 두 구현이 같은 순서를 쓴다.
  * - **미지정은 미적용**: `undefined`는 "그 축을 건드리지 않는다"는 뜻이지 `0`이 아니다.
- * - **`bg`**: 시맨틱 color 토큰 경로만 받는다. 원시 색 문자열은 받지 않는다 —
- *   web은 CSS 변수로, RN은 토큰 트리 조회로 해석한다.
+ * - **`bg`**: color 트리의 **leaf 경로**를 받는다. 시맨틱 역할(`background.surface`,
+ *   `text.default`)뿐 아니라 원시 램프(`primary.pr500`, `neutral.ne200`)도 포함한다 —
+ *   `ColorToken` 이 `color` 트리 전체에서 유도되기 때문이고, 의도된 범위다 (demo-mobile 이
+ *   램프 경로로 Box 배경을 칠한다). 받지 않는 것은 **원시 색 문자열**(`#ff0000`)과
+ *   leaf 가 아닌 중간 노드(`background`)다. web은 CSS 변수로, RN은 토큰 트리 조회로 해석한다.
  */
 export type BoxSpacingValue = SpacingToken | number;
 export type BoxRadiusValue = RadiusToken | number;

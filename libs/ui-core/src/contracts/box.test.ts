@@ -21,12 +21,29 @@ const semantic: BoxProps = {
 const numericRadius: BoxRadiusValue = 8;
 const tokenSpacing: BoxSpacingValue = 'xl';
 
+/**
+ * `bg` 는 semantic-only 가 **아니다**. `ColorToken` 은 `color` 트리 전체에서 유도되므로
+ * 원시 램프 경로도 leaf 면 받는다. demo-mobile 의 `BoxSection` 이 정확히 이 경로들을 쓴다 —
+ * 시맨틱 역할만 남기도록 좁히면 그 소비자가 깨진다. 좁힘을 컴파일에서 잡으려고 여기 둔다.
+ */
+const rampBg: BoxProps = { bg: 'primary.pr500' };
+const neutralRampBg: BoxProps = { bg: 'neutral.ne200' };
+const componentBg: BoxProps = { bg: 'primaryBtn.hover' };
+
 describe('Box 계약이 받는 것', () => {
   it('시맨틱 토큰과 원시 숫자를 함께 받는다', () => {
     expect(semantic.p).toBe('md');
     expect(semantic.px).toBe(4);
     expect(numericRadius).toBe(8);
     expect(tokenSpacing).toBe('xl');
+  });
+
+  it('bg 는 시맨틱 역할과 원시 램프 경로를 모두 받는다', () => {
+    // 값 비교가 아니라 위 선언이 컴파일된다는 사실이 계약이다.
+    expect(semantic.bg).toBe('background.primary');
+    expect(rampBg.bg).toBe('primary.pr500');
+    expect(neutralRampBg.bg).toBe('neutral.ne200');
+    expect(componentBg.bg).toBe('primaryBtn.hover');
   });
 
   it('미지정 축은 키 자체가 없다 — 0 이 아니다', () => {
