@@ -30,16 +30,18 @@ const reactNativeUi = (name, importStr, limit) => ({
 module.exports = [
   // react-ui — 단일 bundle 구조라 베이스 ~9.3 KB가 항상 들어감
   reactUi('cx only', '{ cx }', '11 KB'),
+  reactUi('Box only', '{ Box }', '11 KB'),
   reactUi('Button only', '{ Button }', '11 KB'),
   reactUi('ThemeProvider only', '{ ThemeProvider }', '11 KB'),
   reactUi('themes registry only', '{ themes }', '11 KB'),
   reactUi('Web tokens (Light)', '{ Web }', '13 KB'),
   reactUi('* (full)', '*', '14 KB'),
 
-  // react-native-ui — 단일 import도 theme/styles 모듈 evaluate로 약 1.8~3 KB가 들어감
-  reactNativeUi('themes registry only', '{ themes }', '2.2 KB'),
-  reactNativeUi('getColor only', '{ getColor }', '2.6 KB'),
-  reactNativeUi('Box only', '{ Box }', '3.6 KB'),
-  reactNativeUi('Native tokens (Light)', '{ Native }', '3 KB'),
-  reactNativeUi('* (full)', '*', '6 KB'),
+  // react-native-ui — 단일 import도 theme/styles 모듈 evaluate로 약 3 KB가 들어감.
+  reactNativeUi('themes registry only', '{ themes }', '3.7 KB'),
+  reactNativeUi('getColor only', '{ getColor }', '4.1 KB'),
+  reactNativeUi('Box only', '{ Box }', '5.1 KB'),
+  reactNativeUi('ThemeProvider only', '{ ThemeProvider }', '3.8 KB'),
+  reactNativeUi('Native tokens (Light)', '{ Native }', '3.7 KB'),
+  reactNativeUi('* (full)', '*', '15.1 KB'),
 ];
