@@ -10,7 +10,7 @@ import { Native } from '@berrypjh/ui-core';
 
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import type { ReactElement } from 'react';
-import type { PressableProps } from 'react-native';
+import type { PressableProps, View } from 'react-native';
 
 import { ThemeProvider } from '../../theme';
 import type { ButtonBaseProps } from '../button-base/ButtonBase.types';
@@ -92,6 +92,17 @@ describe('기본 동작', () => {
 
     expect(onPress).not.toHaveBeenCalled();
     expect(button()).toBeDisabled();
+  });
+
+  it('ref 가 Pressable 호스트까지 닿는다', async () => {
+    // ButtonBase 테스트는 ButtonBase→Pressable 구간만 본다. Button 은 자체 prop 만
+    // 구조분해하고 나머지를 흘리므로, ref 가 그 목록에 잘못 들어가면 여기서만 잡힌다.
+    const ref = { current: null } as { current: View | null };
+
+    await renderWithTheme(<Button ref={ref}>Save</Button>);
+
+    expect(ref.current).not.toBeNull();
+    expect(typeof ref.current?.measure).toBe('function');
   });
 });
 
