@@ -53,7 +53,7 @@ const rowStyle = {
 };
 
 const boxBaseStyle = {
-  border: '1px dashed #D0D5DD',
+  border: '1px dashed var(--ds-stroke-default)',
   minWidth: '80px',
   minHeight: '40px',
 };
@@ -73,26 +73,42 @@ export const WithSpacing: Story = {
   render: () => (
     <div style={columnStyle}>
       <div>
-        <p style={{ fontSize: '12px', color: '#667085', marginBottom: '4px' }}>p="md" (14px)</p>
-        <Box p="md" style={{ ...boxBaseStyle, backgroundColor: '#F9FAFB' }}>
+        <p style={{ fontSize: '12px', color: 'var(--ds-text-light)', marginBottom: '4px' }}>
+          p="md" (0.75rem)
+        </p>
+        <Box p="md" style={{ ...boxBaseStyle, backgroundColor: 'var(--ds-background-surface)' }}>
           padding md
         </Box>
       </div>
       <div>
-        <p style={{ fontSize: '12px', color: '#667085', marginBottom: '4px' }}>px="lg" py="sm"</p>
-        <Box px="lg" py="sm" style={{ ...boxBaseStyle, backgroundColor: '#F9FAFB' }}>
+        <p style={{ fontSize: '12px', color: 'var(--ds-text-light)', marginBottom: '4px' }}>
+          px="lg" py="sm"
+        </p>
+        <Box
+          px="lg"
+          py="sm"
+          style={{ ...boxBaseStyle, backgroundColor: 'var(--ds-background-surface)' }}
+        >
           padding x/y 분리
         </Box>
       </div>
       <div>
-        <p style={{ fontSize: '12px', color: '#667085', marginBottom: '4px' }}>p={24} (숫자 px)</p>
-        <Box p={24} style={{ ...boxBaseStyle, backgroundColor: '#F9FAFB' }}>
+        <p style={{ fontSize: '12px', color: 'var(--ds-text-light)', marginBottom: '4px' }}>
+          p={24} (숫자 px)
+        </p>
+        <Box p={24} style={{ ...boxBaseStyle, backgroundColor: 'var(--ds-background-surface)' }}>
           padding 24px
         </Box>
       </div>
       <div>
-        <p style={{ fontSize: '12px', color: '#667085', marginBottom: '4px' }}>p="xl" m="sm"</p>
-        <Box p="xl" m="sm" style={{ ...boxBaseStyle, backgroundColor: '#F9FAFB' }}>
+        <p style={{ fontSize: '12px', color: 'var(--ds-text-light)', marginBottom: '4px' }}>
+          p="xl" m="sm"
+        </p>
+        <Box
+          p="xl"
+          m="sm"
+          style={{ ...boxBaseStyle, backgroundColor: 'var(--ds-background-surface)' }}
+        >
           padding + margin
         </Box>
       </div>
@@ -105,11 +121,11 @@ export const WithBackground: Story = {
     <div style={rowStyle}>
       {(
         [
-          { token: 'background.primary', fg: '#fff' },
-          { token: 'background.secondary', fg: '#fff' },
-          { token: 'background.success', fg: '#fff' },
-          { token: 'background.error', fg: '#fff' },
-          { token: 'background.warning', fg: '#fff' },
+          { token: 'background.primary', fg: 'var(--ds-text-contrast-text)' },
+          { token: 'background.secondary', fg: 'var(--ds-text-contrast-text)' },
+          { token: 'background.success', fg: 'var(--ds-text-contrast-text)' },
+          { token: 'background.error', fg: 'var(--ds-text-contrast-text)' },
+          { token: 'background.warning', fg: 'var(--ds-text-contrast-text)' },
           { token: 'background.grey', fg: 'var(--ds-text-default)' },
         ] as const
       ).map(({ token, fg }) => (
@@ -135,7 +151,12 @@ export const WithRadius: Story = {
           radius={r}
           p="md"
           bg="background.primary"
-          style={{ color: '#fff', fontSize: '12px', minWidth: '60px', textAlign: 'center' }}
+          style={{
+            color: 'var(--ds-text-contrast-text)',
+            fontSize: '12px',
+            minWidth: '60px',
+            textAlign: 'center',
+          }}
         >
           {r}
         </Box>
@@ -149,7 +170,11 @@ export const WithLongText: Story = {
     <Box
       p="lg"
       radius="md"
-      style={{ maxWidth: '400px', backgroundColor: '#F9FAFB', border: '1px solid #EAECF0' }}
+      style={{
+        maxWidth: '400px',
+        backgroundColor: 'var(--ds-background-surface)',
+        border: '1px solid var(--ds-stroke-light)',
+      }}
     >
       공지사항: 다음 주 화요일 오전 10시부터 정기 시스템 점검이 진행됩니다. 점검 시간은 약 2시간으로
       예상되며, 해당 시간 동안 서비스 이용이 일시 중단될 수 있습니다. 이용에 불편을 드려 죄송합니다.
@@ -165,7 +190,7 @@ export const A11y: Story = {
         aria-label="사용자 프로필 섹션"
         p="lg"
         radius="md"
-        style={{ border: '1px solid #D0D5DD' }}
+        style={{ border: '1px solid var(--ds-stroke-default)' }}
       >
         role="region" + aria-label
       </Box>
@@ -173,7 +198,7 @@ export const A11y: Story = {
         role="article"
         aria-labelledby="article-title"
         p="md"
-        style={{ border: '1px solid #D0D5DD' }}
+        style={{ border: '1px solid var(--ds-stroke-default)' }}
       >
         <h3 id="article-title" style={{ margin: 0, marginBottom: '8px' }}>
           공지사항
@@ -184,7 +209,7 @@ export const A11y: Story = {
         role="complementary"
         aria-describedby="section-desc"
         p="md"
-        style={{ border: '1px solid #D0D5DD' }}
+        style={{ border: '1px solid var(--ds-stroke-default)' }}
       >
         <p id="section-desc" style={{ margin: 0 }}>
           aria-describedby 예시

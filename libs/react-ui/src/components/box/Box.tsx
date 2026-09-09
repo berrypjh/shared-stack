@@ -26,6 +26,7 @@ export const Box = ({
   bg,
   radius,
   children,
+  ref,
   ...rest
 }: ReactBoxProps) => {
   const computedStyle = getBoxComputedStyle({
@@ -53,7 +54,7 @@ export const Box = ({
   };
 
   return (
-    <div {...rest} className={cx(boxClasses.root, className)} style={mergedStyle}>
+    <div {...rest} ref={ref} className={cx(boxClasses.root, className)} style={mergedStyle}>
       {children}
     </div>
   );

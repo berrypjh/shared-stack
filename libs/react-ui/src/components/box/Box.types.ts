@@ -1,10 +1,10 @@
 import type { BoxProps, BoxRadiusValue, BoxSpacingValue, ColorToken } from '@berrypjh/ui-core';
 
-import type { CSSProperties, HTMLAttributes } from 'react';
+import type { ComponentPropsWithRef, CSSProperties } from 'react';
 
 export type { BoxProps, BoxRadiusValue, BoxSpacingValue, ColorToken };
 
-type HtmlDivProps = HTMLAttributes<HTMLDivElement>;
+type HtmlDivProps = ComponentPropsWithRef<'div'>;
 
 export type ReactBoxProps = BoxProps &
   Omit<HtmlDivProps, keyof BoxProps | 'color'> & {

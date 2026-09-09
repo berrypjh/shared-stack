@@ -81,4 +81,30 @@ describe('<ThemeProvider />', () => {
       expect(root).toHaveClass(themeProviderClasses.root);
     });
   });
+
+  /**
+   * web은 Context가 아니라 `data-theme` DOM 스코프로 테마를 내려보낸다. 그래서 중첩의 계약은
+   * "안쪽이 자기 scope를 새로 연다"는 **구조**다 — 실제 값 선택은 CSS 캐스케이드가 하고,
+   * 그것은 브라우저 몫이라 jsdom에서 검증하지 않는다. RN은 같은 시맨틱을 Context로 구현한다.
+   */
+  describe('중첩', () => {
+    it('중첩하면 안쪽이 자기 data-theme scope를 연다', () => {
+      render(
+        <ThemeProvider mode="light" data-testid="outer">
+          <ThemeProvider mode="dark" data-testid="inner">
+            content
+          </ThemeProvider>
+        </ThemeProvider>,
+      );
+
+      const outer = screen.getByTestId('outer');
+      const inner = screen.getByTestId('inner');
+
+      expect(outer).toHaveAttribute('data-theme', 'light');
+      expect(inner).toHaveAttribute('data-theme', 'dark');
+      expect(inner).toHaveClass(themeProviderClasses.root);
+      // 안쪽은 바깥을 대체하지 않고 그 안에 중첩된다 — 캐스케이드가 성립하는 조건이다.
+      expect(outer).toContainElement(inner);
+    });
+  });
 });
