@@ -43,6 +43,12 @@ module.exports = [
   // react-native-ui — 단일 import도 theme/styles 모듈 evaluate로 약 3 KB가 들어감.
   // 여기서는 선택 import가 실제로 갈린다(Button 4.59 / Fab 4.35 / IconButton 4.14 vs 전체 12.54)
   // 그래서 공개 Button 계열 3종을 개별로 건다. 내부 전용 ButtonBase 는 공개 API 가 아니라 넣지 않는다.
+  //
+  // Input 계열도 같은 이유로 RN 에만 건다. web 은 Input 심볼이 9.51~9.55 KB 로 모여
+  // (InputBase 9.51 / PlainInput 9.53 / FilledInput 9.55 / TextField 9.51) 서로 구분되지 않고,
+  // 여유가 더 좁은 `* (full)` 이 같은 회귀를 이미 잡는다.
+  // Plain·Filled·Boxed 는 RN 에서도 셋 다 5.17 로 동일하다 — 공유 InputBase 가 거의 전부라
+  // 하나만 걸어도 같은 회귀를 잡는다. 합성 계층은 값이 갈라져(TextField 6.29) 따로 건다.
   reactNativeUi('themes registry only', '{ themes }', '3.7 KB'),
   reactNativeUi('getColor only', '{ getColor }', '4.1 KB'),
   reactNativeUi('Box only', '{ Box }', '5.1 KB'),
@@ -51,5 +57,7 @@ module.exports = [
   reactNativeUi('Fab only', '{ Fab }', '5.3 KB'),
   reactNativeUi('ThemeProvider only', '{ ThemeProvider }', '3.8 KB'),
   reactNativeUi('Native tokens (Light)', '{ Native }', '3.7 KB'),
+  reactNativeUi('PlainInput only', '{ PlainInput }', '6.2 KB'),
+  reactNativeUi('TextField only', '{ TextField }', '7.5 KB'),
   reactNativeUi('* (full)', '*', '15.1 KB'),
 ];
