@@ -8,7 +8,7 @@
   --ui-input-border-color: var(--ds-field-border);
   --ui-input-border-hover: var(--ds-field-border-hover);
   --ui-input-active-color: var(--ds-border-primary-color);
-  --ui-input-focus-halo: var(--ds-primary-btn-outlined-hover);
+  --ui-input-focus-halo: var(--ds-field-focus-ring-primary);
   --ui-input-disabled-bg: var(--ds-field-surface-subtle);
   --ui-input-disabled-fg: var(--ds-text-disable);
   --ui-input-disabled-border: var(--ds-border-disabled-color);
@@ -139,4 +139,14 @@
 
 .ui-input-base--read-only .ui-input-base__input {
   cursor: default;
+}
+
+/**
+ * 루트가 테두리·halo·표면·글자색을 transition 한다. 상태 변화 자체는 색이 담당하므로
+ * 전환을 꺼도 정보가 사라지지 않는다 — 움직임에 민감한 사용자에게는 끄는 편이 낫다.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .ui-input-base {
+    transition: none;
+  }
 }

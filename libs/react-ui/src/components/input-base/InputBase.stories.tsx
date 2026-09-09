@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { InputBase } from './InputBase';
@@ -8,6 +10,22 @@ const meta = {
   tags: ['autodocs'],
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component: [
+          'native `<input>`/`<textarea>` 하나를 감싸는 동작 원시입니다.',
+          '',
+          'prop은 두 요소로 갈립니다. 시맨틱·native 속성(`id`·`name`·`placeholder`·`required`·',
+          '`disabled`·`readOnly`·`autoComplete`·`autoFocus`·`inputMode`·`enterKeyHint`와',
+          '`aria-label`·`aria-labelledby`·`aria-describedby`·`aria-invalid`)은 native 요소로 갑니다.',
+          '나머지 `div` prop은 래퍼에 남습니다 — native 요소에 직접 얹으려면 `inputProps`/',
+          '`textareaProps`를 씁니다.',
+          '',
+          '`error`는 native 요소의 `aria-invalid`가 됩니다. 루트 `role`은 기본값이 `presentation`',
+          '이고 소비자가 덮어쓸 수 있습니다.',
+        ].join('\n'),
+      },
+    },
   },
   args: {
     placeholder: 'Enter value',
@@ -46,6 +64,15 @@ const meta = {
     onBlur: { action: 'blurred' },
     startAdornment: { control: false },
     endAdornment: { control: false },
+    role: {
+      control: 'text',
+      description: '래퍼 div의 role. 기본값 `presentation`을 덮어쓸 수 있다.',
+    },
+    inputMode: {
+      control: 'select',
+      options: [undefined, 'text', 'numeric', 'decimal', 'tel', 'email', 'url', 'search'],
+      description: 'native 요소로 전달된다 — 래퍼에 남으면 가상 키보드에 닿지 않는다.',
+    },
     inputProps: { control: false },
     textareaProps: { control: false },
     inputRef: { control: false },
@@ -244,7 +271,7 @@ export const A11y: Story = {
         aria-label="Search"
         startAdornment={<SearchIcon />}
         placeholder="Search..."
-        role="searchbox"
+        type="search"
       />
       <InputBase
         id="a11y-notes"
@@ -254,7 +281,54 @@ export const A11y: Story = {
         rows={3}
         placeholder="Optional notes..."
       />
-      <InputBase aria-label="Disabled field" disabled value="Not editable" aria-disabled="true" />
+      <InputBase aria-label="Disabled field" disabled value="Not editable" />
     </div>
   ),
+};
+
+/**
+ * 포커스 chrome 은 CSS `:focus` 가 아니라 `InputBase` 가 관리하는 상태 클래스가 그린다.
+ * 그래서 `play` 에서 실제로 포커스를 옮겨야 보인다 — 클래스를 손으로 붙이면 상태 기계를
+ * 건너뛰고 시각만 흉내 내는 것이 된다.
+ *
+ * 평상시 필드를 옆에 둬서 대비를 함께 본다. Chromatic 은 `play` 이후를 찍으므로
+ * 포커스 표시 자체가 시각 회귀 대상이 된다.
+ */
+export const Focused: Story = {
+  render: () => (
+    <div style={columnStyle}>
+      <InputBase aria-label="Focused field" placeholder="Focused" />
+      <InputBase aria-label="Resting field" placeholder="Resting" />
+      <InputBase aria-label="Focused with error" placeholder="Focused + error" error />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    canvasElement.querySelector<HTMLInputElement>('input')?.focus();
+  },
+};
+
+/**
+ * 값의 주인이 누구인지 보여준다.
+ *
+ * `InputBase` 는 값을 내부에 복제하지 않는다 — `value` 를 주면 소비자가 유일한 권한이고,
+ * `defaultValue` 만 주면 native input 이 소유한다. 두 모델을 나란히 두면 계약이 눈에 보인다.
+ */
+export const ControlledVsUncontrolled: Story = {
+  render: function Render() {
+    const [value, setValue] = useState('controlled');
+
+    return (
+      <div style={columnStyle}>
+        <InputBase
+          aria-label="Controlled value"
+          value={value}
+          onChange={(event) => setValue(event.target.value)}
+        />
+        <InputBase aria-label="Uncontrolled value" defaultValue="uncontrolled" />
+        <p style={{ margin: 0, fontSize: '12px', color: 'var(--ds-text-light)' }}>
+          controlled 값: {value || '(비어 있음)'}
+        </p>
+      </div>
+    );
+  },
 };

@@ -6,30 +6,30 @@
   box-shadow: none;
 }
 
-.ui-plain-input:hover:not(.ui-plain-input-base--disabled):not(.ui-plain-input-base--focused):not(
-    .ui-plain-input-base--error
+.ui-plain-input:hover:not(.ui-input-base--disabled):not(.ui-input-base--focused):not(
+    .ui-input-base--error
   ) {
   border-bottom-color: var(--ds-field-border-strong);
 }
 
-.ui-plain-input.ui-plain-input-base--focused {
+.ui-plain-input.ui-input-base--focused {
   border-bottom-color: var(--ui-input-active-color);
   box-shadow: 0 1px 0 0 var(--ui-input-active-color);
 }
 
-.ui-plain-input.ui-plain-input-base--error {
+.ui-plain-input.ui-input-base--error {
   border-bottom-color: var(--ds-stroke-error);
 }
 
-.ui-plain-input.ui-plain-input-base--error.ui-plain-input-base--focused {
+.ui-plain-input.ui-input-base--error.ui-input-base--focused {
   box-shadow: 0 1px 0 0 var(--ds-stroke-error);
 }
 
-.ui-plain-input.ui-plain-input-base--disabled {
+.ui-plain-input.ui-input-base--disabled {
   background: transparent;
 }
 
-.ui-plain-input .ui-plain-input-base__input {
+.ui-plain-input .ui-plain-input__input {
   padding-inline: 0;
 }
 

@@ -1,4 +1,4 @@
-import type { ComponentPropsWithRef, ReactNode } from 'react';
+import type { ComponentPropsWithRef, ReactNode, Ref } from 'react';
 
 import type {
   InputFieldProps,
@@ -49,7 +49,12 @@ export type InputBaseOwnProps = Omit<InputFieldProps, 'variant'> & {
   inputClassName?: string;
   inputProps?: NativeInputProps;
   textareaProps?: NativeTextareaProps;
-  inputRef?: unknown;
+  /**
+   * native input/textarea 로 가는 ref.
+   *
+   * 루트 `<div>` 를 받는 `ref` 와 별개다 — 값 읽기·포커스·선택은 native 요소에서만 된다.
+   */
+  inputRef?: Ref<InputLikeElement>;
   name?: string;
   onBlur?: InputLikeFocusEventHandler;
   onChange?: InputLikeChangeEventHandler;

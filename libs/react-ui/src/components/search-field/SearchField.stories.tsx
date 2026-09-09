@@ -138,12 +138,7 @@ export const AllColors: Story = {
 export const Disabled: Story = {
   render: () => (
     <div style={{ minWidth: '320px' }}>
-      <SearchField
-        disabled
-        placeholder="Search is disabled"
-        aria-label="Search (disabled)"
-        aria-disabled="true"
-      />
+      <SearchField disabled placeholder="Search is disabled" aria-label="Search (disabled)" />
     </div>
   ),
 };
@@ -316,12 +311,7 @@ export const A11y: Story = {
         suggestions={projectSuggestions}
         noSuggestionsText="No matching projects"
       />
-      <SearchField
-        aria-label="Search (disabled)"
-        disabled
-        aria-disabled="true"
-        placeholder="Search unavailable"
-      />
+      <SearchField aria-label="Search (disabled)" disabled placeholder="Search unavailable" />
     </div>
   ),
 };

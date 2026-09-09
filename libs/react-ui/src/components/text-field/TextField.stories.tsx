@@ -1,5 +1,8 @@
+import { themes } from '@berrypjh/ui-core';
+
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
+import { ThemeProvider } from '../../theme';
 import { MenuItem } from '../menu-item';
 
 import { TextField } from './TextField';
@@ -326,6 +329,65 @@ export const A11y: Story = {
         <MenuItem value="editor">Editor</MenuItem>
         <MenuItem value="viewer">Viewer</MenuItem>
       </TextField>
+    </div>
+  ),
+};
+
+/** `deepSea` 같은 합성어도 읽히도록 띄어 쓴다. preview 툴바와 같은 규칙. */
+const themeLabel = (name: string) =>
+  name.replace(/([a-z0-9])([A-Z])/g, '$1 $2').replace(/^./, (character) => character.toUpperCase());
+
+/**
+ * 등록된 모든 테마를 한 화면에 나란히 세운다.
+ *
+ * 테마마다 스토리를 복사하면 design-tokens 에 테마가 늘어도 Storybook 만 조용히 낡는다 —
+ * 툴바가 이미 겪은 문제다. 여기서는 `themes` 레지스트리를 순회하므로 새 테마가 자동으로 들어온다.
+ *
+ * 툴바 데코레이터를 끄는 것은 **정확성 때문**이다. light 는 CSS 선택자가 `:root` 하나뿐이라
+ * `data-theme="light"` 에 대응하는 규칙이 없다 — 바깥이 dark 로 감싸여 있으면 light 칸이
+ * dark 를 물려받아 매트릭스가 거짓말을 한다. 데코레이터를 끄면 `:root` 가 light 를 맡고
+ * 나머지 여섯은 각자의 `data-theme` 로 스코프된다.
+ */
+export const ThemeMatrix: Story = {
+  parameters: {
+    layout: 'fullscreen',
+    disableThemeDecorator: true,
+  },
+  render: () => (
+    <div style={{ display: 'grid', gap: '20px', padding: '24px' }}>
+      {themes.map(({ name }) => (
+        <ThemeProvider key={name} mode={name}>
+          <div
+            style={{
+              display: 'grid',
+              gap: '12px',
+              padding: '16px',
+              borderRadius: 'var(--ds-radius-md)',
+              background: 'var(--ds-background-default)',
+              color: 'var(--ds-text-default)',
+              border: '1px solid var(--ds-field-border)',
+            }}
+          >
+            <strong style={{ font: 'var(--ds-body-small-font-size) / 1 inherit' }}>
+              {themeLabel(name)}
+            </strong>
+
+            <div style={rowStyle}>
+              <TextField variant="plain" label="Plain" placeholder="Enter value" />
+              <TextField variant="filled" label="Filled" defaultValue="Filled value" />
+              <TextField
+                variant="boxed"
+                label="Boxed"
+                error
+                defaultValue="bad@"
+                helperText="Enter a valid email address."
+              />
+              <TextField variant="boxed" label="Disabled" disabled defaultValue="Not editable" />
+              <TextField variant="boxed" label="Required" required placeholder="Enter value" />
+            </div>
+          </div>
+        </ThemeProvider>
+      ))}
     </div>
   ),
 };

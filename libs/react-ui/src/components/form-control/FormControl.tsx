@@ -32,8 +32,16 @@ export const FormControl = (props: FormControlImplementationProps) => {
   const derivedChildState = useMemo(() => deriveStateFromChildren(children), [children]);
 
   const [focusedState, setFocusedState] = useState(false);
-  const [filledState, setFilledState] = useState(false);
   const [adornedStartState, setAdornedStartState] = useState(false);
+
+  /**
+   * 자식 스캔은 **첫 값만** 정한다.
+   *
+   * 값을 넣은 채로 마운트해도 첫 페인트부터 filled여야 라벨이 튀지 않는다. 하지만 그 뒤로는
+   * 입력이 `onFilled`/`onEmpty`로 알려주는 것이 진실이다 — 스캔은 `defaultValue`를 계속 참으로
+   * 읽으므로, OR로 합치면 사용자가 지워도 filled가 내려오지 못한다.
+   */
+  const [filled, setFilled] = useState(derivedChildState.filled);
 
   useEffect(() => {
     if (disabled) {
@@ -42,7 +50,8 @@ export const FormControl = (props: FormControlImplementationProps) => {
   }, [disabled]);
 
   const focused = !disabled && (focusedProp ?? focusedState);
-  const filled = derivedChildState.filled || filledState;
+
+  // 장식은 런타임 값이 아니라 prop이라 스캔이 children 변화를 그대로 따라간다.
   const adornedStart = derivedChildState.adornedStart || adornedStartState;
 
   const handleFocus = useCallback(
@@ -82,11 +91,11 @@ export const FormControl = (props: FormControlImplementationProps) => {
   }, []);
 
   const handleFilled = useCallback(() => {
-    setFilledState(true);
+    setFilled(true);
   }, []);
 
   const handleEmpty = useCallback(() => {
-    setFilledState(false);
+    setFilled(false);
   }, []);
 
   const contextValue = useMemo(

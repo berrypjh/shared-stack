@@ -240,3 +240,24 @@ export const A11y: Story = {
     </div>
   ),
 };
+
+/**
+ * 포커스 chrome 은 CSS `:focus` 가 아니라 `InputBase` 가 관리하는 상태 클래스가 그린다.
+ * 그래서 `play` 에서 실제로 포커스를 옮겨야 보인다 — 클래스를 손으로 붙이면 상태 기계를
+ * 건너뛰고 시각만 흉내 내는 것이 된다.
+ *
+ * 평상시 필드를 옆에 둬서 대비를 함께 본다. Chromatic 은 `play` 이후를 찍으므로
+ * 포커스 표시 자체가 시각 회귀 대상이 된다.
+ */
+export const Focused: Story = {
+  render: () => (
+    <div style={columnStyle}>
+      <BoxedInput aria-label="Focused field" placeholder="Focused" />
+      <BoxedInput aria-label="Resting field" placeholder="Resting" />
+      <BoxedInput aria-label="Focused with error" placeholder="Focused + error" error />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    canvasElement.querySelector<HTMLInputElement>('input')?.focus();
+  },
+};

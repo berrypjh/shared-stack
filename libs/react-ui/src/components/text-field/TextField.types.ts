@@ -1,7 +1,8 @@
-import type { ReactNode } from 'react';
+import type { ReactNode, Ref } from 'react';
 
 import type {
   InputLikeChangeEventHandler,
+  InputLikeElement,
   InputLikeFocusEventHandler,
   TextFieldProps as TextFieldSemanticProps,
 } from '../../types';
@@ -13,7 +14,8 @@ export type TextFieldOwnProps = TextFieldSemanticProps & {
   defaultValue?: unknown;
   helperText?: ReactNode;
   id?: string;
-  inputRef?: unknown;
+  /** 합성된 native input/textarea 로 가는 ref. `select` 모드에서는 연결되지 않는다. */
+  inputRef?: Ref<InputLikeElement>;
   label?: ReactNode;
   name?: string;
   onBlur?: InputLikeFocusEventHandler;

@@ -22,9 +22,28 @@ import {
   getInputBaseRootClassNames,
   getResolvedDefaultValue,
   getResolvedInputValue,
+  ownsFocus,
   syncFilledState,
 } from './InputBase.utils';
 
+/**
+ * native `<input>`/`<textarea>` 하나를 감싸는 동작 원시.
+ *
+ * **prop은 두 요소로 갈린다.** 시맨틱·native 속성(`id`·`name`·`placeholder`·`required`·
+ * `disabled`·`readOnly`·`autoComplete`·`autoFocus`·`inputMode`·`enterKeyHint`, 그리고
+ * `aria-label`·`aria-labelledby`·`aria-describedby`·`aria-invalid`)은 native 요소로 간다.
+ * 나머지 `div` prop(`className`·`style`·`data-*`·이벤트 핸들러·그 밖의 `aria-*`)은 래퍼
+ * `<div>`에 남는다 — 래퍼도 실제 요소라 소비자가 꾸밀 수 있어야 하기 때문이다. native 요소에
+ * 직접 얹고 싶은 것은 `inputProps`/`textareaProps`로 준다.
+ *
+ * 루트 `role`은 기본값이 `presentation`이고 **소비자가 덮어쓸 수 있다** — 받아 놓고 무시하면
+ * 왜 안 되는지 알 수 없다. 다만 `searchbox`·`textbox` 같은 **위젯 role은 래퍼의 것이 아니다**:
+ * 이름 prop이 native 요소로 가므로 래퍼는 이름 없는 위젯이 되고 진짜 입력을 자식으로 품는다.
+ * 그런 의미는 native `type`(`type="search"`)이나 `inputProps`로 표현한다. 래퍼 `role`은
+ * `group` 처럼 묶음을 뜻할 때만 쓴다.
+ *
+ * `ref`는 래퍼 `<div>`, `inputRef`는 native 요소를 가리킨다.
+ */
 export const InputBase = ({
   'aria-describedby': ariaDescribedby,
   'aria-label': ariaLabel,
@@ -38,9 +57,11 @@ export const InputBase = ({
   defaultValue,
   disabled,
   endAdornment,
+  enterKeyHint,
   error,
   fullWidth,
   id,
+  inputMode,
   inputClassName,
   inputProps,
   textareaProps,
@@ -155,9 +176,12 @@ export const InputBase = ({
       return;
     }
 
-    if (event.target !== input) {
-      input.focus();
+    // native input 자신도 포커스를 갖는 요소라 이 판별 하나로 함께 걸러진다.
+    if (ownsFocus(event.target, event.currentTarget)) {
+      return;
     }
+
+    input.focus();
   };
 
   const handleNativeElementRef = createHandleNativeElementRef({
@@ -235,7 +259,10 @@ export const InputBase = ({
     autoComplete,
     autoFocus,
     disabled: resolvedDisabled,
+    enterKeyHint,
+    error: resolvedError,
     id,
+    inputMode,
     name,
     placeholder,
     readOnly,
@@ -247,9 +274,9 @@ export const InputBase = ({
 
   return (
     <div
+      role="presentation"
       {...rest}
       ref={ref}
-      role="presentation"
       className={rootClassNames}
       onClick={handleRootClick}
     >

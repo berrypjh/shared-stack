@@ -283,7 +283,7 @@ export const A11y: Story = {
       </FormControl>
       <FormControl disabled>
         <InputLabel htmlFor="a11y-disabled">Read-only account ID</InputLabel>
-        <FilledInput id="a11y-disabled" value="USR-00142" aria-disabled="true" />
+        <FilledInput id="a11y-disabled" value="USR-00142" />
         <FormHelperText>This value cannot be changed.</FormHelperText>
       </FormControl>
     </div>
