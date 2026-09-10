@@ -1,12 +1,14 @@
-import { act, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { act, cleanup, screen } from '@testing-library/react';
+import { beforeAll, describe, expect, it } from 'vitest';
 
 import { createRenderer, describeConformance } from '../../../test';
+import { applyComponentStyles, matchingStateColorRules } from '../../../test/componentStyles';
 import { FormControl } from '../form-control';
 import { PlainInput } from '../plain-input';
 
 import { InputLabel } from './InputLabel';
 import { inputLabelClasses } from './InputLabel.constants';
+import type { InputLabelProps } from './InputLabel.types';
 
 describe('<InputLabel />', () => {
   const { render } = createRenderer();
@@ -303,6 +305,74 @@ describe('<InputLabel />', () => {
 
       expect(root).toHaveClass(inputLabelClasses.root);
       expect(root).toHaveClass('custom-class-name');
+    });
+  });
+
+  /**
+   * 상태가 겹쳤을 때 어떤 색이 이기는지.
+   *
+   * 클래스가 붙었는지가 아니라 **실제 cascade 결과**를 본다. 상태 클래스는 셋 다 붙어 있고
+   * 사용자가 보는 색은 그중 하나뿐이라, 클래스 존재 검사로는 이 계약을 지킬 수 없다.
+   *
+   * 목표 순서 `disabled > error > focused > 평상시` 의 근거:
+   * - RN `InputLabel.styles.ts` 의 `labelColor` 가 같은 순서다
+   * - 같은 필드의 Input chrome(`boxed-input.scss`)도 disabled 를 가장 앞에 둔다
+   * - disabled 는 "편집 불가" 라는 더 강한 사실이라 오류·포커스보다 먼저 읽혀야 한다
+   */
+  describe('동시 상태 색 우선순위', () => {
+    const STATE_CLASSES = [
+      inputLabelClasses.disabled,
+      inputLabelClasses.error,
+      inputLabelClasses.focused,
+    ];
+
+    beforeAll(() => {
+      applyComponentStyles('input-label/input-label.scss');
+    });
+
+    /** 이 상태에서 색을 정하는 상태 규칙들. 정확히 하나여야 배타성이 지켜진 것이다. */
+    const winningColors = (props: Partial<InputLabelProps>): string[] => {
+      render(
+        <InputLabel data-testid="root" {...props}>
+          Label
+        </InputLabel>,
+      );
+
+      return matchingStateColorRules(screen.getByTestId('root'), STATE_CLASSES).map(
+        (rule) => rule.color,
+      );
+    };
+
+    it('상태가 없으면 상태 규칙이 하나도 매칭되지 않는다 — 기본 규칙이 남는다', () => {
+      expect(winningColors({})).toEqual([]);
+    });
+
+    it('focused 단독이면 color 에 따라 text.primary / text.secondary 다', () => {
+      expect(winningColors({ focused: true })).toEqual(['var(--ds-text-primary)']);
+
+      cleanup();
+
+      expect(winningColors({ focused: true, color: 'secondary' })).toEqual([
+        'var(--ds-text-secondary)',
+      ]);
+    });
+
+    it('error 가 focused 를 이긴다', () => {
+      expect(winningColors({ error: true, focused: true })).toEqual(['var(--ds-text-error)']);
+    });
+
+    it('disabled 가 error 를 이긴다', () => {
+      expect(winningColors({ disabled: true, error: true })).toEqual(['var(--ds-text-disable)']);
+    });
+
+    it('disabled 가 focused 를 이긴다', () => {
+      expect(winningColors({ disabled: true, focused: true })).toEqual(['var(--ds-text-disable)']);
+    });
+
+    it('셋이 겹쳐도 disabled 다', () => {
+      expect(winningColors({ disabled: true, error: true, focused: true })).toEqual([
+        'var(--ds-text-disable)',
+      ]);
     });
   });
 });

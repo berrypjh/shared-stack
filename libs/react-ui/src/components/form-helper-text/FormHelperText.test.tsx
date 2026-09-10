@@ -1,9 +1,10 @@
 import * as React from 'react';
 
 import { screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 
 import { createRenderer, describeConformance } from '../../../test';
+import { applyComponentStyles, matchingStateColorRules } from '../../../test/componentStyles';
 import { FormControl } from '../form-control';
 
 import { FormHelperText } from './FormHelperText';
@@ -164,6 +165,45 @@ describe('<FormHelperText />', () => {
         expect(screen.getByText('Foo')).toHaveClass(formHelperTextClasses.sizeSm);
         expect(screen.getByText('Foo')).not.toHaveClass(formHelperTextClasses.sizeMd);
       });
+    });
+  });
+
+  /**
+   * 상태가 겹쳤을 때 어떤 색이 이기는지. 클래스가 아니라 실제 cascade 결과를 본다.
+   *
+   * 목표 순서 `disabled > error > 평상시` — RN `FormHelperText.styles.ts` 와 같고,
+   * 같은 필드의 `InputLabel`·Input chrome 과도 같다.
+   */
+  describe('동시 상태 색 우선순위', () => {
+    const STATE_CLASSES = [formHelperTextClasses.disabled, formHelperTextClasses.error];
+
+    beforeAll(() => {
+      applyComponentStyles('form-helper-text/form-helper-text.scss');
+    });
+
+    /** 이 상태에서 색을 정하는 상태 규칙들. 정확히 하나여야 배타성이 지켜진 것이다. */
+    const winningColors = (props: React.ComponentProps<typeof FormHelperText>): string[] => {
+      render(<FormHelperText {...props}>Foo</FormHelperText>);
+
+      return matchingStateColorRules(screen.getByText('Foo'), STATE_CLASSES).map(
+        (rule) => rule.color,
+      );
+    };
+
+    it('상태가 없으면 상태 규칙이 하나도 매칭되지 않는다 — 기본 규칙이 남는다', () => {
+      expect(winningColors({})).toEqual([]);
+    });
+
+    it('error 단독이면 text.error 다', () => {
+      expect(winningColors({ error: true })).toEqual(['var(--ds-text-error)']);
+    });
+
+    it('disabled 단독이면 text.disable 이다', () => {
+      expect(winningColors({ disabled: true })).toEqual(['var(--ds-text-disable)']);
+    });
+
+    it('disabled 가 error 를 이긴다', () => {
+      expect(winningColors({ disabled: true, error: true })).toEqual(['var(--ds-text-disable)']);
     });
   });
 });

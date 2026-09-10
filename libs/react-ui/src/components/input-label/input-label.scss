@@ -36,21 +36,35 @@
   line-height: var(--ds-body-small-strong-line-height);
 }
 
-.ui-input-label--focused.ui-input-label--color-primary {
+/**
+ * 상태 색 우선순위: disabled > error > focused > 평상시.
+ *
+ * 각 규칙이 자기보다 센 상태를 `:not()` 으로 배제해서 **한 번에 하나만 매칭**되게 한다.
+ * 특정도나 선언 순서에 기대지 않는다 — focus 규칙은 `--color-*` 와 겹쳐야 해서 특정도가
+ * 한 단계 높고, 그대로 두면 순서와 무관하게 disabled·error 를 이겨 버린다.
+ *
+ * 같은 순서를 RN `InputLabel.styles.ts` 의 `labelColor` 와 Input chrome(`boxed-input.scss`)이
+ * 이미 쓴다. disabled 는 "편집 불가" 라는 더 강한 사실이라 오류·포커스보다 먼저 읽혀야 한다.
+ */
+.ui-input-label--focused:not(.ui-input-label--disabled):not(
+    .ui-input-label--error
+  ).ui-input-label--color-primary {
   color: var(--ds-text-primary);
 }
 
-.ui-input-label--focused.ui-input-label--color-secondary {
+.ui-input-label--focused:not(.ui-input-label--disabled):not(
+    .ui-input-label--error
+  ).ui-input-label--color-secondary {
   color: var(--ds-text-secondary);
+}
+
+.ui-input-label--error:not(.ui-input-label--disabled) {
+  color: var(--ds-text-error);
 }
 
 .ui-input-label--disabled {
   color: var(--ds-text-disable);
   cursor: default;
-}
-
-.ui-input-label--error {
-  color: var(--ds-text-error);
 }
 
 .ui-input-label__asterisk {
