@@ -419,6 +419,33 @@ describe('style 우선순위', () => {
     expect(getWrapper()).toHaveStyle({ minHeight: T.component.field.height.md });
   });
 
+  /**
+   * 리졸버가 `containerStateCritical` 을 만든다는 것(`InputBase.styles.test.ts`)과, 그것이
+   * 소비자 `containerStyle` **뒤에** 실제로 다시 얹힌다는 것은 다른 사실입니다. 배열에서
+   * 한 줄만 빠져도 리졸버 테스트는 그대로 통과합니다.
+   *
+   * error·disabled 는 소비자가 지울 수 없어야 합니다 — 둘 다 "이 필드를 지금 쓸 수 없거나
+   * 잘못됐다"는 고지라서, 꾸미기가 고지를 덮으면 사용자가 알 수 없습니다.
+   */
+  it.each([
+    ['error', { error: true }, (): string => T.color.stroke.error],
+    ['disabled', { disabled: true }, (): string => T.border.disabled.color],
+  ] as const)(
+    '소비자 containerStyle이 %s 테두리를 지울 수 없다',
+    async (_label, props, expected) => {
+      await renderWithTheme(
+        <InputBase
+          accessibilityLabel="probe"
+          variant="boxed"
+          {...props}
+          containerStyle={{ borderColor: 'rgb(1, 2, 3)' }}
+        />,
+      );
+
+      expect(getWrapper()).toHaveStyle({ borderColor: expected() });
+    },
+  );
+
   it('fullWidth는 래퍼를 늘린다', async () => {
     await renderWithTheme(<InputBase accessibilityLabel="probe" fullWidth />);
 

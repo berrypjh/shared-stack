@@ -63,6 +63,20 @@ describe('호스트와 접근성', () => {
 
     expect(getButton()).toBeDisabled();
   });
+
+  /**
+   * 타입은 `accessibilityRole` 을 이미 막지만(`RejectsInvariantBreakingProps`), 그것은 소비자
+   * 쪽 방어일 뿐이다. Base 안에서 `{...rest}` 가 `accessibilityRole` **뒤**로 옮겨지면 타입은
+   * 그대로 통과하면서 런타임 불변식만 조용히 사라진다. 그 순서를 여기서 고정한다.
+   */
+  it('accessibilityRole 은 런타임으로도 덮어쓸 수 없다', async () => {
+    const forced = { accessibilityRole: 'link' } as unknown as ButtonBaseProps;
+
+    await renderWithTheme(<ButtonBase accessibilityLabel="probe" {...forced} />);
+
+    expect(getButton()).toBeTruthy();
+    expect(screen.queryByRole('link')).toBeNull();
+  });
 });
 
 describe('press 동작', () => {
@@ -105,6 +119,20 @@ describe('press 동작', () => {
     await fireEvent.press(getButton());
 
     expect(onPress).not.toHaveBeenCalled();
+  });
+
+  /**
+   * 타입에 남아 있다는 것(`KeepsValidPressableProps`)과 Pressable 까지 실제로 닿는다는 것은
+   * 다른 이야기다. Base 가 `hitSlop` 을 destructure 로 삼켜도 타입 검사는 통과한다.
+   *
+   * `android_ripple` 은 여기서 같이 볼 수 없다 — Pressable 의 `useAndroidRippleForView` 가
+   * `Platform.OS === 'android'` 일 때만 viewProps 를 만들어서, iOS 기본인 jest 프리셋에서는
+   * 넘겨도 호스트에 나타나지 않는다. 그쪽은 타입 수준 단언이 지킨다.
+   */
+  it('hitSlop 이 Pressable 까지 닿는다', async () => {
+    await renderWithTheme(<ButtonBase accessibilityLabel="probe" hitSlop={12} />);
+
+    expect(getButton().props.hitSlop).toBe(12);
   });
 
   it('testID 같은 일반 Pressable prop 을 전달한다', async () => {

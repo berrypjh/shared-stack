@@ -196,6 +196,37 @@ describe('content color 토큰', () => {
   });
 });
 
+/**
+ * Button 과 같은 눌림 언어입니다 — 색이 아니라 위치. 옮기는 것은 보이는 면이고,
+ * 루트는 최소 터치 타깃을 지키는 상자라 제자리에 둡니다.
+ */
+describe('pressed 피드백', () => {
+  it('눌리면 면이 토큰 오프셋만큼 내려간다', async () => {
+    await renderWithTheme(
+      <IconButton icon={icon} accessibilityLabel="즐겨찾기" testOnly_pressed />,
+    );
+
+    expect(surface()).toHaveStyle({ transform: [{ translateY: t.component.pressedOffset }] });
+  });
+
+  it('눌리지 않았으면 오프셋이 없다', async () => {
+    await renderWithTheme(<IconButton icon={icon} accessibilityLabel="즐겨찾기" />);
+
+    expect(surface()).not.toHaveStyle({ transform: [{ translateY: t.component.pressedOffset }] });
+  });
+
+  it.each([
+    ['disabled', { disabled: true }],
+    ['loading', { loading: true }],
+  ] as const)('%s 면 눌림 표현이 나오지 않는다', async (_label, props) => {
+    await renderWithTheme(
+      <IconButton icon={icon} accessibilityLabel="즐겨찾기" testOnly_pressed {...props} />,
+    );
+
+    expect(surface()).not.toHaveStyle({ transform: [{ translateY: t.component.pressedOffset }] });
+  });
+});
+
 describe('loading', () => {
   it('기본 스피너는 ActivityIndicator 다', async () => {
     await renderWithTheme(<IconButton icon={icon} accessibilityLabel="즐겨찾기" loading />);

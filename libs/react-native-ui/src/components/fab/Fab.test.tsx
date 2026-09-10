@@ -234,6 +234,20 @@ describe('elevation 토큰', () => {
 
     expect(surface()).toHaveStyle({ boxShadow: boxShadow(t.shadow.xl) });
   });
+
+  /**
+   * Fab 만 눌림 언어가 다릅니다 — Button·IconButton 은 `component.pressedOffset` 만큼 내려가고
+   * Fab 은 elevation 을 올립니다. 우연이 아니라 web 과 맞춘 것입니다: `fab.scss` 의 `:active`
+   * 도 그림자만 `shadow.lg` → `xl` 로 바꿉니다. 떠 있는 컨트롤이라 "가라앉는" 대신 "떠오르는"
+   * 것이 이 컴포넌트의 은유입니다. 둘을 겹치면 은유가 섞이므로 오프셋은 넣지 않습니다.
+   */
+  it('눌림을 오프셋이 아니라 elevation 으로 표현한다', async () => {
+    await renderWithTheme(<Fab testOnly_pressed icon={<Text>+</Text>} accessibilityLabel="추가" />);
+
+    expect(surface()).not.toHaveStyle({
+      transform: [{ translateY: t.component.pressedOffset }],
+    });
+  });
 });
 
 /** 타입 수준 계약. circular은 아이콘만 있는 컨트롤이라 이름을 타입에서 요구합니다. */

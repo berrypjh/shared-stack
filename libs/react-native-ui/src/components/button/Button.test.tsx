@@ -337,6 +337,40 @@ describe('loading', () => {
   });
 });
 
+/**
+ * 눌림 피드백.
+ *
+ * 이 디자인 시스템의 pressed 는 색이 아니라 **위치**입니다 — web `.ui-button:active` 가 색을
+ * 그대로 둔 채 `translateY(var(--ds-component-pressed-offset))` 만 주는 것과 같은 값,
+ * 같은 뜻입니다. `hover` 토큰을 pressed 로 돌려쓰지 않습니다.
+ */
+describe('pressed 피드백', () => {
+  it('눌리면 토큰 오프셋만큼 내려간다', async () => {
+    await renderWithTheme(<Button testOnly_pressed>Save</Button>);
+
+    expect(button()).toHaveStyle({ transform: [{ translateY: t.component.pressedOffset }] });
+  });
+
+  it('눌리지 않았으면 오프셋이 없다', async () => {
+    await renderWithTheme(<Button>Save</Button>);
+
+    expect(button()).not.toHaveStyle({ transform: [{ translateY: t.component.pressedOffset }] });
+  });
+
+  it.each([
+    ['disabled', { disabled: true }],
+    ['loading', { loading: true }],
+  ] as const)('%s 면 눌림 표현이 나오지 않는다', async (_label, props) => {
+    await renderWithTheme(
+      <Button testOnly_pressed {...props}>
+        Save
+      </Button>,
+    );
+
+    expect(button()).not.toHaveStyle({ transform: [{ translateY: t.component.pressedOffset }] });
+  });
+});
+
 describe('소비자 style', () => {
   it('일반 표현은 소비자가 덮어쓸 수 있다', async () => {
     await renderWithTheme(<Button style={{ backgroundColor: 'rgb(1, 2, 3)' }}>Save</Button>);
@@ -362,6 +396,18 @@ describe('소비자 style', () => {
     );
 
     expect(button()).toHaveStyle({ backgroundColor: t.color.primaryBtn.disabled });
+  });
+
+  it('pressed 오프셋은 소비자가 덮을 수 있다', async () => {
+    // 배열 순서를 가정하지 않고, 실제로 소비자 값이 이겼는지 본다.
+    // disabled·loading 과 달리 눌림은 안전 장치가 아니라 표현이라 양보한다.
+    await renderWithTheme(
+      <Button testOnly_pressed style={{ transform: [{ translateY: 9 }] }}>
+        Save
+      </Button>,
+    );
+
+    expect(button()).toHaveStyle({ transform: [{ translateY: 9 }] });
   });
 
   it('disabled/loading 중에는 pressed 표현이 살아나지 않는다', async () => {

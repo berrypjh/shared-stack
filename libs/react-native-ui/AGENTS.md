@@ -92,6 +92,7 @@ pnpm nx typecheck @berrypjh/react-native-ui      # tsc --build (lib + spec)
 - **ui-core 직접 import 금지**: 외부에 `@berrypjh/ui-core`를 import하라고 안내 X. react-native-ui가 캡슐화 — ui-core export는 react-native-ui index를 통해 패스스루.
 - **테마 맵은 손으로 채운다**: `DEFAULT_TOKENS_BY_MODE`는 `satisfies Record<ThemeName, RNTokens>`다. design-tokens에 테마가 늘면 여기서 컴파일이 깨지는 것이 정상 — `Partial`이나 `Record<string, …>`로 넓혀 에러를 지우지 말 것. 빠진 테마는 `mode`로 선택 가능하고 그러면 `tokens`가 `undefined`가 되어 렌더에서 터진다.
 - **`Native` namespace**: 정적 토큰 트리. RN-specific transforms(예: shadow → boxShadow object) 적용된 값. 런타임 테마 전환은 `ThemeProvider` + CSS 변수 대안인 context value 사용.
+- **세 입력 variant 타입은 일부러 중복이다**: `PlainInputProps`·`FilledInputProps`·`BoxedInputProps`가 docstring 빼고 같은 목록을 반복한다. 공유 타입으로 묶어 실제로 재어 봤다 — 선언 번들은 2.9KB 줄지만 그 공유 타입이 **공개 심볼로 하나 늘어난다**(카탈로그 250 → 251). 소비자가 쓰지 않는 타입을 공개 API에 더하는 값이라 묶지 않는다. 셋은 각각 독립된 공개 API이고, 목록이 갈라지는 것은 각 테스트의 `Expect<Equal<keyof XProps, keyof BaseWithoutVariant>>` 가드가 막는다. (예전 주석은 "재사용하면 내부 타입이 끌려 올라간다"고 했는데 그건 사실이 아니다 — `InputContainerStyle`은 이미 공개 선언에 있다.)
 - **demo-mobile typecheck**: composite project + dts-bundle-generator 조합으로 nx typecheck가 TS6305 발생 가능. 직접 `tsc --noEmit -p tsconfig.app.json`은 통과.
 
 ## 다운스트림 영향

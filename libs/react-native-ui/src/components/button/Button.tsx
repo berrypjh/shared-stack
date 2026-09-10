@@ -14,9 +14,10 @@ import type { ButtonProps } from './Button.types';
  *
  * style 우선순위 (마지막에 ButtonBase가 최소 터치 타깃을 다시 얹습니다):
  * 1. 토큰으로 푼 컨테이너 (variant·size·color)
- * 2. `fullWidth`
- * 3. 소비자 style
- * 4. disabled·loading 표현 — 소비자가 덮을 수 없습니다.
+ * 2. pressed 오프셋 — 소비자가 덮을 수 있습니다 (web `:active` 와 같은 자리)
+ * 3. `fullWidth`
+ * 4. 소비자 style
+ * 5. disabled·loading 표현 — 소비자가 덮을 수 없습니다.
  */
 export const Button = ({
   variant = 'contained',
@@ -37,7 +38,7 @@ export const Button = ({
   const { tokens } = useTheme();
   const inactive = disabled || loading;
 
-  const { container, label, stateCritical } = resolveButtonStyles({
+  const { container, label, pressed, stateCritical } = resolveButtonStyles({
     tokens,
     variant,
     size,
@@ -58,6 +59,7 @@ export const Button = ({
       accessibilityState={{ ...accessibilityState, busy: loading }}
       style={(state) => [
         container,
+        state.pressed ? pressed : null,
         fullWidth ? { alignSelf: 'stretch' } : null,
         typeof style === 'function' ? style(state) : style,
         stateCritical,

@@ -8,9 +8,10 @@ import type { InputContainerStyle } from '../input-base/InputBase.types';
 /**
  * 채워진 표면과 사방 테두리를 가지는 필드. `variant`는 컴포넌트가 고정하므로 prop에 없습니다.
  *
- * `InputBaseProps`를 재사용하지 않고 `TextInputProps`에서 다시 파생합니다 — 재사용하면
- * `dts-bundle-generator`가 내부 타입을 공개 선언으로 끌어올립니다. 두 목록의 드리프트는
- * 테스트의 타입 가드가 막습니다.
+ * `InputBaseProps`를 재사용하지 않고 `TextInputProps`에서 다시 파생합니다. 세 variant 의
+ * 목록이 지금 같은 것은 우연이고 셋은 각각 독립된 공개 API 입니다 — 근거는 AGENTS.md 의
+ * "세 입력 variant 타입은 일부러 중복이다" 항목에 실측과 함께 적어 두었습니다. 드리프트는
+ * 테스트의 `Expect<Equal<keyof …>>` 가드가 막습니다.
  */
 export type FilledInputProps = Omit<InputFieldSemanticProps, 'variant'> &
   Omit<

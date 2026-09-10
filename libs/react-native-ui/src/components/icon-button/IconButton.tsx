@@ -41,7 +41,7 @@ export const IconButton = ({
       style={style}
     >
       {({ pressed }) => {
-        const s = resolveIconButtonStyles({ tokens, size, color, disabled: inactive });
+        const s = resolveIconButtonStyles({ tokens, size, color, disabled: inactive, pressed });
 
         return (
           <View style={s.surface}>

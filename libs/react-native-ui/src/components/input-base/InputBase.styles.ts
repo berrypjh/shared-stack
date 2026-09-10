@@ -96,9 +96,11 @@ const surfaceFor = (tokens: RNTokens, variant: FieldVariant, disabled: boolean) 
  * variant × 상태 chrome. 축은 표면(`surfaceFor`)과 상자 모양 둘뿐이라, 테두리·radius가 같은
  * filled·boxed를 한 갈래로 묶습니다. plain만 상자가 아니라 밑줄입니다.
  *
- * focus halo는 만들지 않습니다. web은 box-shadow halo를 그리면서 primary일 때 버튼 토큰
- * (`primaryBtn.outlinedHover`)을 빌려 쓰는데, field 전용 primary halo 토큰이 없습니다.
- * 대신 active 테두리만 굵게 합니다.
+ * focus halo는 만들지 않습니다. **토큰이 없어서가 아닙니다** — `color.field.focusRing`·
+ * `focusRingPrimary`·`focusRingError` 가 Native 트리에 있고, web 도 버튼 토큰이 아니라 그것으로
+ * halo를 그립니다(`boxed-input.scss`·`filled-input.scss`의 `--ds-field-focus-ring-*`).
+ * 여기서는 active 테두리를 굵게 하는 것으로 포커스를 표시합니다. halo를 더하고 싶다면 토큰이
+ * 아니라 RN 에서 링을 어떻게 그릴지가 남은 문제입니다.
  *
  * chrome은 항상 래퍼 View가 가집니다 — TextInput에 얹으면 한쪽 테두리·radius의 플랫폼 차이로
  * multiline에서 깨집니다.
