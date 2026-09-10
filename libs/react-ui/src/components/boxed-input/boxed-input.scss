@@ -11,16 +11,21 @@
   border-color: var(--ds-field-border-hover);
 }
 
-.ui-boxed-input.ui-input-base--focused {
+/*
+ * 상태 우선순위는 `disabled > error > focused > 평상시` — RN 리졸버와 같은 순서다.
+ * `:not()` 으로 서로 배제해서 **어느 규칙이 이기는지가 선언 순서에 달리지 않게** 한다.
+ * (`focused` 와 `disabled` 는 독립된 boolean 이라 두 클래스가 함께 붙는 상태가 실재한다.)
+ */
+.ui-boxed-input.ui-input-base--focused:not(.ui-input-base--disabled):not(.ui-input-base--error) {
   border-color: var(--ui-input-active-color);
   box-shadow: 0 0 0 var(--ds-component-field-focus-ring-width) var(--ui-input-focus-halo);
 }
 
-.ui-boxed-input.ui-input-base--error {
+.ui-boxed-input.ui-input-base--error:not(.ui-input-base--disabled) {
   border-color: var(--ds-stroke-error);
 }
 
-.ui-boxed-input.ui-input-base--error.ui-input-base--focused {
+.ui-boxed-input.ui-input-base--error.ui-input-base--focused:not(.ui-input-base--disabled) {
   box-shadow: 0 0 0 var(--ds-component-field-focus-ring-width) var(--ds-field-focus-ring-error);
 }
 
@@ -31,4 +36,23 @@
 
 .ui-boxed-input__input {
   min-height: calc(var(--ui-input-min-height) - (var(--ds-border-primary-width) * 2));
+}
+
+/**
+ * forced-colors(Windows 고대비) 대응.
+ *
+ * 그 모드에서 브라우저는 `box-shadow` 를 렌더하지 않고 저자 색을 시스템 색으로 갈아끼운다
+ * (CSS Color Adjust 1). 그래서 포커스 링 는 사라지고, 평상시와 포커스의 테두리가 같은 색으로
+ * 평탄화돼 포커스 표시가 통째로 없어진다 — WCAG 2.4.7 Focus Visible 위반이다.
+ *
+ * `outline` 은 그 모드에서도 남으므로 여기서만 켠다. `Highlight` 는 CSS 시스템 색 키워드지
+ * 하드코딩한 값이 아니다 — forced-colors 에서는 저자 색이 무시되므로 팔레트를 OS 가 가진다.
+ * 길이는 색이 아니라 강제되지 않으므로 토큰을 그대로 쓴다.
+ */
+@media (forced-colors: active) {
+  .ui-boxed-input.ui-input-base--focused:not(.ui-input-base--disabled):not(.ui-input-base--error),
+  .ui-boxed-input.ui-input-base--error.ui-input-base--focused:not(.ui-input-base--disabled) {
+    outline: var(--ds-border-primary-width) solid Highlight;
+    outline-offset: var(--ds-spacing-2xs);
+  }
 }

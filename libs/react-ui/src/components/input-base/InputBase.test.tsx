@@ -168,6 +168,86 @@ describe('<InputBase />', () => {
     });
   });
 
+  /**
+   * 제어/비제어 소유권.
+   *
+   * `value`·`defaultValue` 는 native 요소로 그대로 내려가고 Base 는 자기 값 상태를 두지
+   * 않습니다. 그 사실은 속성으로는 보이지 않습니다 — 실제로 타이핑해 봐야 드러납니다.
+   */
+  describe('controlled / uncontrolled', () => {
+    it('비제어 입력은 소비자 개입 없이 타이핑을 반영한다', async () => {
+      const { user } = render(<InputBase defaultValue="ab" />);
+
+      const input = screen.getByRole('textbox') as HTMLInputElement;
+      await user.type(input, 'c');
+
+      // Base 가 value 를 붙잡으면 "ab" 에서 멈춘다.
+      expect(input.value).toBe('abc');
+    });
+
+    it('defaultValue 는 controlled 로 승격되지 않는다', async () => {
+      const { user } = render(<InputBase defaultValue="ab" />);
+
+      const input = screen.getByRole('textbox') as HTMLInputElement;
+      await user.type(input, 'c');
+
+      // 비제어의 지문: DOM 속성은 기본값에 머물고 프로퍼티만 움직인다.
+      // 제어로 승격되면 둘이 함께 움직이거나 프로퍼티가 기본값에 묶인다.
+      expect(input.getAttribute('value')).toBe('ab');
+      expect(input.value).toBe('abc');
+    });
+
+    it('제어 value 는 소비자만 바꾼다', async () => {
+      const onChange = spy();
+      const { user } = render(<InputBase value="fixed" onChange={onChange} />);
+
+      const input = screen.getByRole('textbox') as HTMLInputElement;
+      await user.type(input, 'x');
+
+      expect(onChange.callCount).toBe(1);
+      expect(input.value).toBe('fixed');
+    });
+  });
+
+  /**
+   * `disabled` 와 `readOnly` 는 둘 다 편집을 막지만 **같은 상태가 아닙니다.**
+   * 속성만 보면 구분되지 않아서, 포커스를 받는지까지 봅니다 — readOnly 는 읽을 수 있어야
+   * 하므로 탐색 가능한 채로 남고, disabled 는 상호작용 대상에서 빠집니다.
+   */
+  describe('편집 가능성', () => {
+    it('disabled 는 타이핑을 막는다', async () => {
+      const onChange = spy();
+      const { user } = render(<InputBase disabled defaultValue="ab" onChange={onChange} />);
+
+      const input = screen.getByRole('textbox') as HTMLInputElement;
+      await user.type(input, 'c');
+
+      expect(onChange.callCount).toBe(0);
+      expect(input.value).toBe('ab');
+    });
+
+    it('readOnly 는 타이핑을 막지만 포커스는 받는다', async () => {
+      const onChange = spy();
+      const { user } = render(<InputBase readOnly defaultValue="ab" onChange={onChange} />);
+
+      const input = screen.getByRole('textbox') as HTMLInputElement;
+      await user.type(input, 'c');
+
+      expect(onChange.callCount).toBe(0);
+      expect(input.value).toBe('ab');
+      expect(input).toHaveFocus();
+    });
+
+    it('disabled 는 포커스를 받지 않는다 — readOnly 와 갈리는 지점', async () => {
+      const { user } = render(<InputBase disabled defaultValue="ab" />);
+
+      const input = screen.getByRole('textbox');
+      await user.click(input);
+
+      expect(input).not.toHaveFocus();
+    });
+  });
+
   describe('event callbacks', () => {
     it('이벤트 콜백들을 호출해야 한다', () => {
       const handleChange = spy();

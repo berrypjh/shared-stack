@@ -437,4 +437,135 @@ describe('<ButtonBase />', () => {
       expect(link).toHaveAttribute('tabindex', '-1');
     });
   });
+
+  /**
+   * 키보드 활성화의 불변식.
+   *
+   * ButtonBase 는 native 가 이미 하는 일을 다시 구현하지 않는다 — emulation 은 native 활성화가
+   * **없는** host 에서만 켠다(`activateWithKeyboard: !isLinkLike`, native button 분기는 아예
+   * 핸들러를 붙이지 않는다). 아래는 그 경계가 어긋나면 바로 깨지는 자리들이다.
+   */
+  describe('키보드 활성화 불변식', () => {
+    /**
+     * 여기도 click 횟수로는 검사할 수 없다. emulation 을 잘못 붙이면 `preventDefault` 가
+     * native 활성화를 지우고 자기 click 을 대신 넣어, 총합은 여전히 1로 보인다. 관찰 가능한
+     * 차이는 "native 의 기본 동작을 가로챘는가" 하나뿐이다.
+     */
+    it.each([
+      ['Enter', 'Enter'],
+      ['Space', ' '],
+    ])('native button 의 %s 를 가로채지 않는다', (_label, key) => {
+      const onClick = spy();
+      render(<ButtonBase onClick={onClick}>Hello</ButtonBase>);
+
+      expect(fireEvent.keyDown(screen.getByRole('button'), { key })).toBe(true);
+      expect(fireEvent.keyUp(screen.getByRole('button'), { key })).toBe(true);
+    });
+
+    it('native button 은 Enter 로 정확히 한 번 활성화된다', async () => {
+      const onClick = spy();
+      const { user } = render(<ButtonBase onClick={onClick}>Hello</ButtonBase>);
+
+      await user.tab();
+      await user.keyboard('{Enter}');
+
+      expect(onClick.callCount).toBe(1);
+    });
+
+    it('non-native host 의 Enter 는 정확히 한 번만 활성화한다', async () => {
+      const onClick = spy();
+      const { user } = render(
+        <ButtonBase component="div" onClick={onClick}>
+          Hello
+        </ButtonBase>,
+      );
+
+      await user.tab();
+      await user.keyboard('{Enter}');
+
+      expect(onClick.callCount).toBe(1);
+    });
+
+    it('non-native host 의 Space 는 keydown 에서 스크롤을 막는다', () => {
+      render(<ButtonBase component="div">Hello</ButtonBase>);
+
+      const host = screen.getByRole('button');
+
+      // dispatchEvent 는 preventDefault 되면 false 를 돌려준다.
+      expect(fireEvent.keyDown(host, { key: ' ' })).toBe(false);
+    });
+
+    /**
+     * click 횟수로는 이것을 검사할 수 없다 — jsdom 은 anchor 의 기본 활성화를 구현하지 않아
+     * "native 가 1 + emulation 이 0" 과 "native 가 0 + emulation 이 1" 이 똑같이 1로 보인다.
+     * 대신 emulation 의 관찰 가능한 부작용인 `preventDefault` 를 본다: anchor 의 Enter 를
+     * 가로채면 네이티브 이동이 죽는다.
+     */
+    it('href 를 가진 anchor 의 Enter 를 가로채지 않는다', () => {
+      render(<ButtonBase href="/next">Hello</ButtonBase>);
+
+      expect(fireEvent.keyDown(screen.getByRole('link'), { key: 'Enter' })).toBe(true);
+    });
+
+    it('emulation 이 필요한 host 의 Enter 는 가로챈다', () => {
+      render(<ButtonBase component="div">Hello</ButtonBase>);
+
+      // 위 anchor 검사가 "아무도 preventDefault 하지 않는다" 로 공허해지지 않게 짝을 둔다.
+      expect(fireEvent.keyDown(screen.getByRole('button'), { key: 'Enter' })).toBe(false);
+    });
+
+    it('중첩된 대화형 자식에서 올라온 키는 활성화하지 않는다', async () => {
+      const onClick = spy();
+      const { user } = render(
+        <ButtonBase component="div" onClick={onClick}>
+          <input aria-label="nested" />
+        </ButtonBase>,
+      );
+
+      await user.click(screen.getByLabelText('nested'));
+      onClick.resetHistory();
+      await user.keyboard('{Enter}');
+
+      // `event.target !== event.currentTarget` 가드가 이것을 막는다.
+      expect(onClick.callCount).toBe(0);
+    });
+
+    it('disabled 인 non-native host 는 키보드로 활성화되지 않는다', async () => {
+      const onClick = spy();
+      const { user } = render(
+        <ButtonBase component="div" disabled onClick={onClick}>
+          Hello
+        </ButtonBase>,
+      );
+
+      const host = screen.getByRole('button');
+      act(() => host.focus());
+
+      await user.keyboard('{Enter}');
+      await user.keyboard(' ');
+
+      expect(onClick.callCount).toBe(0);
+    });
+  });
+
+  describe('링크 시맨틱', () => {
+    it('href 를 가진 anchor 를 role="button" 으로 바꾸지 않는다', () => {
+      render(<ButtonBase href="/next">Hello</ButtonBase>);
+
+      const link = screen.getByRole('link');
+
+      expect(link).not.toHaveAttribute('role');
+      expect(link).toHaveAttribute('href', '/next');
+    });
+
+    it('custom host 라도 href 가 있으면 링크로 남는다', () => {
+      render(
+        <ButtonBase component="a" href="/next">
+          Hello
+        </ButtonBase>,
+      );
+
+      expect(screen.getByRole('link')).not.toHaveAttribute('role');
+    });
+  });
 });

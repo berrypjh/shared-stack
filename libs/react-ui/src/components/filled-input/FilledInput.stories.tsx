@@ -264,6 +264,9 @@ export const A11y: Story = {
         rows={3}
         placeholder="Optional notes..."
       />
+      <p id="notes-hint" style={{ fontSize: '12px', color: 'var(--ds-text-light)', margin: 0 }}>
+        Notes are visible to your team only.
+      </p>
       <FilledInput aria-label="Disabled field" disabled value="Not editable" />
     </div>
   ),

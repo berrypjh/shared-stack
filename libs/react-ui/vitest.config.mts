@@ -19,7 +19,9 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     setupFiles: ['./vitest.setup.ts'],
-    include: ['src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
+    // `test/` 도 포함한다 — 테스트 하네스(`createRenderer`) 자체의 회귀 검사가 거기 있고,
+    // `src/**` 만 보던 동안 그 파일은 한 번도 실행되지 않았다.
+    include: ['{src,test}/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
     reporters: ['default'],
     coverage: {
       reportsDirectory: './test-output/vitest/coverage',

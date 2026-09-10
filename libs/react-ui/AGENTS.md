@@ -4,7 +4,7 @@
 
 - **웹 전용**: DOM API · CSS · React DOM이 전제. RN API 금지. 양 플랫폼이 쓸 코드는 ui-core로 올린다.
 - **ui-core 캡슐화**: react-ui 소비자는 `@berrypjh/ui-core`·`@berrypjh/design-tokens`를 모른다. 컴포넌트 prop은 시맨틱 계약을 wrap해 노출한다.
-- **시맨틱 계약의 소유자**: 양 렌더러가 같은 불변식을 실제로 구현하는 계약만 ui-core에 있다 (현재 `BoxProps` 하나). web 전용 계약(button/field/fab/icon-button/menu-item)은 `src/types/`가 소유한다. RN 구현이 생기기 전에 ui-core로 올리지 않는다.
+- **시맨틱 계약의 소유자**: 양 렌더러가 같은 불변식을 실제로 구현하는 계약만 ui-core에 있다 (`box`·`button`·`fab`·`icon-button`·`field`). RN 구현이 없는 `menu-item`, 그리고 같은 계약 안에서도 한쪽에만 있는 키(`FieldProps`의 `required`·`margin`·`hiddenLabel`, `IconButtonProps`의 `edge`·`loading`)는 `src/types/`가 소유한다. RN 구현이 생기기 전에 ui-core로 올리지 않는다.
 - **accessibility는 필수**: keyboard/focus/aria 동작은 변경 시 보존. `describeConformance` 기반 conformance 테스트는 회귀 방지용.
 - **토큰만 사용**: 색·spacing·radius 하드코딩 금지. SCSS는 CSS 변수, JSX는 `getColor`/Tailwind class 활용.
 - **단일 사용처면 `src/utils`가 아님**: 한 컴포넌트만 쓰면 그 컴포넌트 폴더로 (`Select.navigation.ts`·`Select.selection.ts`·`SearchField.utils.ts`가 그 예). 양 플랫폼이 **실제로** 같은 의미로 쓸 때만 ui-core.
@@ -27,7 +27,7 @@ src/
     ThemeProvider.tsx      <html data-theme=...> 적용
     ThemeProvider.types.ts
     index.ts
-  types/                   web 시맨틱 계약 (ui-core가 아니라 여기가 소유)
+  types/                   ui-core 계약의 web wrap + web 전용 계약 (소유 경계는 위 '절대 원칙' 참조)
     button.ts              ButtonProps, ButtonVariant/Size/Color, ButtonLoadingPosition
     fab.ts                 FabProps, FabShape
     field.ts               FieldProps, FormControlProps, InputFieldProps, TextFieldProps + FieldMargin, InputLike* alias
@@ -73,6 +73,8 @@ pnpm build-storybook @berrypjh/react-ui   # static storybook
 - **ui-core 직접 import 금지**: 외부에서 `@berrypjh/ui-core`를 import하라고 안내 X. react-ui가 캡슐화 — ui-core export는 react-ui index를 통해 패스스루.
 - **`components/index.ts`·`styles.ts` 동기화**: 새 컴포넌트는 두 곳에 등록해야 SCSS도 dist/index.css에 들어감.
 - **conformance 테스트**: `test-utils/describeConformance`가 root class·prop spread·ref forwarding·polymorphic·className merge를 확인. props 패턴 바꾸면 같이 갱신.
+- **스토리와 `.storybook/`도 typecheck 대상이다**: 둘은 `tsconfig.lib.json`·`tsconfig.spec.json` 어디에도 없어서, `tsconfig.storybook.json`을 돌리지 않으면 타입 오류가 CI 어디에서도 걸리지 않는다 (Storybook 빌더는 vite/esbuild라 타입을 지우고 지나간다 — 빌드 성공이 타입 검사를 대신하지 못한다). `typecheck` 타깃이 두 tsc를 순서대로 도는 이유다.
+- **forced-colors에서 `box-shadow`는 렌더되지 않는다**: Windows 고대비 모드는 저자 색을 시스템 색으로 갈아끼우고 `box-shadow`를 지운다(CSS Color Adjust 1). 그래서 halo·링·밑줄을 box-shadow로만 그리면 그 모드에서 사라지고, 테두리 색 변화도 평상시와 같은 색으로 평탄화된다. **포커스를 box-shadow로 그리는 새 규칙에는 `@media (forced-colors: active)` outline 대응을 함께 둔다** — `outline`은 그 모드에서도 남는다. `src/components/forcedColors.test.ts`가 규칙 자체를 검사하므로 variant를 더하면 목록 수정 없이 걸린다. 그 블록 안의 `Highlight`·`ButtonBorder`는 CSS 시스템 색 키워드지 하드코딩이 아니다 — 그 모드의 팔레트는 OS가 소유해서 토큰을 써도 무시된다. 길이는 강제되지 않으므로 토큰을 그대로 쓴다.
 
 ## 다운스트림 영향
 

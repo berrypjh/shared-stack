@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { expect, fn, userEvent, within } from 'storybook/test';
 
 import { ButtonBase } from './ButtonBase';
 import type { ButtonBaseNativeButtonProps } from './ButtonBase.types';
@@ -203,6 +204,9 @@ export const A11y: Story = {
       >
         Delete
       </ButtonBase>
+      <p id="delete-warning" style={{ fontSize: '12px', color: 'var(--ds-text-light)', margin: 0 }}>
+        Deleted items cannot be recovered.
+      </p>
       {/* 비네이티브 host 는 ButtonBase 가 role="button"·tabIndex·키보드 활성화를 스스로 붙인다. */}
       <ButtonBase component="div" variant="text" aria-label="Custom interactive element">
         Custom Element
@@ -214,5 +218,75 @@ export const A11y: Story = {
   ),
   parameters: {
     a11y: { disable: false },
+  },
+};
+
+/**
+ * 호스트마다 키보드 활성화 경로가 다르다는 것을 실제로 눌러서 보인다.
+ *
+ * - native `<button>` 은 브라우저가 Enter/Space 를 click 으로 바꾼다. ButtonBase 는 **끼어들지
+ *   않는다** — 끼어들면 한 번 누른 것이 두 번 활성화된다.
+ * - `component="div"` 같은 비네이티브 host 에는 그런 기본 동작이 없어서 ButtonBase 가
+ *   Enter(keydown)/Space(keyup) 를 직접 click 으로 바꾼다.
+ *
+ * 두 경로 모두 "정확히 한 번"이어야 한다. 스크린샷으로는 증명되지 않아 단언으로 고정한다.
+ */
+export const KeyboardActivation: Story = {
+  render: function Render() {
+    const onNative = fn();
+    const onCustom = fn();
+
+    return (
+      <div style={columnStyle}>
+        <ButtonBase data-testid="native" onClick={onNative}>
+          Native button
+        </ButtonBase>
+        <ButtonBase component="div" data-testid="custom" onClick={onCustom}>
+          Custom host
+        </ButtonBase>
+        <ButtonBase component="div" disabled data-testid="custom-disabled">
+          Custom host (disabled)
+        </ButtonBase>
+      </div>
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    // native: Tab 으로 도달하고 Enter 로 활성화된다.
+    await userEvent.tab();
+    await expect(canvas.getByTestId('native')).toHaveFocus();
+    await userEvent.keyboard('{Enter}');
+
+    // 비네이티브 host 도 같은 탭 순서에 있고 role=button 으로 노출된다.
+    await userEvent.tab();
+    const custom = canvas.getByTestId('custom');
+    await expect(custom).toHaveFocus();
+    await expect(custom).toHaveAttribute('role', 'button');
+    await userEvent.keyboard(' ');
+
+    // disabled 비네이티브 host 는 aria-disabled 로 알리고 탭 순서에서 빠진다.
+    const disabled = canvas.getByTestId('custom-disabled');
+    await expect(disabled).toHaveAttribute('aria-disabled', 'true');
+    await expect(disabled).toHaveAttribute('tabindex', '-1');
+  },
+};
+
+/**
+ * 포커스 링은 키보드 경로에서만 켜진다 (`:focus-visible`).
+ * `.focus()` 로는 재현되지 않아 Chromatic 이 찍으려면 실제 Tab 이 필요하다.
+ */
+export const FocusVisible: Story = {
+  render: () => (
+    <div style={rowStyle}>
+      <ButtonBase>Focus me</ButtonBase>
+      <ButtonBase variant="outlined">Then me</ButtonBase>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await userEvent.tab();
+    await expect(canvas.getByRole('button', { name: 'Focus me' })).toHaveFocus();
   },
 };

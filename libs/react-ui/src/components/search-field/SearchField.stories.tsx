@@ -311,6 +311,12 @@ export const A11y: Story = {
         suggestions={projectSuggestions}
         noSuggestionsText="No matching projects"
       />
+      <p
+        id="a11y-search-hint"
+        style={{ fontSize: '12px', color: 'var(--ds-text-light)', margin: 0 }}
+      >
+        Results update as you type.
+      </p>
       <SearchField aria-label="Search (disabled)" disabled placeholder="Search unavailable" />
     </div>
   ),

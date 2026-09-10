@@ -207,6 +207,25 @@ describe('<Button />', () => {
       expect(progressbar).toBeInTheDocument();
     });
 
+    /**
+     * center loading 은 라벨을 `opacity: 0` 으로 가립니다 — `display: none` 이 아니라서
+     * 접근성 트리에 남습니다. 세 위치를 모두 도는 이유는 위치마다 loader 가 라벨 앞뒤로
+     * 옮겨 다니기 때문입니다: 어느 배치에서도 이름이 사라지거나 두 번 읽히면 안 됩니다.
+     */
+    it.each([['start'], ['center'], ['end']] as const)(
+      'loadingPosition=%s 에서도 접근 가능한 이름이 정확히 라벨 하나다',
+      (loadingPosition) => {
+        render(
+          <Button loading loadingPosition={loadingPosition}>
+            Submit
+          </Button>,
+        );
+
+        // 이름이 "Submit Submit" 이 되면 exact 매치가 실패한다.
+        expect(screen.getByRole('button', { name: 'Submit' })).toBeInTheDocument();
+      },
+    );
+
     it('loading 상태일 때 네이티브 button은 비활성화되어야 한다', () => {
       render(<Button loading>Submit</Button>);
 

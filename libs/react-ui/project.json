@@ -82,7 +82,11 @@
       "executor": "nx:run-commands",
       "outputs": ["{projectRoot}/out-tsc"],
       "options": {
-        "command": "tsc -p libs/react-ui/tsconfig.lib.json"
+        "commands": [
+          "tsc -p libs/react-ui/tsconfig.lib.json",
+          "tsc -p libs/react-ui/tsconfig.storybook.json --noEmit"
+        ],
+        "parallel": false
       }
     },
     "test": {

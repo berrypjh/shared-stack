@@ -2,6 +2,12 @@ import { useState } from 'react';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
+import { ThemeGallery, themeGalleryParameters } from '../../../.storybook/ThemeGallery';
+import { BoxedInput } from '../boxed-input';
+import { FilledInput } from '../filled-input';
+import { FormControl } from '../form-control';
+import { PlainInput } from '../plain-input';
+
 import { InputBase } from './InputBase';
 
 const meta = {
@@ -281,6 +287,12 @@ export const A11y: Story = {
         rows={3}
         placeholder="Optional notes..."
       />
+      <p
+        id="a11y-notes-hint"
+        style={{ fontSize: '12px', color: 'var(--ds-text-light)', margin: 0 }}
+      >
+        Notes are visible to your team only.
+      </p>
       <InputBase aria-label="Disabled field" disabled value="Not editable" />
     </div>
   ),
@@ -331,4 +343,53 @@ export const ControlledVsUncontrolled: Story = {
       </div>
     );
   },
+};
+
+/**
+ * 등록된 모든 테마 × 세 variant × 대표 상태를 한 화면에 담는다.
+ *
+ * 갤러리를 variant 마다 따로 두지 않고 하나로 묶은 이유는, 회귀에서 보고 싶은 것이 "이 테마에서
+ * plain·filled·boxed 가 **서로** 어떻게 다른가" 이기 때문이다. 따로 찍으면 그 비교가 사라진다.
+ *
+ * `focused` 는 `FormControl` 의 controlled prop 으로 켠다 — 상태를 흉내 내려고 클래스를 손으로
+ * 붙이지 않는다. 그것이 실제 합성 계층이고, 스크린샷도 진짜 경로를 지나야 의미가 있다.
+ *
+ * 전체 곱을 만들지 않는다. 토큰이 갈라지는 자리(테두리·표면·halo·비활성)를 대표하는 상태만 둔다.
+ */
+export const ThemeMatrix: Story = {
+  parameters: themeGalleryParameters,
+  render: () => (
+    <ThemeGallery>
+      {(theme) => (
+        <div style={{ display: 'grid', gap: '12px' }}>
+          {(
+            [
+              ['plain', PlainInput],
+              ['filled', FilledInput],
+              ['boxed', BoxedInput],
+            ] as const
+          ).map(([variant, Input]) => (
+            <div
+              key={variant}
+              style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', alignItems: 'flex-start' }}
+            >
+              <FormControl>
+                <Input aria-label={`${theme} ${variant} default`} placeholder="Default" />
+              </FormControl>
+              <FormControl focused>
+                <Input aria-label={`${theme} ${variant} focused`} placeholder="Focused" />
+              </FormControl>
+              <FormControl error>
+                <Input aria-label={`${theme} ${variant} error`} defaultValue="Invalid" />
+              </FormControl>
+              <FormControl disabled>
+                <Input aria-label={`${theme} ${variant} disabled`} defaultValue="Locked" />
+              </FormControl>
+              <Input aria-label={`${theme} ${variant} read only`} readOnly defaultValue="Read" />
+            </div>
+          ))}
+        </div>
+      )}
+    </ThemeGallery>
+  ),
 };

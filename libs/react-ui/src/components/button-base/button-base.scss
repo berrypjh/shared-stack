@@ -194,7 +194,7 @@ $colors: (
   }
 
   &:active:not(:disabled):not([aria-disabled='true']) {
-    transform: translateY(1px);
+    transform: translateY(var(--ds-component-pressed-offset));
   }
 
   &:focus {
@@ -299,11 +299,27 @@ $colors: (
  * 다뤄서, 여기가 없으면 6개 속성을 전환하는 루트만 정책에서 빠진다.
  *
  * 끄는 것은 전환뿐이다. `:focus-visible`의 outline·halo 선언은 그대로 남아 포커스 표시가
- * 사라지지 않는다. `:active`의 translateY(1px)도 유지한다 — 전환 없이 즉시 적용되는 눌림
+ * 사라지지 않는다. `:active`의 눌림 오프셋도 유지한다 — 전환 없이 즉시 적용되는 눌림
  * 위치이지 애니메이션이 아니다.
  */
 @media (prefers-reduced-motion: reduce) {
   .ui-button {
     transition: none;
+  }
+}
+
+/**
+ * forced-colors(Windows 고대비) 대응.
+ *
+ * 채워진 버튼은 배경색만으로 자기를 식별시키는데, 그 모드에서 배경은 `ButtonFace`, 페이지는
+ * `Canvas` 가 되고 두 값이 같은 고대비 테마가 있다. 그러면 버튼이 페이지에 녹아 사라진다.
+ * outlined·text 는 이미 테두리가 있거나 글자로 식별되므로 여기서 다루지 않는다.
+ *
+ * `:focus-visible` 은 손대지 않는다 — outline 을 이미 함께 선언해 halo 가 지워져도 남는다.
+ * `ButtonBorder` 는 CSS 시스템 색 키워드다. 두께는 색이 아니라 강제되지 않으므로 토큰을 쓴다.
+ */
+@media (forced-colors: active) {
+  .ui-button--variant-contained {
+    border: var(--ds-border-primary-width) solid ButtonBorder;
   }
 }

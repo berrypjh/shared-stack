@@ -1,4 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { expect, userEvent, within } from 'storybook/test';
+
+import { ThemeGallery, themeGalleryParameters } from '../../../.storybook/ThemeGallery';
 
 import { Fab } from './Fab';
 
@@ -173,6 +176,9 @@ export const A11y: Story = {
           Edit
         </Fab>
       </div>
+      <p id="fab-hint" style={{ fontSize: '12px', color: 'var(--ds-text-light)', margin: 0 }}>
+        Opens the current document in edit mode.
+      </p>
       <div style={rowStyle}>
         {/* 네이티브 button 은 `disabled` 만으로 충분하다 — aria-disabled 는 링크 host 전용이다. */}
         <Fab disabled icon={<PlusIcon />} aria-label="Add (unavailable)" />
@@ -181,5 +187,54 @@ export const A11y: Story = {
   ),
   parameters: {
     a11y: { disable: false },
+  },
+};
+
+/**
+ * 등록된 모든 테마 × shape·상태. 테마 목록은 레지스트리에서 순회한다.
+ *
+ * Fab 은 elevation 이 시각 언어라 배경이 밝은 테마와 어두운 테마에서 그림자가 다르게 읽힌다 —
+ * 테마별로 나란히 두는 것이 이 컴포넌트에서 특히 값이 있다.
+ */
+export const ThemeMatrix: Story = {
+  parameters: themeGalleryParameters,
+  render: () => (
+    <ThemeGallery>
+      {() => (
+        <div style={rowStyle}>
+          <Fab icon={<PlusIcon />} aria-label="Add" />
+          <Fab icon={<EditIcon />} aria-label="Edit" color="secondary" />
+          <Fab icon={<PlusIcon />} aria-label="Add (small)" size="sm" />
+          <Fab icon={<PlusIcon />} aria-label="Add (unavailable)" disabled />
+          <Fab shape="extended" icon={<EditIcon />}>
+            Extended
+          </Fab>
+          <Fab shape="extended" icon={<ShareIcon />} color="secondary">
+            Share
+          </Fab>
+        </div>
+      )}
+    </ThemeGallery>
+  ),
+};
+
+/** 키보드로 도달한다. circular Fab 은 이름이 `aria-label` 에만 있으므로 이름으로 단언한다. */
+export const KeyboardFocus: Story = {
+  render: () => (
+    <div style={rowStyle}>
+      <Fab icon={<PlusIcon />} aria-label="Add new item" />
+      <Fab shape="extended" icon={<EditIcon />}>
+        Edit document
+      </Fab>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await userEvent.tab();
+    await expect(canvas.getByRole('button', { name: 'Add new item' })).toHaveFocus();
+
+    await userEvent.tab();
+    await expect(canvas.getByRole('button', { name: 'Edit document' })).toHaveFocus();
   },
 };
