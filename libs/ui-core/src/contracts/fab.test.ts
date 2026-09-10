@@ -20,6 +20,13 @@ describe('Fab 계약이 받는 것', () => {
     expect(shapes).toHaveLength(2);
     expect(full.shape).toBe('extended');
   });
+
+  it('공유되는 시맨틱 키만 가진다', () => {
+    // 거부 검사(@ts-expect-error)는 키가 **들어오는** 것만 막는다. 계약이 넓어지는 방향은
+    // 잡지 못하므로, 다른 계약(button·icon-button·field·box)과 같은 키셋 단언을 둔다 —
+    // 승격하려면 이 목록을 손대야 하고, 그러면 승격이 리뷰에 보인다.
+    expect(Object.keys(full).sort()).toEqual(['color', 'disabled', 'shape', 'size']);
+  });
 });
 
 describe('Fab 계약이 거부하는 것', () => {

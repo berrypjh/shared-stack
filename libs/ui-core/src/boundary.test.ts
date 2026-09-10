@@ -26,9 +26,19 @@ const FORBIDDEN_IDENTIFIERS = [
   'ViewStyle',
   'PressableProps',
   'TextInputProps',
+  'StyleProp',
+  'StyleSheet',
+  'TextStyle',
   'Platform',
   'window',
   'document',
+  // 렌더러 이벤트·스타일·a11y prop — 계약이 아니라 각 렌더러가 가진다.
+  'MouseEvent',
+  'KeyboardEvent',
+  'FocusEvent',
+  'className',
+  'accessibilityRole',
+  'hitSlop',
 ];
 
 /** 주석 안의 단어가 걸리지 않도록 먼저 걷어낸다. */

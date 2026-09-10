@@ -60,7 +60,12 @@ const leafPaths = (tree: TokenTree, prefix = ''): string[] =>
       : [here];
   });
 
-const SHARED_CATEGORIES = ['color', 'spacing', 'radius'] as const;
+/**
+ * `component` 는 `getColor` 같은 공개 별칭이 없어 타입 단언에서 빠져 있었지만, RN
+ * `InputBase.styles.ts` 가 `component.field.*` 를 직접 읽는다. 어휘가 갈라지면 web 만
+ * 멀쩡한 채 RN 런타임이 `undefined` 를 집는다.
+ */
+const SHARED_CATEGORIES = ['color', 'spacing', 'radius', 'component'] as const;
 
 const capitalize = (name: string) => name.charAt(0).toUpperCase() + name.slice(1);
 
