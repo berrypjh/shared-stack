@@ -4,6 +4,10 @@
       "$value": "{spacing.sm} {spacing.lg}",
       "$type": "spacing"
     },
+    "pressedOffset": {
+      "$value": "1",
+      "$type": "spacing"
+    },
     "field": {
       "height": {
         "sm": {

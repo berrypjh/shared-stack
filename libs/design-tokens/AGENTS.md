@@ -111,12 +111,19 @@ color 램프 같은 primitive도 테마에서 자유롭게 덮어쓴다 — 이 
 2. **기존 시맨틱으로 표현 불가능한가** — 가능하면 시맨틱을 쓴다.
 3. **여러 컴포넌트가 공유하거나 안정적인가**
 
-승격된 것은 둘이다.
+승격된 것은 셋이다.
 
 | 토큰                             | 왜                                                                                                                    |
 | -------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
 | `component.field.height.{sm,md}` | `input-base`/`select`가 같은 값(40/52)을 각자 하드코딩. Web `2.5rem`/`3.25rem`, RN `40`/`52`                          |
 | `component.field.focusRingWidth` | 폼 필드 포커스 링은 2px, 버튼은 `borderWidth.semantic.focus`(4px)로 서로 다르다. 3개 컴포넌트에 8회 하드코딩돼 있었다 |
+| `component.pressedOffset`        | 눌림 깊이. web `.ui-button:active`가 `1px`을 하드코딩했고 RN Button·IconButton은 아직 눌림 표현이 없다                |
+
+**pressed는 색이 아니라 위치다.** `.ui-button:active`는 색을 그대로 둔 채 `translateY`만 주고,
+Fab만 그 위에 elevation을 얹는다(`shadow.lg` → `xl`). 그래서 `primaryBtn.pressed` 같은 **색**
+토큰은 만들지 않는다 — web에 없는 시각을 RN에 지어내는 셈이 된다. 테마를 타지 않으므로 base
+(`tokens/light/component.json`)에만 authoring하고 테마 델타를 두지 않는다.
+`contrast.test.ts`의 `describe('pressed 상태 어휘')`가 이 결정 셋을 전부 검사한다.
 
 `component.button`은 소비처가 없어 **internal로 남긴다** — 카테고리 통째 공개가 아니라
 path 단위 opt-in이다.
@@ -133,7 +140,17 @@ path 단위 opt-in이다.
 | Input 의 값·장식 아이콘 (페이지·카드·filled 세 표면) | 4.5:1 | WCAG 1.4.3                              |
 | 필드 라벨·헬퍼의 모든 상태 (페이지·카드 두 표면)     | 4.5:1 | WCAG 1.4.3 — 아래 disabled 항목 참조    |
 | Input 테두리 평소/hover/strong/error (세 표면)       | 3:1   | WCAG 1.4.11 (UI 경계)                   |
+| contained 버튼 라벨의 **hover 면**                   | 4.5:1 | WCAG 1.4.3                              |
+| outlined·text 라벨과 IconButton 글리프의 hover 틴트  | 4.5:1 | WCAG 1.4.3                              |
+| 버튼 outline 테두리 = `:focus-visible` 링 (두 표면)  | 3:1   | WCAG 1.4.11 + 2.4.7                     |
 | 구분선                                               | 1.2:1 | 장식이라 기준 밖. 안 보이는 것만 막는다 |
+| contained 면, 비활성 버튼 라벨, 포커스 halo          | 1.2:1 | 기준 밖 — 아래 참조                     |
+
+**버튼에서 기준 밖인 것 셋.** ① 채워진 버튼의 **면**은 3:1을 요구하지 않는다 — 라벨이 4.5:1을
+지키면 버튼은 테두리가 아니라 글자로 식별된다. ② 비활성 버튼 라벨은 native `disabled` 컨트롤
+**안**이라 Incidental 면제가 실제로 닿는다. ③ focus **halo**(`focusRipple`)는 outline 테두리
+위에 얹는 장식이고, halo를 규정하는 Focus Appearance(2.4.13)는 **AAA**다. 셋 다 "안 보이게
+미끄러지는 것"만 막는 가시성 바닥을 건다.
 
 **Input 은 표면을 세 가지로 본다.** plain·boxed 는 배경이 투명해서 뒤의 페이지나 카드가
 그대로 인접색이 되고, filled 만 자기 표면(`field.surface`)을 가진다. 한 표면에서만 재면

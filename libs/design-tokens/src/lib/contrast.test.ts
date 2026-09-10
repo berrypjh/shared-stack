@@ -191,6 +191,111 @@ const FIELD_TEXT = onLabelSurface([
  */
 const FIELD_DISABLED = onLabelSurface([['disabled label / helper', 'color.text.disable']]);
 
+/**
+ * Button 계열이 실제로 만드는 색 조합.
+ *
+ * web 은 Button·IconButton·Fab 이 모두 `.ui-button` 을 상속해 상태 처리가 같다. `error` 는
+ * 공개 `ButtonColor` 가 아니지만 `.ui-button--color-error` 클래스가 실제로 생성되므로 함께
+ * 본다 — 토큰·CSS 가 있다는 것과 prop 을 여는 것은 다른 이야기다.
+ */
+const BUTTON_COLORS = ['primary', 'secondary', 'error'] as const;
+
+/** 컨트롤 색과 같은 이름의 전경 토큰. IconButton 은 `icon.*`, 나머지는 `text.*` 를 쓴다. */
+const onSurfaceToken = (color: string, kind: 'text' | 'icon') => `color.${kind}.${color}`;
+
+/**
+ * contained 라벨은 **hover 면 위에서도** 읽혀야 한다 (WCAG 1.4.3, 4.5:1).
+ *
+ * 평상시 면(`{c}Btn.default`)은 `TEXT_PAIRS` 가 이미 본다. 여기는 hover 로 면이 바뀐 뒤다.
+ */
+const BUTTON_CONTAINED_HOVER: [string, string, string][] = BUTTON_COLORS.map((c) => [
+  `${c} contained label on hover surface`,
+  'color.text.contrastText',
+  `color.${c}Btn.hover`,
+]);
+
+/**
+ * outlined·text 라벨과 IconButton 글리프는 **hover 틴트 위에서** 읽혀야 한다 (1.4.3, 4.5:1).
+ *
+ * 실제로 깨졌던 자리다. `outlinedHover` 는 light 램프의 가장 밝은 단계(`pr100`)라서, 전경
+ * `text.*` 까지 밝아지는 어두운 테마에서 밝은 글자 위에 밝은 면이 됐다. 테마별 시맨틱
+ * override 로 고쳤고 — 그 수정을 지키는 것은 이 표뿐이다.
+ */
+const BUTTON_HOVER_TINT: [string, string, string][] = [
+  ...BUTTON_COLORS.map((c): [string, string, string] => [
+    `${c} outlined/text label on hover tint`,
+    onSurfaceToken(c, 'text'),
+    `color.${c}Btn.outlinedHover`,
+  ]),
+  ...(['primary', 'secondary'] as const).map((c): [string, string, string] => [
+    `${c} icon-button glyph on hover tint`,
+    onSurfaceToken(c, 'icon'),
+    `color.${c}Btn.outlinedHover`,
+  ]),
+];
+
+/** IconButton 글리프가 평상시 올라앉는 면 (1.4.3, 4.5:1). IconButton 은 primary·secondary 뿐이다. */
+const ICON_BUTTON_RESTING = onLabelSurface(
+  (['primary', 'secondary'] as const).map((c): [string, string] => [
+    `${c} icon-button glyph`,
+    onSurfaceToken(c, 'icon'),
+  ]),
+);
+
+/**
+ * outlined 테두리이자 `:focus-visible` 링 (WCAG 1.4.11, 3:1).
+ *
+ * 두 역할이 같은 토큰을 쓴다 — `button-base.scss` 의 `outline-border` 와 `focus-ring` 이
+ * 색마다 같은 값이다. 그래서 한 표로 둘을 함께 고정한다.
+ *
+ * 같은 토큰이 필드 테두리도 받치므로 `INPUT_BOUNDARIES` 와 겹친다. 겹치는 것이 맞다 —
+ * `stroke.secondary` 를 건드리면 버튼과 필드가 **함께** 빨개져 영향 범위가 드러난다.
+ */
+const BUTTON_BOUNDARIES = onLabelSurface(
+  BUTTON_COLORS.map((c): [string, string] => [
+    `${c} outline border / focus ring`,
+    c === 'primary' ? 'border.primary.color' : `color.stroke.${c}`,
+  ]),
+);
+
+/**
+ * contained 면이 배경에 완전히 묻히지 않는 바닥.
+ *
+ * **AA 요구가 아니다.** 라벨이 4.5:1 을 지키는 채워진 버튼은 테두리가 아니라 글자로 식별되므로
+ * 1.4.11 의 3:1 을 면에 그대로 요구하는 것은 기준을 지어내는 것이다. 다만 면이 배경과 같은
+ * 램프 단계로 미끄러지면 버튼이 사라지므로, 구분선과 같은 가시성 바닥만 건다.
+ */
+const BUTTON_SURFACES = onLabelSurface(
+  BUTTON_COLORS.map((c): [string, string] => [`${c} contained surface`, `color.${c}Btn.default`]),
+);
+
+/**
+ * 비활성 버튼.
+ *
+ * 라벨은 native `disabled` 인 컨트롤 **안**에 있어서 WCAG 1.4.3 의 Incidental 면제가 실제로
+ * 닿는다 (필드 바깥의 형제 헬퍼와 다른 점이다 — `FIELD_DISABLED` 주석 참조). 그러므로 AA 가
+ * 아니라 가시성 바닥만 본다.
+ */
+const BUTTON_DISABLED: [string, string, string][] = BUTTON_COLORS.map((c) => [
+  `${c} disabled label on disabled surface`,
+  'color.text.disable',
+  `color.${c}Btn.disabled`,
+]);
+
+/**
+ * `:focus-visible` halo (`focusRipple`·`outlinedFocusRipple`).
+ *
+ * 포커스 **표시**는 outline 테두리가 담당하고(`BUTTON_BOUNDARIES`), halo 는 그 위의 보조
+ * 장식이다. halo 두께·대비를 규정하는 WCAG 2.2 Focus Appearance(2.4.13)는 **AAA** 라서
+ * AA 기준을 적용하지 않는다. 여기서는 "보이기는 하는가"만 본다.
+ */
+const BUTTON_HALOS = onLabelSurface(
+  BUTTON_COLORS.flatMap((c): [string, string][] => [
+    [`${c} solid focus halo`, `color.${c}Btn.focusRipple`],
+    [`${c} outlined focus halo`, `color.${c}Btn.outlinedFocusRipple`],
+  ]),
+);
+
 describe('contrastRatio', () => {
   it('matches the WCAG reference extremes', () => {
     expect(contrastRatio('#000000', '#FFFFFF')).toBeCloseTo(21, 2);
@@ -251,5 +356,58 @@ describe.each(catalog.themes)('Field label and helper — %s theme', (theme) => 
 
   it.each(FIELD_DISABLED)('%s reaches 4.5:1', (_label, fg, bg) => {
     expect(contrastRatio(value(fg, theme), value(bg, theme))).toBeGreaterThanOrEqual(WCAG_AA.text);
+  });
+});
+
+describe.each(catalog.themes)('Button family — %s theme', (theme) => {
+  it.each([...BUTTON_CONTAINED_HOVER, ...BUTTON_HOVER_TINT, ...ICON_BUTTON_RESTING])(
+    '%s reaches 4.5:1',
+    (_label, fg, bg) => {
+      expect(contrastRatio(value(fg, theme), value(bg, theme))).toBeGreaterThanOrEqual(
+        WCAG_AA.text,
+      );
+    },
+  );
+
+  it.each(BUTTON_BOUNDARIES)('%s reaches 3:1', (_label, fg, bg) => {
+    expect(contrastRatio(value(fg, theme), value(bg, theme))).toBeGreaterThanOrEqual(
+      WCAG_AA.nonText,
+    );
+  });
+
+  it.each([...BUTTON_SURFACES, ...BUTTON_DISABLED])('%s stays visible', (_label, fg, bg) => {
+    expect(contrastRatio(value(fg, theme), value(bg, theme))).toBeGreaterThanOrEqual(DIVIDER_MIN);
+  });
+
+  it.each(BUTTON_HALOS)('%s stays visible', (_label, fg, bg) => {
+    expect(contrastRatio(value(fg, theme), value(bg, theme))).toBeGreaterThan(1);
+  });
+});
+
+/**
+ * pressed 의 정본 표현.
+ *
+ * 이 디자인 시스템에서 pressed 는 **색이 아니라 위치**다. web `.ui-button:active` 는 색을
+ * 그대로 두고 `translateY` 만 주고, Fab 만 그 위에 elevation 을 얹는다(`shadow.lg` → `xl`).
+ * 그래서 `*Btn.pressed` **색** 토큰을 만들면 web 에 없는 시각을 RN 에 지어내는 셈이 된다.
+ *
+ * 대신 눌림 깊이를 토큰이 갖는다 — web 이 `button-base.scss` 에 하드코딩하던 자리이자,
+ * RN Button·IconButton 이 아직 갖지 못한 값이다.
+ */
+describe('pressed 상태 어휘', () => {
+  it('눌림 깊이를 토큰이 소유한다', () => {
+    expect(catalog.tokens['component.pressedOffset']).toBeDefined();
+  });
+
+  it('테마를 타지 않는다 — 눌림 깊이는 팔레트가 아니라 제스처다', () => {
+    const [, ...values] = catalog.tokens['component.pressedOffset'];
+
+    expect(values).toHaveLength(catalog.themes.length);
+    expect(new Set(values).size).toBe(1);
+  });
+
+  it('pressed 를 색 토큰으로 표현하지 않는다', () => {
+    // 나중에 `primaryBtn.pressed` 를 더하려는 사람이 이 결정을 다시 읽게 만든다.
+    expect(Object.keys(catalog.tokens).filter((p) => /^color\..*[Pp]ressed/.test(p))).toEqual([]);
   });
 });
