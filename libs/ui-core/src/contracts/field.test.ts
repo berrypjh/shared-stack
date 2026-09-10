@@ -207,7 +207,43 @@ describe('Field 계약이 거부하는 것', () => {
       // @ts-expect-error FormControl label float 신호다 — RN 소비자가 없다
       onEmpty: () => undefined,
     };
+    const filled: FieldSemanticProps = {
+      // @ts-expect-error 신호만이 아니라 상태 자체도 아니다 — web FormControl 안에서만 산다
+      filled: true,
+    };
+    const adornedStart: FieldSemanticProps = {
+      // @ts-expect-error 장식 유무는 web FormControl이 자식을 훑어 만드는 파생 상태다
+      adornedStart: true,
+    };
 
-    expect([onFilled, onEmpty]).toHaveLength(2);
+    expect([onFilled, onEmpty, filled, adornedStart]).toHaveLength(4);
+  });
+
+  /**
+   * 가장 그럴듯한 승격 후보라서 명시적으로 막는다.
+   *
+   * 두 렌더러의 `focused`는 이름도 우선순위(`disabled`가 이긴다)도 같지만, **입력의 시맨틱이
+   * 아니라 FormControl 컨테이너의 상태**다. 양쪽 `InputBase` 어느 쪽도 `focused`를 prop으로
+   * 받지 않는다 — web은 context나 자기 DOM 이벤트에서, RN은 context나 TextInput 콜백에서
+   * 얻는다. 수집 수단도 다르다: web은 루트에서 focus를 버블링받아 `relatedTarget`으로 거르고,
+   * RN View는 포커스를 버블링하지 않아 입력이 직접 알린다.
+   *
+   * 컨테이너 계약을 ui-core가 갖기 시작하면 context·hook까지 따라 올라온다. 그 선을 넘지 않는다.
+   */
+  it('포커스 상태와 포커스 알림을 거부한다', () => {
+    const focused: FieldSemanticProps = {
+      // @ts-expect-error FormControl 컨테이너의 상태다 — 입력 시맨틱이 아니다
+      focused: true,
+    };
+    const onFocus: InputFieldSemanticProps = {
+      // @ts-expect-error 포커스 수집 수단이 렌더러마다 다르다 (DOM 버블링 vs 입력 콜백)
+      onFocus: () => undefined,
+    };
+    const onBlur: InputFieldSemanticProps = {
+      // @ts-expect-error 위와 같다
+      onBlur: () => undefined,
+    };
+
+    expect([focused, onFocus, onBlur]).toHaveLength(3);
   });
 });
