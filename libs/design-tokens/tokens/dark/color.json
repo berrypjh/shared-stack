@@ -97,7 +97,7 @@
       "$type": "color"
     },
     "outlinedHover": {
-      "$value": "{primary.pr300}",
+      "$value": "{primary.pr900}",
       "$type": "color"
     }
   },
@@ -115,7 +115,7 @@
       "$type": "color"
     },
     "disable": {
-      "$value": "{neutral.ne500}",
+      "$value": "#8791A3",
       "$type": "color"
     },
     "primary": {
@@ -312,6 +312,18 @@
     },
     "focusRingPrimary": {
       "$value": "{primary.pr300}",
+      "$type": "color"
+    }
+  },
+  "secondaryBtn": {
+    "outlinedHover": {
+      "$value": "{secondary.se900}",
+      "$type": "color"
+    }
+  },
+  "errorBtn": {
+    "outlinedHover": {
+      "$value": "#5A1D13",
       "$type": "color"
     }
   }

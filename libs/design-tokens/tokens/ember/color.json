@@ -74,5 +74,11 @@
       "$value": "#0A0A0A",
       "$type": "color"
     }
+  },
+  "text": {
+    "disable": {
+      "$value": "#7F7F79",
+      "$type": "color"
+    }
   }
 }

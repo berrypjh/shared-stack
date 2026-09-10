@@ -109,6 +109,10 @@
     "placeholder": {
       "$value": "{neutral.ne600}",
       "$type": "color"
+    },
+    "disable": {
+      "$value": "#78674C",
+      "$type": "color"
     }
   },
   "stroke": {

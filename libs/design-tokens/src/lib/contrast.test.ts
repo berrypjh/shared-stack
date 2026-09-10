@@ -92,6 +92,8 @@ const INPUT_BOUNDARIES = onEachSurface([
   ['hover border', 'color.field.borderHover'],
   ['strong border', 'color.field.borderStrong'],
   ['error border', 'color.stroke.error'],
+  ['focus border (primary)', 'border.primary.color'],
+  ['focus border (secondary)', 'color.stroke.secondary'],
 ]);
 
 /**
@@ -116,32 +118,78 @@ const INPUT_HALOS: [string, string, string][] = [
 ];
 
 /**
- * 아직 AA 에 못 미치는 조합. **면제가 아니라 미해결 결함이다.**
+ * **비어 있어야 정상이다.**
  *
- * 원인이 전부 field 밖 토큰이라 여기서 고치면 버튼·링크까지 같이 움직인다:
- * - `text.placeholder`·`icon.placeholder` = `{neutral.ne500}` — frost 램프 간격이 좁다
- * - `border.primary.color` — amber primary 램프
- * - `stroke.secondary` — light 계열 secondary 램프
- *
- * 값을 지어내지 않고, 대신 **현재 값을 바닥으로 못 박아** 더 나빠지는 것만 막는다.
- * 기준을 올려 고치면 이 목록에서 빼야 한다.
+ * 한때 placeholder·focus 테두리가 여기 얼어 있었다. 원인은 전부 "light 테마용 램프 단계를
+ * 다른 테마가 그대로 물려받았다" 였고, 테마별 시맨틱 override 로 해결했다. 새 팔레트가
+ * 기준에 못 미치면 여기 넣어 동결하지 말고 **그 테마의 시맨틱을 다시 잡는다** — 동결은
+ * 기준을 낮추는 것이지 지키는 것이 아니다.
  */
-const BELOW_AA: [string, number, string, string][] = [
-  ['placeholder on page', 4.2, 'color.text.placeholder', 'color.background.default'],
-  ['placeholder on filled', 3.8, 'color.text.placeholder', 'color.field.surface'],
-  ['muted icon on page', 4.2, 'color.icon.placeholder', 'color.background.default'],
-  ['muted icon on filled', 3.8, 'color.icon.placeholder', 'color.field.surface'],
-  ['primary focus border on page', 2.8, 'border.primary.color', 'color.background.default'],
-  ['primary focus border on filled', 2.6, 'border.primary.color', 'color.field.surface'],
-  ['secondary focus border on page', 2.8, 'color.stroke.secondary', 'color.background.default'],
-  ['secondary focus border on filled', 2.6, 'color.stroke.secondary', 'color.field.surface'],
+const BELOW_AA: [string, number, string, string][] = [];
+
+/**
+ * placeholder 도 그냥 텍스트다 — WCAG 에 면제 조항이 없다.
+ *
+ * 값 텍스트보다 흐려야 한다는 것은 디자인 요구이지 기준 완화 사유가 아니라서, 세 표면
+ * 모두에서 다른 텍스트와 같은 4.5:1 을 건다.
+ */
+const PLACEHOLDER = onEachSurface([
+  ['placeholder', 'color.text.placeholder'],
+  ['muted icon', 'color.icon.placeholder'],
+]);
+
+/**
+ * 라벨과 헬퍼가 실제로 올라앉는 표면.
+ *
+ * 둘은 입력 **안**이 아니라 입력 위·아래에 있다 — 뒤에 있는 페이지나 카드가 인접색이다.
+ * `field.surface` 는 여기 없다: filled variant 의 표면은 입력 상자의 것이고 라벨이 그 위에
+ * 놓이지 않는다. 없는 조합을 검사하면 기준을 지어내는 것이다.
+ */
+const LABEL_SURFACES: [string, string][] = [
+  ['page', 'color.background.default'],
+  ['card', 'color.background.surface'],
 ];
 
-/** placeholder 는 카드 위에서는 AA 를 넘긴다 — 회귀 방지로 남긴다. */
-const INPUT_TEXT_ON_CARD: [string, string, string][] = [
-  ['placeholder on card', 'color.text.placeholder', 'color.background.surface'],
-  ['muted icon on card', 'color.icon.placeholder', 'color.background.surface'],
-];
+const onLabelSurface = (rows: [string, string][]): [string, string, string][] =>
+  rows.flatMap(([name, token]) =>
+    LABEL_SURFACES.map(([surface, bg]): [string, string, string] => [
+      `${name} on ${surface}`,
+      token,
+      bg,
+    ]),
+  );
+
+/**
+ * 라벨·헬퍼가 각 상태에서 실제로 쓰는 색 (WCAG 1.4.3, 4.5:1).
+ *
+ * 상태별 색은 `react-ui/input-label.scss` 와 `react-native-ui/InputLabel.styles.ts` 가 같은
+ * 순서(disabled > error > focused > 평상시)로 고른다. 여기 있는 것이 그 분기의 전부다.
+ *
+ * 필수 표시(`*`)는 라벨 색을 그대로 상속한다 (`.ui-input-label__asterisk { color: inherit }`,
+ * RN 은 중첩 `Text`). 자기 색이 없으므로 따로 검사할 조합도, 새 토큰도 없다.
+ */
+const FIELD_TEXT = onLabelSurface([
+  ['default label', 'color.text.default'],
+  ['focused label (primary)', 'color.text.primary'],
+  ['focused label (secondary)', 'color.text.secondary'],
+  ['error label / helper', 'color.text.error'],
+  ['helper', 'color.text.light'],
+]);
+
+/**
+ * 비활성 라벨·헬퍼는 **AA 를 실제로 지켜야 한다.**
+ *
+ * WCAG 2.2 의 1.4.3 은 비활성 컨트롤에 속한 텍스트를 Incidental 로 면제하지만, 그 면제는
+ * **비활성이라는 사실이 드러나는 텍스트**에만 닿는다. 라벨과 헬퍼는 입력의 형제일 뿐이라
+ * 그 사실을 프로그래밍적으로 말하는 수단이 없다 — 실제로 axe 는 `<label for>` 이 비활성
+ * 컨트롤을 가리키면 면제하지만, `aria-describedby` 로만 이어진 헬퍼 `<p>` 는 면제하지 않고
+ * 4.5:1 을 요구한다. 사람 눈에도 마찬가지다: 옆 입력이 비활성이라는 것을 알기 전까지 그
+ * 문단은 그냥 읽어야 하는 글이다.
+ *
+ * 입력 **안**의 값 텍스트는 다르다 — native `disabled` 안에 있어서 도구도 사람도 비활성임을
+ * 알 수 있다. 그쪽은 `INPUT_DISABLED` 가 가시성 바닥만 건다.
+ */
+const FIELD_DISABLED = onLabelSurface([['disabled label / helper', 'color.text.disable']]);
 
 describe('contrastRatio', () => {
   it('matches the WCAG reference extremes', () => {
@@ -173,7 +221,7 @@ describe.each(catalog.themes)('WCAG AA — %s theme', (theme) => {
 });
 
 describe.each(catalog.themes)('Input surfaces — %s theme', (theme) => {
-  it.each([...INPUT_TEXT, ...INPUT_TEXT_ON_CARD])('%s reaches 4.5:1', (_label, fg, bg) => {
+  it.each([...INPUT_TEXT, ...PLACEHOLDER])('%s reaches 4.5:1', (_label, fg, bg) => {
     expect(contrastRatio(value(fg, theme), value(bg, theme))).toBeGreaterThanOrEqual(WCAG_AA.text);
   });
 
@@ -191,7 +239,17 @@ describe.each(catalog.themes)('Input surfaces — %s theme', (theme) => {
     expect(contrastRatio(value(fg, theme), value(bg, theme))).toBeGreaterThan(1);
   });
 
-  it.each(BELOW_AA)('%s holds at %s:1 (still below AA)', (_label, floor, fg, bg) => {
-    expect(contrastRatio(value(fg, theme), value(bg, theme))).toBeGreaterThanOrEqual(floor);
+  it('carries no frozen sub-AA debt', () => {
+    expect(BELOW_AA).toEqual([]);
+  });
+});
+
+describe.each(catalog.themes)('Field label and helper — %s theme', (theme) => {
+  it.each(FIELD_TEXT)('%s reaches 4.5:1', (_label, fg, bg) => {
+    expect(contrastRatio(value(fg, theme), value(bg, theme))).toBeGreaterThanOrEqual(WCAG_AA.text);
+  });
+
+  it.each(FIELD_DISABLED)('%s reaches 4.5:1', (_label, fg, bg) => {
+    expect(contrastRatio(value(fg, theme), value(bg, theme))).toBeGreaterThanOrEqual(WCAG_AA.text);
   });
 });

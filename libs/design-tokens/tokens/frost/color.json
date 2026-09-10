@@ -80,5 +80,25 @@
       "$value": "#F8FAFC",
       "$type": "color"
     }
+  },
+  "text": {
+    "disable": {
+      "$value": "#58687E",
+      "$type": "color"
+    },
+    "placeholder": {
+      "$value": "#58687E",
+      "$type": "color"
+    }
+  },
+  "stroke": {
+    "primary": {
+      "$value": "{primary.pr700}",
+      "$type": "color"
+    },
+    "secondary": {
+      "$value": "{secondary.se600}",
+      "$type": "color"
+    }
   }
 }

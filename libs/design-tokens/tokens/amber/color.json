@@ -80,5 +80,21 @@
       "$value": "#FAFAF7",
       "$type": "color"
     }
+  },
+  "stroke": {
+    "primary": {
+      "$value": "{primary.pr700}",
+      "$type": "color"
+    },
+    "secondary": {
+      "$value": "{secondary.se600}",
+      "$type": "color"
+    }
+  },
+  "text": {
+    "placeholder": {
+      "$value": "#696961",
+      "$type": "color"
+    }
   }
 }
