@@ -218,6 +218,110 @@ describe('disabled 가 최우선이다', () => {
 
     expect(ctx().focused).toBe(false);
   });
+
+  /**
+   * disabled 를 지나면 내부 focus 상태는 버려져야 한다.
+   *
+   * `disabled ? false : …` 는 값을 **가릴 뿐**이라, 가려진 사이 `true` 로 남아 있던 상태가
+   * 다시 켤 때 되살아난다. 그러면 실제로는 아무것도 포커스를 갖고 있지 않은데 라벨과 테두리가
+   * 포커스를 주장한다.
+   *
+   * RN 은 blur 알림이 반드시 온다고 기대할 수 없다 — `editable={false}` 가 네이티브 blur 를
+   * 부르는지는 플랫폼 구현에 달렸고, 포커스를 아예 알리지 않는 자손(Select)도 같은
+   * FormControl 을 쓴다. 그래서 상태 기계가 알림에 기대지 않고 스스로 정리해야 한다.
+   */
+  it('disabled 를 켰다 끄면 내부 focus 상태가 남지 않는다', async () => {
+    const view = await show(
+      <FormControl>
+        <ContextProbe />
+      </FormControl>,
+    );
+
+    await press('ctx-focus');
+    expect(ctx().focused).toBe(true);
+
+    await view.rerender(
+      <FormControl disabled>
+        <ContextProbe />
+      </FormControl>,
+    );
+    expect(ctx().focused).toBe(false);
+
+    await view.rerender(
+      <FormControl>
+        <ContextProbe />
+      </FormControl>,
+    );
+
+    expect(ctx().focused).toBe(false);
+  });
+});
+
+/**
+ * context 값의 참조 안정성.
+ *
+ * 자손이 전부 `useContext` 로 붙어 있어서, 값이 매 렌더 새 객체면 부모가 다시 그릴 때마다
+ * 라벨·입력·헬퍼가 통째로 다시 그려진다. `useMemo` 가 실제로 그것을 막고 있는지 본다.
+ *
+ * 동시에 **과하게 얼지도 않았는지** 확인한다 — 값이 바뀌었는데 같은 객체를 재사용하면
+ * 자손이 갱신을 놓친다.
+ */
+describe('context 참조 안정성', () => {
+  const identities = new Set<unknown>();
+
+  const IdentityProbe = () => {
+    identities.add(useFormControl());
+
+    return <Text testID="identity">{String(identities.size)}</Text>;
+  };
+
+  beforeEach(() => identities.clear());
+
+  it('prop 이 그대로면 다시 렌더해도 같은 객체다', async () => {
+    const view = await show(
+      <FormControl color="primary" size="md">
+        <IdentityProbe />
+      </FormControl>,
+    );
+
+    await view.rerender(
+      <FormControl color="primary" size="md">
+        <IdentityProbe />
+      </FormControl>,
+    );
+
+    expect(identities.size).toBe(1);
+  });
+
+  it('prop 이 바뀌면 새 객체다', async () => {
+    const view = await show(
+      <FormControl size="md">
+        <IdentityProbe />
+      </FormControl>,
+    );
+
+    await view.rerender(
+      <FormControl size="sm">
+        <IdentityProbe />
+      </FormControl>,
+    );
+
+    expect(identities.size).toBe(2);
+  });
+
+  it('focus 알림도 새 객체를 만든다 — 자손이 상태 변화를 본다', async () => {
+    await show(
+      <FormControl>
+        <IdentityProbe />
+        <ContextProbe />
+      </FormControl>,
+    );
+
+    await press('ctx-focus');
+
+    expect(identities.size).toBe(2);
+    expect(ctx().focused).toBe(true);
+  });
 });
 
 describe('중첩', () => {

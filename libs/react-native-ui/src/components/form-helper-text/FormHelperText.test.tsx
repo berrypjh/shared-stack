@@ -228,6 +228,34 @@ describe('접근성 경계', () => {
   });
 });
 
+/**
+ * 글자 크기 확대. `InputLabel`·`InputBase` 와 같은 규약이다 — 끄지 않고, 높이를 고정하지 않는다.
+ */
+describe('글자 크기 확대', () => {
+  it('allowFontScaling 을 건드리지 않는다 — RN 기본값(확대 허용)이 남는다', async () => {
+    await show(<FormHelperText testID="helper">회사 이메일을 입력하세요</FormHelperText>);
+
+    expect(helper().props.allowFontScaling).toBeUndefined();
+  });
+
+  it('소비자가 확대를 끌 수 있다', async () => {
+    await show(
+      <FormHelperText testID="helper" allowFontScaling={false}>
+        회사 이메일을 입력하세요
+      </FormHelperText>,
+    );
+
+    expect(helper().props.allowFontScaling).toBe(false);
+  });
+
+  it('높이를 고정하지 않는다', async () => {
+    await show(<FormHelperText testID="helper">회사 이메일을 입력하세요</FormHelperText>);
+
+    expect(helper()).not.toHaveStyle({ height: expect.anything() });
+    expect(helper()).not.toHaveStyle({ maxHeight: expect.anything() });
+  });
+});
+
 describe('공개 경계', () => {
   it('배럴은 FormHelperText 만 내보낸다', () => {
     expect(Object.keys(barrel).sort()).toEqual(['FormHelperText']);

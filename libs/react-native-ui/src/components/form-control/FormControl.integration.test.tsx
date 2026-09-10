@@ -137,6 +137,30 @@ describe('disabled 상속', () => {
 
     expect(label()).toHaveStyle({ color: T.color.text.disable });
   });
+
+  it('disabled 를 켰다 끄면 라벨이 포커스를 주장하지 않는다', async () => {
+    const view = await show(<Field />);
+
+    await fireEvent(input(), 'focus');
+    expect(label()).toHaveStyle({ color: T.color.text.primary });
+
+    // 비활성화되는 동안 네이티브 blur 알림은 오지 않을 수 있다.
+    await view.rerender(
+      <ThemeProvider>
+        <Field disabled />
+      </ThemeProvider>,
+    );
+    expect(label()).toHaveStyle({ color: T.color.text.disable });
+
+    // 다시 켰을 때 포커스를 가진 것은 아무것도 없다.
+    await view.rerender(
+      <ThemeProvider>
+        <Field />
+      </ThemeProvider>,
+    );
+
+    expect(label()).toHaveStyle({ color: T.color.text.default });
+  });
 });
 
 describe('error 상속', () => {

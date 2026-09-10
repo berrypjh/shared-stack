@@ -325,6 +325,38 @@ describe('접근성', () => {
   });
 });
 
+/**
+ * 글자 크기 확대.
+ *
+ * 시스템 글꼴 확대는 저시력 사용자의 기본 수단이다. `allowFontScaling` 을 끄면 그 수단이
+ * 통째로 사라지므로 건드리지 않는다 — `InputBase` 와 같은 규약이고, 정책은 소비자가 고른다.
+ * 높이를 고정하지 않는다는 것도 함께 지킨다: 고정하면 확대된 글자가 잘린다.
+ */
+describe('글자 크기 확대', () => {
+  it('allowFontScaling 을 건드리지 않는다 — RN 기본값(확대 허용)이 남는다', async () => {
+    await show(<InputLabel testID="label">이메일</InputLabel>);
+
+    expect(label().props.allowFontScaling).toBeUndefined();
+  });
+
+  it('소비자가 확대를 끌 수 있다', async () => {
+    await show(
+      <InputLabel testID="label" allowFontScaling={false}>
+        이메일
+      </InputLabel>,
+    );
+
+    expect(label().props.allowFontScaling).toBe(false);
+  });
+
+  it('높이를 고정하지 않는다', async () => {
+    await show(<InputLabel testID="label">이메일</InputLabel>);
+
+    expect(label()).not.toHaveStyle({ height: expect.anything() });
+    expect(label()).not.toHaveStyle({ maxHeight: expect.anything() });
+  });
+});
+
 describe('공개 경계', () => {
   it('배럴은 InputLabel 만 내보낸다', () => {
     expect(Object.keys(barrel).sort()).toEqual(['InputLabel']);
