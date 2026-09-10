@@ -28,10 +28,18 @@ const reactNativeUi = (name, importStr, limit) => ({
 });
 
 module.exports = [
-  // react-ui — 단일 bundle 구조라 베이스 ~9.3 KB가 항상 들어감.
-  // 그래서 단일 심볼 케이스는 서로 구분되지 않는다 — 측정값이 9.36~9.41 KB 로 모인다
-  // (ButtonBase 9.39 / IconButton 9.37 / Fab 9.40). Button 계열 형제를 더 넣어도
-  // `* (full)` 이 더 좁은 여유로 이미 잡는 회귀만 중복 감시하므로 추가하지 않는다.
+  // react-ui — 단일 심볼 케이스가 서로 구분되지 않는다: `cx`(10줄 순수 함수)와 `TextField` 가
+  // **바이트 단위로 같다** (raw 34,244 vs 34,245). 원인은 번들 구조가 아니라
+  // **`Component.displayName = '...'` 최상위 할당 21개**다 — 속성 할당은 번들러가 순수하다고
+  // 증명할 수 없어서 그 컴포넌트를 통째로 붙잡는다. 그래서 무엇을 import 하든 21개가 전부 남는다.
+  //
+  // 실측: 빌드된 `dist/index.esm.js` 에서 그 21줄만 지우고 `cx` 를 다시 번들하면
+  // raw 34,245 → 1,150, gzip 10,697 → 481 (−97%). RN 은 `displayName` 을 쓰지 않아서
+  // 단일 심볼이 단조 증가한다 (getColor 63KB → TextField 83KB).
+  //
+  // 고치려면 `displayName` 을 없애거나 `process.env.NODE_ENV` 로 감싸야 하는데, 둘 다 소비자가
+  // 관찰하는 속성을 바꾸므로 **breaking public** 이다. 저장소 안에는 읽는 곳이 0 이지만
+  // 외부 소비자 영향은 별도 판단이 필요해 여기서는 숫자만 고정한다.
   reactUi('cx only', '{ cx }', '11 KB'),
   reactUi('Box only', '{ Box }', '11 KB'),
   reactUi('Button only', '{ Button }', '11 KB'),

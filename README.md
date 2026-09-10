@@ -34,46 +34,6 @@ pnpm add @berrypjh/react-ui         # peer: react ^19, react-dom ^19
 pnpm add @berrypjh/react-native-ui  # peer: react ^19, react-native ~0.81.5
 ```
 
-## 빠른 시작
-
-### Web
-
-```tsx
-import '@berrypjh/react-ui/styles.css';
-import { Button, TextField, ThemeProvider } from '@berrypjh/react-ui';
-
-export const App = () => (
-  <ThemeProvider mode="light">
-    <TextField label="이름" />
-    <Button variant="contained" color="primary">
-      확인
-    </Button>
-  </ThemeProvider>
-);
-```
-
-Tailwind를 쓴다면 preset을 연결합니다.
-
-```ts
-import preset from '@berrypjh/react-ui/tailwind';
-
-export default { presets: [preset] };
-```
-
-### React Native
-
-```tsx
-import { Box, ThemeProvider } from '@berrypjh/react-native-ui';
-
-export const App = () => (
-  <ThemeProvider mode="light">
-    <Box p="md" bg="background.surface" radius="md" />
-  </ThemeProvider>
-);
-```
-
-컴포넌트 목록과 prop은 각 패키지 README를 참조하세요.
-
 ## 공유 설정 패키지
 
 ```bash
