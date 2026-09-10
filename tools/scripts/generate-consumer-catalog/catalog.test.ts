@@ -196,6 +196,25 @@ describe('react-native catalog contents', () => {
     }
   });
 
+  /**
+   * 배럴이 없는 내부 원시는 **빌드 산출물에도** 나오면 안 된다.
+   *
+   * 소스 쪽 검사(`FormControl.test.tsx` 의 "배럴은 FormControl 만 내보낸다")는 배럴을 통한
+   * 승격만 막는다. `src/index.ts` 가 그 파일을 직접 내보내면 배럴은 그대로인 채 선언과
+   * 카탈로그로 샌다. 방향이 반대라 두 검사가 모두 필요하다.
+   *
+   * 위 `covers …` 검사도 이것을 대신하지 못한다 — 그쪽은 "배럴에 있는 것이 카탈로그에 있는가"
+   * 이고, 카탈로그에 더 있는 것은 통과시킨다.
+   */
+  it('keeps barrel-less internals out of the built surface', async () => {
+    const text = await declarationText(TARGETS['react-native-ui']);
+
+    for (const internal of ['useFormControl', 'FormControlContext', 'InputBase', 'ButtonBase']) {
+      expect(native.symbols[internal]).toBeUndefined();
+      expect(new RegExp(`^export .*\\b${internal}\\b`, 'm').test(text)).toBe(false);
+    }
+  });
+
   it('extracts token-based Box props without React Native ViewProps', () => {
     const props = Object.keys(native.symbols.Box.props ?? {});
     expect(props).toEqual(expect.arrayContaining(['p', 'bg', 'radius', 'style']));
