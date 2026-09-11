@@ -1,0 +1,140 @@
+/**
+ * Checkbox.
+ *
+ * native input 자체를 `appearance: none` 으로 상자로 그린다. 상태는 전부 native 선택자가
+ * 정한다 — `:checked`·`:indeterminate`·`:disabled`·`:focus-visible`·`[aria-invalid]`.
+ * JS 상태 클래스를 만들지 않는다.
+ *
+ * 테두리 색은 상태마다 **한 규칙만** 매칭되게 `:not()` 으로 배제한다 (disabled > error >
+ * checked > hover > 평상시, Input·Label 과 같은 순서). 선언 순서에 기대지 않는다.
+ */
+.ui-checkbox {
+  --ui-checkbox-size: var(--ds-spacing-lg);
+  --ui-checkbox-stroke: var(--ds-semantic-border-default);
+
+  display: inline-flex;
+  align-items: flex-start;
+  gap: var(--ds-spacing-sm);
+  max-width: 100%;
+  color: var(--ds-text-default);
+  cursor: pointer;
+
+  font-family: var(--ds-body-medium-font-family);
+  font-size: var(--ds-body-medium-font-size);
+  font-weight: var(--ds-body-medium-font-weight);
+  letter-spacing: var(--ds-body-medium-letter-spacing);
+  line-height: var(--ds-body-medium-line-height);
+}
+
+.ui-checkbox:has(.ui-checkbox__input:disabled) {
+  color: var(--ds-text-disable);
+  cursor: default;
+}
+
+.ui-checkbox__input {
+  appearance: none;
+  flex: none;
+  display: grid;
+  place-content: center;
+  box-sizing: border-box;
+  inline-size: var(--ui-checkbox-size);
+  block-size: var(--ui-checkbox-size);
+  margin: 0;
+  // 긴 라벨의 첫 줄 가운데에 상자를 맞춘다.
+  margin-block-start: calc((var(--ds-body-medium-line-height) - var(--ui-checkbox-size)) / 2);
+  border: var(--ui-checkbox-stroke) solid var(--ds-field-border);
+  border-radius: var(--ds-radius-xs);
+  background-color: transparent;
+  cursor: inherit;
+  transition:
+    background-color var(--ds-motion-duration-fast) var(--ds-motion-easing-standard),
+    border-color var(--ds-motion-duration-fast) var(--ds-motion-easing-standard);
+}
+
+/* 체크 글리프: 오른쪽·아래 테두리만 있는 상자를 45도 돌린다. 평소에는 보이지 않는다. */
+.ui-checkbox__input::before {
+  content: '';
+  box-sizing: border-box;
+  inline-size: calc(var(--ui-checkbox-size) * 0.3);
+  block-size: calc(var(--ui-checkbox-size) * 0.55);
+  border: 0 solid var(--ds-selection-control-indicator);
+  border-inline-end-width: var(--ui-checkbox-stroke);
+  border-block-end-width: var(--ui-checkbox-stroke);
+  transform: translateY(-12%) rotate(45deg);
+  visibility: hidden;
+}
+
+/* 혼합 상태 글리프: 가로 막대. */
+.ui-checkbox__input:indeterminate::before {
+  inline-size: calc(var(--ui-checkbox-size) * 0.5);
+  block-size: 0;
+  border-inline-end-width: 0;
+  transform: none;
+}
+
+.ui-checkbox__input:is(:checked, :indeterminate)::before {
+  visibility: visible;
+}
+
+.ui-checkbox__input:is(:checked, :indeterminate):not(:disabled) {
+  background-color: var(--ds-selection-control-checked);
+}
+
+.ui-checkbox__input:is(:checked, :indeterminate):not(:disabled):not([aria-invalid='true']) {
+  border-color: var(--ds-selection-control-checked);
+}
+
+.ui-checkbox__input[aria-invalid='true']:not(:disabled) {
+  border-color: var(--ds-stroke-error);
+}
+
+.ui-checkbox__input:disabled {
+  border-color: var(--ds-border-disabled-color);
+}
+
+.ui-checkbox__input:disabled:is(:checked, :indeterminate) {
+  border-color: var(--ds-background-disable);
+  background-color: var(--ds-background-disable);
+}
+
+/* 포커스는 outline 으로 그린다 — forced-colors 에서도 남고 루트가 잘라내지 않는다. */
+.ui-checkbox__input:focus-visible {
+  outline: var(--ds-component-field-focus-ring-width) solid var(--ds-border-primary-color);
+  outline-offset: var(--ds-spacing-2xs);
+}
+
+.ui-checkbox__label {
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+}
+
+/* 터치에서는 hover 가 탭 뒤에 남는다. hover 가능한 포인터에서만 켠다. */
+@media (hover: hover) {
+  .ui-checkbox:hover
+    .ui-checkbox__input:not(:disabled):not(:checked):not(:indeterminate):not(
+      [aria-invalid='true']
+    ) {
+    border-color: var(--ds-field-border-hover);
+  }
+}
+
+/* 끄는 것은 전환뿐이다. 포커스 outline 은 그대로 남는다. */
+@media (prefers-reduced-motion: reduce) {
+  .ui-checkbox__input {
+    transition: none;
+  }
+}
+
+/**
+ * forced-colors(Windows 고대비)에서는 토큰 배경·테두리가 시스템 색으로 평탄화되어 checked 가
+ * 사라진다. native 외형으로 되돌려 OS 가 상태를 시스템 색으로 직접 그리게 한다.
+ */
+@media (forced-colors: active) {
+  .ui-checkbox__input {
+    appearance: auto;
+  }
+
+  .ui-checkbox__input::before {
+    content: none;
+  }
+}

@@ -1,0 +1,37 @@
+/**
+ * RadioGroup.
+ *
+ * native `<fieldset>` 의 기본 테두리·여백만 걷어낸다. 그룹 시맨틱과 `disabled` 전파는
+ * 브라우저 것 그대로다. 선택지 경계의 오류 색은 `radio.scss` 가 input 의 `data-invalid` 로 정한다.
+ */
+.ui-radio-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--ds-spacing-xs);
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+/* 필드 라벨과 같은 모양이다 (InputLabel). 상태 색은 disabled > error > 평상시. */
+.ui-radio-group__label {
+  padding: 0;
+  margin-block-end: var(--ds-spacing-xs);
+  color: var(--ds-text-default);
+
+  font-family: var(--ds-body-small-strong-font-family);
+  font-size: var(--ds-body-small-strong-font-size);
+  font-weight: var(--ds-body-small-strong-font-weight);
+  letter-spacing: var(--ds-body-small-strong-letter-spacing);
+  line-height: var(--ds-body-small-strong-line-height);
+}
+
+.ui-radio-group--error:not(:disabled) .ui-radio-group__label {
+  color: var(--ds-text-error);
+}
+
+.ui-radio-group:disabled .ui-radio-group__label {
+  color: var(--ds-text-disable);
+}

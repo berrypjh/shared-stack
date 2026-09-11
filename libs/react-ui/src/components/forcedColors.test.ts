@@ -243,6 +243,101 @@ describe('SegmentControl', () => {
 });
 
 /**
+ * Checkbox·Radio 는 `appearance: none` 인 native input 을 토큰 색으로 칠한다. forced-colors
+ * 에서는 그 배경·테두리 색이 시스템 색으로 평탄화되어 checked·indeterminate 가 사라진다.
+ *
+ * 그 모드에서는 **native 외형으로 되돌린다** — 상태를 OS 가 시스템 색으로 직접 그린다.
+ * `forced-color-adjust: none` 으로 저자 색을 되살리지 않는다: 사용자가 고른 고대비 팔레트를
+ * 끄는 셈이다.
+ */
+describe.each([
+  ['Checkbox', 'checkbox/checkbox.scss', '.ui-checkbox__input'],
+  ['Radio', 'radio/radio.scss', '.ui-radio__input'],
+])('%s', (_name, sheet, inputSelector) => {
+  const source = css(sheet);
+
+  it('컴파일된 CSS 를 실제로 읽는다', () => {
+    expect(source.length).toBeGreaterThan(100);
+  });
+
+  it('forced-colors 에서 native 컨트롤로 돌아간다', () => {
+    const native = rules(forcedColorsBody(source)).filter((rule) =>
+      rule.selector.includes(inputSelector),
+    );
+
+    expect(native.some((rule) => /appearance:\s*auto/.test(rule.body))).toBe(true);
+  });
+
+  it('포커스 표시가 outline 으로 선언되어 있다', () => {
+    const focusRules = rules(source).filter((rule) => rule.selector.includes(':focus-visible'));
+
+    expect(focusRules.length).toBeGreaterThan(0);
+    expect(
+      focusRules.filter((rule) => {
+        const outline = outlineValue(rule.body);
+        return outline === null || outline === 'none';
+      }),
+    ).toEqual([]);
+  });
+
+  it('forced-color-adjust: none 으로 시스템 팔레트를 끄지 않는다', () => {
+    expect(source).not.toMatch(/forced-color-adjust:\s*none/);
+  });
+});
+
+/**
+ * Switch 는 Checkbox·Radio 처럼 native 외형으로 되돌리지 않는다 — native 체크박스에는 thumb 이
+ * 없어서 "켜짐/꺼짐 위치"라는 이 컨트롤의 표현이 사라진다.
+ *
+ * 대신 forced-colors 에서 살아남는 수단만으로 그린다.
+ *
+ * - thumb 은 **border** 로 채운다. 그 모드에서 배경색은 Canvas 로 지워지지만 테두리는 남는다.
+ * - 켜짐/꺼짐은 thumb **위치**가 1차로 말한다 (색이 아니다). 그 위에 시스템 색을 얹는다:
+ *   checked 는 `Highlight`, disabled 는 `GrayText`.
+ * - 포커스는 outline 이다.
+ */
+describe('Switch', () => {
+  const source = css('switch/switch.scss');
+
+  it('컴파일된 CSS 를 실제로 읽는다', () => {
+    expect(source.length).toBeGreaterThan(100);
+  });
+
+  it('thumb 을 배경이 아니라 border 로 그린다', () => {
+    const thumb = rules(source).filter((rule) => rule.selector === '.ui-switch__input::before');
+
+    expect(thumb.some((rule) => /(^|[\s;])border:[^;]*solid/.test(rule.body))).toBe(true);
+  });
+
+  it('forced-colors 에서 checked 를 Highlight, disabled 를 GrayText 로 구분한다', () => {
+    const forced = rules(forcedColorsBody(source));
+
+    expect(
+      forced.some((rule) => rule.selector.includes(':checked') && /Highlight/.test(rule.body)),
+    ).toBe(true);
+    expect(
+      forced.some((rule) => rule.selector.includes(':disabled') && /GrayText/.test(rule.body)),
+    ).toBe(true);
+  });
+
+  it('포커스 표시가 outline 으로 선언되어 있다', () => {
+    const focusRules = rules(source).filter((rule) => rule.selector.includes(':focus-visible'));
+
+    expect(focusRules.length).toBeGreaterThan(0);
+    expect(
+      focusRules.filter((rule) => {
+        const outline = outlineValue(rule.body);
+        return outline === null || outline === 'none';
+      }),
+    ).toEqual([]);
+  });
+
+  it('forced-color-adjust: none 으로 시스템 팔레트를 끄지 않는다', () => {
+    expect(source).not.toMatch(/forced-color-adjust:\s*none/);
+  });
+});
+
+/**
  * aria-activedescendant 목록의 활성 option 은 DOM 포커스가 아니라서 UA 포커스 링이 없다.
  * 배경 틴트(`field.surfaceSubtle`)는 패널과 1.1:1 안팎이라 활성 위치를 보여 주지 못하고
  * forced-colors 에서는 사라진다. 그래서 활성 option 은 **outline 을 선언**해야 한다.

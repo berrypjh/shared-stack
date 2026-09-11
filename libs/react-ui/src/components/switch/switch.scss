@@ -1,0 +1,130 @@
+/**
+ * Switch.
+ *
+ * native input 자체가 트랙이고 `::before` 가 thumb 이다. 상태는 native 선택자(`:checked`·
+ * `:disabled`·`:focus-visible`)가 정한다. 치수는 web 전용이라 지역 변수로 둔다 — RN 은 core
+ * Switch 가 자기 크기를 정한다.
+ *
+ * - 켜짐/꺼짐은 thumb **위치**가 1차로 말한다. 트랙 색은 그 위에 얹는다.
+ * - thumb 이동은 `margin-inline-start` 다. 논리 속성이라 RTL 에서 저절로 뒤집힌다.
+ * - thumb 은 배경이 아니라 **border** 로 채운다. forced-colors 에서 배경은 지워지고 테두리는 남는다.
+ */
+.ui-switch {
+  --ui-switch-width: var(--ds-spacing-3xl);
+  --ui-switch-height: var(--ds-spacing-xl);
+  --ui-switch-stroke: var(--ds-semantic-border-default);
+  --ui-switch-inset: var(--ds-spacing-2xs);
+  --ui-switch-thumb: calc(
+    var(--ui-switch-height) - 2 * (var(--ui-switch-stroke) + var(--ui-switch-inset))
+  );
+  --ui-switch-travel: calc(var(--ui-switch-width) - var(--ui-switch-height));
+
+  display: inline-flex;
+  align-items: flex-start;
+  gap: var(--ds-spacing-sm);
+  max-width: 100%;
+  color: var(--ds-text-default);
+  cursor: pointer;
+
+  font-family: var(--ds-body-medium-font-family);
+  font-size: var(--ds-body-medium-font-size);
+  font-weight: var(--ds-body-medium-font-weight);
+  letter-spacing: var(--ds-body-medium-letter-spacing);
+  line-height: var(--ds-body-medium-line-height);
+}
+
+.ui-switch:has(.ui-switch__input:disabled) {
+  color: var(--ds-text-disable);
+  cursor: default;
+}
+
+/* 트랙. */
+.ui-switch__input {
+  appearance: none;
+  flex: none;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  inline-size: var(--ui-switch-width);
+  block-size: var(--ui-switch-height);
+  margin: 0;
+  // 긴 라벨의 첫 줄 가운데에 트랙을 맞춘다.
+  margin-block-start: calc((var(--ds-body-medium-line-height) - var(--ui-switch-height)) / 2);
+  padding-block: 0;
+  padding-inline: var(--ui-switch-inset);
+  border: var(--ui-switch-stroke) solid var(--ds-selection-control-track-off);
+  border-radius: var(--ds-radius-rounded);
+  background-color: var(--ds-selection-control-track-off);
+  cursor: inherit;
+  transition:
+    background-color var(--ds-motion-duration-normal) var(--ds-motion-easing-standard),
+    border-color var(--ds-motion-duration-normal) var(--ds-motion-easing-standard);
+}
+
+/* thumb. 배경 대신 border 로 원을 채운다. */
+.ui-switch__input::before {
+  content: '';
+  box-sizing: border-box;
+  inline-size: var(--ui-switch-thumb);
+  block-size: var(--ui-switch-thumb);
+  margin-inline-start: 0;
+  border: calc(var(--ui-switch-thumb) / 2) solid var(--ds-selection-control-indicator);
+  border-radius: var(--ds-radius-rounded);
+  transition: margin-inline-start var(--ds-motion-duration-normal) var(--ds-motion-easing-standard);
+}
+
+.ui-switch__input:checked::before {
+  margin-inline-start: var(--ui-switch-travel);
+}
+
+.ui-switch__input:checked:not(:disabled) {
+  border-color: var(--ds-selection-control-checked);
+  background-color: var(--ds-selection-control-checked);
+}
+
+/* 비활성은 native disabled 면제 범위다 — 트랙이 배경에 묻히지만 않게 한다. */
+.ui-switch__input:disabled {
+  border-color: var(--ds-background-disable);
+  background-color: var(--ds-background-disable);
+}
+
+/* 포커스는 outline 으로 그린다 — forced-colors 에서도 남고 루트가 잘라내지 않는다. */
+.ui-switch__input:focus-visible {
+  outline: var(--ds-component-field-focus-ring-width) solid var(--ds-border-primary-color);
+  outline-offset: var(--ds-spacing-2xs);
+}
+
+.ui-switch__label {
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+}
+
+/* 끄는 것은 전환뿐이다 — thumb 은 즉시 제자리로 가고 포커스 outline 은 그대로 남는다. */
+@media (prefers-reduced-motion: reduce) {
+  .ui-switch__input,
+  .ui-switch__input::before {
+    transition: none;
+  }
+}
+
+/**
+ * forced-colors(Windows 고대비). 트랙 배경은 Canvas 로 지워지지만 테두리와 border 로 그린
+ * thumb 은 남는다. 상태는 thumb 위치가 말하고, 시스템 색으로 한 번 더 구분한다.
+ * 시스템 색 키워드는 하드코딩이 아니다 — 그 모드의 팔레트는 OS 가 소유한다.
+ */
+@media (forced-colors: active) {
+  .ui-switch__input,
+  .ui-switch__input::before {
+    border-color: CanvasText;
+  }
+
+  .ui-switch__input:checked,
+  .ui-switch__input:checked::before {
+    border-color: Highlight;
+  }
+
+  .ui-switch__input:disabled,
+  .ui-switch__input:disabled::before {
+    border-color: GrayText;
+  }
+}
