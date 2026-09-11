@@ -140,6 +140,31 @@ export const Disabled: Story = {
   ),
 };
 
+/**
+ * `readOnly` 와 `disabled` 를 나란히 둔다 — 둘은 다른 상태다.
+ *
+ * readOnly 는 편집만 막고 포커스·탐색·값 제출은 살린다. disabled 는 셋 다 막고 비활성으로
+ * 고지된다. 시각이 거의 같아서 회귀가 눈에 띄지 않으므로 한 화면에서 비교한다.
+ */
+export const ReadOnly: Story = {
+  render: () => (
+    <div style={columnStyle}>
+      <TextField
+        label="Account ID"
+        value="ACC-1024"
+        readOnly
+        helperText="Read-only: focusable, submitted with the form."
+      />
+      <TextField
+        label="Account ID"
+        value="ACC-1024"
+        disabled
+        helperText="Disabled: not focusable, not submitted."
+      />
+    </div>
+  ),
+};
+
 export const Error: Story = {
   render: () => (
     <div style={columnStyle}>

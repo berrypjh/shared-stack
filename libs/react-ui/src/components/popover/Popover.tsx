@@ -10,6 +10,7 @@ export const Popover = ({
   open: controlledOpen,
   defaultOpen = false,
   onOpenChange,
+  semantics = 'disclosure',
 }: PopoverProps) => {
   const [internalOpen, setInternalOpen] = useState(defaultOpen);
   const isControlled = controlledOpen !== undefined;
@@ -29,8 +30,8 @@ export const Popover = ({
   const triggerId = useId();
 
   const value = useMemo(
-    () => ({ open, setOpen, triggerRef, panelRef, panelId, triggerId }),
-    [open, setOpen, panelId, triggerId],
+    () => ({ open, setOpen, semantics, triggerRef, panelRef, panelId, triggerId }),
+    [open, setOpen, semantics, panelId, triggerId],
   );
 
   return <PopoverContext.Provider value={value}>{children}</PopoverContext.Provider>;

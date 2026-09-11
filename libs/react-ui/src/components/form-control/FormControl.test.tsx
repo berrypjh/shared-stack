@@ -493,6 +493,50 @@ describe('<FormControl />', () => {
     });
   });
 
+  /**
+   * 중첩 시 상속 값의 격리.
+   *
+   * web 은 React Context 로 값을 내려보내므로 가장 가까운 Provider 가 이긴다 — RN 과 같은
+   * 계약이다 (`react-native-ui` FormControl.test.tsx 의 '중첩' describe).
+   *
+   * **focus 는 이 테스트의 범위가 아니다.** web 은 루트에서 DOM focus 를 버블로 받는데
+   * 버블링은 Context 경계를 모른다. 중첩 시 focus 거동은 두 렌더러가 갈리며, 그 결정은
+   * 아직 열려 있다 — 여기서 고정하지 않는다.
+   */
+  describe('중첩', () => {
+    it('가장 가까운 FormControl 이 이긴다 — 안쪽이 바깥 값을 상속하지 않는다', () => {
+      const seen: { outer?: FormControlContextHookValue; inner?: FormControlContextHookValue } = {};
+      const captureOuter = (context: FormControlContextHookValue) => {
+        seen.outer = context;
+      };
+      const captureInner = (context: FormControlContextHookValue) => {
+        seen.inner = context;
+      };
+
+      render(
+        <FormControl color="secondary" size="sm">
+          <TestComponent contextCallback={captureOuter} />
+          <FormControl error required>
+            <TestComponent contextCallback={captureInner} />
+          </FormControl>
+        </FormControl>,
+      );
+
+      expect(seen.outer).toMatchObject({
+        color: 'secondary',
+        size: 'sm',
+        error: false,
+        required: false,
+      });
+      expect(seen.inner).toMatchObject({
+        color: 'primary',
+        size: 'md',
+        error: true,
+        required: true,
+      });
+    });
+  });
+
   describe('useFormControl', () => {
     const FormController = React.forwardRef<FormControlContextValue>((_, ref) => {
       const formControl = useFormControl();

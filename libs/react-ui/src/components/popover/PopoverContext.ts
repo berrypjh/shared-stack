@@ -1,8 +1,11 @@
 import { createContext, type RefObject, useContext } from 'react';
 
+import type { PopoverSemantics } from './Popover.types';
+
 export type PopoverContextValue = {
   open: boolean;
   setOpen: (open: boolean) => void;
+  semantics: PopoverSemantics;
   triggerRef: RefObject<HTMLElement | null>;
   panelRef: RefObject<HTMLDivElement | null>;
   panelId: string;

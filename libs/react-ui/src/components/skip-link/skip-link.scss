@@ -22,6 +22,12 @@
 .ui-skip-link:focus,
 .ui-skip-link:focus-visible {
   position: absolute;
+
+  /*
+   * 드러난 링크는 페이지 위에 떠야 한다. 저장소에 공유 레이어 체계가 없어서 (web CSS 의
+   * z-index 는 select·search-field 의 `10` 과 이것뿐) 토큰을 만들지 않고 로컬로 둔다.
+   * 50 은 그 팝업 층(10)보다 위라는 뜻이다 — 우회 링크가 열린 목록에 가리면 안 된다.
+   */
   z-index: 50;
   inset-inline-start: var(--ui-skip-link-offset);
   inset-block-start: var(--ui-skip-link-offset);
@@ -46,5 +52,13 @@
       var(--ds-shadow-lg-1-spread) var(--ds-shadow-lg-1-color),
     var(--ds-shadow-lg-2-offset-x) var(--ds-shadow-lg-2-offset-y) var(--ds-shadow-lg-2-blur)
       var(--ds-shadow-lg-2-spread) var(--ds-shadow-lg-2-color);
-  outline: none;
+
+  /*
+   * 포커스 링. `.ui-button:focus-visible` 과 같은 전략이다 — outline 과 그림자를 함께
+   * 선언한다. forced-colors 는 `box-shadow` 를 지우고 저자 색을 시스템 색으로 갈아끼우므로
+   * (CSS Color Adjust 1) 그림자에만 기대면 그 모드에서 포커스 표시가 사라진다. outline 은
+   * 남는다. 버튼과 같은 토큰을 쓰고 새 토큰을 만들지 않는다.
+   */
+  outline: var(--ds-border-primary-width) solid var(--ds-border-primary-color);
+  outline-offset: var(--ds-spacing-xs);
 }

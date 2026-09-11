@@ -24,7 +24,7 @@ src/
     <name>/index.ts        feature export
     index.ts               전체 aggregator (정확한 목록은 dist/llm-catalog.json)
   theme/
-    ThemeProvider.tsx      <html data-theme=...> 적용
+    ThemeProvider.tsx      <div data-theme=...> 스코프 (Context 아님 — 중첩하면 안쪽이 자기 scope를 연다)
     ThemeProvider.types.ts
     index.ts
   types/                   ui-core 계약의 web wrap + web 전용 계약 (소유 경계는 위 '절대 원칙' 참조)

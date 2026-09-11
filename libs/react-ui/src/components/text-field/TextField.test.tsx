@@ -129,6 +129,72 @@ describe('<TextField />', () => {
         'my-field-helper-text',
       );
     });
+
+    /**
+     * 소비자가 준 `aria-describedby` 는 helper text 와 **합성**되어 input 에 닿아야 한다.
+     *
+     * 설명은 여러 요소를 가리킬 수 있는 공백 구분 id 목록이다. 둘 중 하나를 버리면
+     * 스크린리더가 설명 하나를 통째로 잃는데, 타입도 런타임도 아무 말을 하지 않는다.
+     *
+     * TextField 가 이 합성의 소유자다 — helper 의 id 를 만드는 유일한 층이기 때문이다.
+     */
+    it('소비자 aria-describedby 를 helper text id 와 합성해 input 에 건다', () => {
+      render(
+        <>
+          <span id="extra">추가 설명</span>
+          <TextField id="f" label="이메일" helperText="회사 메일" aria-describedby="extra" />
+        </>,
+      );
+
+      const input = screen.getByRole('textbox');
+
+      expect(input).toHaveAttribute('aria-describedby', 'extra f-helper-text');
+      expect(input).toHaveAccessibleDescription('추가 설명 회사 메일');
+    });
+
+    it('helperText 가 없으면 소비자 aria-describedby 만 input 에 닿는다', () => {
+      render(
+        <>
+          <span id="extra">추가 설명</span>
+          <TextField id="f" label="이메일" aria-describedby="extra" />
+        </>,
+      );
+
+      expect(screen.getByRole('textbox')).toHaveAttribute('aria-describedby', 'extra');
+    });
+  });
+
+  /**
+   * `readOnly` 는 ui-core `InputFieldSemanticProps` 가 소유한 공유 시맨틱이고 TextField 에
+   * 타입으로 선언되어 있다. 진짜 입력에 닿지 않으면 타입은 통과하는데 필드는 그대로
+   * 편집 가능한 채 남는다 — 조용한 계약 위반이다.
+   *
+   * `disabled` 와 갈리는 지점이기도 하다: readOnly 는 편집만 막고 포커스와 값 제출은 살린다.
+   */
+  describe('prop: readOnly', () => {
+    it('readOnly 가 실제 input 에 닿는다 — disabled 로 바뀌지 않는다', () => {
+      render(<TextField label="A" readOnly defaultValue="x" />);
+
+      const input = screen.getByRole('textbox');
+
+      expect(input).toHaveAttribute('readonly');
+      expect(input).not.toBeDisabled();
+    });
+
+    it('readOnly 를 FormControl 래퍼 div 로 흘리지 않는다', () => {
+      render(<TextField label="A" readOnly />);
+
+      expect(document.querySelector('.ui-form-control')).not.toHaveAttribute('readonly');
+    });
+
+    it('readOnly 는 포커스를 막지 않는다', async () => {
+      const { user } = render(<TextField label="A" readOnly defaultValue="x" />);
+
+      const input = screen.getByRole('textbox');
+      await user.click(input);
+
+      expect(input).toHaveFocus();
+    });
   });
 
   describe('events', () => {

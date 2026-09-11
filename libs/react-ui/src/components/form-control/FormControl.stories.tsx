@@ -338,6 +338,53 @@ export const ExplicitAriaInvalidOverride: Story = {
 };
 
 /**
+ * **진짜 포커스**로 본 합성 상태.
+ *
+ * 다른 스토리는 `focused` prop 으로 시각만 흉내 낸다. 그 경로로는 소비자가 실제로 밟는 길 —
+ * DOM 포커스가 루트로 버블링되어 FormControl 이 받고, 라벨·입력·헬퍼가 함께 상태를 바꾸는
+ * 과정 — 이 한 번도 그려지지 않는다. 입력 variant 스토리에 `play` 포커스가 있지만 그쪽은
+ * 입력 단독이라 라벨·헬퍼 협응이 빠진다.
+ *
+ * `play` 는 저장소의 기존 관용구를 따른다 (`BoxedInput`·`FilledInput`·`PlainInput` 스토리).
+ * 비활성 필드를 나란히 둬서 `disabled > focused` 우선순위를 눈으로도 확인한다 —
+ * `inputVariantStates.test.ts` 가 CSS 규칙 수준에서 지키는 것과 같은 계약이다.
+ */
+export const FocusedByInteraction: Story = {
+  render: () => (
+    <div style={columnStyle}>
+      <FormControl>
+        <InputLabel htmlFor="focus-active">Focused field</InputLabel>
+        <BoxedInput
+          id="focus-active"
+          aria-describedby="focus-active-helper"
+          placeholder="Type here"
+        />
+        <FormHelperText id="focus-active-helper">This field has real DOM focus.</FormHelperText>
+      </FormControl>
+
+      <FormControl>
+        <InputLabel htmlFor="focus-resting">Resting field</InputLabel>
+        <BoxedInput
+          id="focus-resting"
+          aria-describedby="focus-resting-helper"
+          placeholder="Type here"
+        />
+        <FormHelperText id="focus-resting-helper">Same tokens, no focus.</FormHelperText>
+      </FormControl>
+
+      <FormControl disabled>
+        <InputLabel htmlFor="focus-disabled">Disabled field</InputLabel>
+        <BoxedInput id="focus-disabled" aria-describedby="focus-disabled-helper" value="Locked" />
+        <FormHelperText id="focus-disabled-helper">Cannot take focus.</FormHelperText>
+      </FormControl>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    canvasElement.querySelector<HTMLInputElement>('#focus-active')?.focus();
+  },
+};
+
+/**
  * 등록된 모든 테마에서 대표 상태를 한눈에 본다.
  *
  * 목록은 `themes` 레지스트리에서 만든다 — 테마가 늘면 이 스토리도 저절로 늘어난다.

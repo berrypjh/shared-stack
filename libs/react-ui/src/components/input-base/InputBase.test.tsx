@@ -246,6 +246,29 @@ describe('<InputBase />', () => {
 
       expect(input).not.toHaveFocus();
     });
+
+    /**
+     * disabled 를 풀어도 focus 가 되살아나면 안 된다.
+     *
+     * disabled 동안 실제 포커스는 이미 떠났다 (`InputBase` 가 활성 요소를 blur 시킨다).
+     * 로컬 focus 상태가 남아 있으면 다시 켜는 순간 아무것도 포커스를 갖지 않았는데 루트가
+     * `--focused` 를 주장한다 — 시맨틱과 시각이 어긋난다.
+     *
+     * 이 경로는 **FormControl 밖**이라 InputBase 가 focus 의 소유자다. 안쪽에서는
+     * FormControl 이 같은 이유로 자기 상태를 버린다. RN `InputBase` 도 같은 계약이다.
+     */
+    it('disabled 를 풀어도 focus 시각 상태가 되살아나지 않는다', async () => {
+      const { user, setProps } = render(<InputBase data-testid="root" />);
+
+      await user.click(screen.getByRole('textbox'));
+      expect(screen.getByTestId('root')).toHaveClass(inputBaseClasses.focused);
+
+      setProps({ disabled: true });
+      expect(screen.getByTestId('root')).not.toHaveClass(inputBaseClasses.focused);
+
+      setProps({ disabled: false });
+      expect(screen.getByTestId('root')).not.toHaveClass(inputBaseClasses.focused);
+    });
   });
 
   describe('event callbacks', () => {

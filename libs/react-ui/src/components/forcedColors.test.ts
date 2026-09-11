@@ -142,3 +142,55 @@ describe('contained 버튼', () => {
     expect(bordered).toBe(true);
   });
 });
+
+/**
+ * SkipLink 는 포커스를 받을 때만 드러나는 우회 링크다 — 그 모드에서 포커스 표시를 잃으면
+ * 링크가 있다는 사실 자체가 사라진다.
+ *
+ * `SHEETS` 의 규칙(그림자에만 기댄 포커스에는 forced-colors 대응이 있다)으로는 볼 수 없다.
+ * 이 시트는 `.ui-button:focus-visible` 과 같은 전략을 골랐기 때문이다 — outline 과 그림자를
+ * 함께 선언해 그림자가 지워져도 outline 이 남는다. 그래서 전용 블록 대신 **outline 이
+ * 실제로 선언되어 있는지**를 본다.
+ */
+describe('SkipLink', () => {
+  const source = css('skip-link/skip-link.scss');
+
+  /**
+   * 선언된 `outline` 값. 없으면 null.
+   *
+   * `outline:\s*(?!none)` 같은 lookahead 는 쓰지 않는다 — `\s*` 가 0글자로 되돌아가면
+   * 공백 위치에서 lookahead 가 통과해 `outline: none` 도 "outline 이 있다"로 읽힌다.
+   * 값을 꺼내 직접 비교하는 편이 짧고 틀릴 여지가 없다.
+   */
+  const outlineValue = (body: string): string | null =>
+    body.match(/(?:^|[\s;])outline:([^;]*)/)?.[1].trim() ?? null;
+
+  it('컴파일된 CSS 를 실제로 읽는다', () => {
+    expect(source.length).toBeGreaterThan(100);
+  });
+
+  it('포커스 상태가 그림자와 함께 outline 을 선언한다', () => {
+    const focusRules = rules(source).filter((rule) => rule.selector.includes(':focus'));
+
+    // 수집이 조용히 비면 아래 검사가 공허하게 통과한다.
+    expect(focusRules.length).toBeGreaterThan(0);
+
+    const unprotected = focusRules
+      .filter((rule) => /box-shadow:\s*(?!none)/.test(rule.body))
+      .filter((rule) => {
+        const outline = outlineValue(rule.body);
+        return outline === null || outline === 'none';
+      })
+      .map((rule) => rule.selector);
+
+    expect(unprotected).toEqual([]);
+  });
+
+  it('포커스 표시를 outline: none 으로 지우지 않는다', () => {
+    const suppressed = rules(source)
+      .filter((rule) => outlineValue(rule.body) === 'none')
+      .map((rule) => rule.selector);
+
+    expect(suppressed).toEqual([]);
+  });
+});

@@ -7,6 +7,7 @@ import { createRenderer, describeConformance } from '../../../test';
 
 import { Box } from './Box';
 import { boxClasses } from './Box.constants';
+import type { ColorToken } from './Box.types';
 
 describe('<Box />', () => {
   const { render } = createRenderer();
@@ -166,6 +167,26 @@ describe('<Box />', () => {
 
       // 점 경로가 대시로 평탄화된다. 값 해석은 CSS 캐스케이드가 맡는다.
       expect(screen.getByText('Hello').style.backgroundColor).toBe('var(--ds-background-surface)');
+    });
+
+    /**
+     * 계약을 어긴 `bg` 는 **조용히 무의미한 CSS 변수가 된다** — 막지 않는 것이 의도다.
+     *
+     * 경로 검증은 타입이 한다 (`ColorToken` 은 color 트리의 leaf 경로다). 타입을 우회해 들어온
+     * 값에 대해 web 은 이름을 평탄화해 넘기기만 하고, 브라우저는 정의되지 않은 변수를 만나
+     * 그 선언을 버린다 — 배경이 칠해지지 않을 뿐 아무것도 깨지지 않는다.
+     *
+     * 같은 입력에서 **RN 은 던진다** (`getToken` 의 엄격 실패. `ui-core/src/tokens/getToken.test.ts`).
+     * 갈리는 이유는 수단이 다르기 때문이다: RN 은 렌더 시점에 토큰 트리를 실제로 조회해서
+     * 결손이 `undefined` 인 채로 색 자리까지 흘러가지만, web 은 조회하지 않고 이름만 넘긴다.
+     *
+     * 대칭을 만들려고 web 에 런타임 검증을 더하지 말 것 — 타입이 이미 막는 입력을 위해
+     * 모든 소비자 번들이 비용을 내게 된다. 이 테스트는 그 결정을 고정한다.
+     */
+    it('타입을 우회한 bg 는 검증하지 않고 그대로 변수로 내보낸다', () => {
+      render(<Box bg={'nonsense.path' as ColorToken}>Hello</Box>);
+
+      expect(screen.getByText('Hello').style.backgroundColor).toBe('var(--ds-nonsense-path)');
     });
 
     it('style prop이 계산된 스타일을 덮어쓸 수 있어야 한다', () => {

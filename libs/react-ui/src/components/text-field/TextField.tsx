@@ -11,12 +11,14 @@ import { Select } from '../select';
 import { textFieldClasses } from './TextField.constants';
 import type { TextFieldProps } from './TextField.types';
 import {
+  composeDescribedBy,
   getTextFieldHelperTextId,
   getTextFieldInputComponent,
   hasTextFieldContent,
 } from './TextField.utils';
 
 export const TextField = ({
+  'aria-describedby': ariaDescribedby,
   autoComplete,
   autoFocus = false,
   children,
@@ -38,6 +40,7 @@ export const TextField = ({
   onChange,
   onFocus,
   placeholder,
+  readOnly = false,
   required = false,
   rows,
   select = false,
@@ -58,6 +61,14 @@ export const TextField = ({
     hasHelperText,
     id,
   });
+
+  /**
+   * 설명은 소비자 값과 helper text 를 **합쳐서** 진짜 입력에 건다.
+   *
+   * `...rest` 로 흘려보내면 `aria-describedby` 가 FormControl 래퍼 `div` 에 얹혀 아무것도
+   * 설명하지 못한 채 사라진다 — 입력은 helper 만 알게 된다.
+   */
+  const describedBy = composeDescribedBy(ariaDescribedby, helperTextId);
 
   const InputComponent = getTextFieldInputComponent(variant);
 
@@ -80,7 +91,7 @@ export const TextField = ({
 
       {select ? (
         <Select
-          aria-describedby={helperTextId}
+          aria-describedby={describedBy}
           autoFocus={autoFocus}
           color={color}
           defaultValue={defaultValue}
@@ -101,7 +112,7 @@ export const TextField = ({
         </Select>
       ) : (
         <InputComponent
-          aria-describedby={helperTextId}
+          aria-describedby={describedBy}
           autoComplete={autoComplete}
           autoFocus={autoFocus}
           color={color}
@@ -117,6 +128,7 @@ export const TextField = ({
           onChange={onChange}
           onFocus={onFocus}
           placeholder={placeholder}
+          readOnly={readOnly}
           required={required}
           rows={rows}
           size={size}
