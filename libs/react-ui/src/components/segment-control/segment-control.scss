@@ -33,11 +33,17 @@
   color: var(--ds-text-default);
 }
 
+/**
+ * 포커스는 outline 으로 그린다 — forced-colors 에서 그림자는 지워지지만 outline 은 남는다.
+ * offset 을 두어 링이 선택된 면(`background.primary`) 위가 아니라 트랙 위에 놓이게 한다.
+ * 링과 면이 같은 색인 테마(amber·frost)에서도 포커스가 묻히지 않는다.
+ */
 .ui-segment-control__option:focus-visible {
-  outline: none;
-  box-shadow: 0 0 0 var(--ds-semantic-border-focus) var(--ds-stroke-primary);
+  outline: var(--ds-semantic-border-focus) solid var(--ds-stroke-primary);
+  outline-offset: var(--ds-spacing-2xs);
 }
 
+/* 글자색 상태는 서로 배타적이다: disabled > selected > 평상시 (RN 리졸버와 같은 순서). */
 .ui-segment-control__option:disabled {
   color: var(--ds-text-disable);
   cursor: not-allowed;
@@ -45,5 +51,29 @@
 
 .ui-segment-control__option.is-active {
   background-color: var(--ds-background-primary);
+}
+
+.ui-segment-control__option.is-active:not(:disabled) {
   color: var(--ds-text-contrast-text);
+}
+
+/**
+ * forced-colors 에서는 배경·글자색이 시스템 색으로 평탄화되어 선택이 사라진다.
+ * 그 모드에서만 선택된 세그먼트를 `Highlight` 로 채운다. 시스템 색 키워드는 하드코딩이 아니다.
+ */
+@media (forced-colors: active) {
+  .ui-segment-control__option.is-active {
+    forced-color-adjust: none;
+    background-color: Highlight;
+    color: HighlightText;
+  }
+
+  .ui-segment-control__option.is-active:disabled {
+    color: GrayText;
+  }
+
+  /* `forced-color-adjust: none` 이라 링 색도 강제되지 않는다 — 시스템 색을 직접 준다. */
+  .ui-segment-control__option.is-active:focus-visible {
+    outline: var(--ds-semantic-border-focus) solid Highlight;
+  }
 }

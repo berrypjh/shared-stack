@@ -1,6 +1,7 @@
 import { themes } from '@berrypjh/ui-core';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { expect, userEvent, within } from 'storybook/test';
 
 import { ThemeProvider } from '../../theme';
 import { MenuItem } from '../menu-item';
@@ -254,6 +255,17 @@ export const WithSelect: Story = {
       </TextField>
     </div>
   ),
+  // select 모드의 목록도 라벨로 이름을 갖고, Escape 는 포커스를 trigger 에 둔다.
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const trigger = canvas.getByRole('combobox', { name: 'Notification frequency' });
+
+    await userEvent.click(trigger);
+    await expect(canvas.getByRole('listbox')).toHaveAccessibleName('Notification frequency');
+
+    await userEvent.keyboard('{Escape}');
+    await expect(trigger).toHaveFocus();
+  },
 };
 
 export const WithHelperText: Story = {

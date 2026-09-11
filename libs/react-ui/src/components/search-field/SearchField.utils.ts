@@ -1,3 +1,5 @@
+import { getNextEnabledIndex } from '../select/Select.navigation';
+
 import type { SearchFieldInputKeyDownHandler, SearchFieldSuggestion } from './SearchField.types';
 
 /**
@@ -14,54 +16,65 @@ export const getSuggestionValue = (suggestion: SearchFieldSuggestion): string =>
 };
 
 /**
- * 현재 입력값과 suggestion의 값을 비교해 선택 상태인지 판별합니다.
+ * 활성 제안을 한 칸 옮긴다. disabled 제안은 건너뛰고 끝에서 반대편으로 돈다.
  *
- * @param params 비교에 필요한 값 묶음
- * @param params.currentValue 현재 입력값
- * @param params.suggestion 비교할 suggestion
- * @returns suggestion 선택 여부
+ * 활성 제안이 없으면(-1) 아래 방향은 첫 활성 제안, 위 방향은 마지막 활성 제안이 된다.
+ * 전부 disabled 면 -1 이다.
  */
-export const isSuggestionSelected = ({
-  currentValue,
-  suggestion,
-}: {
-  currentValue: string;
-  suggestion: SearchFieldSuggestion;
-}) => {
-  return currentValue === getSuggestionValue(suggestion);
+export const moveActiveIndex = (
+  suggestions: readonly SearchFieldSuggestion[],
+  activeIndex: number,
+  direction: 1 | -1,
+): number => {
+  const start = activeIndex >= 0 ? activeIndex : direction === 1 ? -1 : suggestions.length;
+
+  return getNextEnabledIndex(suggestions, start, direction, (suggestion) =>
+    Boolean(suggestion.disabled),
+  );
 };
 
 /**
- * SearchField 내부 inputProps를 병합해 combobox 접근성 속성과
- * 기본 검색 입력 속성을 함께 구성합니다.
+ * SearchField 내부 inputProps를 병합합니다.
+ *
+ * 제안 표면(`suggestions`·`noSuggestionsText`)이 있을 때만 combobox 속성을 겁니다 — 없으면
+ * `type="search"` 의 암묵 역할(searchbox)을 그대로 둡니다. `aria-controls` 는 listbox 가
+ * 실제로 그려질 때만 가리킵니다.
  *
  * @param params 병합에 필요한 값 묶음
- * @param params.expanded suggestion 목록 열림 여부
+ * @param params.activeOptionId 활성 option 의 id. 없으면 `aria-activedescendant` 를 걸지 않는다
+ * @param params.expanded listbox 가 그려져 있는지
+ * @param params.hasPopup 제안 표면이 설정되어 있는지
  * @param params.inputProps 기존 inputProps
  * @param params.listboxId suggestion 목록 요소 id
  * @param params.onKeyDown 병합할 keyDown 핸들러
- * @param params.showEmptyState suggestion이 없을 때 empty 상태 표시 여부
  * @returns 병합된 inputProps 객체
  */
 export const getMergedInputProps = ({
+  activeOptionId,
   expanded,
+  hasPopup,
   inputProps,
   listboxId,
   onKeyDown,
-  showEmptyState,
 }: {
+  activeOptionId?: string;
   expanded: boolean;
+  hasPopup: boolean;
   inputProps?: Record<string, unknown>;
   listboxId: string;
   onKeyDown: SearchFieldInputKeyDownHandler;
-  showEmptyState: boolean;
 }) => {
   return {
     ...inputProps,
-    role: 'combobox' as const,
-    'aria-expanded': expanded,
-    'aria-controls': expanded || showEmptyState ? listboxId : undefined,
-    'aria-autocomplete': 'list' as const,
+    ...(hasPopup
+      ? {
+          role: 'combobox' as const,
+          'aria-expanded': expanded,
+          'aria-controls': expanded ? listboxId : undefined,
+          'aria-autocomplete': 'list' as const,
+          'aria-activedescendant': activeOptionId,
+        }
+      : {}),
     enterKeyHint:
       (inputProps?.enterKeyHint as
         | React.HTMLAttributes<HTMLInputElement>['enterKeyHint']

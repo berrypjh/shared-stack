@@ -2,11 +2,13 @@
 
 import { useId } from 'react';
 
+import type { InputLikeChangeEventHandler } from '../../types';
 import { cx } from '../../utils';
 import { FormControl } from '../form-control';
 import { FormHelperText } from '../form-helper-text';
 import { InputLabel } from '../input-label';
 import { Select } from '../select';
+import type { SelectProps } from '../select/Select.types';
 
 import { textFieldClasses } from './TextField.constants';
 import type { TextFieldProps } from './TextField.types';
@@ -53,6 +55,7 @@ export const TextField = ({
 }: TextFieldProps) => {
   const generatedId = useId();
   const id = idProp ?? generatedId;
+  const labelId = `${id}-label`;
 
   const hasLabel = hasTextFieldContent(label);
   const hasHelperText = hasTextFieldContent(helperText);
@@ -87,8 +90,13 @@ export const TextField = ({
       size={size}
       variant={variant}
     >
-      {hasLabel ? <InputLabel htmlFor={id}>{label}</InputLabel> : null}
+      {hasLabel ? (
+        <InputLabel htmlFor={id} id={labelId}>
+          {label}
+        </InputLabel>
+      ) : null}
 
+      {/* 타입이 `select` 로 모드를 가르므로 각 분기의 `onChange` 는 그 모드의 계약이다. */}
       {select ? (
         <Select
           aria-describedby={describedBy}
@@ -99,8 +107,10 @@ export const TextField = ({
           error={error}
           fullWidth={fullWidth}
           id={id}
+          labelId={hasLabel ? labelId : undefined}
           name={name}
           onBlur={onBlur}
+          onChange={onChange as SelectProps['onChange']}
           onFocus={onFocus}
           placeholder={placeholder}
           required={required}
@@ -125,7 +135,7 @@ export const TextField = ({
           multiline={multiline}
           name={name}
           onBlur={onBlur}
-          onChange={onChange}
+          onChange={onChange as InputLikeChangeEventHandler}
           onFocus={onFocus}
           placeholder={placeholder}
           readOnly={readOnly}

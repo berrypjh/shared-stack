@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { fireEvent, screen } from '@testing-library/react';
 import { spy } from 'sinon';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { createRenderer, describeConformance } from '../../../test';
 import { filledInputClasses } from '../filled-input';
@@ -309,6 +309,90 @@ describe('<TextField />', () => {
       );
 
       expect(screen.getByRole('combobox')).toHaveAccessibleDescription('Choose one');
+    });
+
+    it('옵션을 고르면 onChange가 Select 의 change 계약({ target: { name, value } })으로 호출되어야 한다', async () => {
+      const onChange = vi.fn();
+      const { user } = render(
+        <TextField select label="Currency" name="currency" defaultValue="usd" onChange={onChange}>
+          <option value="usd">USD</option>
+          <option value="krw">KRW</option>
+        </TextField>,
+      );
+
+      await user.click(screen.getByRole('combobox'));
+      await user.click(screen.getByRole('option', { name: 'KRW' }));
+
+      expect(onChange).toHaveBeenCalledTimes(1);
+      expect(onChange.mock.calls[0][0].target).toEqual({ name: 'currency', value: 'krw' });
+    });
+
+    it('controlled select는 onChange로 값을 갱신할 수 있어야 한다', async () => {
+      const Controlled = () => {
+        const [value, setValue] = React.useState<unknown>('usd');
+        return (
+          <TextField
+            select
+            label="Currency"
+            value={value}
+            onChange={(event) => setValue(event.target.value)}
+          >
+            <option value="usd">USD</option>
+            <option value="krw">KRW</option>
+          </TextField>
+        );
+      };
+
+      const { user } = render(<Controlled />);
+
+      await user.click(screen.getByRole('combobox'));
+      await user.click(screen.getByRole('option', { name: 'KRW' }));
+
+      expect(screen.getByRole('combobox')).toHaveTextContent('KRW');
+    });
+
+    it('열린 listbox 도 label 로 이름을 가져야 한다', async () => {
+      const { user } = render(
+        <TextField select label="Currency" value="usd">
+          <option value="usd">USD</option>
+          <option value="krw">KRW</option>
+        </TextField>,
+      );
+
+      await user.click(screen.getByRole('combobox'));
+
+      expect(screen.getByRole('listbox')).toHaveAccessibleName('Currency');
+    });
+
+    it('select 모드는 Select 에 뜻이 없는 입력 전용 prop 을 타입에서 거부한다', () => {
+      const elements = [
+        // @ts-expect-error select 의 포커스 대상은 native input 이 아니다
+        <TextField key="ref" select label="L" inputRef={() => undefined} />,
+        // @ts-expect-error Select 에는 readOnly 가 없다
+        <TextField key="readOnly" select label="L" readOnly />,
+        // @ts-expect-error Select 에는 multiline 이 없다
+        <TextField key="multiline" select label="L" multiline />,
+        // @ts-expect-error Select 에는 rows 가 없다
+        <TextField key="rows" select label="L" rows={3} />,
+        // @ts-expect-error Select 에는 input type 이 없다
+        <TextField key="type" select label="L" type="email" />,
+      ];
+
+      expect(elements).toHaveLength(5);
+    });
+
+    it('disabled·required·error 를 combobox 에 알려야 한다', () => {
+      render(
+        <TextField select label="Currency" value="usd" disabled required error>
+          <option value="usd">USD</option>
+        </TextField>,
+      );
+
+      const combobox = screen.getByRole('combobox');
+
+      expect(combobox).toBeDisabled();
+      expect(combobox).toHaveAttribute('aria-required', 'true');
+      expect(combobox).toHaveAttribute('aria-invalid', 'true');
     });
   });
 });

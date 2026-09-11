@@ -1,8 +1,9 @@
 /**
- * Select 의 키보드 이동 규칙 (옵션 인덱스 계산).
+ * web 리스트박스의 키보드 이동 규칙 (옵션 인덱스 계산).
  *
- * `<Select>` 하나만 쓰는 도메인 로직이라 컴포넌트 폴더가 소유한다.
- * 순수 제네릭이지만 "비활성 옵션을 건너뛰며 순환한다"는 것은 web 리스트박스의 의미론이다.
+ * `<Select>` 가 소유하고 `<SearchField>` 의 제안 목록도 같은 규칙("비활성 옵션을 건너뛰며
+ * 순환한다")을 쓴다. 순수 제네릭이지만 web 리스트박스의 의미론이라 ui-core 로 올리지 않는다 —
+ * RN 목록에는 하드웨어 키보드 이동이 없다.
  */
 type IsOptionDisabled<T> = (option: T) => boolean;
 type IsOptionSelected<T> = (option: T) => boolean;

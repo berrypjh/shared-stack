@@ -84,7 +84,8 @@
       "options": {
         "commands": [
           "tsc -p libs/react-ui/tsconfig.lib.json",
-          "tsc -p libs/react-ui/tsconfig.storybook.json --noEmit"
+          "tsc -p libs/react-ui/tsconfig.storybook.json --noEmit",
+          "tsc -p libs/react-ui/tsconfig.spec.json --noEmit"
         ],
         "parallel": false
       }

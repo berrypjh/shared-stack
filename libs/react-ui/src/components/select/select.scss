@@ -264,9 +264,21 @@
   line-height: var(--ds-body-small-line-height);
 }
 
-.ui-select__option:hover:not(:disabled),
-.ui-select__option--highlighted:not(:disabled) {
+.ui-select__option:hover:not([aria-disabled='true']),
+.ui-select__option--highlighted:not([aria-disabled='true']) {
   background-color: var(--ui-select-option-hover);
+}
+
+/**
+ * 활성 option (`aria-activedescendant` 대상).
+ *
+ * DOM 포커스가 trigger 에 남아 UA 링이 없고, 배경 틴트는 패널과 1.1:1 안팎이라 위치를 보여 주지
+ * 못한다. 필드 포커스 테두리와 같은 토큰(3:1 보장)으로 안쪽 outline 을 그린다 — outline 은
+ * forced-colors 에서도 남는다.
+ */
+.ui-select__option--highlighted {
+  outline: var(--ds-component-field-focus-ring-width) solid var(--ui-select-active);
+  outline-offset: calc(var(--ds-component-field-focus-ring-width) * -1);
 }
 
 .ui-select__option--selected {
@@ -278,7 +290,33 @@
   line-height: var(--ds-body-small-strong-line-height);
 }
 
-.ui-select__option:disabled {
+.ui-select__option[aria-disabled='true'] {
   color: var(--ds-text-disable);
   cursor: not-allowed;
+}
+
+/**
+ * forced-colors(Windows 고대비) 대응.
+ *
+ * trigger 의 포커스·열림은 `border-color` 변화와 `box-shadow` 로만 그려진다. 그 모드에서 그림자는
+ * 지워지고 테두리 색은 평상시와 같은 시스템 색으로 평탄화돼 포커스 표시가 사라진다
+ * (WCAG 2.4.7). 남는 것은 outline 이라 여기서만 켠다 — 입력 variant 와 같은 전략이다.
+ * `Highlight` 는 CSS 시스템 색 키워드지 하드코딩한 값이 아니다.
+ */
+@media (forced-colors: active) {
+  .ui-select--variant-plain.ui-select--focused .ui-select__trigger,
+  .ui-select--variant-plain.ui-select--open .ui-select__trigger,
+  .ui-select--variant-plain.ui-select--error.ui-select--focused .ui-select__trigger,
+  .ui-select--variant-plain.ui-select--error.ui-select--open .ui-select__trigger,
+  .ui-select--variant-filled.ui-select--focused .ui-select__trigger,
+  .ui-select--variant-filled.ui-select--open .ui-select__trigger,
+  .ui-select--variant-filled.ui-select--error.ui-select--focused .ui-select__trigger,
+  .ui-select--variant-filled.ui-select--error.ui-select--open .ui-select__trigger,
+  .ui-select--variant-boxed.ui-select--focused .ui-select__trigger,
+  .ui-select--variant-boxed.ui-select--open .ui-select__trigger,
+  .ui-select--variant-boxed.ui-select--error.ui-select--focused .ui-select__trigger,
+  .ui-select--variant-boxed.ui-select--error.ui-select--open .ui-select__trigger {
+    outline: var(--ds-border-primary-width) solid Highlight;
+    outline-offset: var(--ds-spacing-2xs);
+  }
 }

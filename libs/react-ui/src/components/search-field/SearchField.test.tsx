@@ -1,4 +1,4 @@
-import { fireEvent, screen } from '@testing-library/react';
+import { fireEvent, screen, within } from '@testing-library/react';
 import type { ComponentProps } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
@@ -135,7 +135,7 @@ describe('<SearchField />', () => {
 
       render(<SearchField inputRef={inputRef} />);
 
-      const input = screen.getByRole('combobox');
+      const input = screen.getByRole('searchbox');
 
       expect(inputRef).toHaveBeenCalled();
       expect(inputRef).toHaveBeenCalledWith(input);
@@ -242,15 +242,10 @@ describe('<SearchField />', () => {
 
       fireEvent.focus(input);
 
-      const suggestionLabel = screen.getByText('Apple');
-      const suggestionButton = suggestionLabel.closest('button');
+      const option = screen.getByRole('option', { name: /Apple/ });
 
-      if (!(suggestionButton instanceof HTMLButtonElement)) {
-        throw new Error('Apple suggestion button을 찾지 못했습니다.');
-      }
-
-      fireEvent.mouseDown(suggestionButton);
-      fireEvent.click(suggestionButton);
+      fireEvent.mouseDown(option);
+      fireEvent.click(option);
 
       expect(input).toHaveValue('apple');
       expect(onSuggestionSelect).toHaveBeenCalledWith(suggestions[0]);
@@ -272,20 +267,18 @@ describe('<SearchField />', () => {
       fireEvent.focus(input);
 
       const disabledOption = screen.getAllByRole('option')[1];
-      const disabledButton = screen.getByRole('button', { name: 'Banana' });
 
       expect(disabledOption).toHaveAttribute('aria-disabled', 'true');
       expect(disabledOption).toHaveClass(searchFieldClasses.suggestionDisabled);
-      expect(disabledButton).toBeDisabled();
 
-      fireEvent.click(disabledButton);
+      fireEvent.click(disabledOption);
 
       expect(onSuggestionSelect).not.toHaveBeenCalled();
       expect(input).toHaveValue('');
       expect(screen.getByRole('listbox')).toBeInTheDocument();
     });
 
-    it('suggestion이 없고 noSuggestionsText가 있으면 empty state를 보여줘야 한다', () => {
+    it('suggestion이 없고 noSuggestionsText가 있으면 option 이 아닌 status 로 보여줘야 한다', () => {
       render(
         <SearchField
           suggestions={[]}
@@ -298,11 +291,229 @@ describe('<SearchField />', () => {
 
       fireEvent.focus(input);
 
-      const listbox = screen.getByRole('listbox');
+      expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+      expect(screen.getByRole('status')).toHaveTextContent('No results');
+      expect(input).toHaveAttribute('aria-expanded', 'false');
+      expect(input).not.toHaveAttribute('aria-controls');
+    });
+  });
 
-      expect(listbox).toBeInTheDocument();
-      expect(screen.getByText('No results')).toBeInTheDocument();
-      expect(screen.queryByRole('option')).not.toBeInTheDocument();
+  describe('clear', () => {
+    const CLEAR = 'Clear search';
+
+    it('clearable 이 없으면 값이 있어도 지우기 버튼을 그리지 않는다', () => {
+      render(<SearchField aria-label="Search" defaultValue="apple" />);
+
+      expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    });
+
+    it('clearable 이고 값이 있으면 이름 있는 지우기 버튼을 그린다', () => {
+      render(
+        <SearchField aria-label="Search" clearable clearAriaLabel={CLEAR} defaultValue="apple" />,
+      );
+
+      expect(screen.getByRole('button', { name: CLEAR })).toBeInTheDocument();
+    });
+
+    it('값이 비어 있으면 지우기 버튼을 그리지 않는다', () => {
+      render(<SearchField aria-label="Search" clearable clearAriaLabel={CLEAR} />);
+
+      expect(screen.queryByRole('button', { name: CLEAR })).not.toBeInTheDocument();
+    });
+
+    it.each([
+      ['disabled', { disabled: true }],
+      ['readOnly', { readOnly: true }],
+    ])('%s 이면 지우기 버튼을 그리지 않는다', (_label, props) => {
+      render(
+        <SearchField
+          aria-label="Search"
+          clearable
+          clearAriaLabel={CLEAR}
+          defaultValue="apple"
+          {...props}
+        />,
+      );
+
+      expect(screen.queryByRole('button', { name: CLEAR })).not.toBeInTheDocument();
+    });
+
+    it('uncontrolled 에서 누르면 값을 비우고 onValueChange("") 다음 onClear 를 부르며 입력에 포커스를 둔다', async () => {
+      const calls: string[] = [];
+      const { user } = render(
+        <SearchField
+          aria-label="Search"
+          clearable
+          clearAriaLabel={CLEAR}
+          defaultValue="apple"
+          onValueChange={(value) => calls.push(`value:${value}`)}
+          onClear={() => calls.push('clear')}
+        />,
+      );
+
+      await user.click(screen.getByRole('button', { name: CLEAR }));
+
+      const input = screen.getByRole('searchbox');
+
+      expect(input).toHaveValue('');
+      expect(input).toHaveFocus();
+      expect(calls).toEqual(['value:', 'clear']);
+    });
+
+    it('controlled 에서는 onValueChange("") 로 요청만 하고 값은 소비자가 바꿀 때까지 유지한다', async () => {
+      const onValueChange = vi.fn();
+      const { user } = render(
+        <SearchField
+          aria-label="Search"
+          clearable
+          clearAriaLabel={CLEAR}
+          value="apple"
+          onValueChange={onValueChange}
+        />,
+      );
+
+      await user.click(screen.getByRole('button', { name: CLEAR }));
+
+      expect(onValueChange).toHaveBeenCalledWith('');
+      expect(screen.getByRole('searchbox')).toHaveValue('apple');
+    });
+
+    it('clear 관련 prop 은 DOM 으로 새지 않는다', () => {
+      const error = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+
+      render(<SearchField aria-label="Search" clearable clearAriaLabel={CLEAR} />);
+
+      expect(error).not.toHaveBeenCalled();
+      error.mockRestore();
+    });
+  });
+
+  describe('combobox semantics', () => {
+    const fruits: SearchFieldSuggestion[] = [
+      { id: 'apple', label: 'Apple', value: 'apple' },
+      { id: 'banana', label: 'Banana', value: 'banana', disabled: true },
+      { id: 'cherry', label: 'Cherry', value: 'cherry' },
+    ];
+
+    it('suggestions 가 없으면 combobox 가 아니라 native searchbox 다', () => {
+      render(<SearchField aria-label="Search" />);
+
+      expect(screen.getByRole('searchbox')).not.toHaveAttribute('aria-expanded');
+      expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
+    });
+
+    it('option 안에 상호작용 요소가 없고 option 은 탭 순서에 없다', async () => {
+      const { user } = render(<SearchField aria-label="Search" suggestions={fruits} />);
+
+      await user.click(screen.getByRole('combobox'));
+
+      screen.getAllByRole('option').forEach((option) => {
+        expect(within(option).queryByRole('button')).toBeNull();
+        expect(option.id).not.toBe('');
+        expect(option).not.toHaveAttribute('tabindex');
+      });
+    });
+
+    it('ArrowDown 은 입력 포커스를 유지한 채 활성 option 을 aria-activedescendant 로 알린다', async () => {
+      const { user } = render(<SearchField aria-label="Search" suggestions={fruits} />);
+      const input = screen.getByRole('combobox');
+
+      await user.click(input);
+      await user.keyboard('{ArrowDown}');
+
+      const [apple] = screen.getAllByRole('option');
+
+      expect(input).toHaveFocus();
+      expect(input).toHaveAttribute('aria-activedescendant', apple.id);
+      expect(apple).toHaveAttribute('aria-selected', 'true');
+    });
+
+    it('화살표 이동은 disabled option 을 건너뛴다', async () => {
+      const { user } = render(<SearchField aria-label="Search" suggestions={fruits} />);
+      const input = screen.getByRole('combobox');
+
+      await user.click(input);
+      await user.keyboard('{ArrowDown}{ArrowDown}');
+
+      const [apple, , cherry] = screen.getAllByRole('option');
+
+      expect(input).toHaveAttribute('aria-activedescendant', cherry.id);
+
+      await user.keyboard('{ArrowUp}');
+
+      expect(input).toHaveAttribute('aria-activedescendant', apple.id);
+    });
+
+    it('Enter 는 활성 option 을 선택하고 목록을 닫으며 포커스는 입력에 남는다', async () => {
+      const onSuggestionSelect = vi.fn();
+      const { user } = render(
+        <SearchField
+          aria-label="Search"
+          suggestions={fruits}
+          onSuggestionSelect={onSuggestionSelect}
+        />,
+      );
+      const input = screen.getByRole('combobox');
+
+      await user.click(input);
+      await user.keyboard('{ArrowDown}{Enter}');
+
+      expect(input).toHaveValue('apple');
+      expect(onSuggestionSelect).toHaveBeenCalledWith(fruits[0]);
+      expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+      expect(input).toHaveFocus();
+      expect(input).not.toHaveAttribute('aria-activedescendant');
+    });
+
+    it('활성 option 이 없으면 Enter 를 가로채지 않는다 (폼 제출이 살아 있다)', () => {
+      render(<SearchField aria-label="Search" suggestions={fruits} />);
+      const input = screen.getByRole('combobox');
+
+      fireEvent.focus(input);
+
+      expect(fireEvent.keyDown(input, { key: 'Enter' })).toBe(true);
+    });
+
+    it('Escape 는 열린 목록을 닫고 입력 포커스를 유지한다', async () => {
+      const { user } = render(<SearchField aria-label="Search" suggestions={fruits} />);
+      const input = screen.getByRole('combobox');
+
+      await user.click(input);
+      await user.keyboard('{ArrowDown}');
+
+      expect(fireEvent.keyDown(input, { key: 'Escape' })).toBe(false);
+      expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+      expect(input).toHaveFocus();
+      expect(input).not.toHaveAttribute('aria-activedescendant');
+    });
+
+    it('option 을 클릭하면 선택하고 목록이 다시 열리지 않으며 입력 포커스를 유지한다', async () => {
+      const { user } = render(<SearchField aria-label="Search" suggestions={fruits} />);
+      const input = screen.getByRole('combobox');
+
+      await user.click(input);
+      await user.click(screen.getByRole('option', { name: 'Apple' }));
+
+      expect(input).toHaveValue('apple');
+      expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+      expect(input).toHaveFocus();
+    });
+
+    it('disabled option 은 클릭해도 선택되지 않는다', async () => {
+      const onSuggestionSelect = vi.fn();
+      const { user } = render(
+        <SearchField
+          aria-label="Search"
+          suggestions={fruits}
+          onSuggestionSelect={onSuggestionSelect}
+        />,
+      );
+
+      await user.click(screen.getByRole('combobox'));
+      await user.click(screen.getByRole('option', { name: 'Banana' }));
+
+      expect(onSuggestionSelect).not.toHaveBeenCalled();
+      expect(screen.getByRole('combobox')).toHaveValue('');
     });
   });
 

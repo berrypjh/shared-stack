@@ -32,6 +32,7 @@ const SHEETS = [
   'plain-input/plain-input.scss',
   'boxed-input/boxed-input.scss',
   'filled-input/filled-input.scss',
+  'select/select.scss',
 ] as const;
 
 type Rule = { selector: string; body: string };
@@ -124,6 +125,16 @@ describe.each(SHEETS)('%s', (sheet) => {
 });
 
 /**
+ * 선언된 `outline` 값. 없으면 null.
+ *
+ * `outline:\s*(?!none)` 같은 lookahead 는 쓰지 않는다 — `\s*` 가 0글자로 되돌아가면
+ * 공백 위치에서 lookahead 가 통과해 `outline: none` 도 "outline 이 있다"로 읽힌다.
+ * 값을 꺼내 직접 비교하는 편이 짧고 틀릴 여지가 없다.
+ */
+const outlineValue = (body: string): string | null =>
+  body.match(/(?:^|[\s;])outline:([^;]*)/)?.[1].trim() ?? null;
+
+/**
  * 채워진 버튼은 배경색만으로 자기를 식별시킨다. forced-colors 에서 배경은 `ButtonFace`,
  * 페이지는 `Canvas` 가 되는데 두 값이 같은 고대비 테마가 있어서 버튼이 사라질 수 있다.
  * 그 모드에서만 테두리를 켜서 경계를 만든다.
@@ -155,16 +166,6 @@ describe('contained 버튼', () => {
 describe('SkipLink', () => {
   const source = css('skip-link/skip-link.scss');
 
-  /**
-   * 선언된 `outline` 값. 없으면 null.
-   *
-   * `outline:\s*(?!none)` 같은 lookahead 는 쓰지 않는다 — `\s*` 가 0글자로 되돌아가면
-   * 공백 위치에서 lookahead 가 통과해 `outline: none` 도 "outline 이 있다"로 읽힌다.
-   * 값을 꺼내 직접 비교하는 편이 짧고 틀릴 여지가 없다.
-   */
-  const outlineValue = (body: string): string | null =>
-    body.match(/(?:^|[\s;])outline:([^;]*)/)?.[1].trim() ?? null;
-
   it('컴파일된 CSS 를 실제로 읽는다', () => {
     expect(source.length).toBeGreaterThan(100);
   });
@@ -192,5 +193,73 @@ describe('SkipLink', () => {
       .map((rule) => rule.selector);
 
     expect(suppressed).toEqual([]);
+  });
+});
+
+/**
+ * SegmentControl 은 두 상태를 forced-colors 에서 잃기 쉽다.
+ *
+ * - 포커스: 그림자만으로 그리면 지워진다. SkipLink·버튼과 같은 전략으로 **outline 을 선언**한다.
+ * - 선택: 배경·글자색만으로 표현하므로 시스템 색으로 평탄화되면 어느 세그먼트가 눌렸는지
+ *   보이지 않는다. 그 모드에서만 시스템 색(`Highlight`)으로 채운다.
+ */
+describe('SegmentControl', () => {
+  const source = css('segment-control/segment-control.scss');
+
+  it('컴파일된 CSS 를 실제로 읽는다', () => {
+    expect(source.length).toBeGreaterThan(100);
+  });
+
+  it('포커스 표시가 outline 으로 선언되어 있다', () => {
+    const focusRules = rules(source).filter((rule) => rule.selector.includes(':focus-visible'));
+
+    expect(focusRules.length).toBeGreaterThan(0);
+
+    const invisible = focusRules
+      .filter((rule) => {
+        const outline = outlineValue(rule.body);
+        return outline === null || outline === 'none';
+      })
+      .map((rule) => rule.selector);
+
+    expect(invisible).toEqual([]);
+  });
+
+  it('포커스 표시를 outline: none 으로 지우지 않는다', () => {
+    const suppressed = rules(source)
+      .filter((rule) => outlineValue(rule.body) === 'none')
+      .map((rule) => rule.selector);
+
+    expect(suppressed).toEqual([]);
+  });
+
+  it('forced-colors 에서 선택된 세그먼트를 시스템 색으로 채운다', () => {
+    const selected = rules(forcedColorsBody(source)).filter((rule) =>
+      rule.selector.includes('.is-active'),
+    );
+
+    expect(selected.some((rule) => /background-color:\s*Highlight/.test(rule.body))).toBe(true);
+  });
+});
+
+/**
+ * aria-activedescendant 목록의 활성 option 은 DOM 포커스가 아니라서 UA 포커스 링이 없다.
+ * 배경 틴트(`field.surfaceSubtle`)는 패널과 1.1:1 안팎이라 활성 위치를 보여 주지 못하고
+ * forced-colors 에서는 사라진다. 그래서 활성 option 은 **outline 을 선언**해야 한다.
+ */
+describe.each([
+  ['SearchField', 'search-field/search-field.scss', '.ui-search-field__suggestion--active'],
+  ['Select', 'select/select.scss', '.ui-select__option--highlighted'],
+])('%s 활성 option', (_name, sheet, activeSelector) => {
+  const source = css(sheet);
+
+  it('활성 표시가 outline 으로 선언되어 있다', () => {
+    const active = rules(source).filter((rule) => rule.selector.startsWith(activeSelector));
+    const outlined = active.filter((rule) => {
+      const outline = outlineValue(rule.body);
+      return outline !== null && outline !== 'none';
+    });
+
+    expect(outlined.length).toBeGreaterThan(0);
   });
 });

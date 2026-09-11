@@ -36,6 +36,12 @@
   color: var(--ds-text-default);
 }
 
+/* 지우기 버튼은 DOM 포커스를 받는다. 필드 포커스 테두리와 같은 토큰의 outline 은 forced-colors 에서도 남는다. */
+.ui-search-field__clear:focus-visible {
+  outline: var(--ds-component-field-focus-ring-width) solid var(--ds-border-primary-color);
+  outline-offset: 0;
+}
+
 .ui-search-field__suggestions {
   position: absolute;
   top: calc(100% + var(--ds-spacing-sm));
@@ -47,7 +53,7 @@
   list-style: none;
   border: var(--ds-border-primary-width) solid var(--ds-field-border);
   border-radius: var(--ds-radius-xl);
-  background: var(--ds-background-default, #fff);
+  background: var(--ds-background-surface);
   box-shadow: var(--ds-shadow-lg);
 }
 
@@ -56,20 +62,53 @@
   padding: 0;
 }
 
-.ui-search-field__suggestion-button {
+.ui-search-field__suggestion {
   display: flex;
   align-items: center;
   gap: var(--ds-spacing-sm);
-  width: 100%;
   padding: var(--ds-spacing-sm) var(--ds-spacing-lg);
-  border: 0;
-  background: transparent;
   color: var(--ds-text-default);
-  text-align: left;
   cursor: pointer;
   transition: background-color var(--ds-motion-duration-normal) var(--ds-motion-easing-standard);
 }
 
-.ui-search-field__suggestion-button:hover {
+.ui-search-field__suggestion:hover:not(.ui-search-field__suggestion--disabled) {
   background-color: var(--ds-field-surface-subtle);
+}
+
+/**
+ * 활성 option (`aria-activedescendant` 대상).
+ *
+ * DOM 포커스가 아니라 UA 포커스 링이 없고, 배경 틴트는 패널과 1.1:1 안팎이라 위치를 보여 주지
+ * 못한다. 필드 포커스 테두리와 같은 토큰(3:1 보장)으로 안쪽 outline 을 그린다 — outline 은
+ * forced-colors 에서도 남는다.
+ */
+.ui-search-field__suggestion--active {
+  background-color: var(--ds-field-surface-subtle);
+  outline: var(--ds-component-field-focus-ring-width) solid var(--ds-border-primary-color);
+  outline-offset: calc(var(--ds-component-field-focus-ring-width) * -1);
+}
+
+.ui-search-field__suggestion--disabled {
+  color: var(--ds-text-disable);
+  cursor: not-allowed;
+}
+
+.ui-search-field__suggestion-content {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.ui-search-field__suggestion-description {
+  color: var(--ds-text-light);
+}
+
+.ui-search-field__suggestion--disabled .ui-search-field__suggestion-description {
+  color: inherit;
+}
+
+.ui-search-field__empty {
+  padding: var(--ds-spacing-sm) var(--ds-spacing-lg);
+  color: var(--ds-text-light);
 }

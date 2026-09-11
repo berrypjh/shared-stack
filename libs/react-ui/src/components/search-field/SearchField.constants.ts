@@ -6,7 +6,7 @@ export const searchFieldClasses = {
   suggestions: 'ui-search-field__suggestions',
   suggestionsOpen: 'ui-search-field__suggestions--open',
   suggestion: 'ui-search-field__suggestion',
-  suggestionButton: 'ui-search-field__suggestion-button',
+  suggestionActive: 'ui-search-field__suggestion--active',
   suggestionIcon: 'ui-search-field__suggestion-icon',
   suggestionContent: 'ui-search-field__suggestion-content',
   suggestionLabel: 'ui-search-field__suggestion-label',

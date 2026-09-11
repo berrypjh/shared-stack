@@ -1,4 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { expect, userEvent, within } from 'storybook/test';
+
+import { ThemeGallery, themeGalleryParameters } from '../../../.storybook/ThemeGallery';
 
 import { SearchField } from './SearchField';
 import type { SearchFieldSuggestion } from './SearchField.types';
@@ -16,6 +19,7 @@ const meta = {
     size: 'md',
     color: 'primary',
     clearable: true,
+    clearAriaLabel: 'Clear search',
     disabled: false,
     error: false,
     readOnly: false,
@@ -40,6 +44,7 @@ const meta = {
     readOnly: { control: 'boolean' },
     fullWidth: { control: 'boolean' },
     clearable: { control: 'boolean' },
+    clearAriaLabel: { control: 'text' },
     onChange: { action: 'changed' },
     onFocus: { action: 'focused' },
     onBlur: { action: 'blurred' },
@@ -255,6 +260,17 @@ export const WithNoSuggestionsText: Story = {
       />
     </div>
   ),
+  // 빈 상태는 focus 해야 그려진다. 선택할 수 없는 안내라 option 이 아니라 status 로 나온다.
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByRole('combobox', { name: 'Search' });
+
+    await userEvent.click(input);
+
+    await expect(canvas.getByRole('status')).toHaveTextContent('No results found');
+    await expect(canvas.queryByRole('listbox')).not.toBeInTheDocument();
+    await expect(input).toHaveAttribute('aria-expanded', 'false');
+  },
 };
 
 export const FullWidth: Story = {
@@ -319,5 +335,104 @@ export const A11y: Story = {
       </p>
       <SearchField aria-label="Search (disabled)" disabled placeholder="Search unavailable" />
     </div>
+  ),
+};
+
+/** 값이 있을 때만 이름 있는 지우기 버튼이 나온다. 이름은 소비자가 준다(`clearAriaLabel`). */
+export const Clearable: Story = {
+  render: () => (
+    <div style={{ minWidth: '320px' }}>
+      <SearchField
+        aria-label="Search projects"
+        clearable
+        clearAriaLabel="Clear search"
+        defaultValue="Dashboard"
+      />
+    </div>
+  ),
+};
+
+const frameworkSuggestions: SearchFieldSuggestion[] = [
+  { id: 'react', label: 'React' },
+  { id: 'vue', label: 'Vue', disabled: true },
+  { id: 'svelte', label: 'Svelte' },
+  { id: 'solid', label: 'Solid' },
+];
+
+/**
+ * list-autocomplete combobox 의 키보드·포커스 계약.
+ *
+ * DOM 포커스는 끝까지 입력에 남고, 활성 제안은 `aria-activedescendant` 로 알린다.
+ * 단위 테스트가 규칙을 고정하고, 이 스토리는 실제 브라우저에서 같은 경로를 한 번 돈다 —
+ * test-runner 가 play 를 실행한 뒤 axe 가 끝 상태를 검사한다.
+ */
+export const KeyboardInteraction: Story = {
+  render: () => (
+    <div style={{ minWidth: '320px', minHeight: '260px' }}>
+      <SearchField
+        aria-label="Search frameworks"
+        placeholder="Search frameworks..."
+        clearable
+        clearAriaLabel="Clear search"
+        suggestions={frameworkSuggestions}
+      />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByRole('combobox', { name: 'Search frameworks' });
+
+    await userEvent.click(input);
+    await expect(canvas.getByRole('listbox')).toBeInTheDocument();
+
+    await userEvent.keyboard('{ArrowDown}');
+    const [react, , svelte] = canvas.getAllByRole('option');
+    await expect(input).toHaveAttribute('aria-activedescendant', react.id);
+    await expect(react).toHaveAttribute('aria-selected', 'true');
+    await expect(input).toHaveFocus();
+
+    // disabled 제안(Vue)은 건너뛴다.
+    await userEvent.keyboard('{ArrowDown}');
+    await expect(input).toHaveAttribute('aria-activedescendant', svelte.id);
+
+    await userEvent.keyboard('{Enter}');
+    await expect(input).toHaveValue('Svelte');
+    await expect(canvas.queryByRole('listbox')).not.toBeInTheDocument();
+    await expect(input).toHaveFocus();
+
+    await userEvent.click(canvas.getByRole('button', { name: 'Clear search' }));
+    await expect(input).toHaveValue('');
+    await expect(input).toHaveFocus();
+
+    await userEvent.type(input, 'S');
+    await expect(canvas.getByRole('listbox')).toBeInTheDocument();
+
+    await userEvent.keyboard('{Escape}');
+    await expect(canvas.queryByRole('listbox')).not.toBeInTheDocument();
+    await expect(input).toHaveFocus();
+  },
+};
+
+/**
+ * 모든 테마에서 필드 상태(값·지우기 버튼·오류·비활성)를 한 장에 담는다.
+ * 열린 제안 목록은 포커스가 있어야 그려져 정적 갤러리에 담을 수 없다 — `KeyboardInteraction` 이 맡는다.
+ */
+export const ThemeMatrix: Story = {
+  parameters: themeGalleryParameters,
+  render: () => (
+    <ThemeGallery>
+      {(theme) => (
+        <div style={{ display: 'grid', gap: '12px', maxWidth: '360px' }}>
+          <SearchField
+            aria-label={`Search (${theme})`}
+            clearable
+            clearAriaLabel={`Clear search (${theme})`}
+            defaultValue="Dashboard"
+          />
+          <SearchField aria-label={`Search invalid (${theme})`} error defaultValue="??" />
+          <SearchField aria-label={`Search disabled (${theme})`} disabled placeholder="Disabled" />
+        </div>
+      )}
+    </ThemeGallery>
   ),
 };

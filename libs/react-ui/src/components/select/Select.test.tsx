@@ -613,6 +613,248 @@ describe('<Select />', () => {
     });
   });
 
+  /**
+   * 선택된 위젯 모델: APG select-only combobox.
+   *
+   * DOM 포커스는 언제나 trigger(`role="combobox"`)에 남고, 목록 안의 활성 위치는
+   * `aria-activedescendant` 로 알린다. option 은 탭 순서에 없다.
+   */
+  describe('keyboard and focus model', () => {
+    // Fragment 요소여야 한다 — Select 는 children 을 훑어 `value` 를 가진 요소만 option 으로 쓰고,
+    // 컴포넌트 요소(`{fruits}`)는 펼치지 않는다.
+    const fruits = (
+      <React.Fragment>
+        <MenuItem value="apple">Apple</MenuItem>
+        <MenuItem value="banana" disabled>
+          Banana
+        </MenuItem>
+        <MenuItem value="cherry">Cherry</MenuItem>
+      </React.Fragment>
+    );
+
+    it('열어도 DOM 포커스는 trigger 에 남고 선택된 option 을 aria-activedescendant 로 가리킨다', async () => {
+      const { user } = render(
+        <Select aria-label="Fruit" defaultValue="apple">
+          {fruits}
+        </Select>,
+      );
+      const trigger = screen.getByRole('combobox');
+
+      await user.click(trigger);
+
+      const [apple] = screen.getAllByRole('option');
+
+      expect(trigger).toHaveFocus();
+      expect(trigger).toHaveAttribute('aria-activedescendant', apple.id);
+    });
+
+    it('option 은 버튼이 아니고 탭 순서에 없으며 id 를 가진다', () => {
+      render(
+        <Select aria-label="Fruit" open value="apple">
+          {fruits}
+        </Select>,
+      );
+
+      screen.getAllByRole('option').forEach((option) => {
+        expect(option.tagName).not.toBe('BUTTON');
+        expect(option).not.toHaveAttribute('tabindex');
+        expect(option.id).not.toBe('');
+      });
+    });
+
+    it('ArrowDown/ArrowUp 은 disabled option 을 건너뛰며 활성 위치만 옮긴다', async () => {
+      const { user } = render(
+        <Select aria-label="Fruit" defaultValue="apple">
+          {fruits}
+        </Select>,
+      );
+      const trigger = screen.getByRole('combobox');
+
+      await user.click(trigger);
+      await user.keyboard('{ArrowDown}');
+
+      const [apple, , cherry] = screen.getAllByRole('option');
+
+      expect(trigger).toHaveAttribute('aria-activedescendant', cherry.id);
+
+      await user.keyboard('{ArrowUp}');
+
+      expect(trigger).toHaveAttribute('aria-activedescendant', apple.id);
+      expect(trigger).toHaveFocus();
+    });
+
+    it('Home/End 는 첫·마지막 활성 option 으로 간다', async () => {
+      const { user } = render(
+        <Select aria-label="Fruit" defaultValue="apple">
+          {fruits}
+        </Select>,
+      );
+      const trigger = screen.getByRole('combobox');
+
+      await user.click(trigger);
+      await user.keyboard('{End}');
+
+      const [apple, , cherry] = screen.getAllByRole('option');
+
+      expect(trigger).toHaveAttribute('aria-activedescendant', cherry.id);
+
+      await user.keyboard('{Home}');
+
+      expect(trigger).toHaveAttribute('aria-activedescendant', apple.id);
+    });
+
+    it.each(['{Enter}', ' '])(
+      '%s 는 활성 option 을 고르고 닫으며 포커스는 trigger 에 남는다',
+      async (key) => {
+        const handleChange = spy();
+        const { user } = render(
+          <Select aria-label="Fruit" defaultValue="apple" onChange={handleChange}>
+            {fruits}
+          </Select>,
+        );
+        const trigger = screen.getByRole('combobox');
+
+        await user.click(trigger);
+        await user.keyboard('{ArrowDown}');
+        await user.keyboard(key);
+
+        expect(handleChange.callCount).toBe(1);
+        expect(handleChange.firstCall.args[0]?.target).toHaveProperty('value', 'cherry');
+        expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+        expect(trigger).toHaveFocus();
+        expect(trigger).toHaveTextContent('Cherry');
+      },
+    );
+
+    it('Escape 는 값을 바꾸지 않고 닫으며 포커스는 trigger 에 남는다', async () => {
+      const handleChange = spy();
+      const { user } = render(
+        <Select aria-label="Fruit" defaultValue="apple" onChange={handleChange}>
+          {fruits}
+        </Select>,
+      );
+      const trigger = screen.getByRole('combobox');
+
+      await user.click(trigger);
+      await user.keyboard('{ArrowDown}{Escape}');
+
+      expect(handleChange.callCount).toBe(0);
+      expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+      expect(trigger).toHaveFocus();
+    });
+
+    it('Tab 으로 벗어나면 목록을 닫는다', async () => {
+      const { user } = render(
+        <React.Fragment>
+          <Select aria-label="Fruit" defaultValue="apple">
+            {fruits}
+          </Select>
+          <button type="button">after</button>
+        </React.Fragment>,
+      );
+
+      await user.click(screen.getByRole('combobox'));
+      await user.tab();
+
+      expect(screen.getByRole('button', { name: 'after' })).toHaveFocus();
+      expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+    });
+
+    it('outside pointer 로 닫혀도 포커스를 trigger 로 끌어오지 않는다', async () => {
+      const { user } = render(
+        <React.Fragment>
+          <Select aria-label="Fruit" defaultValue="apple">
+            {fruits}
+          </Select>
+          <button type="button">outside</button>
+        </React.Fragment>,
+      );
+
+      await user.click(screen.getByRole('combobox'));
+      await user.click(screen.getByRole('button', { name: 'outside' }));
+
+      expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+      expect(screen.getByRole('button', { name: 'outside' })).toHaveFocus();
+    });
+
+    it('multiple 은 토글 뒤에도 열려 있고 활성 위치가 제자리에 남는다', async () => {
+      const Controlled = () => {
+        const [value, setValue] = React.useState<unknown>(['apple']);
+
+        return (
+          <Select
+            aria-label="Fruit"
+            multiple
+            value={value}
+            onChange={(event) => setValue(event.target.value)}
+          >
+            {fruits}
+          </Select>
+        );
+      };
+
+      const { user } = render(<Controlled />);
+      const trigger = screen.getByRole('combobox');
+
+      await user.click(trigger);
+      await user.keyboard('{End} ');
+
+      const listbox = screen.getByRole('listbox');
+      const [apple, , cherry] = screen.getAllByRole('option');
+
+      expect(listbox).toHaveAttribute('aria-multiselectable', 'true');
+      expect(apple).toHaveAttribute('aria-selected', 'true');
+      expect(cherry).toHaveAttribute('aria-selected', 'true');
+      expect(trigger).toHaveAttribute('aria-activedescendant', cherry.id);
+      expect(trigger).toHaveFocus();
+    });
+
+    it('disabled 면 open·defaultOpen 이어도 목록을 그리지 않는다', () => {
+      render(
+        <Select aria-label="Fruit" disabled defaultOpen value="apple">
+          {fruits}
+        </Select>,
+      );
+
+      expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+      expect(screen.getByRole('combobox')).toHaveAttribute('aria-expanded', 'false');
+    });
+
+    it('controlled open 은 Escape 에서 onClose 만 부르고 스스로 닫지 않는다', async () => {
+      const handleClose = spy();
+      const { user } = render(
+        <Select aria-label="Fruit" open onClose={handleClose} value="apple">
+          {fruits}
+        </Select>,
+      );
+
+      screen.getByRole('combobox').focus();
+      await user.keyboard('{Escape}');
+
+      expect(handleClose.callCount).toBe(1);
+      expect(screen.getByRole('listbox')).toBeInTheDocument();
+    });
+
+    it('aria-label 만 있어도 열린 listbox 가 이름을 가진다', () => {
+      render(
+        <Select aria-label="Fruit" open value="apple">
+          {fruits}
+        </Select>,
+      );
+
+      expect(screen.getByRole('listbox')).toHaveAccessibleName('Fruit');
+    });
+
+    it('disabled 는 error 표시보다 우선한다', () => {
+      const { container } = render(<Select aria-label="Fruit" disabled error value="" />);
+      const root = container.firstElementChild;
+
+      expect(root).toHaveClass(selectClasses.disabled);
+      expect(root).not.toHaveClass(selectClasses.error);
+      expect(screen.getByRole('combobox')).toHaveAttribute('aria-invalid', 'true');
+    });
+  });
+
   describe('events', () => {
     it('onKeyDown을 전달해야 한다', async () => {
       const handleKeyDown = spy();

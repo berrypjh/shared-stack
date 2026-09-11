@@ -29,6 +29,16 @@ import {
   isOptionDisabled,
 } from './Select.utils';
 
+/**
+ * APG select-only combobox.
+ *
+ * DOM 포커스는 언제나 trigger(`role="combobox"`)에 남고, 목록 안의 활성 위치는
+ * `aria-activedescendant` 로 알린다. option 은 탭 순서에 없는 `role="option"` 요소이며, 목록을
+ * 누를 때 mousedown 기본 동작을 막아 포커스를 trigger 에서 빼앗지 않는다.
+ *
+ * 포커스 정책: 선택·Escape 뒤에도 포커스는 trigger 에 있다. 바깥을 눌러 닫히면 포커스는 누른 곳을
+ * 따라간다(trigger 로 끌어오지 않는다). Tab 은 목록을 닫고 다음 요소로 간다.
+ */
 export const Select = ({
   'aria-describedby': ariaDescribedby,
   'aria-label': ariaLabel,
@@ -74,17 +84,21 @@ export const Select = ({
 
   const rootRef = useRef<HTMLDivElement | null>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
-  const optionRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const optionRefs = useRef<Array<HTMLDivElement | null>>([]);
 
   const generatedId = useId();
   const triggerId = id ?? generatedId;
   const listboxId = `${triggerId}-listbox`;
+  const optionId = (index: number) => `${listboxId}-option-${index}`;
+  const listboxLabelledBy = ariaLabelledby ?? labelId;
 
   const [focused, setFocused] = useState(false);
   const [uncontrolledOpen, setUncontrolledOpen] = useState(defaultOpen);
 
   const isControlledOpen = openProp != null;
   const open = openProp ?? uncontrolledOpen;
+  // disabled 는 open 보다 우선한다 — 비활성 컨트롤은 목록을 보여 주지도, 값을 바꾸지도 않는다.
+  const listOpen = open && !resolvedDisabled;
 
   const isControlledValue = valueProp !== undefined;
   const [valueState, setValueState] = useState<unknown>(() =>
@@ -99,11 +113,27 @@ export const Select = ({
     [multiple, optionElements, value],
   );
 
-  const [highlightedIndex, setHighlightedIndex] = useState<number>(() =>
+  const getInitialIndex = () =>
     getInitialHighlightedIndex(optionElements, isOptionDisabled, (option) =>
       isOptionSelected(option.props.value, value, multiple),
-    ),
-  );
+    );
+
+  const [highlightedIndex, setHighlightedIndex] = useState<number>(getInitialIndex);
+
+  // 활성 위치는 목록이 **열릴 때만** 선택값으로 맞춘다. 열린 동안 값이 바뀌어도(multiple 토글)
+  // 사용자가 옮겨 둔 위치를 되돌리지 않는다.
+  const [prevListOpen, setPrevListOpen] = useState(listOpen);
+
+  if (listOpen !== prevListOpen) {
+    setPrevListOpen(listOpen);
+
+    if (listOpen) {
+      setHighlightedIndex(getInitialIndex());
+    }
+  }
+
+  const activeOptionId =
+    listOpen && optionElements[highlightedIndex] ? optionId(highlightedIndex) : undefined;
 
   const hiddenValues = useMemo(
     () =>
@@ -136,29 +166,15 @@ export const Select = ({
   }, [autoFocus, resolvedDisabled]);
 
   useEffect(() => {
-    if (!open) {
+    if (!listOpen || highlightedIndex < 0) {
       return;
     }
 
-    const initialIndex = getInitialHighlightedIndex(optionElements, isOptionDisabled, (option) =>
-      isOptionSelected(option.props.value, value, multiple),
-    );
-
-    setHighlightedIndex(initialIndex);
-
-    const frame = window.requestAnimationFrame(() => {
-      if (initialIndex >= 0) {
-        optionRefs.current[initialIndex]?.focus();
-      }
-    });
-
-    return () => {
-      window.cancelAnimationFrame(frame);
-    };
-  }, [multiple, open, optionElements, value]);
+    optionRefs.current[highlightedIndex]?.scrollIntoView?.({ block: 'nearest' });
+  }, [highlightedIndex, listOpen]);
 
   useEffect(() => {
-    if (!open) {
+    if (!listOpen) {
       return;
     }
 
@@ -185,7 +201,7 @@ export const Select = ({
     return () => {
       document.removeEventListener('mousedown', handlePointerDown);
     };
-  }, [isControlledOpen, onClose, open]);
+  }, [isControlledOpen, onClose, listOpen]);
 
   useEffect(() => {
     const labelElements = Array.from(document.getElementsByTagName('label')).filter(
@@ -204,7 +220,7 @@ export const Select = ({
       event.preventDefault();
       triggerRef.current?.focus();
 
-      if (!open) {
+      if (!listOpen) {
         if (!isControlledOpen) {
           setUncontrolledOpen(true);
         }
@@ -222,7 +238,7 @@ export const Select = ({
         labelElement.removeEventListener('click', handleLabelClick);
       });
     };
-  }, [triggerId, resolvedDisabled, open, isControlledOpen, onOpen]);
+  }, [triggerId, resolvedDisabled, listOpen, isControlledOpen, onOpen]);
 
   const handleOpen = (event?: SelectOpenCloseEvent) => {
     if (resolvedDisabled) {
@@ -245,7 +261,7 @@ export const Select = ({
   };
 
   const selectOption = (event: SelectOpenCloseEvent, child: SelectOptionElement) => {
-    if (child.props.disabled) {
+    if (resolvedDisabled || child.props.disabled) {
       return;
     }
 
@@ -283,7 +299,7 @@ export const Select = ({
   };
 
   const handleTriggerClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    if (open) {
+    if (listOpen) {
       handleClose(event);
       return;
     }
@@ -291,36 +307,70 @@ export const Select = ({
     handleOpen(event);
   };
 
+  const moveHighlight = (nextIndex: number) => {
+    if (nextIndex >= 0) {
+      setHighlightedIndex(nextIndex);
+    }
+  };
+
   const handleTriggerKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
     if (resolvedDisabled) {
       return;
     }
 
-    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
-      event.preventDefault();
-
-      if (!open) {
+    if (!listOpen) {
+      if (['ArrowDown', 'ArrowUp', 'Enter', ' '].includes(event.key)) {
+        event.preventDefault();
         handleOpen(event);
       }
 
       return;
     }
 
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
+    switch (event.key) {
+      case 'ArrowDown':
+      case 'ArrowUp': {
+        event.preventDefault();
+        const direction = event.key === 'ArrowDown' ? 1 : -1;
+        moveHighlight(
+          getNextEnabledIndex(optionElements, highlightedIndex, direction, isOptionDisabled),
+        );
+        return;
+      }
 
-      if (open) {
+      case 'Home':
+        event.preventDefault();
+        moveHighlight(getFirstEnabledIndex(optionElements, isOptionDisabled));
+        return;
+
+      case 'End':
+        event.preventDefault();
+        moveHighlight(getLastEnabledIndex(optionElements, isOptionDisabled));
+        return;
+
+      case 'Enter':
+      case ' ': {
+        event.preventDefault();
+        const child = optionElements[highlightedIndex];
+
+        if (child) {
+          selectOption(event, child);
+        } else {
+          handleClose(event);
+        }
+
+        return;
+      }
+
+      case 'Escape':
+        event.preventDefault();
         handleClose(event);
-      } else {
-        handleOpen(event);
-      }
+        return;
 
-      return;
-    }
-
-    if (event.key === 'Escape' && open) {
-      event.preventDefault();
-      handleClose(event);
+      case 'Tab':
+        // 기본 동작(다음 요소로 이동)은 그대로 둔다.
+        handleClose(event);
+        return;
     }
   };
 
@@ -340,85 +390,16 @@ export const Select = ({
     onFocus?.(event);
   };
 
-  const handleOptionKeyDown = (
-    event: React.KeyboardEvent<HTMLButtonElement>,
-    child: SelectOptionElement,
-    index: number,
-  ) => {
-    if (event.key === 'ArrowDown') {
-      event.preventDefault();
-
-      const nextIndex = getNextEnabledIndex(optionElements, index, 1, isOptionDisabled);
-
-      if (nextIndex >= 0) {
-        setHighlightedIndex(nextIndex);
-        optionRefs.current[nextIndex]?.focus();
-      }
-
-      return;
-    }
-
-    if (event.key === 'ArrowUp') {
-      event.preventDefault();
-
-      const nextIndex = getNextEnabledIndex(optionElements, index, -1, isOptionDisabled);
-
-      if (nextIndex >= 0) {
-        setHighlightedIndex(nextIndex);
-        optionRefs.current[nextIndex]?.focus();
-      }
-
-      return;
-    }
-
-    if (event.key === 'Home') {
-      event.preventDefault();
-
-      const firstIndex = getFirstEnabledIndex(optionElements, isOptionDisabled);
-
-      if (firstIndex >= 0) {
-        setHighlightedIndex(firstIndex);
-        optionRefs.current[firstIndex]?.focus();
-      }
-
-      return;
-    }
-
-    if (event.key === 'End') {
-      event.preventDefault();
-
-      const lastIndex = getLastEnabledIndex(optionElements, isOptionDisabled);
-
-      if (lastIndex >= 0) {
-        setHighlightedIndex(lastIndex);
-        optionRefs.current[lastIndex]?.focus();
-      }
-
-      return;
-    }
-
-    if (event.key === 'Escape') {
-      event.preventDefault();
-      handleClose(event);
-      triggerRef.current?.focus();
-      return;
-    }
-
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      selectOption(event, child);
-    }
-  };
-
   const rootClassName = getSelectRootClassNames({
     className,
     color: resolvedColor,
     disabled: resolvedDisabled,
-    error: resolvedError,
-    focused,
+    // 상태 표시 우선순위: disabled > error > focused (입력 variant 와 같다).
+    error: resolvedError && !resolvedDisabled,
+    focused: focused && !resolvedDisabled,
     fullWidth: resolvedFullWidth,
     multiple,
-    open,
+    open: listOpen,
     size: resolvedSize,
     variant: resolvedVariant,
   });
@@ -464,14 +445,15 @@ export const Select = ({
       )}
 
       <button
-        aria-controls={open ? listboxId : undefined}
+        aria-activedescendant={activeOptionId}
+        aria-controls={listOpen ? listboxId : undefined}
         aria-describedby={ariaDescribedby}
         aria-disabled={resolvedDisabled ? 'true' : undefined}
-        aria-expanded={open ? 'true' : 'false'}
+        aria-expanded={listOpen ? 'true' : 'false'}
         aria-haspopup="listbox"
         aria-invalid={resolvedError ? 'true' : undefined}
         aria-label={ariaLabel}
-        aria-labelledby={ariaLabelledby ?? labelId}
+        aria-labelledby={listboxLabelledBy}
         aria-required={resolvedRequired ? 'true' : undefined}
         className={selectClasses.trigger}
         disabled={resolvedDisabled}
@@ -499,12 +481,16 @@ export const Select = ({
         ) : null}
       </button>
 
-      {open ? (
+      {listOpen ? (
+        // aria-activedescendant 패턴: DOM 포커스는 trigger 에 남으므로 listbox 는 포커스를 받지 않는다.
+        // eslint-disable-next-line jsx-a11y/interactive-supports-focus
         <div
-          aria-labelledby={labelId}
+          aria-label={listboxLabelledBy ? undefined : ariaLabel}
+          aria-labelledby={listboxLabelledBy}
           aria-multiselectable={multiple ? 'true' : undefined}
           className={selectClasses.listbox}
           id={listboxId}
+          onMouseDown={(event) => event.preventDefault()}
           role="listbox"
         >
           {optionElements.map((child, index) => {
@@ -514,7 +500,10 @@ export const Select = ({
             const disabledOption = Boolean(child.props.disabled);
 
             return (
-              <button
+              // 키보드는 trigger(combobox)가 처리하고 option 은 탭 순서에도 포커스 대상에도 들지 않는다.
+              // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/interactive-supports-focus
+              <div
+                aria-disabled={disabledOption ? 'true' : undefined}
                 aria-selected={selected ? 'true' : 'false'}
                 className={cx(
                   selectClasses.option,
@@ -522,18 +511,21 @@ export const Select = ({
                   highlighted && selectClasses.optionHighlighted,
                 )}
                 data-value={stringifyValue(optionValue)}
-                disabled={disabledOption}
+                id={optionId(index)}
                 key={child.key ?? index}
                 onClick={(event) => selectOption(event, child)}
-                onKeyDown={(event) => handleOptionKeyDown(event, child, index)}
+                onMouseEnter={() => {
+                  if (!disabledOption) {
+                    setHighlightedIndex(index);
+                  }
+                }}
                 ref={(node) => {
                   optionRefs.current[index] = node;
                 }}
                 role="option"
-                type="button"
               >
                 {child.props.children}
-              </button>
+              </div>
             );
           })}
         </div>
