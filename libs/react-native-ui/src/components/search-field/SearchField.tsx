@@ -109,8 +109,12 @@ export const SearchField = ({
         readOnly={readOnly}
         fullWidth={fullWidth}
         accessibilityRole={accessibilityRole}
+        // `expanded` 는 내부 open 플래그가 아니라 실제로 그려진 표면을 말합니다 — 그릴 것이 없거나
+        // 편집할 수 없으면 open 이어도 펼쳐진 목록은 없습니다.
         accessibilityState={
-          hasSuggestionSurface ? { ...accessibilityState, expanded: open } : accessibilityState
+          hasSuggestionSurface
+            ? { ...accessibilityState, expanded: listVisible }
+            : accessibilityState
         }
         enterKeyHint={enterKeyHint}
         inputMode={inputMode}

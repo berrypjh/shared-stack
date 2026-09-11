@@ -219,7 +219,8 @@ chrome 도 소유하지 않는다 — 전부 합성 대상 것이다.
 - **하드웨어 키보드 이동은 없다** — ArrowDown/Up·Escape·`aria-activedescendant` 는 DOM 포커스
   안무라 옮기지 않았다.
 - **네이티브 역할·상태**: 입력은 `accessibilityRole="search"`, 제안 표면이 있을 때만
-  `accessibilityState.expanded` 를 말한다. 제안 행은 `button` 역할 +
+  `accessibilityState.expanded` 를 말한다. 그 값은 **실제로 그려진 목록**을 따른다 — 빈 목록에
+  안내도 없거나 disabled·readOnly 라서 목록이 없으면 focus 중이어도 `expanded=false` 다. 제안 행은 `button` 역할 +
   `accessibilityState={{ selected, disabled }}` 다 — RN 은 `option` 역할을 네이티브 역할로
   **매핑하지 않는다**(Android `ReactAccessibilityDelegate` 의 role 스위치에 case 가 없다).
   `combobox` 로 승격하지 않는 이유도 같다: 행이 option 이 될 수 없어 반쪽 약속이 된다.
@@ -240,6 +241,8 @@ chrome 도 소유하지 않는다 — 전부 합성 대상 것이다.
   이벤트는 HTML 폼 호환을 위한 것이라 옮기지 않았다. 개폐 콜백은 `onOpen()`/`onClose()` 다.
 - 이미 선택된 값을 다시 골라도 닫히지만 `onValueChange` 는 부르지 않는다(web 과 같은 정책).
   비활성 선택지는 값도 못 바꾸고 목록도 닫지 못한다.
+- **disabled 는 open 보다 우선한다.** disabled Select 는 `open`·`defaultOpen` 이 켜져 있어도 Modal 을
+  보여 주지 않고 `expanded=false` 를 말한다. 요청은 버리지 않는다 — 다시 활성화되면 요청대로 열린다.
 - **접근성**: 트리거 `combobox` + `accessibilityState.expanded`, 목록 `radiogroup`,
   선택지 `radio` + `accessibilityState.checked`. 설치된 RN 이 실제로 지원하는 역할만 쓴다.
   `accessibilityLabel` 은 **필수**다 — 형제 `InputLabel` 은 이름을 만들어 주지 않는다.

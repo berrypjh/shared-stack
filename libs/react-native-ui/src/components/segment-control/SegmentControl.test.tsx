@@ -175,6 +175,23 @@ describe('접근성', () => {
     );
   });
 
+  it('선택된 disabled 옵션은 selected 와 disabled 를 함께 알리고 누를 수 없다', async () => {
+    const onChange = jest.fn();
+    await show(<SegmentControl value="month" onChange={onChange} options={OPTIONS} />);
+
+    expect(seg('월')).toHaveProp(
+      'accessibilityState',
+      expect.objectContaining({ selected: true, disabled: true }),
+    );
+    // 표면은 선택을, 라벨색은 비활성을 말한다 (disabled > selected — web 과 같은 우선순위).
+    expect(seg('월')).toHaveStyle({ backgroundColor: T.color.background.primary });
+    expect(screen.getByText('월')).toHaveStyle({ color: T.color.text.disable });
+
+    await fireEvent.press(seg('월'));
+
+    expect(onChange).not.toHaveBeenCalled();
+  });
+
   it('옵션이 최소 터치 타깃을 지킨다', async () => {
     await show(<SegmentControl value="day" onChange={jest.fn()} options={OPTIONS} />);
 

@@ -64,7 +64,9 @@ export const Select = <T extends string>({
   const value = valueProp !== undefined ? valueProp : uncontrolledValue;
 
   const [uncontrolledOpen, setUncontrolledOpen] = useState(defaultOpen);
-  const open = openProp !== undefined ? openProp : uncontrolledOpen;
+  // disabled 는 open 보다 우선합니다 — 비활성 컨트롤은 목록을 보여 주지도, 값을 바꾸지도 않습니다.
+  // `open`·`defaultOpen` 요청은 그대로 두고 표시만 막습니다 (다시 활성화되면 요청대로 열립니다).
+  const open = (openProp !== undefined ? openProp : uncontrolledOpen) && !disabledValue;
 
   const requestOpen = () => {
     if (openProp === undefined) setUncontrolledOpen(true);

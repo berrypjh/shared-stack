@@ -79,6 +79,54 @@ describe('개폐 (uncontrolled)', () => {
   });
 });
 
+/**
+ * disabled 는 open 보다 우선한다. 비활성 컨트롤은 목록을 보여 주지도, 값을 바꾸지도 않는다 —
+ * `defaultOpen`·`open` 이 켜져 있어도 마찬가지다.
+ */
+describe('disabled 는 open 보다 우선한다', () => {
+  it('disabled + defaultOpen 이면 Modal 을 보여 주지 않고 expanded=false 다', async () => {
+    await show(<Select accessibilityLabel="국가" options={OPTIONS} disabled defaultOpen />);
+
+    expect(panelOpen()).toBe(false);
+    expect(trigger()).toHaveProp(
+      'accessibilityState',
+      expect.objectContaining({ expanded: false, disabled: true }),
+    );
+  });
+
+  it('disabled + controlled open 이어도 선택지를 눌러 값을 바꿀 수 없다', async () => {
+    const onValueChange = jest.fn();
+
+    await show(
+      <Select
+        accessibilityLabel="국가"
+        options={OPTIONS}
+        disabled
+        open
+        onValueChange={onValueChange}
+      />,
+    );
+
+    expect(panelOpen()).toBe(false);
+    expect(screen.queryAllByRole('radio')).toHaveLength(0);
+    expect(onValueChange).not.toHaveBeenCalled();
+  });
+
+  it('열린 동안 disabled 가 되면 목록이 사라진다', async () => {
+    const view = await show(<Select accessibilityLabel="국가" options={OPTIONS} defaultOpen />);
+
+    expect(panelOpen()).toBe(true);
+
+    await view.rerender(
+      <ThemeProvider>
+        <Select accessibilityLabel="국가" options={OPTIONS} defaultOpen disabled />
+      </ThemeProvider>,
+    );
+
+    expect(panelOpen()).toBe(false);
+  });
+});
+
 describe('개폐 (controlled)', () => {
   it('open={false} 면 트리거를 눌러도 열리지 않고 onOpen 만 부른다', async () => {
     const onOpen = jest.fn();
@@ -308,6 +356,14 @@ describe('접근성', () => {
     await show(<Select accessibilityLabel="국가" options={OPTIONS} defaultOpen />);
 
     expect(choice('일본')).toBeDisabled();
+  });
+
+  it('선택된 disabled 선택지는 checked 와 disabled 를 함께 알린다', async () => {
+    await show(
+      <Select accessibilityLabel="국가" options={OPTIONS} defaultValue="jp" defaultOpen />,
+    );
+
+    expect(choice('일본')).toHaveProp('accessibilityState', { checked: true, disabled: true });
   });
 
   it('목록 컨테이너가 radiogroup 이고 자식을 삼키지 않는다', async () => {

@@ -453,6 +453,74 @@ describe('접근성', () => {
     expect(getInput()).toHaveProp('accessibilityState', { expanded: true, disabled: false });
   });
 
+  /**
+   * `expanded` 는 내부 open 플래그가 아니라 **실제로 그려진 제안 표면**을 말해야 한다.
+   * open 이어도 그릴 것이 없거나(빈 목록·안내 없음) 편집할 수 없으면(disabled·readOnly)
+   * 표면이 없으므로 펼쳐졌다고 말하면 스크린리더에게 없는 목록을 약속하는 셈이다.
+   */
+  describe('expanded 는 보이는 제안 표면과 일치한다', () => {
+    it('제안이 비고 안내도 없으면 focus 해도 expanded=false', async () => {
+      await renderWithTheme(<SearchField accessibilityLabel="검색" suggestions={[]} />);
+
+      await openList();
+
+      expect(queryList()).toBeNull();
+      expect(getInput()).toHaveProp('accessibilityState', { expanded: false, disabled: false });
+    });
+
+    it('제안이 비어도 안내가 보이면 expanded=true', async () => {
+      await renderWithTheme(
+        <SearchField accessibilityLabel="검색" suggestions={[]} noSuggestionsText="결과 없음" />,
+      );
+
+      await openList();
+
+      expect(queryList()).toBeOnTheScreen();
+      expect(getInput()).toHaveProp('accessibilityState', { expanded: true, disabled: false });
+    });
+
+    it('열린 동안 disabled 가 되어 목록이 사라지면 expanded=false', async () => {
+      const view = await renderWithTheme(
+        <SearchField accessibilityLabel="검색" suggestions={SUGGESTIONS} />,
+      );
+
+      await openList();
+      await view.rerender(
+        <ThemeProvider>
+          <SearchField accessibilityLabel="검색" suggestions={SUGGESTIONS} disabled />
+        </ThemeProvider>,
+      );
+
+      expect(queryList()).toBeNull();
+      expect(getInput()).toHaveProp('accessibilityState', { expanded: false, disabled: true });
+    });
+
+    it('열린 동안 readOnly 가 되어 목록이 사라지면 expanded=false', async () => {
+      const view = await renderWithTheme(
+        <SearchField accessibilityLabel="검색" suggestions={SUGGESTIONS} />,
+      );
+
+      await openList();
+      await view.rerender(
+        <ThemeProvider>
+          <SearchField accessibilityLabel="검색" suggestions={SUGGESTIONS} readOnly />
+        </ThemeProvider>,
+      );
+
+      expect(queryList()).toBeNull();
+      expect(getInput()).toHaveProp('accessibilityState', { expanded: false, disabled: false });
+    });
+
+    it('선택으로 목록이 닫히면 expanded=false', async () => {
+      await renderWithTheme(<SearchField accessibilityLabel="검색" suggestions={SUGGESTIONS} />);
+
+      await openList();
+      await fireEvent.press(getRow('사과'));
+
+      expect(getInput()).toHaveProp('accessibilityState', { expanded: false, disabled: false });
+    });
+  });
+
   it('제안 표면이 없으면 expanded 를 지어내지 않는다', async () => {
     await renderWithTheme(<SearchField accessibilityLabel="검색" />);
 
