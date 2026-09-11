@@ -385,6 +385,31 @@ describe.each(catalog.themes)('Button family — %s theme', (theme) => {
 });
 
 /**
+ * SkipLink 가 포커스를 받아 드러났을 때의 조합.
+ *
+ * 이 컴포넌트는 포커스 전까지 숨어 있다가 포커스에서만 나타난다 — 드러난 그 순간이
+ * 유일한 노출이라 모든 테마에서 읽혀야 한다. 전용 토큰을 만들지 않고 시맨틱
+ * `background.primary` / `text.contrastText` 쌍을 그대로 쓰므로, 그 쌍이 실제로 기준을
+ * 넘는지 여기서 못박는다. 링은 버튼 포커스 링과 같은 토큰이고 페이지 배경 위에 그려진다.
+ */
+describe.each(catalog.themes)('SkipLink — %s theme', (theme) => {
+  it('드러난 라벨이 4.5:1 을 넘는다', () => {
+    expect(
+      contrastRatio(
+        value('color.text.contrastText', theme),
+        value('color.background.primary', theme),
+      ),
+    ).toBeGreaterThanOrEqual(WCAG_AA.text);
+  });
+
+  it('포커스 링이 페이지 배경 위에서 3:1 을 넘는다', () => {
+    expect(
+      contrastRatio(value('border.primary.color', theme), value('color.background.default', theme)),
+    ).toBeGreaterThanOrEqual(WCAG_AA.nonText);
+  });
+});
+
+/**
  * pressed 의 정본 표현.
  *
  * 이 디자인 시스템에서 pressed 는 **색이 아니라 위치**다. web `.ui-button:active` 는 색을
