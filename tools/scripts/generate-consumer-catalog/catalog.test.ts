@@ -157,6 +157,17 @@ describe('web catalog contents', () => {
     expect(bg?.valueCount).toBeGreaterThan(50);
   });
 
+  /**
+   * dts-bundle-generator 는 공개 타입이 참조하는 이름 붙은 타입을 전부 export 로 끌어올린다.
+   * TextField 의 모드 분기는 `TextFieldProps` 를 만드는 재료일 뿐이라 공개 심볼이 되면 안 된다 —
+   * SearchField 가 같은 이유로 유니온을 익명으로 둔다.
+   */
+  it('does not leak TextField mode helper types as public symbols', () => {
+    for (const name of ['ModeSpecificKey', 'TextFieldInputModeProps', 'TextFieldSelectModeProps']) {
+      expect(web.symbols).not.toHaveProperty(name);
+    }
+  });
+
   it('marks a props type that is not publicly exported as null', () => {
     expect(web.symbols.TextField.propsType).toBeNull();
     expect(Object.keys(web.symbols.TextField.props ?? {})).toContain('helperText');
