@@ -46,7 +46,17 @@ module.exports = [
   reactUi('ThemeProvider only', '{ ThemeProvider }', '11 KB'),
   reactUi('themes registry only', '{ themes }', '11 KB'),
   reactUi('Web tokens (Light)', '{ Web }', '13 KB'),
-  reactUi('* (full)', '*', '14 KB'),
+  // 14 KB -> 15 KB: Popover 접근성 보강분이다. 측정으로 확인한 값 — 이 작업 직전 baseline
+  // 13.97 KB, 이후 14.23 KB (+232 B brotli). 늘어난 것은 포커스 수명주기(닫힐 때 패널 안
+  // 포커스를 트리거로 복원), Escape 범위 지정(중첩/형제에서 무관한 팝업을 닫지 않음),
+  // dialog 진입 포커스, `semantics` 전달이다 — 전부 동작이라 줄일 군더더기가 없다.
+  // `FOCUSABLE_SELECTOR` 를 문자열 리터럴로 합쳐 보기도 했으나 brotli 가 반복 패턴을 덜
+  // 압축해 오히려 +7 B 라 되돌렸다.
+  //
+  // 기존 14 KB 는 baseline 대비 여유가 0.2% 뿐이라 어떤 기능 추가에도 걸렸다 — 이 파일
+  // 머리말이 말하는 "baseline +20%" 와 맞지 않았다. 15 KB 는 현재값 위로 약 5% 여유로,
+  // 다른 타이트한 게이트(Web tokens 13 KB vs 12.81)와 같은 수준을 유지한다.
+  reactUi('* (full)', '*', '15 KB'),
 
   // react-native-ui — 단일 import도 theme/styles 모듈 evaluate로 약 3 KB가 들어감.
   // 여기서는 선택 import가 실제로 갈린다(Button 4.59 / Fab 4.35 / IconButton 4.14 vs 전체 12.54)
