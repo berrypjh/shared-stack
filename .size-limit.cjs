@@ -62,7 +62,14 @@ module.exports = [
   // 기존 14 KB 는 baseline 대비 여유가 0.2% 뿐이라 어떤 기능 추가에도 걸렸다 — 이 파일
   // 머리말이 말하는 "baseline +20%" 와 맞지 않았다. 15 KB 는 현재값 위로 약 5% 여유로,
   // 다른 타이트한 게이트(Web tokens 13 KB vs 12.81)와 같은 수준을 유지한다.
-  reactUi('* (full)', '*', '15 KB'),
+  //
+  // 15 KB -> 16 KB: 선택 컨트롤(Checkbox·Radio·RadioGroup) 추가분이다. 측정으로 확인한 값 —
+  // Checkbox 직전 baseline 14.6 KB, Checkbox 뒤 14.8 KB, Radio·RadioGroup 뒤 15.18 KB
+  // (+0.58 KB brotli). 새 컴포넌트는 displayName 을 두지 않아 단일 심볼 케이스는 그대로다
+  // (cx 10.18 -> 10.15) — 늘어난 것은 전체 re-export 에 실리는 동작 코드뿐이다. 16 KB 는
+  // 현재값 위 약 5% 여유로 기존 게이트와 같은 수준이다. 이어서 Switch 뒤 15.25 KB (+0.07 KB) —
+  // 한도는 그대로 두었다.
+  reactUi('* (full)', '*', '16 KB'),
 
   // react-native-ui — 단일 import도 theme/styles 모듈 evaluate로 약 3 KB가 들어감.
   // 여기서는 선택 import가 실제로 갈린다(Button 4.59 / Fab 4.35 / IconButton 4.14 vs 전체 12.54)

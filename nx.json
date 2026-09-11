@@ -172,7 +172,12 @@
     },
     "build-storybook": {
       "cache": true,
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build"],
+      "inputs": [
+        "default",
+        "^production",
+        { "externalDependencies": ["storybook", "@storybook/test-runner"] }
+      ]
     },
     "test": {
       "cache": true,
