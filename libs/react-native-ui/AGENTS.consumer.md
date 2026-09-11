@@ -72,6 +72,7 @@ npx @berrypjh/react-native-ui token color.primary
 | ---------------- | ----------------------------------------------------------------------------- |
 | `Box`            | 토큰 기반 레이아웃 (padding·margin·background·radius). `ref` 는 호스트 `View` |
 | `Button`         | 라벨 버튼. `variant`·`size`·`color`·`fullWidth`·`loading`·아이콘 슬롯         |
+| `Checkbox`       | 체크박스. `checked`·`defaultChecked`·`onCheckedChange`·`indeterminate`        |
 | `Fab`            | 플로팅 액션 버튼. `shape="circular" \| "extended"`                            |
 | `IconButton`     | 아이콘 전용 버튼. `accessibilityLabel` **필수**                               |
 | `PlainInput`     | 밑줄만 있는 텍스트 필드. `accessibilityLabel` **필수**                        |
@@ -81,6 +82,9 @@ npx @berrypjh/react-native-ui token color.primary
 | `SearchField`    | 검색 입력 + 지우기 + 제안 목록. `accessibilityLabel` **필수**                 |
 | `Select`         | 데이터 `options` 기반 단일 선택. `accessibilityLabel` **필수**                |
 | `SegmentControl` | 상호배타 선택. **controlled 전용**                                            |
+| `RadioGroup`     | 단일 선택 그룹. `value`·`defaultValue`·`onValueChange`. 자식은 `Radio`        |
+| `Radio`          | `RadioGroup` 안의 선택지. `value` **필수**. 그룹 밖에서는 오류                |
+| `Switch`         | core Switch 래퍼. **controlled 전용**. `accessibilityLabel` **필수**          |
 
 #### Button 계열 공통
 
@@ -271,11 +275,55 @@ chrome 도 소유하지 않는다 — 전부 합성 대상 것이다.
 - 루트는 접근성 집합체가 아니다 — 세그먼트는 각각 조작된다.
 - **`size`·`fullWidth`·루트 `disabled` 는 없다** (web 에도 없다).
 
+#### Checkbox
+
+- **값**: `checked` 를 주면 controlled(누르면 `onCheckedChange(next)` 만 부르고 스스로 바뀌지
+  않는다), 안 주면 `defaultChecked` 로 시작해 컴포넌트가 가진다. 콜백은 `onCheckedChange` 하나다.
+- **`indeterminate`** 는 `checked` 와 따로 두는 boolean 이다. 켜져 있으면
+  `accessibilityState.checked` 는 `'mixed'` 이고, 누르면 web native 와 같이 `!checked` 를 알린다 —
+  혼합 상태를 끄는 것은 소비자 몫이다.
+- **접근성**: `checkbox` 역할 + `accessibilityState.{checked, disabled}`. 소비자
+  `accessibilityState` 의 두 키는 실제 값으로 덮인다. `accessibilityHint` 는 그대로 전달된다.
+- `FormControl` 에서는 `disabled`·`error` 만 상속한다. `error` 는 시각 상태다.
+- 시각 상자와 누를 수 있는 영역은 따로다 — 최소 터치 타깃(48)은 `style` 로 줄일 수 없다.
+- `onPress`·`role`·`accessibilityRole` 은 받지 않는다. 아이콘 의존성 없이 View 로 글리프를 그린다.
+
+#### RadioGroup · Radio
+
+- **선택 값은 그룹이 가진다.** `value` 를 주면 controlled(누르면 `onValueChange(next)` 만
+  부른다), 안 주면 `defaultValue` 로 시작해 그룹이 가진다. RN 에는 native radio 그룹핑이 없다.
+- **토글이 아니라 선택이다.** 이미 선택된 `Radio` 를 누르면 아무 일도 없고 콜백도 없다.
+- `Radio` 는 `RadioGroup` 안에서만 쓴다 — 밖에서 렌더하면 오류로 실패한다.
+- **접근성**: 그룹은 `radiogroup` 역할 + 이름(문자열 `label` 또는 `accessibilityLabel`, 타입이
+  강제). 컨테이너는 접근성 요소가 아니라 선택지는 각각 조작된다 — 그래서 RNTL
+  `getByRole('radiogroup')` 에 잡히지 않는다. 선택지는 `radio` 역할 + `accessibilityState.{checked, disabled}`.
+- **하드웨어 키보드 이동(방향키)은 없다** — SearchField·Select 와 같은 범위다.
+- 그룹 `disabled` 는 모든 선택지를 막는다. `FormControl` 에서는 `disabled`·`error` 를 상속한다.
+  `error` 는 시각 상태다.
+- `SegmentControl` 과 다르다: 그쪽은 `button` + `selected` 인 뷰 전환 컨트롤이고 폼 radio 가 아니다.
+
+#### Switch
+
+- **core `Switch` 에 토큰 색만 입힌 래퍼다.** 역할·상태·애니메이션은 native 것이다.
+- **controlled 전용이다.** `value`·`onValueChange` 가 필수이고 `defaultValue` 는 없다 —
+  core Switch 가 그렇다. 누른다고 스스로 바뀌지 않으니 `value` 를 갱신해야 한다.
+- 색 prop(`trackColor`·`thumbColor`·`ios_backgroundColor`)은 받지 않는다 — 토큰이 소유한다.
+  thumb 색을 지정하므로 **iOS thumb 은 그림자가 없다**(core Switch 동작).
+- `accessibilityLabel` 이 **필수**다. 옆에 둔 `Text` 는 이름이 되지 않는다.
+- `disabled` 는 native 비활성(반투명)과 `accessibilityState.disabled` 를 함께 준다.
+  `FormControl` 에서는 `disabled` 만 상속한다.
+- reduced-motion 으로 native 애니메이션을 끄는 API 는 core Switch 에 없다.
+- **터치 영역은 native Switch 크기다.** 다른 컨트롤의 최소 터치 타깃(48)을 래퍼가 늘리지 않는다
+  — iOS 기본 스위치는 높이가 48 보다 작다. 행 전체를 누르게 하려면 소비자가 감싼다.
+
 #### 접근 가능한 이름
 
 | 컴포넌트               | 이름의 출처                                                                       |
 | ---------------------- | --------------------------------------------------------------------------------- |
 | `Button`               | 보이는 라벨(children). `accessibilityLabel` 로 덮을 수 있다                       |
+| `Checkbox`             | 문자열 `label` 에서 파생, 또는 `accessibilityLabel`. 타입이 둘 중 하나를 강제한다 |
+| `RadioGroup`·`Radio`   | 문자열 `label` 에서 파생, 또는 `accessibilityLabel`. 타입이 둘 중 하나를 강제한다 |
+| `Switch`               | `accessibilityLabel` **필수** — 타입에서 강제한다                                 |
 | `Fab shape="extended"` | 보이는 라벨(children). `accessibilityLabel` 로 덮을 수 있다                       |
 | `Fab` (circular)       | `accessibilityLabel` **필수** — 타입에서 강제한다                                 |
 | `IconButton`           | `accessibilityLabel` **필수** — 타입에서 강제한다                                 |

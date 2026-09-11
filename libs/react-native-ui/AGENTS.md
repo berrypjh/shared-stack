@@ -18,6 +18,10 @@ src/
     button-base/              내부 Pressable 동작 원시 — 배럴 없음(비공개)
       {ButtonBase.tsx, ButtonBase.types.ts, ButtonBase.test.tsx}
     button/{Button.tsx, Button.types.ts, Button.styles.ts, index.ts}
+    checkbox/                 Pressable + checkbox 역할 (ButtonBase 는 역할이 button 고정이라 쓰지 않음)
+      {Checkbox.tsx, .types.ts, .styles.ts, index.ts}
+    selection-control/        Checkbox·Radio 공유 스타일 리졸버(색 우선순위·터치 타깃·라벨) — 배럴 없음(비공개)
+      {selectionControl.styles.ts}
     fab/{Fab.tsx, Fab.types.ts, Fab.styles.ts, index.ts}
     icon-button/{IconButton.tsx, IconButton.types.ts, IconButton.styles.ts, index.ts}
     form-control/             FormControl + 비공개 Context/hook
@@ -27,6 +31,8 @@ src/
     input-base/               내부 TextInput 동작 원시 — 배럴 없음(비공개)
       {InputBase.tsx, InputBase.types.ts, InputBase.styles.ts, InputBase.test.tsx}
     plain-input/{PlainInput.tsx, PlainInput.types.ts, index.ts}
+    radio/                    RadioGroup(선택 값 소유, radiogroup) + Radio(Pressable + radio 역할)
+      {Radio.tsx, RadioGroup.tsx, RadioGroupContext.ts(비공개), .types.ts, Radio.styles.ts, index.ts}
     filled-input/{FilledInput.tsx, FilledInput.types.ts, index.ts}
     boxed-input/{BoxedInput.tsx, BoxedInput.types.ts, index.ts}
     text-field/               합성 계층 — 상태를 갖지 않는다
@@ -37,6 +43,8 @@ src/
       {Select.tsx, .types.ts, .styles.ts, .selection.ts, index.ts}
     segment-control/          controlled 전용 상호배타 선택
       {SegmentControl.tsx, .types.ts, .styles.ts, index.ts}
+    switch/                   core Switch 얇은 래퍼 — controlled 전용, 색은 토큰
+      {Switch.tsx, Switch.types.ts, index.ts}
     index.ts                  공개 배럴 (위 컴포넌트 전부)
   utils/
     cx.ts                     deprecated — 공개 API였던 className 유틸. 다음 major에서 제거

@@ -1,6 +1,7 @@
 export * from './box';
 export * from './boxed-input';
 export * from './button';
+export * from './checkbox';
 export * from './fab';
 export * from './filled-input';
 export * from './form-control';
@@ -8,9 +9,11 @@ export * from './form-helper-text';
 export * from './icon-button';
 export * from './input-label';
 export * from './plain-input';
+export * from './radio';
 export * from './search-field';
 export * from './segment-control';
 export * from './select';
+export * from './switch';
 export * from './text-field';
 
 // 세 Input variant가 공유하는 공개 prop 어휘. 내부 `InputBase`는 배럴이 없고
