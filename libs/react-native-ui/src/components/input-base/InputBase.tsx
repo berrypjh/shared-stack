@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { TextInput, View } from 'react-native';
 
 import { useTheme } from '../../theme';
@@ -53,6 +53,21 @@ export const InputBase = ({
   // 않는다. disabled가 그보다 우선이다(명시 prop이 context를 이길 때 FormControl은 focused를
   // 참으로 유지할 수 있다).
   const focused = (formControl ? formControl.focused : focusedState) && !disabledValue;
+
+  /**
+   * disabled 가 되면 로컬 focus 상태를 버린다.
+   *
+   * 위 파생은 값을 **가릴 뿐**이라, 가려진 사이 `true` 로 남은 상태가 다시 켤 때 되살아난다 —
+   * `editable={false}` 동안 네이티브 포커스는 이미 사라졌는데 테두리만 포커스를 주장한다.
+   * FormControl 안에서는 FormControl 이 같은 이유로 자기 상태를 버리고, 이 경로는 그 밖이다.
+   *
+   * blur 알림이 반드시 온다고 기대하지 않는다 — `editable={false}` 가 네이티브 blur 를
+   * 부르는지는 플랫폼 구현에 달렸다. `disabled` 가 참일 때만 정리한다: 마운트 때 비우면
+   * `autoFocus` 가 알린 포커스를 지운다.
+   */
+  useEffect(() => {
+    if (disabledValue) setFocusedState(false);
+  }, [disabledValue]);
 
   const styles = resolveInputBaseStyles({
     tokens,

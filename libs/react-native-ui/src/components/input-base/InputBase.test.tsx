@@ -217,6 +217,44 @@ describe('focus 상태', () => {
 
     expect(getWrapper()).toHaveStyle({ backgroundColor: 'rgb(0, 0, 0)' });
   });
+
+  /**
+   * disabled 를 풀어도 focus 가 되살아나면 안 된다.
+   *
+   * disabled 동안 네이티브 포커스는 이미 사라져 있다 (`editable={false}`). 그런데 로컬
+   * `focusedState` 가 남아 있으면 다시 켜는 순간 아무것도 포커스를 갖지 않았는데 테두리가
+   * 포커스를 주장한다 — 시맨틱과 시각이 어긋난다.
+   *
+   * FormControl 안에서는 FormControl 이 같은 이유로 내부 상태를 버린다. 이 경로는
+   * FormControl **밖** 이라 InputBase 가 스스로 소유자다.
+   */
+  it('disabled 를 풀어도 focus 시각 상태가 되살아나지 않는다', async () => {
+    const chrome = ({ focused }: { focused: boolean }) => ({
+      backgroundColor: focused ? 'rgb(9, 9, 9)' : 'rgb(0, 0, 0)',
+    });
+
+    const { rerender } = await renderWithTheme(
+      <InputBase accessibilityLabel="probe" containerStyle={chrome} />,
+    );
+
+    await fireEvent(getInput(), 'focus');
+    expect(getWrapper()).toHaveStyle({ backgroundColor: 'rgb(9, 9, 9)' });
+
+    await rerender(
+      <ThemeProvider>
+        <InputBase accessibilityLabel="probe" disabled containerStyle={chrome} />
+      </ThemeProvider>,
+    );
+    expect(getWrapper()).toHaveStyle({ backgroundColor: 'rgb(0, 0, 0)' });
+
+    await rerender(
+      <ThemeProvider>
+        <InputBase accessibilityLabel="probe" containerStyle={chrome} />
+      </ThemeProvider>,
+    );
+
+    expect(getWrapper()).toHaveStyle({ backgroundColor: 'rgb(0, 0, 0)' });
+  });
 });
 
 describe('disabled', () => {
