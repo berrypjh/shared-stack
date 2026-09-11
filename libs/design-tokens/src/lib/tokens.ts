@@ -77,6 +77,7 @@ const HEAD_REWRITE: Record<string, readonly string[]> = {
   secondaryBtn: ['color', 'secondaryBtn'],
   errorBtn: ['color', 'errorBtn'],
   field: ['color', 'field'],
+  selectionControl: ['color', 'selectionControl'],
   text: ['color', 'text'],
   background: ['color', 'background'],
   icon: ['color', 'icon'],

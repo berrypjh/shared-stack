@@ -17,6 +17,14 @@ describe('classifyTokenPath', () => {
     expect(classifyTokenPath(['text', 'default'])).toEqual(['color', 'text', 'default']);
   });
 
+  it('rewrites the selection control family under the color category', () => {
+    expect(classifyTokenPath(['selectionControl', 'checked'])).toEqual([
+      'color',
+      'selectionControl',
+      'checked',
+    ]);
+  });
+
   it('rewrites typography heads under the typography category', () => {
     expect(classifyTokenPath(['fontSize', 'md'])).toEqual(['typography', 'fontSize', 'md']);
     expect(classifyTokenPath(['fontFamilies', 'inter'])).toEqual([

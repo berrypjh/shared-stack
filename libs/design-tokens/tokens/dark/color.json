@@ -315,6 +315,20 @@
       "$type": "color"
     }
   },
+  "selectionControl": {
+    "checked": {
+      "$value": "{primary.pr400}",
+      "$type": "color"
+    },
+    "indicator": {
+      "$value": "{neutral.ne900}",
+      "$type": "color"
+    },
+    "trackOff": {
+      "$value": "{neutral.ne300}",
+      "$type": "color"
+    }
+  },
   "secondaryBtn": {
     "outlinedHover": {
       "$value": "{secondary.se900}",

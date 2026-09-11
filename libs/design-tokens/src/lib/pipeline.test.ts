@@ -233,6 +233,44 @@ describe('tokens.json catalog ABI', () => {
   });
 });
 
+describe('selection control outputs', () => {
+  const ROWS = [
+    ['color.selectionControl.checked', '--ds-selection-control-checked'],
+    ['color.selectionControl.indicator', '--ds-selection-control-indicator'],
+    ['color.selectionControl.trackOff', '--ds-selection-control-track-off'],
+  ] as const;
+
+  it.each(ROWS)('catalogs %s with a color for every theme', (tokenPath, cssVar) => {
+    const row = catalog.tokens[tokenPath];
+
+    expect(row?.[0]).toBe(cssVar);
+    expect(row.slice(1)).toHaveLength(themes.length);
+    expect(row.slice(1).every((v) => /^#[0-9A-Fa-f]{6}$/.test(String(v)))).toBe(true);
+  });
+
+  it.each(ROWS)('declares %s in the base css', (_tokenPath, cssVar) => {
+    expect(lightCss).toContain(`  ${cssVar}: #`);
+  });
+
+  it('emits the dark delta in the dark theme file', async () => {
+    const darkCss = await fs.readFile(
+      path.join(first.distDir, 'css', 'variables.dark.css'),
+      'utf8',
+    );
+
+    for (const [, cssVar] of ROWS) expect(darkCss).toContain(`  ${cssVar}: #`);
+  });
+
+  it.each(['web', 'rn'])('exposes the family in the generated %s token tree', async (platform) => {
+    const source = await fs.readFile(
+      path.join(first.generatedDir, platform, 'themes', 'light', 'tokens.ts'),
+      'utf8',
+    );
+
+    expect(source).toContain('"selectionControl"');
+  });
+});
+
 describe('deterministic generation', () => {
   it('produces byte-identical output when built twice from the same input', async () => {
     const second = await buildInto('b');

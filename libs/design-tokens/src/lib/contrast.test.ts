@@ -444,6 +444,78 @@ describe.each(catalog.themes)('SkipLink — %s theme', (theme) => {
 });
 
 /**
+ * Checkbox·Radio·Switch 가 만드는 조합 (WCAG 1.4.11, 3:1).
+ *
+ * 컨트롤은 입력 옆 라벨처럼 페이지나 카드 위에 놓인다 — 자기 배경이 없으므로 그 두 표면이
+ * 인접색이다. 경계·선택된 면·off 트랙은 "컴포넌트와 상태를 식별하는 시각 정보"라 3:1 이다.
+ * 체크 글리프·라디오 점·스위치 thumb 은 글자가 아니라 그래픽이라 4.5 가 아니라 3:1 이고,
+ * 올라앉는 면(선택된 면, off 트랙) 위에서 잰다. thumb 은 위치로 상태를 말하므로 트랙과
+ * 구분되지 않으면 on/off 가 사라진다.
+ *
+ * 경계·hover·error·focus 는 기존 시맨틱을 그대로 쓰므로 `INPUT_BOUNDARIES`·
+ * `BUTTON_BOUNDARIES` 와 겹친다. 겹치는 것이 맞다 — 그 토큰을 건드리면 컨트롤도 함께 빨개진다.
+ */
+const CONTROL_BOUNDARIES = onLabelSurface([
+  ['unchecked boundary', 'color.field.border'],
+  ['unchecked boundary on hover', 'color.field.borderHover'],
+  ['error boundary', 'color.stroke.error'],
+  ['focus-visible ring', 'border.primary.color'],
+  ['checked surface', 'color.selectionControl.checked'],
+  ['switch off track', 'color.selectionControl.trackOff'],
+]);
+
+const CONTROL_INDICATORS: [string, string, string][] = [
+  [
+    'check glyph / radio dot / thumb on checked surface',
+    'color.selectionControl.indicator',
+    'color.selectionControl.checked',
+  ],
+  ['thumb on off track', 'color.selectionControl.indicator', 'color.selectionControl.trackOff'],
+];
+
+/**
+ * 컨트롤 라벨과 그룹 라벨 (WCAG 1.4.3, 4.5:1).
+ *
+ * 라벨은 컨트롤 옆 글자라 `FIELD_TEXT` 와 같은 토큰이다. 선택 컨트롤이 실제로 쓰는 글자 조합을
+ * 이 표에 한 번 더 모아 둔다 — 라벨 색을 바꾸면 여기와 필드 표가 함께 빨개진다.
+ * 비활성 라벨은 `FIELD_DISABLED` 가 이미 본다. 면제를 여기서 따로 다루지 않는다.
+ */
+const CONTROL_LABELS = onLabelSurface([
+  ['control label', 'color.text.default'],
+  ['radio group label (error)', 'color.text.error'],
+]);
+
+/**
+ * 비활성 컨트롤.
+ *
+ * native `disabled` 인 컨트롤 자체라 1.4.11 의 비활성 면제가 닿는다. 기준치가 아니라
+ * 필드·버튼과 같은 가시성 바닥만 본다 — 기준에 맞추려고 비활성 색을 왜곡하지 않는다.
+ */
+const CONTROL_DISABLED: [string, string, string][] = [
+  ...onLabelSurface([
+    ['disabled boundary', 'border.disabled.color'],
+    ['disabled checked surface / track', 'color.background.disable'],
+  ]),
+  ['indicator on disabled surface', 'color.selectionControl.indicator', 'color.background.disable'],
+];
+
+describe.each(catalog.themes)('Selection control — %s theme', (theme) => {
+  it.each([...CONTROL_BOUNDARIES, ...CONTROL_INDICATORS])('%s reaches 3:1', (_label, fg, bg) => {
+    expect(contrastRatio(value(fg, theme), value(bg, theme))).toBeGreaterThanOrEqual(
+      WCAG_AA.nonText,
+    );
+  });
+
+  it.each(CONTROL_LABELS)('%s reaches 4.5:1', (_label, fg, bg) => {
+    expect(contrastRatio(value(fg, theme), value(bg, theme))).toBeGreaterThanOrEqual(WCAG_AA.text);
+  });
+
+  it.each(CONTROL_DISABLED)('%s stays visible', (_label, fg, bg) => {
+    expect(contrastRatio(value(fg, theme), value(bg, theme))).toBeGreaterThanOrEqual(DIVIDER_MIN);
+  });
+});
+
+/**
  * pressed 의 정본 표현.
  *
  * 이 디자인 시스템에서 pressed 는 **색이 아니라 위치**다. web `.ui-button:active` 는 색을

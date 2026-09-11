@@ -1,3 +1,4 @@
+import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -51,6 +52,64 @@ describe('buildThemeDictionaries', () => {
       expect(build.web.allTokens.map((t) => t.path.join('.')).sort()).toEqual(basePaths);
     }
   });
+});
+
+/**
+ * Checkbox·Radio·Switch 의 선택 컨트롤 색 패밀리.
+ *
+ * 상태를 기계적으로 다 만들지 않는다. 기존 시맨틱과 뜻이 같은 상태는 그것을 쓴다 —
+ * unchecked 경계 `field.border`, hover `field.borderHover`, error `stroke.error`,
+ * focus `border.primary.color`, disabled `border.disabled.color`·`background.disable`.
+ * 여기 있는 셋은 표현할 시맨틱이 없는 것뿐이다: 선택된 면, 그 위의 전경, 스위치 off 트랙.
+ */
+const SELECTION_CONTROL_KEYS = ['checked', 'indicator', 'trackOff'];
+
+const readColorSource = (dir: string): Record<string, unknown> =>
+  JSON.parse(fs.readFileSync(path.join(TOKENS_DIR, dir, 'color.json'), 'utf8'));
+
+const selectionControlKeys = (dir: string): string[] =>
+  Object.keys((readColorSource(dir).selectionControl as Record<string, unknown>) ?? {});
+
+describe('selection control family', () => {
+  it('authors the full family in the base theme', () => {
+    expect(selectionControlKeys(themes[0].name).sort()).toEqual([...SELECTION_CONTROL_KEYS].sort());
+  });
+
+  it('never adds a key in a delta theme that the base lacks', () => {
+    for (const theme of themes.slice(1)) {
+      expect(
+        selectionControlKeys(theme.name).filter((key) => !SELECTION_CONTROL_KEYS.includes(key)),
+      ).toEqual([]);
+    }
+  });
+
+  /**
+   * base 의 램프 단계는 밝은 표면용이다. 표면이 뒤집히는 dark 에서만 다시 잡고, dark 를
+   * 중간 단계로 끼우는 ember·midnight 는 그것을 물려받는다. 나머지 테마는 base alias 가
+   * 자기 램프로 풀려 `contrast.test.ts` 를 통과한다 — 델타가 늘면 이 목록부터 다시 읽는다.
+   */
+  it('overrides the family only in dark', () => {
+    const overriding = themes
+      .slice(1)
+      .filter((theme) => selectionControlKeys(theme.name).length > 0)
+      .map((theme) => theme.name);
+
+    expect(overriding).toEqual(['dark']);
+  });
+
+  it.each(themes.map((theme) => theme.name))(
+    'resolves every key to the same color on web and rn — %s',
+    (name) => {
+      const build = byTheme(name);
+
+      for (const key of SELECTION_CONTROL_KEYS) {
+        const web = find(build.web.allTokens, `selectionControl.${key}`);
+
+        expect(web).toMatch(/^#[0-9A-Fa-f]{6}$/);
+        expect(find(build.rn.allTokens, `selectionControl.${key}`)).toBe(web);
+      }
+    },
+  );
 });
 
 describe('base source precedence', () => {

@@ -339,6 +339,20 @@
       "$type": "color"
     }
   },
+  "selectionControl": {
+    "checked": {
+      "$value": "{primary.pr700}",
+      "$type": "color"
+    },
+    "indicator": {
+      "$value": "{neutral.ne100}",
+      "$type": "color"
+    },
+    "trackOff": {
+      "$value": "{neutral.ne500}",
+      "$type": "color"
+    }
+  },
   "text": {
     "default": {
       "$value": "{neutral.ne900}",

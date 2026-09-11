@@ -95,12 +95,20 @@ color 램프 같은 primitive도 테마에서 자유롭게 덮어쓴다 — 이 
 
 컴포넌트가 primitive를 직접 참조하지 않도록, 역할별로 패밀리를 맞춰 둔다.
 
-| 패밀리                                                         | 용도                                                                                                                                              | 소비처                                                                               |
-| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
-| `color.primaryBtn.*` `color.secondaryBtn.*` `color.errorBtn.*` | 버튼 색 역할 3종. 각각 `default`/`hover`/`disabled`/`focusRipple`/`outlinedHover`/`outlinedFocusRipple`                                           | `button-base`, `fab`, `icon-button`                                                  |
-| `color.field.*`                                                | 폼 컨트롤 표면·테두리·포커스 링 (`border`/`borderHover`/`borderStrong`/`surface`/`surfaceSubtle`/`focusRing`/`focusRingPrimary`/`focusRingError`) | `input-base`, `boxed-input`, `filled-input`, `plain-input`, `search-field`, `select` |
+| 패밀리                                                         | 용도                                                                                                                                                                | 소비처                                                                               |
+| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| `color.primaryBtn.*` `color.secondaryBtn.*` `color.errorBtn.*` | 버튼 색 역할 3종. 각각 `default`/`hover`/`disabled`/`focusRipple`/`outlinedHover`/`outlinedFocusRipple`                                                             | `button-base`, `fab`, `icon-button`                                                  |
+| `color.field.*`                                                | 폼 컨트롤 표면·테두리·포커스 링 (`border`/`borderHover`/`borderStrong`/`surface`/`surfaceSubtle`/`focusRing`/`focusRingPrimary`/`focusRingError`)                   | `input-base`, `boxed-input`, `filled-input`, `plain-input`, `search-field`, `select` |
+| `color.selectionControl.*`                                     | 선택 컨트롤이 기존 시맨틱으로 표현할 수 없는 셋 (`checked` 선택된 면·스위치 on 트랙 / `indicator` 그 위의 체크 글리프·라디오 점·thumb / `trackOff` 스위치 off 트랙) | `checkbox`, `radio`, `switch` (react-ui·react-native-ui 모두)                        |
 
 세 버튼 패밀리는 **같은 shape**를 갖는다 — 새 색 역할을 추가할 때 이 6개 키를 그대로 따른다.
+
+`selectionControl` 은 상태를 기계적으로 다 만들지 않는다. 뜻이 같은 상태는 기존 시맨틱을 쓴다 —
+unchecked 경계 `field.border`, hover `field.borderHover`, error `stroke.error`, focus
+`border.primary.color`, disabled `border.disabled.color`·`background.disable`. pressed 는 색이
+아니라 위치라 색 토큰이 없다. base 램프 단계는 밝은 표면용이라 **`dark` 에서만** 다시 잡고
+(`ember`·`midnight` 가 물려받는다), 나머지 테마는 base alias 가 자기 램프로 풀린다.
+`background.primary` 를 선택된 면으로 쓰지 않는 이유: dark·midnight 에서 표면 대비가 3:1 아래다.
 
 ### component 토큰을 만드는 기준
 
@@ -144,8 +152,9 @@ path 단위 opt-in이다.
 | outlined·text 라벨과 IconButton 글리프의 hover 틴트                                     | 4.5:1 | WCAG 1.4.3                              |
 | 버튼 outline 테두리 = `:focus-visible` 링 (두 표면)                                     | 3:1   | WCAG 1.4.11 + 2.4.7                     |
 | 선택된 목록 행의 라벨·보조 설명 (`background.selected` 를 `background.surface` 에 합성) | 4.5:1 | WCAG 1.4.3                              |
+| 선택 컨트롤의 경계·선택된 면·off 트랙 (두 표면), 그 위의 글리프·thumb                   | 3:1   | WCAG 1.4.11 (상태를 식별하는 그래픽)    |
 | 구분선                                                                                  | 1.2:1 | 장식이라 기준 밖. 안 보이는 것만 막는다 |
-| contained 면, 비활성 버튼 라벨, 포커스 halo                                             | 1.2:1 | 기준 밖 — 아래 참조                     |
+| contained 면, 비활성 버튼 라벨, 비활성 선택 컨트롤, 포커스 halo                         | 1.2:1 | 기준 밖 — 아래 참조                     |
 
 **버튼에서 기준 밖인 것 셋.** ① 채워진 버튼의 **면**은 3:1을 요구하지 않는다 — 라벨이 4.5:1을
 지키면 버튼은 테두리가 아니라 글자로 식별된다. ② 비활성 버튼 라벨은 native `disabled` 컨트롤
