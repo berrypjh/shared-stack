@@ -20,6 +20,7 @@ import { FormArchitectureSection } from './sections/FormArchitectureSection';
 import { InputFamilySection } from './sections/InputFamilySection';
 import { SearchFieldSection } from './sections/SearchFieldSection';
 import { SegmentControlSection } from './sections/SegmentControlSection';
+import { SelectionControlSection } from './sections/SelectionControlSection';
 import { SelectSection } from './sections/SelectSection';
 import { SemanticColorSection } from './sections/SemanticColorSection';
 import { TextFieldSection } from './sections/TextFieldSection';
@@ -48,6 +49,7 @@ const SECTIONS: Record<SectionKey, (mode: ThemeName) => ReactNode> = {
   'search-field': () => <SearchFieldSection />,
   select: () => <SelectSection />,
   'segment-control': () => <SegmentControlSection />,
+  'selection-control': () => <SelectionControlSection />,
   'button-family': () => <ButtonFamilySection />,
   box: () => <BoxSection />,
   'semantic-color': () => <SemanticColorSection />,

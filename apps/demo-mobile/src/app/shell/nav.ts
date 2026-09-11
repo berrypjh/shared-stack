@@ -15,6 +15,7 @@ export type SectionKey =
   | 'search-field'
   | 'select'
   | 'segment-control'
+  | 'selection-control'
   | 'button-family'
   | 'box'
   | 'semantic-color'
@@ -71,6 +72,12 @@ export const NAV: NavGroup[] = [
         label: 'SegmentControl',
         description:
           '상호배타 선택. controlled 전용이라 value 가 유일한 권한이고, 세그먼트는 button 역할 + selected 상태입니다.',
+      },
+      {
+        key: 'selection-control',
+        label: 'Checkbox · Radio · Switch',
+        description:
+          '선택 컨트롤. Checkbox·Radio 는 Pressable 에 checkbox·radio 역할을, Switch 는 core Switch 에 토큰 색만 입힙니다. 테마를 바꾸면 면·표시자·트랙이 함께 움직입니다.',
       },
     ],
   },
