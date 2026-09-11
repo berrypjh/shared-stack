@@ -45,7 +45,13 @@ module.exports = [
   reactUi('Button only', '{ Button }', '11 KB'),
   reactUi('ThemeProvider only', '{ ThemeProvider }', '11 KB'),
   reactUi('themes registry only', '{ themes }', '11 KB'),
-  reactUi('Web tokens (Light)', '{ Web }', '13 KB'),
+  // 13 KB -> 14 KB: 필드 컴포넌트 접근성 보강분이다. 측정으로 확인한 값 — 이 작업 직전 baseline
+  // 12.84 KB, 이후 13.18 KB (+340 B brotli). 같은 증가가 모든 react-ui 케이스에 고르게 나타난다
+  // (cx 9.85 -> 10.18, full 14.28 -> 14.6). 토큰이 아니라 위 displayName 때문에 무엇을 import 하든
+  // 남는 컴포넌트 코드가 늘었다는 뜻이다 — SearchField 지우기 버튼·list-autocomplete combobox,
+  // Select 의 aria-activedescendant 모델, TextField select 모드 onChange 전달. 전부 동작이다.
+  // RN 케이스는 변화가 없다. 14 KB 는 현재값 위 약 6% 여유로 full 게이트와 같은 수준이다.
+  reactUi('Web tokens (Light)', '{ Web }', '14 KB'),
   // 14 KB -> 15 KB: Popover 접근성 보강분이다. 측정으로 확인한 값 — 이 작업 직전 baseline
   // 13.97 KB, 이후 14.23 KB (+232 B brotli). 늘어난 것은 포커스 수명주기(닫힐 때 패널 안
   // 포커스를 트리거로 복원), Escape 범위 지정(중첩/형제에서 무관한 팝업을 닫지 않음),
