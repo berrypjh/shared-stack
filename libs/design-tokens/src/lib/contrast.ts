@@ -37,5 +37,19 @@ export const contrastRatio = (a: string, b: string): number => {
   return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
 };
 
+/**
+ * 반투명 `fg`(`#RRGGBBAA`)를 불투명 `bg` 위에 합성한 불투명 `#rrggbb`.
+ *
+ * `contrastRatio` 는 알파를 무시하므로, 틴트 표면 위 글자는 이것으로 먼저 합성한 뒤 잰다.
+ */
+export const compositeOver = (fg: string, bg: string): string => {
+  const hex = fg.replace('#', '');
+  const alpha = hex.length === 8 ? parseInt(hex.slice(6, 8), 16) / 255 : 1;
+  const top = toRgb(fg);
+  const bottom = toRgb(bg);
+  const channels = top.map((c, i) => Math.round(c * alpha + bottom[i] * (1 - alpha)));
+  return `#${channels.map((c) => c.toString(16).padStart(2, '0')).join('')}`;
+};
+
 /** WCAG AA 최소 대비. 본문 텍스트 4.5:1, UI 요소·큰 텍스트 3:1. */
 export const WCAG_AA = { text: 4.5, nonText: 3 } as const;

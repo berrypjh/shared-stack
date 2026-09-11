@@ -10,7 +10,7 @@ import { fileURLToPath } from 'node:url';
 
 import { describe, expect, it } from 'vitest';
 
-import { contrastRatio, relativeLuminance, WCAG_AA } from './contrast';
+import { compositeOver, contrastRatio, relativeLuminance, WCAG_AA } from './contrast';
 
 const CATALOG = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -381,6 +381,40 @@ describe.each(catalog.themes)('Button family — %s theme', (theme) => {
 
   it.each(BUTTON_HALOS)('%s stays visible', (_label, fg, bg) => {
     expect(contrastRatio(value(fg, theme), value(bg, theme))).toBeGreaterThan(1);
+  });
+});
+
+describe('compositeOver', () => {
+  it('blends a translucent colour over an opaque background', () => {
+    expect(compositeOver('#00000080', '#FFFFFF')).toBe('#7f7f7f');
+  });
+
+  it('returns an opaque colour unchanged', () => {
+    expect(compositeOver('#123456', '#FFFFFF')).toBe('#123456');
+  });
+});
+
+/**
+ * 선택된 목록 행 위의 글자 (WCAG 1.4.3, 4.5:1).
+ *
+ * `background.selected` 는 반투명 틴트(`#RRGGBBAA`)라서 **올라앉은 표면과 합성한 뒤** 잰다 —
+ * `contrastRatio` 는 알파를 무시하므로 그대로 넣으면 틴트 원색과 재는 셈이 된다.
+ * 목록 패널은 web·RN Select 와 RN SearchField 모두 `background.surface` 다. 행 라벨은
+ * `text.default`, RN SearchField 제안의 보조 설명은 `text.light` 다.
+ */
+const SELECTED_ROW_TEXT: [string, string][] = [
+  ['selected row label', 'color.text.default'],
+  ['selected row description', 'color.text.light'],
+];
+
+describe.each(catalog.themes)('Selected list row — %s theme', (theme) => {
+  const row = compositeOver(
+    value('color.background.selected', theme),
+    value('color.background.surface', theme),
+  );
+
+  it.each(SELECTED_ROW_TEXT)('%s reaches 4.5:1', (_label, fg) => {
+    expect(contrastRatio(value(fg, theme), row)).toBeGreaterThanOrEqual(WCAG_AA.text);
   });
 });
 

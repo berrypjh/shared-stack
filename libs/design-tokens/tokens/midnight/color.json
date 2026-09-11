@@ -76,6 +76,10 @@
     }
   },
   "text": {
+    "light": {
+      "$value": "{neutral.ne300}",
+      "$type": "color"
+    },
     "disable": {
       "$value": "#76859B",
       "$type": "color"
