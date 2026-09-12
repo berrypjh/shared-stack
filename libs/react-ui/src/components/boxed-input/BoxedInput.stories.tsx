@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { BoxedInput } from './BoxedInput';
 
 const meta = {
-  title: 'Components/BoxedInput',
+  title: 'Components/Inputs/BoxedInput',
   component: BoxedInput,
   tags: ['autodocs'],
   parameters: {

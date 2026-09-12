@@ -12,7 +12,7 @@ import { PlainInput } from '../plain-input';
 import { FormControl } from './FormControl';
 
 const meta = {
-  title: 'Components/FormControl',
+  title: 'Components/Form/FormControl',
   component: FormControl,
   tags: ['autodocs'],
   parameters: {

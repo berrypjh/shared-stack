@@ -14,7 +14,7 @@ import { Badge } from './Badge';
  * `WithInteractiveChild` 가 play 로 확인한다 — 이 컴포넌트가 조용히 깨지는 자리다.
  */
 const meta = {
-  title: 'Components/Badge',
+  title: 'Components/Data Display/Badge',
   component: Badge,
   tags: ['autodocs'],
   parameters: {
@@ -145,7 +145,7 @@ export const WithInteractiveChild: Story = {
   },
 };
 
-export const AllThemes: Story = {
+export const ThemeMatrix: Story = {
   parameters: themeGalleryParameters,
   render: (args) => (
     <ThemeGallery>
@@ -170,7 +170,7 @@ export const AllThemes: Story = {
  * 없어 **검토 대상을 한 화면에 모아 두는** 것이 이 스토리의 역할이다
  * (규칙 자체는 `forcedColors.test.ts` 가 검사한다).
  */
-export const ForcedColorsReview: Story = {
+export const ForcedColors: Story = {
   render: (args) => (
     <div style={stackStyle}>
       <div style={rowStyle}>

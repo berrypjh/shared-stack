@@ -1,18 +1,16 @@
 import { useState } from 'react';
 
-import { themes } from '@berrypjh/ui-core';
-
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { ThemeProvider } from '../../theme';
+import { ThemeGallery, themeGalleryParameters } from '../../../.storybook/ThemeGallery';
 
 import { Popover } from './Popover';
 import { PopoverPanel } from './PopoverPanel';
 import { PopoverTrigger } from './PopoverTrigger';
 
 const meta = {
-  title: 'Components/Popover',
+  title: 'Components/Overlay/Popover',
   component: Popover,
   tags: ['autodocs'],
   parameters: {
@@ -343,37 +341,18 @@ export const Nested: Story = {
   },
 };
 
-const themeLabel = (name: string) => name.charAt(0).toUpperCase() + name.slice(1);
-
-export const ThemeGallery: Story = {
-  parameters: {
-    layout: 'fullscreen',
-    disableThemeDecorator: true,
-  },
+export const ThemeMatrix: Story = {
+  parameters: themeGalleryParameters,
   render: () => (
-    <div style={{ display: 'grid', gap: '20px', padding: '24px' }}>
-      {themes.map(({ name }) => (
-        <ThemeProvider key={name} mode={name}>
-          <div
-            style={{
-              display: 'grid',
-              gap: '12px',
-              padding: '16px',
-              borderRadius: 'var(--ds-radius-md)',
-              background: 'var(--ds-background-default)',
-              color: 'var(--ds-text-default)',
-            }}
-          >
-            <strong>{themeLabel(name)}</strong>
-            <Popover defaultOpen>
-              <PopoverTrigger>
-                <button type="button">{themeLabel(name)} trigger</button>
-              </PopoverTrigger>
-              <PopoverPanel>surface · stroke · shadow 토큰이 테마를 따라갑니다.</PopoverPanel>
-            </Popover>
-          </div>
-        </ThemeProvider>
-      ))}
-    </div>
+    <ThemeGallery>
+      {(theme) => (
+        <Popover defaultOpen>
+          <PopoverTrigger>
+            <button type="button">{theme} trigger</button>
+          </PopoverTrigger>
+          <PopoverPanel>surface · stroke · shadow 토큰이 테마를 따라갑니다.</PopoverPanel>
+        </Popover>
+      )}
+    </ThemeGallery>
   ),
 };

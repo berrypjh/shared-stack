@@ -6,7 +6,7 @@ import { FormHelperText } from '../form-helper-text';
 import { InputLabel } from './InputLabel';
 
 const meta = {
-  title: 'Components/InputLabel',
+  title: 'Components/Form/InputLabel',
   component: InputLabel,
   tags: ['autodocs'],
   parameters: {

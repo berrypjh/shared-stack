@@ -14,7 +14,7 @@ import { ListItem } from './ListItem';
  * `<button>` 을 자식으로 넣고, 그 시각은 그 control 이 소유한다 (`WithInteractiveChildren`).
  */
 const meta = {
-  title: 'Components/List',
+  title: 'Components/Data Display/List',
   component: List,
   tags: ['autodocs'],
   parameters: {
@@ -179,7 +179,7 @@ export const LongContent: Story = {
   ],
 };
 
-export const AllThemes: Story = {
+export const ThemeMatrix: Story = {
   parameters: themeGalleryParameters,
   render: () => (
     <ThemeGallery>

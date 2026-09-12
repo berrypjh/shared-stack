@@ -20,7 +20,7 @@ const LOADABLE =
 const BROKEN = 'data:image/png;base64,!!!not-an-image!!!';
 
 const meta = {
-  title: 'Components/Avatar',
+  title: 'Components/Data Display/Avatar',
   component: Avatar,
   tags: ['autodocs'],
   parameters: {
@@ -97,7 +97,7 @@ export const Shapes: Story = {
  * 이니셜 Avatar 의 면·글자는 테마를 따라 움직인다 (`background.grey` / `text.default`).
  * 사진 Avatar 는 테마와 무관하므로 여기서는 fallback 만 본다.
  */
-export const AllThemes: Story = {
+export const ThemeMatrix: Story = {
   args: { src: undefined },
   parameters: themeGalleryParameters,
   render: (args) => (

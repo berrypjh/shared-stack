@@ -9,7 +9,7 @@ import { MenuItem } from '../menu-item';
 import { TextField } from './TextField';
 
 const meta = {
-  title: 'Components/TextField',
+  title: 'Components/Inputs/TextField',
   component: TextField,
   tags: ['autodocs'],
   parameters: {

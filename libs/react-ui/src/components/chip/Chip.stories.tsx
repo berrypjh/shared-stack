@@ -21,7 +21,7 @@ import { Chip } from './Chip';
  * `onDelete` 스토리도 없다 — DEFER 했다 (중첩 상호작용 문제).
  */
 const meta = {
-  title: 'Components/Chip',
+  title: 'Components/Data Display/Chip',
   component: Chip,
   tags: ['autodocs'],
   parameters: {
@@ -65,8 +65,15 @@ export const Selected: Story = {
   args: { onClick: () => undefined, selected: true },
 };
 
+/**
+ * 여기부터 `onClick` 을 얹는 story 는 args 에서 `ref` 를 떼고 편다.
+ *
+ * `ChipProps` 는 passive(`span`)·interactive(`button`) 판별 유니온이고 두 분기의 `ref` 타입이
+ * 다르다. args 를 통째로 펴면서 `onClick` 을 더하면 passive 분기의 `Ref<HTMLSpanElement>` 가
+ * button 분기로 넘어가 타입이 깨진다. 모드는 story 가 정하므로 컨트롤에서 ref 를 받을 일이 없다.
+ */
 export const Disabled: Story = {
-  render: (args) => (
+  render: ({ ref: _ref, ...args }) => (
     <div style={rowStyle}>
       <Chip {...args} onClick={() => undefined} disabled>
         비활성
@@ -79,7 +86,7 @@ export const Disabled: Story = {
 };
 
 export const Variants: Story = {
-  render: (args) => (
+  render: ({ ref: _ref, ...args }) => (
     <div style={stackStyle}>
       <div style={rowStyle}>
         <Chip {...args} variant="outlined">
@@ -115,7 +122,7 @@ export const Sizes: Story = {
 };
 
 export const LeadingIcon: Story = {
-  render: (args) => (
+  render: ({ ref: _ref, ...args }) => (
     <div style={rowStyle}>
       <Chip {...args} leading={<span>◆</span>}>
         아이콘
@@ -133,7 +140,7 @@ export const LeadingIcon: Story = {
  * 슬롯은 `aria-hidden` 이라 Avatar 의 이름이 chip 의 접근 가능한 이름을 오염시키지 않는다.
  */
 export const WithAvatar: Story = {
-  render: (args) => (
+  render: ({ ref: _ref, ...args }) => (
     <div style={rowStyle}>
       <Chip
         {...args}
@@ -208,9 +215,9 @@ export const KeyboardFocus: Story = {
   },
 };
 
-export const AllThemes: Story = {
+export const ThemeMatrix: Story = {
   parameters: themeGalleryParameters,
-  render: (args) => (
+  render: ({ ref: _ref, ...args }) => (
     <ThemeGallery>
       {() => (
         <div style={rowStyle}>
@@ -240,8 +247,8 @@ export const AllThemes: Story = {
  * `Highlight` 로 채우므로 선택된 chip 이 구분되어야 한다. 스크린샷으로는 강제 모드를 켤 수 없어
  * 검토 대상을 한 화면에 모아 두는 것이 이 스토리의 역할이다 (규칙은 `forcedColors.test.ts` 가 검사).
  */
-export const ForcedColorsReview: Story = {
-  render: (args) => (
+export const ForcedColors: Story = {
+  render: ({ ref: _ref, ...args }) => (
     <div style={rowStyle}>
       <Chip {...args}>passive</Chip>
       <Chip {...args} onClick={() => undefined}>
@@ -259,7 +266,7 @@ export const ForcedColorsReview: Story = {
 
 /** 긴 라벨은 잘린다 — chip 이 컨테이너를 밀어내지 않는다. */
 export const LongLabel: Story = {
-  render: (args) => (
+  render: ({ ref: _ref, ...args }) => (
     <div style={{ ...stackStyle, maxWidth: '240px' }}>
       <Chip {...args}>디자인 시스템 컴포넌트 라이브러리 태그</Chip>
       <Chip {...args} onClick={() => undefined} selected leading={<span>◆</span>}>

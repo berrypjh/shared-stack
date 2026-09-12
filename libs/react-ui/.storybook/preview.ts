@@ -28,6 +28,27 @@ const themeItems = themes.map(({ name }) => ({ value: name, title: themeLabel(na
 
 const preview: Preview = {
   parameters: {
+    options: {
+      // 사이드바 순서. 적지 않으면 알파벳순이라 `Buttons` 가 `Layout` 앞에 온다.
+      // Storybook 이 이 파일을 **정적 파싱**해 읽으므로 배열은 반드시 리터럴이어야 한다 —
+      // 변수로 빼면 `Unexpected 'sidebarOrder'` 로 빌드가 멈춘다. 목록에 없는 그룹은 뒤에 붙는다.
+      storySort: {
+        order: [
+          'Theme',
+          'Components',
+          [
+            'Layout',
+            'Buttons',
+            'Inputs',
+            'Selection',
+            'Form',
+            'Data Display',
+            'Overlay',
+            'Navigation',
+          ],
+        ],
+      },
+    },
     controls: {
       expanded: true,
       matchers: {

@@ -20,7 +20,7 @@ import { TableScroll } from './TableScroll';
  * 로직도, 상태도, 핸들러도 없다.
  */
 const meta = {
-  title: 'Components/Table',
+  title: 'Components/Data Display/Table',
   component: Table,
   tags: ['autodocs'],
   parameters: {
@@ -366,7 +366,7 @@ export const NarrowContainer: Story = {
   },
 };
 
-export const AllThemes: Story = {
+export const ThemeMatrix: Story = {
   parameters: themeGalleryParameters,
   render: () => (
     <ThemeGallery>
@@ -412,7 +412,7 @@ export const AllThemes: Story = {
  * 어느 값이 어느 열인지 읽을 수 없다. `table.scss` 가 `CanvasText` 로 되살린다.
  * 정렬 표시자는 테두리 삼각형이라 그 모드에서도 남는다 (규칙은 `forcedColors.test.ts` 가 검사).
  */
-export const ForcedColorsReview: Story = {
+export const ForcedColors: Story = {
   args: {
     children: (
       <>

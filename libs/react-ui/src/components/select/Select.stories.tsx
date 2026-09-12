@@ -9,7 +9,7 @@ import { MenuItem } from '../menu-item';
 import { Select } from './Select';
 
 const meta = {
-  title: 'Components/Select',
+  title: 'Components/Selection/Select',
   component: Select,
   tags: ['autodocs'],
   parameters: {

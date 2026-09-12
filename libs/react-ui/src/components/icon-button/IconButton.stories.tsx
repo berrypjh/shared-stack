@@ -6,7 +6,7 @@ import { ThemeGallery, themeGalleryParameters } from '../../../.storybook/ThemeG
 import { IconButton } from './IconButton';
 
 const meta = {
-  title: 'Components/IconButton',
+  title: 'Components/Buttons/IconButton',
   component: IconButton,
   tags: ['autodocs'],
   parameters: {
@@ -265,9 +265,6 @@ export const A11y: Story = {
       </div>
     </div>
   ),
-  parameters: {
-    a11y: { disable: false },
-  },
 };
 
 /**

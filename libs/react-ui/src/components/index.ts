@@ -22,6 +22,7 @@ export * from './search-field';
 export * from './segment-control';
 export * from './select';
 export * from './skip-link';
+export * from './stack';
 export * from './switch';
 export * from './table';
 export * from './text-field';

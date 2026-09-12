@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Box } from './Box';
 
 const meta = {
-  title: 'Components/Box',
+  title: 'Components/Layout/Box',
   component: Box,
   tags: ['autodocs'],
   parameters: {
@@ -217,7 +217,4 @@ export const A11y: Story = {
       </Box>
     </div>
   ),
-  parameters: {
-    a11y: { disable: false },
-  },
 };

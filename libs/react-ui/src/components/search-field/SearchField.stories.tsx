@@ -7,7 +7,7 @@ import { SearchField } from './SearchField';
 import type { SearchFieldSuggestion } from './SearchField.types';
 
 const meta = {
-  title: 'Components/SearchField',
+  title: 'Components/Inputs/SearchField',
   component: SearchField,
   tags: ['autodocs'],
   parameters: {

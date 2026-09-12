@@ -73,12 +73,43 @@ npx @berrypjh/react-ui token color.primary
 
 ### 컴포넌트
 
-카테고리: 레이아웃 · 버튼 · 입력 · 선택 · 폼 구성 · 오버레이 · 내비게이션.
+카테고리: 레이아웃 · 버튼 · 입력 · 선택 · 폼 구성 · 표시 · 오버레이 · 내비게이션.
 
 정확한 컴포넌트 목록과 prop은 `llm-catalog.json`의 `symbols`에서 읽는다
 (`kind: "component"`). 각 컴포넌트는 `<Name>Props` 타입을 함께 export하며,
 대부분 `component` prop으로 polymorphic이다 — `<Button component="a" href="...">`처럼
 다른 element로 렌더할 수 있다.
+
+#### 레이아웃 primitive 둘의 경계
+
+카탈로그는 prop 목록을 주지만 **어느 쪽이 무엇을 소유하는지**는 말하지 않는다. 그 규칙만 여기 둔다.
+
+| 컴포넌트 | 소유                                                        |
+| -------- | ----------------------------------------------------------- |
+| `Box`    | 면·여백·모서리 — `p`/`m` 계열, `bg`, `radius`               |
+| `Stack`  | 1차원 배치 — `direction`, `gap`, `align`, `justify`, `wrap` |
+
+`Stack` 은 `Box` 를 상속하지 않는다. 둘 다 필요하면 겹쳐 쓴다.
+
+```tsx
+<Box p="lg" bg="background.surface" radius="md">
+  <Stack direction="row" gap="md" align="center" justify="between">
+    …
+  </Stack>
+</Box>
+```
+
+함정:
+
+- 기본 축은 `column` 이다. CSS 기본값(`row`)이 아니라 RN 과 맞춘 값이라 `direction` 을 빼면
+  세로로 쌓인다.
+- `gap={0}` 과 `wrap={false}` 는 **미지정이 아니다.** 명시하면 선언을 만든다.
+- `Stack` 은 비상호작용이다 — `role`·`tabIndex`·`aria-*` 를 지어내지 않고 포커스·hover 시각도
+  없다. 소비자가 준 DOM prop 은 그대로 전달하므로 시맨틱이 필요하면 직접 준다.
+- 반응형 prop 객체는 없다. 브레이크포인트는 `className`·`style` 로 다룬다.
+- `Flex`·`Grid` 는 없다. 2차원 배치는 `Stack` 중첩이나 CSS 로 한다.
+- `Stack` 은 스타일시트가 없다. 레이아웃이 전부 계산된 inline style 이라 `.ui-stack` 은 규칙
+  없는 이름 hook 이다.
 
 ### 테마
 

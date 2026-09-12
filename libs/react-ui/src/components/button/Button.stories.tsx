@@ -6,7 +6,7 @@ import { ThemeGallery, themeGalleryParameters } from '../../../.storybook/ThemeG
 import { Button } from './Button';
 
 const meta = {
-  title: 'Components/Button',
+  title: 'Components/Buttons/Button',
   component: Button,
   tags: ['autodocs'],
   parameters: {
@@ -268,9 +268,6 @@ export const A11y: Story = {
       <Button disabled>Unavailable Action</Button>
     </div>
   ),
-  parameters: {
-    a11y: { disable: false },
-  },
 };
 
 /**

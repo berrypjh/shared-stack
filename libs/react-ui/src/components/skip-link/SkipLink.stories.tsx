@@ -4,7 +4,7 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { SkipLink } from './SkipLink';
 
 const meta = {
-  title: 'Components/SkipLink',
+  title: 'Components/Navigation/SkipLink',
   component: SkipLink,
   tags: ['autodocs'],
   parameters: {

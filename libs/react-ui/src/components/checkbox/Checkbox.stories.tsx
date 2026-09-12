@@ -8,7 +8,7 @@ import { FormHelperText } from '../form-helper-text';
 import { Checkbox } from './Checkbox';
 
 const meta = {
-  title: 'Components/Checkbox',
+  title: 'Components/Selection/Checkbox',
   component: Checkbox,
   tags: ['autodocs'],
   parameters: {
@@ -66,7 +66,7 @@ const CheckboxMatrix = () => (
 export const Playground: Story = {};
 
 /** 등록된 모든 테마에서 같은 상태 매트릭스를 한 스크린샷에 담는다. */
-export const StateMatrix: Story = {
+export const ThemeMatrix: Story = {
   parameters: themeGalleryParameters,
   render: () => <ThemeGallery>{() => <CheckboxMatrix />}</ThemeGallery>,
 };

@@ -5,7 +5,7 @@ import { ButtonBase } from './ButtonBase';
 import type { ButtonBaseNativeButtonProps } from './ButtonBase.types';
 
 const meta = {
-  title: 'Components/ButtonBase',
+  title: 'Components/Buttons/ButtonBase',
   component: ButtonBase,
   tags: ['autodocs'],
   parameters: {
@@ -216,9 +216,6 @@ export const A11y: Story = {
       <ButtonBase disabled>Unavailable</ButtonBase>
     </div>
   ),
-  parameters: {
-    a11y: { disable: false },
-  },
 };
 
 /**

@@ -11,7 +11,7 @@ import { PlainInput } from '../plain-input';
 import { InputBase } from './InputBase';
 
 const meta = {
-  title: 'Components/InputBase',
+  title: 'Components/Inputs/InputBase',
   component: InputBase,
   tags: ['autodocs'],
   parameters: {

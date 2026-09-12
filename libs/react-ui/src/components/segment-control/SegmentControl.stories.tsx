@@ -17,7 +17,7 @@ const viewOptions: readonly SegmentOption<View>[] = [
 ];
 
 const meta = {
-  title: 'Components/SegmentControl',
+  title: 'Components/Selection/SegmentControl',
   component: SegmentControl,
   tags: ['autodocs'],
   parameters: {

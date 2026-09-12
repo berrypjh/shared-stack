@@ -24,7 +24,7 @@ const ShareIcon = () => (
 );
 
 const meta = {
-  title: 'Components/Fab',
+  title: 'Components/Buttons/Fab',
   component: Fab,
   tags: ['autodocs'],
   parameters: {
@@ -185,9 +185,6 @@ export const A11y: Story = {
       </div>
     </div>
   ),
-  parameters: {
-    a11y: { disable: false },
-  },
 };
 
 /**

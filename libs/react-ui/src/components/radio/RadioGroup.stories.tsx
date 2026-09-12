@@ -11,7 +11,7 @@ import { Radio } from './Radio';
 import { RadioGroup } from './RadioGroup';
 
 const meta = {
-  title: 'Components/RadioGroup',
+  title: 'Components/Selection/RadioGroup',
   component: RadioGroup,
   tags: ['autodocs'],
   parameters: {
@@ -92,7 +92,7 @@ export const Playground: Story = {
 };
 
 /** 등록된 모든 테마에서 같은 상태 매트릭스를 한 스크린샷에 담는다. */
-export const StateMatrix: Story = {
+export const ThemeMatrix: Story = {
   parameters: themeGalleryParameters,
   render: () => <ThemeGallery>{() => <RadioMatrix />}</ThemeGallery>,
 };
