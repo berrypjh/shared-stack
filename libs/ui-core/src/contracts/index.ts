@@ -31,3 +31,4 @@ export type {
   InputFieldSemanticProps,
 } from './field';
 export type { IconButtonSemanticProps } from './icon-button';
+export type { StackAlign, StackDirection, StackJustify, StackSemanticProps } from './stack';
