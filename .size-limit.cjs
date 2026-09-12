@@ -42,6 +42,12 @@ module.exports = [
   // 외부 소비자 영향은 별도 판단이 필요해 여기서는 숫자만 고정한다.
   reactUi('cx only', '{ cx }', '11 KB'),
   reactUi('Box only', '{ Box }', '11 KB'),
+  // Stack 은 **웹에서 처음으로 floor 를 벗어나는 단일 심볼**이다. 위 주석이 말한 21개
+  // `displayName` 바닥(raw 37,299 = cx · Box · Button 이 바이트 단위로 같은 값)에 Stack 자신의
+  // 코드만 얹힌다 — 실측 raw 37,844 / brotli 10,840 (10.59 KB). Stack 이 `displayName` 을 두지
+  // 않아서 바닥에 붙잡히지 않는다는 증거이고, 그래서 이 케이스는 다른 단일 심볼과 달리
+  // 실제로 무언가를 구분한다. 한도는 형제 케이스와 같은 11 KB (현재값 위 약 3.7% 여유).
+  reactUi('Stack only', '{ Stack }', '11 KB'),
   reactUi('Button only', '{ Button }', '11 KB'),
   reactUi('ThemeProvider only', '{ ThemeProvider }', '11 KB'),
   reactUi('themes registry only', '{ themes }', '11 KB'),
@@ -69,7 +75,14 @@ module.exports = [
   // (cx 10.18 -> 10.15) — 늘어난 것은 전체 re-export 에 실리는 동작 코드뿐이다. 16 KB 는
   // 현재값 위 약 5% 여유로 기존 게이트와 같은 수준이다. 이어서 Switch 뒤 15.25 KB (+0.07 KB) —
   // 한도는 그대로 두었다.
-  reactUi('* (full)', '*', '16 KB'),
+  //
+  // 16 KB -> 17 KB: Avatar·Badge·Chip·List·Table 과 Stack 추가분이다. 실측(esbuild minify +
+  // brotli, 이 파일과 같은 external·target) — Stack 직전 16,507 B, Stack 뒤 16,676 B
+  // (+169 B). size-limit 은 빈 프로젝트 상수를 빼고 보고하므로 각각 약 15.94 KB / 16.11 KB 다.
+  // 즉 **Stack 이 16 KB 게이트를 약 110 B 넘긴다.** 단일 심볼 케이스는 그대로다
+  // (cx raw 37,299 로 변화 없음) — 늘어난 것은 전체 re-export 에 실리는 동작 코드뿐이다.
+  // 17 KB 는 현재값 위 약 5% 여유로 이 파일의 기존 정책과 같은 수준이다.
+  reactUi('* (full)', '*', '17 KB'),
 
   // react-native-ui — 단일 import도 theme/styles 모듈 evaluate로 약 3 KB가 들어감.
   // 여기서는 선택 import가 실제로 갈린다(Button 4.59 / Fab 4.35 / IconButton 4.14 vs 전체 12.54)
