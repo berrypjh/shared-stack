@@ -3,9 +3,9 @@ import { Text, View } from 'react-native';
 
 import { BoxedInput, FilledInput, IconButton, PlainInput } from '@berrypjh/react-native-ui';
 
+import { Column } from '../shell/layout';
 import { useDemoPalette } from '../shell/palette';
 import { Caption, Label } from '../shell/Section';
-import { demoStyles } from '../shell/styles';
 
 /**
  * Input 계열 데모.
@@ -22,13 +22,13 @@ export const InputFamilySection = () => {
   return (
     <View>
       <Label>PlainInput — 밑줄만</Label>
-      <View style={demoStyles.stack}>
+      <Column>
         <PlainInput accessibilityLabel="이름 (small)" placeholder="이름 · size sm" size="sm" />
         <PlainInput accessibilityLabel="이름 (medium)" placeholder="이름 · size md" size="md" />
-      </View>
+      </Column>
 
       <Label>FilledInput — 채워진 표면</Label>
-      <View style={demoStyles.stack}>
+      <Column>
         <FilledInput
           accessibilityLabel="이메일"
           placeholder="you@example.com"
@@ -43,22 +43,22 @@ export const InputFamilySection = () => {
           color="secondary"
         />
         <FilledInput accessibilityLabel="비활성 필드" placeholder="disabled" disabled />
-      </View>
+      </Column>
       <Caption>controlled 값: {email || '(비어 있음)'}</Caption>
 
       <Label>BoxedInput — 윤곽선만</Label>
-      <View style={demoStyles.stack}>
+      <Column>
         <BoxedInput accessibilityLabel="닉네임" defaultValue="berry" />
         <BoxedInput accessibilityLabel="읽기 전용 사용자명" defaultValue="berrypjh" readOnly />
         <BoxedInput accessibilityLabel="쿠폰 코드" placeholder="코드를 확인해 주세요" error />
-      </View>
+      </Column>
       <Caption>
         위에서부터 uncontrolled(defaultValue) · readOnly · error 입니다. readOnly 는 편집만 막고
         비활성으로 알리지 않습니다.
       </Caption>
 
       <Label>multiline · 장식</Label>
-      <View style={demoStyles.stack}>
+      <Column>
         <BoxedInput
           accessibilityLabel="메모"
           placeholder="여러 줄 입력"
@@ -92,7 +92,7 @@ export const InputFamilySection = () => {
             ) : undefined
           }
         />
-      </View>
+      </Column>
       <Caption>
         장식은 받은 노드를 그대로 렌더합니다. 상호작용 가능한 장식은 입력과 별개로 눌리고 읽힙니다.
       </Caption>

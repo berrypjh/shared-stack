@@ -3,8 +3,8 @@ import { View } from 'react-native';
 
 import { SearchField, type SearchFieldSuggestion } from '@berrypjh/react-native-ui';
 
+import { Column } from '../shell/layout';
 import { Caption, Label } from '../shell/Section';
-import { demoStyles } from '../shell/styles';
 
 const FRUITS: SearchFieldSuggestion[] = [
   { id: '1', label: '사과', value: 'apple', description: '가을 제철' },
@@ -38,7 +38,7 @@ export const SearchFieldSection = () => {
   return (
     <View>
       <Label>controlled 질의 + 지우기 + 제출</Label>
-      <View style={demoStyles.stack}>
+      <Column>
         <SearchField
           accessibilityLabel="과일 검색"
           placeholder="과일 이름"
@@ -48,7 +48,7 @@ export const SearchFieldSection = () => {
           onClear={() => setPicked('(없음)')}
           onSubmitEditing={(e) => setSubmitted(e.nativeEvent.text || '(빈 질의)')}
         />
-      </View>
+      </Column>
       <Caption>
         질의: {query || '(비어 있음)'} · 제출: {submitted}
       </Caption>
@@ -58,7 +58,7 @@ export const SearchFieldSection = () => {
       </Caption>
 
       <Label>제안 목록 — 선택·비활성·빈 상태</Label>
-      <View style={demoStyles.stack}>
+      <Column>
         <SearchField
           accessibilityLabel="제안이 있는 검색"
           placeholder="사/바/체 를 입력해 보세요"
@@ -69,7 +69,7 @@ export const SearchFieldSection = () => {
           noSuggestionsText="일치하는 과일이 없습니다"
           onSuggestionSelect={(s) => setPicked(s.label)}
         />
-      </View>
+      </Column>
       <Caption>고른 제안: {picked}</Caption>
       <Caption>
         입력을 누르면 열립니다. &quot;체리&quot; 는 비활성이라 눌러도 값이 바뀌지 않고 목록도 닫히지
@@ -77,7 +77,7 @@ export const SearchFieldSection = () => {
       </Caption>
 
       <Label>uncontrolled + disabled</Label>
-      <View style={demoStyles.stack}>
+      <Column>
         <SearchField
           accessibilityLabel="최근 검색"
           defaultValue="지난 검색어"
@@ -91,7 +91,7 @@ export const SearchFieldSection = () => {
           suggestions={FRUITS}
           disabled
         />
-      </View>
+      </Column>
       <Caption>
         비활성일 때는 지우기 버튼도 제안 목록도 나타나지 않습니다. 제안 행은 button 역할입니다 — RN
         은 option 역할을 네이티브 역할로 매핑하지 않습니다.

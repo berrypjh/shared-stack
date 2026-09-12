@@ -1,7 +1,8 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
 
 import { Box } from '@berrypjh/react-native-ui';
 
+import { Column } from '../shell/layout';
 import { useDemoPalette } from '../shell/palette';
 import { Caption, Label } from '../shell/Section';
 
@@ -22,7 +23,7 @@ export const BoxSection = () => {
   const p = useDemoPalette();
 
   return (
-    <View style={styles.stack}>
+    <Column>
       {SAMPLES.map((sample) => (
         <Box key={sample.bg} bg={sample.bg} radius={sample.radius} p={sample.p}>
           <Text style={[styles.label, { color: p.readableOn(p.hexAt(sample.bg)) }]}>
@@ -55,11 +56,10 @@ export const BoxSection = () => {
         위 40(pt) · 좌우 24(px) · 아래 8(p). 지정하지 않은 축은 건드리지 않습니다 — 0 이 주입되는
         것이 아닙니다.
       </Caption>
-    </View>
+    </Column>
   );
 };
 
 const styles = StyleSheet.create({
-  stack: { gap: 10 },
   label: { fontSize: 13, fontWeight: '600' },
 });

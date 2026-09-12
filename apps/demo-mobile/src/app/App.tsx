@@ -26,6 +26,7 @@ import { SegmentControlSection } from './sections/SegmentControlSection';
 import { SelectionControlSection } from './sections/SelectionControlSection';
 import { SelectSection } from './sections/SelectSection';
 import { SemanticColorSection } from './sections/SemanticColorSection';
+import { StackSection } from './sections/StackSection';
 import { TextFieldSection } from './sections/TextFieldSection';
 import { ThemeTokensSection } from './sections/ThemeTokensSection';
 import { DetailBar } from './shell/DetailBar';
@@ -55,6 +56,7 @@ const SECTIONS: Record<SectionKey, (mode: ThemeName) => ReactNode> = {
   'selection-control': () => <SelectionControlSection />,
   'button-family': () => <ButtonFamilySection />,
   box: () => <BoxSection />,
+  stack: () => <StackSection />,
   avatar: () => <AvatarSection />,
   badge: () => <BadgeSection />,
   chip: () => <ChipSection />,

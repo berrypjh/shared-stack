@@ -4,7 +4,7 @@ import { NAV, type SectionKey } from './nav';
 import { useDemoPalette } from './palette';
 
 /**
- * 홈 목록. 그룹 제목 + 항목 행으로 섹션 11개를 한눈에 보여줍니다.
+ * 홈 목록. 그룹 제목 + 항목 행으로 섹션 전체를 한눈에 보여줍니다.
  *
  * 그룹 제목에 `header` 역할을 주는 것은 `Section` 과 같은 이유입니다 — VoiceOver 로터와
  * TalkBack 의 제목 이동이 RN 에서 구간을 건너뛰는 유일한 네이티브 수단입니다.

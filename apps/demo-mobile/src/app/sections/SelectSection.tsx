@@ -9,8 +9,8 @@ import {
   type SelectOption,
 } from '@berrypjh/react-native-ui';
 
+import { Column } from '../shell/layout';
 import { Caption, Label } from '../shell/Section';
-import { demoStyles } from '../shell/styles';
 
 type Country = 'kr' | 'jp' | 'us' | 'de';
 
@@ -38,7 +38,7 @@ export const SelectSection = () => {
   return (
     <View>
       <Label>controlled 선택 + placeholder</Label>
-      <View style={demoStyles.stack}>
+      <Column>
         <Select
           accessibilityLabel="국가"
           options={COUNTRIES}
@@ -47,7 +47,7 @@ export const SelectSection = () => {
           placeholder="국가를 고르세요"
           dismissAccessibilityLabel="목록 닫기"
         />
-      </View>
+      </Column>
       <Caption>선택: {country ?? '(없음)'} — 비어 있음은 undefined 입니다</Caption>
       <Caption>
         &quot;독일&quot; 은 비활성이라 눌러도 값이 바뀌지 않고 목록도 닫히지 않습니다. 트리거는
@@ -55,7 +55,7 @@ export const SelectSection = () => {
       </Caption>
 
       <Label>uncontrolled defaultValue</Label>
-      <View style={demoStyles.stack}>
+      <Column>
         <Select
           accessibilityLabel="기본 국가"
           options={COUNTRIES}
@@ -63,11 +63,11 @@ export const SelectSection = () => {
           dismissAccessibilityLabel="목록 닫기"
           variant="filled"
         />
-      </View>
+      </Column>
       <Caption>초기값만 주고 상태는 Select 가 가집니다.</Caption>
 
       <Label>FormControl 안에서 — error 상속</Label>
-      <View style={demoStyles.stack}>
+      <Column>
         <FormControl error>
           <InputLabel>배송 국가</InputLabel>
           <Select
@@ -78,13 +78,13 @@ export const SelectSection = () => {
           />
           <FormHelperText>배송 국가를 선택해 주세요</FormHelperText>
         </FormControl>
-      </View>
+      </Column>
       <Caption>
         보이는 라벨은 Select 의 이름이 아닙니다 — accessibilityLabel 을 따로 줍니다.
       </Caption>
 
       <Label>disabled Select · plain variant</Label>
-      <View style={demoStyles.stack}>
+      <Column>
         <Select
           accessibilityLabel="비활성 국가"
           options={COUNTRIES}
@@ -100,7 +100,7 @@ export const SelectSection = () => {
           size="sm"
           dismissAccessibilityLabel="목록 닫기"
         />
-      </View>
+      </Column>
       <Caption>테마를 바꾸면 트리거·패널·선택 표면이 모두 토큰을 따라 움직입니다.</Caption>
     </View>
   );

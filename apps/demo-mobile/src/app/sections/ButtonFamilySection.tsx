@@ -3,9 +3,9 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { Button, Fab, IconButton } from '@berrypjh/react-native-ui';
 
+import { Row } from '../shell/layout';
 import { useDemoPalette } from '../shell/palette';
 import { Caption, Label } from '../shell/Section';
-import { demoStyles } from '../shell/styles';
 
 /**
  * Button 계열 데모.
@@ -33,7 +33,7 @@ export const ButtonFamilySection = () => {
   return (
     <View>
       <Label>variant</Label>
-      <View style={demoStyles.row}>
+      <Row>
         <Button variant="contained" onPress={() => setPressCount((n) => n + 1)}>
           Contained
         </Button>
@@ -43,37 +43,37 @@ export const ButtonFamilySection = () => {
         <Button variant="text" onPress={() => setPressCount((n) => n + 1)}>
           Text
         </Button>
-      </View>
+      </Row>
       <Caption>onPress 횟수: {pressCount}</Caption>
 
       <Label>size</Label>
-      <View style={demoStyles.row}>
+      <Row>
         <Button size="sm">Small</Button>
         <Button size="md">Medium</Button>
         <Button size="lg">Large</Button>
-      </View>
+      </Row>
 
       <Label>color</Label>
-      <View style={demoStyles.row}>
+      <Row>
         <Button color="primary">Primary</Button>
         <Button color="secondary">Secondary</Button>
         <Button variant="outlined" color="secondary">
           Secondary outlined
         </Button>
-      </View>
+      </Row>
 
       <Label>아이콘 슬롯 · disabled</Label>
-      <View style={demoStyles.row}>
+      <Row>
         <Button startIcon={<Text style={{ color: onSolid }}>←</Text>}>Back</Button>
         <Button endIcon={<Text style={{ color: onSolid }}>→</Text>}>Next</Button>
         <Button variant="outlined" startIcon={<Text style={{ color: onSurface }}>☆</Text>}>
           Outlined
         </Button>
         <Button disabled>Disabled</Button>
-      </View>
+      </Row>
 
       <Label>loading</Label>
-      <View style={demoStyles.row}>
+      <Row>
         <Button loading loadingPosition="start">
           Start
         </Button>
@@ -83,7 +83,7 @@ export const ButtonFamilySection = () => {
         <Button loading loadingPosition="end">
           End
         </Button>
-      </View>
+      </Row>
 
       <Label>실제 상호작용 — 누르면 1.2초 동안 loading</Label>
       <View style={styles.block}>
@@ -93,7 +93,7 @@ export const ButtonFamilySection = () => {
       </View>
 
       <Label>Fab</Label>
-      <View style={demoStyles.row}>
+      <Row>
         <Fab
           icon={<Text style={{ color: onSolid }}>＋</Text>}
           accessibilityLabel="추가"
@@ -112,10 +112,10 @@ export const ButtonFamilySection = () => {
         <Fab shape="extended" icon={<Text style={{ color: onSolid }}>＋</Text>}>
           만들기
         </Fab>
-      </View>
+      </Row>
 
       <Label>IconButton — accessibilityLabel 은 필수</Label>
-      <View style={demoStyles.row}>
+      <Row>
         <IconButton
           icon={({ color }) => <Text style={{ color }}>★</Text>}
           accessibilityLabel="즐겨찾기"
@@ -136,7 +136,7 @@ export const ButtonFamilySection = () => {
           accessibilityLabel="저장 중"
           loading
         />
-      </View>
+      </Row>
       <Caption>
         IconButton 의 `icon` 은 함수 형태를 받아 색·크기를 넘겨줍니다 — 슬롯 중 유일합니다.
       </Caption>

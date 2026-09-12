@@ -3,8 +3,8 @@ import { View } from 'react-native';
 
 import { SegmentControl, type SegmentOption } from '@berrypjh/react-native-ui';
 
+import { Column } from '../shell/layout';
 import { Caption, Label } from '../shell/Section';
-import { demoStyles } from '../shell/styles';
 
 type Range = 'day' | 'week' | 'month';
 
@@ -40,9 +40,9 @@ export const SegmentControlSection = () => {
   return (
     <View>
       <Label>controlled 선택</Label>
-      <View style={demoStyles.stack}>
+      <Column>
         <SegmentControl options={RANGES} value={range} onChange={setRange} />
-      </View>
+      </Column>
       <Caption>선택: {range} — 상태는 데모가 가집니다</Caption>
       <Caption>
         문자열 라벨은 보이는 텍스트가 그대로 이름이 됩니다. 이미 선택된 세그먼트를 다시 눌러도
@@ -50,16 +50,16 @@ export const SegmentControlSection = () => {
       </Caption>
 
       <Label>옵션별 disabled</Label>
-      <View style={demoStyles.stack}>
+      <Column>
         <SegmentControl options={DENSITIES} value={density} onChange={setDensity} />
-      </View>
+      </Column>
       <Caption>
         선택: {density} · &quot;넓게&quot; 는 비활성이라 눌리지 않고 accessibilityState.disabled 로
         알립니다. 세그먼트는 시각 크기와 무관하게 최소 터치 타깃(48)을 지킵니다.
       </Caption>
 
       <Label>텍스트가 아닌 라벨 — accessibilityLabel 로 이름을 준다</Label>
-      <View style={demoStyles.stack}>
+      <Column>
         <SegmentControl
           options={[
             { value: 'day', label: '▤', accessibilityLabel: '일간 보기' },
@@ -69,7 +69,7 @@ export const SegmentControlSection = () => {
           value={range}
           onChange={setRange}
         />
-      </View>
+      </Column>
       <Caption>
         글리프는 이름이 되지 못하므로 옵션마다 accessibilityLabel 을 줍니다. 테마를 바꾸면 트랙과
         선택 표면이 토큰을 따라 움직입니다.

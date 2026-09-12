@@ -3,8 +3,8 @@ import { View } from 'react-native';
 
 import { Checkbox, Radio, RadioGroup, Switch } from '@berrypjh/react-native-ui';
 
+import { Column, Row } from '../shell/layout';
 import { Caption, Label } from '../shell/Section';
-import { demoStyles } from '../shell/styles';
 
 type Channels = { email: boolean; push: boolean };
 
@@ -26,7 +26,7 @@ export const SelectionControlSection = () => {
   return (
     <View>
       <Label>Checkbox</Label>
-      <View style={demoStyles.stack}>
+      <Column>
         <Checkbox label="이용 약관에 동의합니다" checked={terms} onCheckedChange={setTerms} />
         <Checkbox
           label="전체 알림"
@@ -45,7 +45,7 @@ export const SelectionControlSection = () => {
           onCheckedChange={(push) => setChannels((prev) => ({ ...prev, push }))}
         />
         <Checkbox label="비활성 (선택됨)" defaultChecked disabled />
-      </View>
+      </Column>
       <Caption>
         일부만 켜지면 &quot;전체 알림&quot; 이 혼합(mixed) 상태가 됩니다. 누르면 전부 켜집니다.
       </Caption>
@@ -59,10 +59,10 @@ export const SelectionControlSection = () => {
       <Caption>선택: {ship} — 이미 선택된 항목을 다시 눌러도 해제되지 않습니다</Caption>
 
       <Label>Switch</Label>
-      <View style={demoStyles.row}>
+      <Row>
         <Switch accessibilityLabel="새 댓글 알림" value={alerts} onValueChange={setAlerts} />
         <Switch accessibilityLabel="비활성 스위치" value disabled onValueChange={() => undefined} />
-      </View>
+      </Row>
       <Caption>
         {alerts ? '켜짐' : '꺼짐'} — core Switch 라 애니메이션·터치 영역은 native 것입니다. 테마를
         바꾸면 트랙과 thumb 이 토큰을 따라 바뀝니다.

@@ -3,8 +3,8 @@ import { View } from 'react-native';
 
 import { Avatar, Chip } from '@berrypjh/react-native-ui';
 
+import { Row } from '../shell/layout';
 import { Caption, Label } from '../shell/Section';
-import { demoStyles } from '../shell/styles';
 
 const FILTERS = ['디자인', '개발', '기획'] as const;
 
@@ -23,25 +23,25 @@ export const ChipSection = () => {
   return (
     <View>
       <Label>passive (태그)</Label>
-      <View style={demoStyles.row}>
+      <Row>
         <Chip>디자인 시스템</Chip>
         <Chip variant="filled">filled</Chip>
         <Chip size="sm">sm</Chip>
         <Chip leading={<Avatar size="sm">길동</Avatar>}>홍길동</Chip>
-      </View>
+      </Row>
       <Caption>
         누를 수 없습니다 — View 라서 button 역할도, 최소 터치 타깃도 없습니다. 눌러도 아무 반응이
         없는 것이 정상입니다.
       </Caption>
 
       <Label>interactive (filter set)</Label>
-      <View style={demoStyles.row}>
+      <Row>
         {FILTERS.map((name) => (
           <Chip key={name} onPress={() => toggle(name)} selected={picked.includes(name)}>
             {name}
           </Chip>
         ))}
-      </View>
+      </Row>
       <Caption>
         선택: {picked.length === 0 ? '없음' : picked.join(' · ')} — button 역할 +
         accessibilityState.selected 입니다. 누르면 면과 테두리가 함께 바뀌고, 눌리는 동안
@@ -49,7 +49,7 @@ export const ChipSection = () => {
       </Caption>
 
       <Label>action chip · disabled</Label>
-      <View style={demoStyles.row}>
+      <Row>
         <Chip onPress={() => undefined}>선택 상태 없음</Chip>
         <Chip onPress={() => undefined} disabled>
           비활성
@@ -57,7 +57,7 @@ export const ChipSection = () => {
         <Chip onPress={() => undefined} selected disabled>
           비활성 · 선택됨
         </Chip>
-      </View>
+      </Row>
       <Caption>
         selected 를 주지 않으면 toggle 이 아니라 단순 action chip 이라 selected 상태를 알리지
         않습니다. 비활성은 누름을 실제로 차단하면서 선택 사실은 계속 알립니다.
