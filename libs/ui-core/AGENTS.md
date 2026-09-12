@@ -5,7 +5,7 @@
 `react-ui`(web)와 `react-native-ui`(RN)가 **같은 디자인 결정을 공유**하되 렌더러 코드는 섞지 않기 위한
 경계다. 두 가지만 한다.
 
-1. **공유 계약** — 두 렌더러가 같은 불변식으로 구현하는 prop 계약 (`avatar`·`badge`·`box`·`button`·`chip`·`fab`·`icon-button`·`field`).
+1. **공유 계약** — 두 렌더러가 같은 불변식으로 구현하는 prop 계약 (`avatar`·`badge`·`box`·`button`·`chip`·`divider`·`fab`·`icon-button`·`field`·`stack`).
 2. **토큰 façade** — design-tokens 산출물을 타입과 함께 통과시킨다. 생성은 하지 않는다.
 
 `private: true`라서 소비자는 이 패키지를 설치하지도, import하지도 않는다. 렌더러 패키지가
@@ -39,10 +39,21 @@ src/
     chip.ts         ChipSize/Variant, ChipSemanticProps (size·variant·selected·disabled — 모드
                     제약(selected/disabled 는 interactive 전용)은 각 렌더러가 판별 유니온으로
                     조립한다. intent 는 selected 강조와 겹쳐 V1 에 없다)
+    divider.ts      DividerOrientation, DividerSemanticProps (orientation 뿐 — 선이 **가르는** 축이라
+                    Stack 의 흐름 축 어휘(column·row)와 일부러 다르다. 두께·색은 토큰이 정하고
+                    (semanticBorder.divider·stroke.light) prop 으로 열지 않는다. web 전용
+                    `decorative` 는 승격 안 함 — RN 에는 끌 native separator 시맨틱이 없다
+                    (accessibilityRole 유니온에 separator 가 없다). 비상호작용이라 상태 키가 없다)
     fab.ts          FabShape, FabSemanticProps
     icon-button.ts  IconButtonSemanticProps (size·color·disabled 뿐 — edge·loading은 승격 안 함)
     field.ts        FieldVariant/Size/Color, FieldSemanticProps, InputFieldSemanticProps
                     (required·margin·hiddenLabel은 RN 구현이 없어 react-ui가 가진다)
+    stack.ts        StackDirection/Align/Justify, StackSemanticProps (direction·gap·align·justify·
+                    wrap 뿐. `direction` 기본값을 계약이 못박는 이유는 두 플랫폼 기본값이 갈리기
+                    때문이다 — CSS `flex-direction` 은 row, RN Yoga 는 column. 자식 자리 prop·2차원
+                    배치·반응형 객체는 승격하지 않는다. 브레이크포인트 어휘가 양 플랫폼에 공통으로
+                    없어서 반응형은 web 전용이다. 비상호작용이라 상태 키가 없고, Box 와는 합성
+                    관계라 BoxProps 를 extends 하지 않는다)
     index.ts
   tokens/
     types.ts        ColorToken, SpacingToken, RadiusToken, RNTokens, Theme<T>, ThemeName

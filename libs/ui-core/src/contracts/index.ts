@@ -22,6 +22,7 @@ export type {
   ButtonVariant,
 } from './button';
 export type { ChipSemanticProps, ChipSize, ChipVariant } from './chip';
+export type { DividerOrientation, DividerSemanticProps } from './divider';
 export type { FabSemanticProps, FabShape } from './fab';
 export type {
   FieldColor,
