@@ -18,6 +18,9 @@ export type SectionKey =
   | 'selection-control'
   | 'button-family'
   | 'box'
+  | 'avatar'
+  | 'badge'
+  | 'chip'
   | 'semantic-color'
   | 'color-scale'
   | 'theme-tokens';
@@ -99,6 +102,29 @@ export const NAV: NavGroup[] = [
         key: 'box',
         label: 'Box',
         description: '토큰 prop 만으로 배경·모서리·여백을 주는 레이아웃 컴포넌트입니다.',
+      },
+    ],
+  },
+  {
+    label: 'Identity',
+    items: [
+      {
+        key: 'avatar',
+        label: 'Avatar',
+        description:
+          '정적 identity visual. 이미지가 없거나 실패하면 이니셜을 그립니다. 누를 수 없고 최소 터치 타깃도 없습니다 — 누르는 identity 컨트롤은 Pressable 로 감쌉니다.',
+      },
+      {
+        key: 'badge',
+        label: 'Badge',
+        description:
+          '앵커 위에 얹는 overlay indicator — 알림·개수·점. 앵커의 역할·이름·누름을 건드리지 않고, standalone 태그가 아닙니다 (그 역할은 Chip 이 가집니다).',
+      },
+      {
+        key: 'chip',
+        label: 'Chip',
+        description:
+          'compact label. onPress 가 없으면 passive View(누를 수 없음), 있으면 ButtonBase 기반 toggle 입니다. selected·disabled 는 interactive 모드에만 있습니다.',
       },
     ],
   },

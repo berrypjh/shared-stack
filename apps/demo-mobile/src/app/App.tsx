@@ -13,8 +13,11 @@ import { ThemeName, ThemeProvider } from '@berrypjh/react-native-ui';
 
 import type { ReactNode } from 'react';
 
+import { AvatarSection } from './sections/AvatarSection';
+import { BadgeSection } from './sections/BadgeSection';
 import { BoxSection } from './sections/BoxSection';
 import { ButtonFamilySection } from './sections/ButtonFamilySection';
+import { ChipSection } from './sections/ChipSection';
 import { ColorScaleSection } from './sections/ColorScaleSection';
 import { FormArchitectureSection } from './sections/FormArchitectureSection';
 import { InputFamilySection } from './sections/InputFamilySection';
@@ -52,6 +55,9 @@ const SECTIONS: Record<SectionKey, (mode: ThemeName) => ReactNode> = {
   'selection-control': () => <SelectionControlSection />,
   'button-family': () => <ButtonFamilySection />,
   box: () => <BoxSection />,
+  avatar: () => <AvatarSection />,
+  badge: () => <BadgeSection />,
+  chip: () => <ChipSection />,
   'semantic-color': () => <SemanticColorSection />,
   'color-scale': () => <ColorScaleSection />,
   'theme-tokens': (mode) => <ThemeTokensSection mode={mode} />,
