@@ -5,6 +5,7 @@ export * from './boxed-input';
 export * from './button';
 export * from './checkbox';
 export * from './chip';
+export * from './divider';
 export * from './fab';
 export * from './filled-input';
 export * from './form-control';
