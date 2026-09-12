@@ -19,6 +19,7 @@ import { BoxSection } from './sections/BoxSection';
 import { ButtonFamilySection } from './sections/ButtonFamilySection';
 import { ChipSection } from './sections/ChipSection';
 import { ColorScaleSection } from './sections/ColorScaleSection';
+import { DividerSection } from './sections/DividerSection';
 import { FormArchitectureSection } from './sections/FormArchitectureSection';
 import { InputFamilySection } from './sections/InputFamilySection';
 import { SearchFieldSection } from './sections/SearchFieldSection';
@@ -57,6 +58,7 @@ const SECTIONS: Record<SectionKey, (mode: ThemeName) => ReactNode> = {
   'button-family': () => <ButtonFamilySection />,
   box: () => <BoxSection />,
   stack: () => <StackSection />,
+  divider: () => <DividerSection />,
   avatar: () => <AvatarSection />,
   badge: () => <BadgeSection />,
   chip: () => <ChipSection />,

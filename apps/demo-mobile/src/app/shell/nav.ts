@@ -20,6 +20,7 @@ export type SectionKey =
   | 'button-family'
   | 'box'
   | 'stack'
+  | 'divider'
   | 'avatar'
   | 'badge'
   | 'chip'
@@ -110,6 +111,12 @@ export const NAV: NavGroup[] = [
         label: 'Stack',
         description:
           '자식을 한 축으로 흘리는 1차원 배치입니다. 면·여백 API 가 없어서 시각은 자식이 가지고, 면이 필요하면 Box 와 겹쳐 씁니다.',
+      },
+      {
+        key: 'divider',
+        label: 'Divider',
+        description:
+          '내용을 가르는 선. 두께·색은 토큰(borderWidth.semantic.divider · stroke.light)이 정하고 여백은 Stack 의 gap 이 가집니다. web 과 달리 decorative 가 없습니다 — RN 에는 끌 native separator 시맨틱이 없습니다.',
       },
     ],
   },
