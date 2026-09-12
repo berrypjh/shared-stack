@@ -1,0 +1,48 @@
+/**
+ * Divider — 선 하나가 전부다.
+ *
+ * 선을 `background-color` 가 아니라 **border** 로 그린다. forced-colors(Windows 고대비)는
+ * 저자 색을 시스템 색으로 갈아끼우므로, 1px 배경으로 그린 선은 그 모드에서 배경과 같은 색이
+ * 되어 사라질 수 있다. border 는 남는다 — `table.scss` 의 셀 경계와 같은 판단이다.
+ *
+ * 물리 방향(`border-top`·`border-left`)이 아니라 논리 속성을 쓴다. RTL 에서 세로 구분선이
+ * 저절로 반대쪽에 붙는다 (`switch`·`skip-link`·`list` 와 같은 관례).
+ *
+ * 여백이 없다. 구분선 주변 간격은 소비자가 `Stack` 의 `gap` 으로 준다 — 여기에 두면 gap 과
+ * 더해져 두 곳을 맞춰야 한다.
+ */
+.ui-divider {
+  /* UA 기본 `<hr>` 은 세로 여백과 inset border 를 갖는다. 둘 다 지우고 선을 직접 그린다. */
+  border: 0;
+  margin: 0;
+
+  /* flex 컨테이너 안에서 선이 찌그러지지 않게 한다. 축소되면 1px 이 0 이 된다. */
+  flex-shrink: 0;
+}
+
+.ui-divider--horizontal {
+  block-size: 0;
+  border-block-start: var(--ds-semantic-border-divider) solid var(--ds-stroke-light);
+}
+
+.ui-divider--vertical {
+  /* 가로 flex 줄에서 형제 높이만큼 늘어난다. 높이를 추측하지 않는다. */
+  align-self: stretch;
+  inline-size: 0;
+  border-inline-start: var(--ds-semantic-border-divider) solid var(--ds-stroke-light);
+}
+
+/**
+ * forced-colors 대응.
+ *
+ * 선은 `stroke.light` 로 그리는데 그 모드에서 저자 색이 시스템 색으로 평탄화되면 배경과
+ * 구분되지 않을 수 있다. 그 모드에서만 `CanvasText` 로 되살린다.
+ *
+ * `forced-color-adjust: none` 을 쓰지 않는다 — 사용자가 고른 팔레트를 끄는 셈이다
+ * (`table.scss` 와 같은 전략).
+ */
+@media (forced-colors: active) {
+  .ui-divider {
+    border-color: CanvasText;
+  }
+}
