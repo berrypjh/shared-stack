@@ -5,6 +5,14 @@
  * TypeScript라거나, 언젠가 재사용할 수 있다는 것은 근거가 아닙니다.
  * `IconButtonSemanticProps`에 `edge`·`loading`이 없는 이유입니다.
  */
+export type { AvatarSemanticProps, AvatarShape, AvatarSize } from './avatar';
+export type {
+  BadgeIntent,
+  BadgePlacement,
+  BadgeSemanticProps,
+  BadgeSize,
+  BadgeVariant,
+} from './badge';
 export type { BoxProps, BoxRadiusValue, BoxSpacingValue } from './box';
 export type {
   ButtonColor,
@@ -13,6 +21,7 @@ export type {
   ButtonSize,
   ButtonVariant,
 } from './button';
+export type { ChipSemanticProps, ChipSize, ChipVariant } from './chip';
 export type { FabSemanticProps, FabShape } from './fab';
 export type {
   FieldColor,

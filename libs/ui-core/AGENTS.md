@@ -5,7 +5,7 @@
 `react-ui`(web)와 `react-native-ui`(RN)가 **같은 디자인 결정을 공유**하되 렌더러 코드는 섞지 않기 위한
 경계다. 두 가지만 한다.
 
-1. **공유 계약** — 두 렌더러가 같은 불변식으로 구현하는 prop 계약 (`box`·`button`·`fab`·`icon-button`·`field`).
+1. **공유 계약** — 두 렌더러가 같은 불변식으로 구현하는 prop 계약 (`avatar`·`badge`·`box`·`button`·`chip`·`fab`·`icon-button`·`field`).
 2. **토큰 façade** — design-tokens 산출물을 타입과 함께 통과시킨다. 생성은 하지 않는다.
 
 `private: true`라서 소비자는 이 패키지를 설치하지도, import하지도 않는다. 렌더러 패키지가
@@ -29,8 +29,16 @@ src/
   boundary.test.ts  렌더러 타입·패키지가 src에 들어왔는지 훑는 검사
   packageSurface.test.ts  exports map ↔ dist 산출물 대조 (subpath 해석·side effect·복사 여부)
   contracts/       양 렌더러가 같은 불변식으로 구현하는 계약만. 각 `*.test.ts`는 타입 수준 검증(@ts-expect-error)
+    avatar.ts       AvatarSize, AvatarShape, AvatarSemanticProps (size·shape 뿐 — src/source·alt·
+                    accessibilityLabel·fallback은 렌더러 소유. 비상호작용이라 상태 키가 없다)
+    badge.ts        BadgeVariant/Size/Intent/Placement, BadgeSemanticProps (어휘·숫자만 —
+                    앵커/content 슬롯·접근성 이름·위치 좌표는 렌더러 소유. intent 에
+                    warning·success 가 없는 것은 대비 실측 결과다)
     box.ts          BoxProps, BoxSpacingValue, BoxRadiusValue
     button.ts       ButtonVariant/Size/Color/LoadingPosition, ButtonSemanticProps
+    chip.ts         ChipSize/Variant, ChipSemanticProps (size·variant·selected·disabled — 모드
+                    제약(selected/disabled 는 interactive 전용)은 각 렌더러가 판별 유니온으로
+                    조립한다. intent 는 selected 강조와 겹쳐 V1 에 없다)
     fab.ts          FabShape, FabSemanticProps
     icon-button.ts  IconButtonSemanticProps (size·color·disabled 뿐 — edge·loading은 승격 안 함)
     field.ts        FieldVariant/Size/Color, FieldSemanticProps, InputFieldSemanticProps
