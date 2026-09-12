@@ -39,7 +39,10 @@ const SOURCE: NavSource[] = [
   },
   {
     label: 'Layout',
-    items: [{ label: 'Stack', path: '/components/stack' }],
+    items: [
+      { label: 'Stack', path: '/components/stack' },
+      { label: 'Divider', path: '/components/divider' },
+    ],
   },
   {
     label: 'Overlay',

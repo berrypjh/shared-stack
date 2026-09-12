@@ -1,6 +1,7 @@
 import { Route, Routes } from 'react-router-dom';
 
 import { ButtonPage } from './pages/ButtonPage';
+import { DividerPage } from './pages/DividerPage';
 import { FabPage } from './pages/FabPage';
 import { FoundationPage } from './pages/FoundationPage';
 import { IconButtonPage } from './pages/IconButtonPage';
@@ -30,6 +31,7 @@ export const App = () => (
       <Route path="/components/fab" element={<FabPage />} />
       <Route path="/components/icon-button" element={<IconButtonPage />} />
       <Route path="/components/stack" element={<StackPage />} />
+      <Route path="/components/divider" element={<DividerPage />} />
       <Route path="/components/popover" element={<PopoverPage />} />
     </Routes>
   </AppShell>
