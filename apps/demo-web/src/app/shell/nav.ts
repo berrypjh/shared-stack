@@ -5,7 +5,7 @@
  * 컴포넌트 확인. 그룹은 그 작업 단위를 그대로 따른다.
  *
  * 컴포넌트 목록이 짧은 것은 의도다. 개별 컴포넌트 상태 탐색과 시각 회귀는 Storybook/Chromatic
- * 이 19개 전부를 담당하고, 여기 있는 것은 실제 앱 통합(테마·프로필·CSS 캐스케이드·패키지 경계)
+ * 이 라이브러리 전체를 담당하고, 여기 있는 것은 실제 앱 통합(테마·프로필·CSS 캐스케이드·패키지 경계)
  * 을 확인하기 위한 대표 세트다.
  */
 export type NavItem = { label: string; path: string; end: boolean };
@@ -36,6 +36,14 @@ const SOURCE: NavSource[] = [
       { label: 'FAB', path: '/components/fab' },
       { label: 'IconButton', path: '/components/icon-button' },
     ],
+  },
+  {
+    label: 'Layout',
+    items: [{ label: 'Stack', path: '/components/stack' }],
+  },
+  {
+    label: 'Overlay',
+    items: [{ label: 'Popover', path: '/components/popover' }],
   },
 ];
 

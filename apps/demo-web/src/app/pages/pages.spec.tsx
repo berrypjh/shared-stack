@@ -6,6 +6,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it } from 'vitest';
 
 import App from '../app';
+import { NAV } from '../shell/nav';
 
 /**
  * 라우팅 스모크. 각 화면이 예외 없이 그려지고, E2E 가 의존하는 앵커가 살아있는지 본다.
@@ -19,15 +20,20 @@ const at = (path: string) =>
   );
 
 describe('라우팅', () => {
-  it.each([
-    ['/', 'overview-page'],
-    ['/verify', 'verify-page'],
-    ['/tokens', 'tokens-page'],
-    ['/foundation', 'foundation-page'],
-  ])('%s 가 렌더된다', (path, testId) => {
-    at(path);
-    expect(screen.getByTestId(testId)).toBeTruthy();
-  });
+  /**
+   * 경로 목록을 여기 다시 적지 않는다 — `NAV` 에서 파생한다. 손으로 적으면 페이지를 늘렸을 때
+   * 스모크만 조용히 낡아, 새 페이지가 어느 테스트에도 걸리지 않은 채 남는다.
+   *
+   * 제목으로 확인하는 이유는 사이드바 라벨과 도착한 화면의 h1 이 **같은 문장**이어야 하기
+   * 때문이다. 다르면 누른 이름과 도착지의 이름이 갈린다.
+   */
+  it.each(NAV.flatMap((g) => g.items).map((i) => [i.path, i.label]))(
+    '%s 가 "%s" 제목으로 렌더된다',
+    (path, label) => {
+      at(path);
+      expect(screen.getByRole('heading', { level: 1, name: label })).toBeTruthy();
+    },
+  );
 });
 
 /**
@@ -115,17 +121,18 @@ describe('배경 층', () => {
 describe('사이드바 묶음', () => {
   const nav = () => within(screen.getByRole('navigation', { name: '주요 메뉴' }));
 
+  /** 묶음 이름도 `NAV` 에서 파생한다 — 여기 다시 적으면 IA 가 바뀔 때 함께 낡는다. */
   it('묶음마다 이름 붙은 목록을 갖는다', () => {
     at('/');
-    for (const name of ['검증', 'Foundation', '컴포넌트']) {
-      expect(nav().getByRole('list', { name })).toBeTruthy();
+    for (const name of NAV.map((g) => g.label).filter(Boolean)) {
+      expect(nav().getByRole('list', { name: name as string })).toBeTruthy();
     }
   });
 
   it('묶음마다 하나씩, 서로 떨어진 블록으로 그려진다', () => {
     at('/');
     const groups = screen.getAllByTestId('nav-group');
-    expect(groups).toHaveLength(4);
+    expect(groups).toHaveLength(NAV.length);
     for (const g of groups) {
       // 사이드바는 surface, 블록은 default. 두 색은 세 테마 모두 다르다.
       expect(g.className.split(/\s+/)).toContain('bg-background-default');
@@ -193,6 +200,16 @@ describe('사이드바 현재 위치', () => {
 });
 
 describe('E2E 앵커', () => {
+  it.each([
+    ['/', 'overview-page'],
+    ['/verify', 'verify-page'],
+    ['/tokens', 'tokens-page'],
+    ['/foundation', 'foundation-page'],
+  ])('%s 가 %s 앵커를 갖는다', (path, testId) => {
+    at(path);
+    expect(screen.getByTestId(testId)).toBeTruthy();
+  });
+
   it('Runtime 화면이 계약 상태 앵커를 갖는다', async () => {
     at('/verify');
     for (const id of ['themed', 'shared', 'derived', 'react-ui', 'tailwind']) {
@@ -205,6 +222,30 @@ describe('E2E 앵커', () => {
     for (const id of ['probe-background-primary', 'probe-background-error', 'probe-spacing-md']) {
       expect(screen.getByTestId(id)).toBeTruthy();
     }
+  });
+});
+
+/**
+ * Popover 는 portal 을 쓰지 않아 패널이 DOM 상 그 자리에 그려진다. 이 화면이 있는 이유가
+ * 그 통합이라, 라우트 스모크만으로는 부족하고 열림·닫힘까지 본다.
+ */
+describe('Popover 페이지', () => {
+  it('트리거로 열고 Escape 로 닫는다', async () => {
+    at('/components/popover');
+    const trigger = screen.getByRole('button', { name: '도움말 열기' });
+    expect(trigger.getAttribute('aria-expanded')).toBe('false');
+
+    await userEvent.click(trigger);
+    expect(trigger.getAttribute('aria-expanded')).toBe('true');
+
+    await userEvent.keyboard('{Escape}');
+    expect(trigger.getAttribute('aria-expanded')).toBe('false');
+  });
+
+  it('dialog 패널은 이름을 갖는다', async () => {
+    at('/components/popover');
+    await userEvent.click(screen.getByRole('button', { name: '계정 메뉴' }));
+    expect(screen.getByRole('dialog', { name: '계정 메뉴' })).toBeTruthy();
   });
 });
 
@@ -292,29 +333,33 @@ describe('토큰 정렬', () => {
   });
 });
 
+/**
+ * 선택 상태는 클래스가 아니라 **시맨틱**으로 확인한다.
+ *
+ * 카테고리는 상호배타 toggle 이라 `Chip` 의 `aria-pressed`, 열은 서로 독립이라 `Checkbox` 의
+ * `checked` 다. 두 컨트롤이 갈리는 것 자체가 의도이므로 테스트도 갈라서 본다.
+ */
 describe('토큰 선택 표시', () => {
-  /** jsdom 은 Tailwind 를 계산하지 않으므로 채움은 클래스 존재로 확인한다. */
-  const filled = (el: HTMLElement) => el.className.includes('bg-background-primary');
+  const pressed = (el: HTMLElement) => el.getAttribute('aria-pressed');
 
-  it('선택한 카테고리만 채워진다', async () => {
+  it('선택한 카테고리만 눌린 상태다', async () => {
     at('/tokens');
     const all = screen.getByRole('button', { name: '전체' });
     const spacing = screen.getByRole('button', { name: 'spacing' });
-    expect([filled(all), filled(spacing)]).toEqual([true, false]);
+    expect([pressed(all), pressed(spacing)]).toEqual(['true', 'false']);
 
     await userEvent.click(spacing);
-    expect([filled(all), filled(spacing)]).toEqual([false, true]);
+    expect([pressed(all), pressed(spacing)]).toEqual(['false', 'true']);
   });
 
-  it('켜진 열 칩은 채움과 체크를 함께 갖는다', async () => {
+  it('켜진 열은 체크된 checkbox 다', async () => {
     at('/tokens');
-    const chip = screen.getByTestId('token-column-preview');
-    expect(filled(chip)).toBe(true);
-    expect(chip.querySelector('svg')).toBeTruthy();
+    const box = screen.getByTestId('token-column-preview') as HTMLInputElement;
+    expect(box.type).toBe('checkbox');
+    expect(box.checked).toBe(true);
 
-    await userEvent.click(chip);
-    expect(filled(chip)).toBe(false);
-    expect(chip.querySelector('svg')).toBeNull();
+    await userEvent.click(box);
+    expect(box.checked).toBe(false);
   });
 });
 
@@ -338,11 +383,11 @@ describe('토큰 열 표시', () => {
 
   it('끈 열은 다시 켤 수 있다', async () => {
     at('/tokens');
-    const button = screen.getByTestId('token-column-preview');
-    await userEvent.click(button);
-    expect(button.getAttribute('aria-pressed')).toBe('false');
-    await userEvent.click(button);
-    expect(button.getAttribute('aria-pressed')).toBe('true');
+    const box = screen.getByTestId('token-column-preview') as HTMLInputElement;
+    await userEvent.click(box);
+    expect(box.checked).toBe(false);
+    await userEvent.click(box);
+    expect(box.checked).toBe(true);
     expect(header()).toContain('미리보기');
   });
 

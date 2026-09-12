@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 
-import { Web } from '@berrypjh/react-ui';
+import { Checkbox, Chip, SearchField, Table, TableScroll, Web } from '@berrypjh/react-ui';
 
 import { Mono, Page, Section } from '../shell/ui';
 
@@ -86,34 +86,6 @@ const sortScales = (rows: Row[]): Row[] => {
 const ALL: Row[] = sortScales(flatten(Web.Light.tokens));
 const CATEGORIES = [...new Set(ALL.map((r) => r.category))].sort();
 
-/**
- * 선택 상태는 채워서 알린다 — 테두리 색만 바꾸면 옆 칩과 구분이 안 된다.
- *
- * 채움은 `background.primary` + `text.contrastText` 를 쓴다. 이 쌍은 세 테마 모두
- * 4.5:1 을 넘도록 설계된 조합이다. `background.dark` 는 dark 테마에서 밝은 색으로
- * 뒤집히는데 `contrastText` 는 밝은 채로 남아 글자가 사라진다.
- */
-const chipClass = (on: boolean) =>
-  [
-    'px-md py-xs text-xxsm rounded-sm border cursor-pointer transition-colors',
-    on
-      ? 'border-stroke-primary bg-background-primary text-text-contrastText'
-      : 'border-stroke-default bg-background-surface text-text-light hover:text-text-default',
-  ].join(' ');
-
-const Check = () => (
-  <svg viewBox="0 0 12 12" className="w-[10px] h-[10px]" aria-hidden focusable="false">
-    <path
-      d="M2.5 6.5 5 9l4.5-5"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.6"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
-
 export const TokensPage = () => {
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState<string>('all');
@@ -140,28 +112,27 @@ export const TokensPage = () => {
     >
       <Section title="검색" note={`${rows.length} / ${ALL.length}개`}>
         <div className="flex flex-wrap gap-lg items-center mb-lg">
-          <label className="flex-1 min-w-[240px]">
-            <span className="sr-only">토큰 검색</span>
-            <input
-              type="search"
+          <div className="flex-1 min-w-[240px]">
+            {/*
+              이름은 `inputProps` 로 준다. SearchField 의 나머지 prop 은 래퍼로 가고
+              `inputProps` 만 native `<input>` 에 닿는다 — 보이는 라벨 없이 이름을 줄 곳이 거기다.
+            */}
+            <SearchField
+              variant="boxed"
+              fullWidth
               value={query}
-              onChange={(e) => setQuery(e.target.value)}
+              onValueChange={setQuery}
+              clearable
+              clearAriaLabel="검색어 지우기"
               placeholder="이름 또는 CSS 변수로 검색"
-              data-testid="token-search"
-              className="w-full px-lg py-sm text-xsm rounded-sm border border-field-border bg-background-surface text-text-default placeholder:text-text-placeholder focus:outline-none focus:border-stroke-primary"
+              inputProps={{ 'aria-label': '토큰 검색', 'data-testid': 'token-search' }}
             />
-          </label>
+          </div>
           <div role="group" aria-label="카테고리" className="flex flex-wrap gap-xs">
             {['all', ...CATEGORIES].map((c) => (
-              <button
-                key={c}
-                type="button"
-                onClick={() => setCategory(c)}
-                aria-pressed={category === c}
-                className={chipClass(category === c)}
-              >
+              <Chip key={c} size="sm" selected={category === c} onClick={() => setCategory(c)}>
                 {c === 'all' ? '전체' : c}
-              </button>
+              </Chip>
             ))}
           </div>
         </div>
@@ -173,23 +144,16 @@ export const TokensPage = () => {
           className="flex flex-wrap gap-xs items-center mb-lg"
         >
           <span className="text-text-light text-xxsm mr-xs">표시</span>
+          {/* 열은 서로 독립이라 checkbox 다. 카테고리(상호배타)와 컨트롤이 갈리는 것이 의도다. */}
           {COLUMNS.map((c) => (
-            <button
+            <Checkbox
               key={c.id}
-              type="button"
-              onClick={() => toggle(c.id)}
-              aria-pressed={isOn(c.id)}
+              checked={isOn(c.id)}
+              onChange={() => toggle(c.id)}
               data-testid={`token-column-${c.id}`}
-              className={chipClass(isOn(c.id))}
             >
-              <span className="inline-flex items-center gap-xs">
-                {/* 열 토글은 서로 독립이라 칩마다 켜짐을 따로 표시한다. 자리는 늘 비워 둬 글자가 밀리지 않는다. */}
-                <span className="inline-flex w-[10px] justify-center">
-                  {isOn(c.id) && <Check />}
-                </span>
-                {c.label}
-              </span>
-            </button>
+              {c.label}
+            </Checkbox>
           ))}
         </div>
 
@@ -198,13 +162,20 @@ export const TokensPage = () => {
             일치하는 토큰이 없습니다. 다른 이름으로 찾아보세요.
           </p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-xsm border-collapse">
+          <TableScroll label="토큰 목록 표">
+            <Table hiddenCaption>
+              <caption>현재 테마 기준 토큰 이름 · 값 · CSS 변수 목록</caption>
               <thead>
                 <tr className="text-text-light text-xxsm">
-                  <th className="text-left font-semiBold pb-md pr-lg">토큰</th>
+                  <th scope="col" className="text-left font-semiBold pb-md pr-lg">
+                    토큰
+                  </th>
                   {COLUMNS.filter((c) => isOn(c.id)).map((c) => (
-                    <th key={c.id} className={`text-left font-semiBold pb-md pr-lg ${c.width}`}>
+                    <th
+                      key={c.id}
+                      scope="col"
+                      className={`text-left font-semiBold pb-md pr-lg ${c.width}`}
+                    >
                       {c.label}
                     </th>
                   ))}
@@ -232,13 +203,13 @@ export const TokensPage = () => {
                   </tr>
                 ))}
               </tbody>
-            </table>
-            {rows.length > 300 && (
-              <p className="text-text-light text-xxsm mt-lg">
-                상위 300개만 보여줍니다. 검색어를 좁혀 주세요.
-              </p>
-            )}
-          </div>
+            </Table>
+          </TableScroll>
+        )}
+        {rows.length > 300 && (
+          <p className="text-text-light text-xxsm mt-lg">
+            상위 300개만 보여줍니다. 검색어를 좁혀 주세요.
+          </p>
         )}
       </Section>
     </Page>

@@ -4,7 +4,14 @@ import { NAV, titleFor } from './nav';
 
 describe('정보 구조', () => {
   it('그룹은 작업 단위로 나뉜다', () => {
-    expect(NAV.map((g) => g.label)).toEqual([null, '검증', 'Foundation', '컴포넌트']);
+    expect(NAV.map((g) => g.label)).toEqual([
+      null,
+      '검증',
+      'Foundation',
+      '컴포넌트',
+      'Layout',
+      'Overlay',
+    ]);
   });
 
   it('모든 경로가 유일하다', () => {
@@ -15,7 +22,6 @@ describe('정보 구조', () => {
   it('현재 경로의 페이지 이름을 찾는다', () => {
     expect(titleFor('/')).toBe('개요');
     expect(titleFor('/verify')).toBe('Runtime');
-    expect(titleFor('/components/button')).toBe('Button');
     expect(titleFor('/components/button')).toBe('Button');
   });
 

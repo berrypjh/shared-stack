@@ -5,8 +5,10 @@ import { FabPage } from './pages/FabPage';
 import { FoundationPage } from './pages/FoundationPage';
 import { IconButtonPage } from './pages/IconButtonPage';
 import { OverviewPage } from './pages/OverviewPage';
+import { PopoverPage } from './pages/PopoverPage';
 import { SearchFieldPage } from './pages/SearchFieldPage';
 import { SelectPage } from './pages/SelectPage';
+import { StackPage } from './pages/StackPage';
 import { TextFieldPage } from './pages/TextFieldPage';
 import { TokensPage } from './pages/TokensPage';
 import { VerifyPage } from './pages/VerifyPage';
@@ -27,6 +29,8 @@ export const App = () => (
       <Route path="/components/search-field" element={<SearchFieldPage />} />
       <Route path="/components/fab" element={<FabPage />} />
       <Route path="/components/icon-button" element={<IconButtonPage />} />
+      <Route path="/components/stack" element={<StackPage />} />
+      <Route path="/components/popover" element={<PopoverPage />} />
     </Routes>
   </AppShell>
 );

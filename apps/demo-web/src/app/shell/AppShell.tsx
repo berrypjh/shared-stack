@@ -1,6 +1,14 @@
 import { ReactNode, useEffect, useState } from 'react';
 
-import { ThemeName, ThemeProvider, themes } from '@berrypjh/react-ui';
+import {
+  IconButton,
+  List,
+  ListItem,
+  SkipLink,
+  ThemeName,
+  ThemeProvider,
+  themes,
+} from '@berrypjh/react-ui';
 
 import { NavLink, useLocation } from 'react-router-dom';
 
@@ -22,6 +30,19 @@ const THEME_OPTIONS = themes.map((t) => ({
   value: t.name as ThemeName,
   label: themeLabel(t.name),
 }));
+
+/** 막대 셋. 아이콘은 소비자가 소유한다 — 라이브러리는 아이콘 세트를 들고 있지 않다. */
+const MenuIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden focusable="false">
+    <path
+      d="M4 7h16M4 12h16M4 17h16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+    />
+  </svg>
+);
 
 const Sidebar = () => (
   <nav
@@ -53,9 +74,9 @@ const Sidebar = () => (
               {group.label}
             </p>
           )}
-          <ul aria-labelledby={group.label ? `nav-group-${i}` : undefined}>
+          <List aria-labelledby={group.label ? `nav-group-${i}` : undefined}>
             {group.items.map((item) => (
-              <li key={item.path}>
+              <ListItem key={item.path}>
                 <NavLink
                   to={item.path}
                   end={item.end}
@@ -73,9 +94,9 @@ const Sidebar = () => (
                 >
                   {item.label}
                 </NavLink>
-              </li>
+              </ListItem>
             ))}
-          </ul>
+          </List>
         </div>
       ))}
     </div>
@@ -97,18 +118,17 @@ const Topbar = ({
 }) => (
   <header className="h-[52px] shrink-0 border-b border-stroke-default bg-background-surface flex items-center justify-between gap-md sm:gap-xl px-lg sticky top-0 z-10">
     <div className="flex items-center gap-md min-w-0">
-      <button
-        type="button"
+      <IconButton
+        size="sm"
+        edge="start"
         onClick={onOpenMenu}
         aria-label="메뉴 열기"
         aria-expanded={menuOpen}
         data-testid="open-menu"
-        className="lg:hidden shrink-0 p-xs -ml-xs rounded-sm text-text-default hover:bg-background-default transition-colors"
+        className="lg:hidden"
       >
-        <span aria-hidden className="block w-4 h-px bg-current" />
-        <span aria-hidden className="block w-4 h-px bg-current mt-1" />
-        <span aria-hidden className="block w-4 h-px bg-current mt-1" />
-      </button>
+        <MenuIcon />
+      </IconButton>
       {/* 좁은 화면에서는 바로 아래 h1 과 같은 말이라 접는다. */}
       <span className="hidden sm:block text-text-default text-xsm font-semiBold truncate">
         {title}
@@ -147,12 +167,7 @@ export const AppShell = ({ children }: { children: ReactNode }) => {
       data-testid="theme-root"
       className="min-h-screen bg-[var(--demo-canvas)]"
     >
-      <a
-        href="#main"
-        className="sr-only focus:not-sr-only focus:absolute focus:z-20 focus:m-md focus:px-lg focus:py-sm focus:rounded-sm focus:bg-background-primary focus:text-text-contrastText"
-      >
-        본문으로 건너뛰기
-      </a>
+      <SkipLink targetId="main">본문으로 건너뛰기</SkipLink>
 
       <div className="flex min-h-screen w-full max-w-[1440px] mx-auto bg-background-default">
         {/* 데스크톱에서만 자리를 차지한다. 좁은 화면에서는 220px 이 본문을 먹는다. */}
@@ -183,7 +198,12 @@ export const AppShell = ({ children }: { children: ReactNode }) => {
             onOpenMenu={() => setMenuOpen(true)}
             menuOpen={menuOpen}
           />
-          <main id="main" className="flex-1 min-w-0 py-xl">
+          {/*
+            skip link 의 대상이다. `tabIndex={-1}` 이 없으면 fragment 이동이 포커스를 옮기지
+            않고 순차 포커스 시작점만 바꾼다. `scroll-mt` 는 52px sticky 헤더가 대상을 덮지
+            않게 한다 (WCAG 2.4.11) — 헤더 높이는 앱이 알고 라이브러리는 모른다.
+          */}
+          <main id="main" tabIndex={-1} className="flex-1 min-w-0 py-xl scroll-mt-[52px]">
             {/* 좌우 여백은 react-deep-dive-zone 의 PageContainer 와 같은 규약을 쓴다. */}
             <div className="mx-auto w-full max-w-[1200px] px-lg sm:px-xl lg:px-2xl">{children}</div>
           </main>
