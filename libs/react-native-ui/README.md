@@ -44,12 +44,33 @@ import { Box, ThemeProvider } from '@berrypjh/react-native-ui';
 | 컴포넌트      | 설명                                                       |
 | ------------- | ---------------------------------------------------------- |
 | `Box`         | 기본 레이아웃 컴포넌트 (padding·margin·background·radius)  |
+| `Stack`       | 1차원 배치 (`direction`·`gap`·`align`·`justify`·`wrap`)    |
 | `Button`      | 라벨 버튼 (`variant`·`size`·`color`·`fullWidth`·`loading`) |
 | `Fab`         | 플로팅 액션 버튼 (`shape="circular" \| "extended"`)        |
 | `IconButton`  | 아이콘 전용 버튼 (`accessibilityLabel` 필수)               |
 | `PlainInput`  | 밑줄만 있는 텍스트 필드 (`accessibilityLabel` 필수)        |
 | `FilledInput` | 채워진 표면 + 사방 테두리 (`accessibilityLabel` 필수)      |
 | `BoxedInput`  | 윤곽선만 있는 필드 (`accessibilityLabel` 필수)             |
+
+`Box` 와 `Stack` 은 책임이 다릅니다. `Box` 는 면·여백·모서리를, `Stack` 은 자식을 한 축으로
+흘리는 1차원 배치만 가집니다. 둘 다 `View` 이고 `Pressable` 이 아니며, `Stack` 은 `Box` 를
+상속하지 않으므로 겹쳐 씁니다.
+
+```tsx
+import { Box, Stack } from '@berrypjh/react-native-ui';
+
+<Box p="lg" bg="background.surface" radius="md">
+  <Stack direction="row" gap="md" align="center" justify="between">
+    <Text>왼쪽</Text>
+    <Text>오른쪽</Text>
+  </Stack>
+</Box>;
+```
+
+`Stack` 의 기본 축은 `column`, `gap` 은 spacing 토큰 이름 또는 원시 숫자입니다 (`0` 은 "간격
+없음"이고 미지정과 다릅니다). 비상호작용이라 `accessible`·`accessibilityRole`·`focusable` 을
+만들지 않고, 소비자가 준 `ViewProps` 는 그대로 전달합니다. 반응형 prop 객체와 `Flex`·`Grid`
+짝 API 는 없습니다.
 
 Button 계열은 RN `Pressable` 위에 있습니다 — `onPress` 를 쓰고, web 의 `href`·`component`·
 `className`·`edge` 는 없습니다. `disabled`/`loading` 은 누름을 막고 접근성 상태로 알립니다.

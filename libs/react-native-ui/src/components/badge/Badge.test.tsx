@@ -15,6 +15,7 @@
  * `accessibilityElementsHidden`/`importantForAccessibility` 를 쓴다.
  */
 import { type ReactElement } from 'react';
+import { Text } from 'react-native';
 
 import { Native } from '@berrypjh/ui-core';
 
@@ -32,8 +33,17 @@ const T = Native.Light.tokens;
 const show = (ui: ReactElement) => render(<ThemeProvider>{ui}</ThemeProvider>);
 
 const root = () => screen.getByTestId('badge');
-const indicator = () => screen.getByTestId('badge-indicator');
-const queryIndicator = () => screen.queryByTestId('badge-indicator');
+
+/**
+ * 표시자.
+ *
+ * `includeHiddenElements` 가 필요하다 — label 없는 dot 은 `accessibilityElementsHidden` 로
+ * 접근성 트리에서 빠지고, 기본 쿼리는 그것을 "없는 것"으로 본다. 여기서 보려는 것은 접근성
+ * 노출이 아니라 **렌더 여부와 그 props** 다.
+ */
+const indicator = () => screen.getByTestId('badge-indicator', { includeHiddenElements: true });
+const queryIndicator = () =>
+  screen.queryByTestId('badge-indicator', { includeHiddenElements: true });
 
 /** Badge 가 계산한 표시자 style. 소비자 style 과 구분하려고 배열 첫 칸만 본다. */
 const indicatorStyle = (): ViewStyle => {
@@ -56,7 +66,7 @@ describe('루트', () => {
   it('ViewProps 를 루트로 전달한다', async () => {
     await show(
       <Badge testID="badge" count={1} pointerEvents="box-none">
-        anchor
+        <Text>anchor</Text>
       </Badge>,
     );
 
@@ -109,7 +119,7 @@ describe('앵커 보존 (회귀 방지)', () => {
   it('표시자가 터치를 가로채지 않는다', async () => {
     await show(
       <Badge testID="badge" count={3}>
-        anchor
+        <Text>anchor</Text>
       </Badge>,
     );
 
@@ -133,7 +143,7 @@ describe('count', () => {
   it('숫자를 표시자에 렌더한다', async () => {
     await show(
       <Badge testID="badge" count={3}>
-        anchor
+        <Text>anchor</Text>
       </Badge>,
     );
 
@@ -143,7 +153,7 @@ describe('count', () => {
   it('count=0 을 렌더한다 — 0 을 미지정으로 취급하지 않는다', async () => {
     await show(
       <Badge testID="badge" count={0}>
-        anchor
+        <Text>anchor</Text>
       </Badge>,
     );
 
@@ -153,7 +163,7 @@ describe('count', () => {
   it('content 가 count 를 이긴다', async () => {
     await show(
       <Badge testID="badge" count={3} content="NEW">
-        anchor
+        <Text>anchor</Text>
       </Badge>,
     );
 
@@ -162,7 +172,11 @@ describe('count', () => {
   });
 
   it('count·content 둘 다 없으면 표시자를 내지 않는다', async () => {
-    await show(<Badge testID="badge">anchor</Badge>);
+    await show(
+      <Badge testID="badge">
+        <Text>anchor</Text>
+      </Badge>,
+    );
 
     expect(queryIndicator()).toBeNull();
   });
@@ -170,7 +184,7 @@ describe('count', () => {
   it('숫자를 토큰 타이포로 감싼다', async () => {
     await show(
       <Badge testID="badge" count={3}>
-        anchor
+        <Text>anchor</Text>
       </Badge>,
     );
 
@@ -185,7 +199,7 @@ describe('max', () => {
   it('기본 max 는 99 다', async () => {
     await show(
       <Badge testID="badge" count={100}>
-        anchor
+        <Text>anchor</Text>
       </Badge>,
     );
 
@@ -195,7 +209,7 @@ describe('max', () => {
   it('count 가 max 이하면 그대로 보여 준다', async () => {
     await show(
       <Badge testID="badge" count={9} max={9}>
-        anchor
+        <Text>anchor</Text>
       </Badge>,
     );
 
@@ -205,7 +219,7 @@ describe('max', () => {
   it('count 가 max 를 넘으면 {max}+ 로 줄인다', async () => {
     await show(
       <Badge testID="badge" count={10} max={9}>
-        anchor
+        <Text>anchor</Text>
       </Badge>,
     );
 
@@ -215,7 +229,7 @@ describe('max', () => {
   it('max 는 content 에 적용되지 않는다', async () => {
     await show(
       <Badge testID="badge" content="1000" max={9}>
-        anchor
+        <Text>anchor</Text>
       </Badge>,
     );
 
@@ -227,7 +241,7 @@ describe('dot', () => {
   it('dot 은 내용을 렌더하지 않는다', async () => {
     await show(
       <Badge testID="badge" variant="dot" count={3}>
-        anchor
+        <Text>anchor</Text>
       </Badge>,
     );
 
@@ -238,7 +252,7 @@ describe('dot', () => {
   it('dot 은 count 없이도 나타난다', async () => {
     await show(
       <Badge testID="badge" variant="dot">
-        anchor
+        <Text>anchor</Text>
       </Badge>,
     );
 
@@ -260,7 +274,7 @@ describe('invisible', () => {
   it('표시자를 렌더하지 않는다 — 감추는 것이 아니라 내지 않는다', async () => {
     await show(
       <Badge testID="badge" count={3} invisible>
-        anchor
+        <Text>anchor</Text>
       </Badge>,
     );
 
@@ -346,7 +360,7 @@ describe('intent', () => {
   it('neutral 만 전경이 다르다 — grey 위에서는 contrastText 가 대비를 잃는다', async () => {
     await show(
       <Badge testID="badge" count={1} intent="neutral">
-        anchor
+        <Text>anchor</Text>
       </Badge>,
     );
 
@@ -360,7 +374,7 @@ describe('접근성', () => {
   it('label 을 주면 표시자가 이름을 갖는다', async () => {
     await show(
       <Badge testID="badge" count={137} label="읽지 않은 알림 137개">
-        anchor
+        <Text>anchor</Text>
       </Badge>,
     );
 
@@ -376,7 +390,7 @@ describe('접근성', () => {
   it('label 이 있으면 축약된 숫자가 따로 읽히지 않는다', async () => {
     await show(
       <Badge testID="badge" count={137} label="읽지 않은 알림 137개">
-        anchor
+        <Text>anchor</Text>
       </Badge>,
     );
 
@@ -389,7 +403,7 @@ describe('접근성', () => {
   it('label 이 없으면 역할·이름을 지어내지 않는다', async () => {
     await show(
       <Badge testID="badge" count={3}>
-        anchor
+        <Text>anchor</Text>
       </Badge>,
     );
 
@@ -401,7 +415,7 @@ describe('접근성', () => {
   it('label 없는 dot 은 접근성 트리에서 감춘다', async () => {
     await show(
       <Badge testID="badge" variant="dot">
-        anchor
+        <Text>anchor</Text>
       </Badge>,
     );
 
@@ -412,7 +426,7 @@ describe('접근성', () => {
   it('label 을 준 dot 은 이름을 갖는다 — 색이 유일한 통로가 아니다', async () => {
     await show(
       <Badge testID="badge" variant="dot" label="읽지 않은 알림 있음">
-        anchor
+        <Text>anchor</Text>
       </Badge>,
     );
 
@@ -423,7 +437,7 @@ describe('접근성', () => {
   it('선택·비활성 상태를 알리지 않는다', async () => {
     await show(
       <Badge testID="badge" count={1} label="알림 1개">
-        anchor
+        <Text>anchor</Text>
       </Badge>,
     );
 

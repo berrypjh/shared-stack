@@ -192,7 +192,7 @@ describe('이미지 실패', () => {
   });
 
   it('source 가 바뀌면 실패 상태를 초기화하고 다시 시도한다', async () => {
-    const { update } = await show(
+    const { rerender } = await show(
       <Avatar testID="avatar" source={SOURCE}>
         길동
       </Avatar>,
@@ -202,7 +202,7 @@ describe('이미지 실패', () => {
     expect(screen.queryByTestId('avatar-image')).toBeNull();
 
     const next = { uri: 'https://example.test/next.png' };
-    await update(
+    await rerender(
       <ThemeProvider>
         <Avatar testID="avatar" source={next}>
           길동

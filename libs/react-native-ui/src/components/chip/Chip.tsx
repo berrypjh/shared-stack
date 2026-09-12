@@ -3,7 +3,7 @@ import { Text, View } from 'react-native';
 import type { ChipSize, ChipVariant } from '@berrypjh/ui-core';
 
 import type { ReactNode } from 'react';
-import type { GestureResponderEvent } from 'react-native';
+import type { GestureResponderEvent, StyleProp, ViewStyle } from 'react-native';
 
 import { useTheme } from '../../theme';
 import { ButtonBase } from '../button-base/ButtonBase';
@@ -22,7 +22,7 @@ type ChipRuntimeProps = {
   leading?: ReactNode;
   size?: ChipSize;
   variant?: ChipVariant;
-  style?: unknown;
+  style?: StyleProp<ViewStyle>;
   onPress?: (event: GestureResponderEvent) => void;
   selected?: boolean;
   disabled?: boolean;

@@ -10,6 +10,7 @@ import { Native } from '@berrypjh/ui-core';
 
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import type { ReactElement, ReactNode } from 'react';
+import type { TextStyle } from 'react-native';
 
 import { ThemeProvider } from '../../theme';
 
@@ -156,6 +157,35 @@ describe('시각 토큰', () => {
     await renderWithTheme(<IconButton icon={icon} accessibilityLabel="즐겨찾기" />);
 
     expect(surface()).toHaveStyle({ backgroundColor: 'transparent' });
+  });
+});
+
+/**
+ * 문자열·숫자 아이콘은 컴포넌트가 `Text` 로 감쌉니다.
+ *
+ * RN 은 `View` 밑의 raw 문자열을 렌더하지 못하고(Invariant), 감싸지 않으면 `glyph` 크기와
+ * content color 가 글리프에 닿을 통로가 없습니다 — RN 에는 색 상속이 없습니다.
+ */
+describe('문자열 아이콘', () => {
+  it('문자열을 Text 로 감싸 렌더한다', async () => {
+    await renderWithTheme(<IconButton icon="🔔" accessibilityLabel="알림" />);
+
+    expect(screen.getByText('🔔')).toBeOnTheScreen();
+  });
+
+  it('숫자도 감싼다', async () => {
+    await renderWithTheme(<IconButton icon={3} accessibilityLabel="알림" />);
+
+    expect(screen.getByText('3')).toBeOnTheScreen();
+  });
+
+  it('감싼 글리프가 크기와 content color 토큰을 받는다', async () => {
+    await renderWithTheme(<IconButton icon="🔔" accessibilityLabel="알림" />);
+
+    const style = screen.getByText('🔔').props.style as TextStyle;
+
+    expect(style.fontSize).toBe(t.typography.fontSize.xl);
+    expect(style.color).toBe(t.color.icon.primary);
   });
 });
 

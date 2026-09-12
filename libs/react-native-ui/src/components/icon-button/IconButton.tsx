@@ -1,4 +1,4 @@
-import { ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator, Text, View } from 'react-native';
 
 import { useTheme } from '../../theme';
 import { ButtonBase } from '../button-base/ButtonBase';
@@ -49,9 +49,13 @@ export const IconButton = ({
               (loadingIndicator ?? <ActivityIndicator size={s.glyph} color={s.contentColor} />)
             ) : (
               <View style={s.icon}>
-                {typeof icon === 'function'
-                  ? icon({ color: s.contentColor, size: s.glyph, disabled: inactive, pressed })
-                  : icon}
+                {typeof icon === 'function' ? (
+                  icon({ color: s.contentColor, size: s.glyph, disabled: inactive, pressed })
+                ) : typeof icon === 'string' || typeof icon === 'number' ? (
+                  <Text style={s.glyphText}>{icon}</Text>
+                ) : (
+                  icon
+                )}
               </View>
             )}
           </View>

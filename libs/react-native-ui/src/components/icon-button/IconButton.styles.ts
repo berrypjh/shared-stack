@@ -1,6 +1,6 @@
 import type { ButtonColor, ButtonSize, RNTokens } from '@berrypjh/ui-core';
 
-import type { ViewStyle } from 'react-native';
+import type { TextStyle, ViewStyle } from 'react-native';
 
 /**
  * web은 컨트롤 크기를 `font-size + padding * 2`로 계산하지만, RN은 padding을 그대로 주면
@@ -39,7 +39,13 @@ export const resolveIconButtonStyles = ({
   color: ButtonColor;
   disabled: boolean;
   pressed: boolean;
-}): { surface: ViewStyle; icon: ViewStyle; glyph: number; contentColor: string } => {
+}): {
+  surface: ViewStyle;
+  icon: ViewStyle;
+  glyphText: TextStyle;
+  glyph: number;
+  contentColor: string;
+} => {
   const { glyph, padding } = sizeSpec(tokens, size);
 
   const contentColor = disabled
@@ -63,6 +69,7 @@ export const resolveIconButtonStyles = ({
       alignItems: 'center',
       justifyContent: 'center',
     },
+    glyphText: { fontSize: glyph, lineHeight: glyph, color: contentColor },
     glyph,
     contentColor,
   };

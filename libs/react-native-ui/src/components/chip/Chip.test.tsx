@@ -173,9 +173,7 @@ describe('selected', () => {
       </Chip>,
     );
 
-    expect(screen.getByRole('button', { name: '필터' })).toHaveAccessibilityState({
-      selected: true,
-    });
+    expect(screen.getByRole('button', { name: '필터' })).toBeSelected();
   });
 
   it('selected=false 도 알린다 — toggle 임을 드러낸다', async () => {

@@ -16,6 +16,7 @@ export * from './radio';
 export * from './search-field';
 export * from './segment-control';
 export * from './select';
+export * from './stack';
 export * from './switch';
 export * from './text-field';
 

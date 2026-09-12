@@ -68,23 +68,54 @@ npx @berrypjh/react-native-ui token color.primary
 
 정확한 컴포넌트 목록과 prop은 `llm-catalog.json`의 `symbols`에서 읽는다 (`kind: "component"`).
 
-| 컴포넌트         | 요약                                                                          |
-| ---------------- | ----------------------------------------------------------------------------- |
-| `Box`            | 토큰 기반 레이아웃 (padding·margin·background·radius). `ref` 는 호스트 `View` |
-| `Button`         | 라벨 버튼. `variant`·`size`·`color`·`fullWidth`·`loading`·아이콘 슬롯         |
-| `Checkbox`       | 체크박스. `checked`·`defaultChecked`·`onCheckedChange`·`indeterminate`        |
-| `Fab`            | 플로팅 액션 버튼. `shape="circular" \| "extended"`                            |
-| `IconButton`     | 아이콘 전용 버튼. `accessibilityLabel` **필수**                               |
-| `PlainInput`     | 밑줄만 있는 텍스트 필드. `accessibilityLabel` **필수**                        |
-| `FilledInput`    | 채워진 표면 + 사방 테두리. `accessibilityLabel` **필수**                      |
-| `BoxedInput`     | 윤곽선만 있는 필드(표면 투명). `accessibilityLabel` **필수**                  |
-| `TextField`      | 라벨·입력·헬퍼 합성. 문자열 `label` 이 입력의 이름이 된다                     |
-| `SearchField`    | 검색 입력 + 지우기 + 제안 목록. `accessibilityLabel` **필수**                 |
-| `Select`         | 데이터 `options` 기반 단일 선택. `accessibilityLabel` **필수**                |
-| `SegmentControl` | 상호배타 선택. **controlled 전용**                                            |
-| `RadioGroup`     | 단일 선택 그룹. `value`·`defaultValue`·`onValueChange`. 자식은 `Radio`        |
-| `Radio`          | `RadioGroup` 안의 선택지. `value` **필수**. 그룹 밖에서는 오류                |
-| `Switch`         | core Switch 래퍼. **controlled 전용**. `accessibilityLabel` **필수**          |
+| 컴포넌트         | 요약                                                                            |
+| ---------------- | ------------------------------------------------------------------------------- |
+| `Box`            | 토큰 기반 레이아웃 (padding·margin·background·radius). `ref` 는 호스트 `View`   |
+| `Stack`          | 1차원 배치 (`direction`·`gap`·`align`·`justify`·`wrap`). `ref` 는 호스트 `View` |
+| `Button`         | 라벨 버튼. `variant`·`size`·`color`·`fullWidth`·`loading`·아이콘 슬롯           |
+| `Checkbox`       | 체크박스. `checked`·`defaultChecked`·`onCheckedChange`·`indeterminate`          |
+| `Fab`            | 플로팅 액션 버튼. `shape="circular" \| "extended"`                              |
+| `IconButton`     | 아이콘 전용 버튼. `accessibilityLabel` **필수**                                 |
+| `PlainInput`     | 밑줄만 있는 텍스트 필드. `accessibilityLabel` **필수**                          |
+| `FilledInput`    | 채워진 표면 + 사방 테두리. `accessibilityLabel` **필수**                        |
+| `BoxedInput`     | 윤곽선만 있는 필드(표면 투명). `accessibilityLabel` **필수**                    |
+| `TextField`      | 라벨·입력·헬퍼 합성. 문자열 `label` 이 입력의 이름이 된다                       |
+| `SearchField`    | 검색 입력 + 지우기 + 제안 목록. `accessibilityLabel` **필수**                   |
+| `Select`         | 데이터 `options` 기반 단일 선택. `accessibilityLabel` **필수**                  |
+| `SegmentControl` | 상호배타 선택. **controlled 전용**                                              |
+| `RadioGroup`     | 단일 선택 그룹. `value`·`defaultValue`·`onValueChange`. 자식은 `Radio`          |
+| `Radio`          | `RadioGroup` 안의 선택지. `value` **필수**. 그룹 밖에서는 오류                  |
+| `Switch`         | core Switch 래퍼. **controlled 전용**. `accessibilityLabel` **필수**            |
+
+#### Box · Stack (레이아웃 primitive 둘)
+
+책임이 갈린다. `Box` 는 면·여백·모서리를, `Stack` 은 자식을 한 축으로 흘리는 1차원 배치만
+가진다. `Stack` 은 `Box` 를 상속하지 않으므로 둘 다 필요하면 겹쳐 쓴다.
+
+```tsx
+<Box p="lg" bg="background.surface" radius="md">
+  <Stack direction="row" gap="md" align="center" justify="between">
+    <Text>왼쪽</Text>
+    <Text>오른쪽</Text>
+  </Stack>
+</Box>
+```
+
+- 둘 다 `View` 다. `Pressable` 이 아니고 최소 터치 타깃도 없다 — 누를 수 있는 레이아웃은
+  소비자가 자식을 `Button`/`IconButton` 으로 만든다.
+- `Stack` 기본 축은 `column` 이다. RN `View` 기본값과 같지만 계약이 못박은 값이라 web 과
+  동작이 같다.
+- `gap` 은 spacing 토큰 이름(`"md"`) 또는 원시 숫자(`12`)다. 숫자는 web 의 `px` 문자열이
+  아니라 **밀도 독립 원시 값**이다. `gap={0}` 과 `wrap={false}` 는 미지정이 아니라 명시한 값이다.
+- 토큰 `gap` 은 현재 `ThemeProvider` 에서 해석된다. Provider 밖에서 쓰면 던진다 — 조용히
+  잘못된 간격을 만들지 않는다. (spacing 은 모든 테마가 같은 눈금을 쓰므로 테마를 바꿔도
+  간격은 변하지 않는다. 바뀌는 것은 색이다.)
+- **비상호작용이다.** `accessible`·`accessibilityRole`·`accessibilityLabel`·
+  `accessibilityHint`·`accessibilityState`·`focusable` 을 **만들지 않는다.** 소비자가 준
+  `ViewProps` 는 그대로 전달하므로 시맨틱이 필요하면 직접 준다.
+- `style` 은 계산된 레이아웃보다 **뒤에 온다** (`[computed, style]`). escape hatch 로 덮을 수 있다.
+- 반응형 prop 객체는 없다. `Flex`·`Grid` 도 없다 — 2차원 배치는 `Stack` 중첩이나 `FlatList`
+  (`numColumns`)의 몫이다.
 
 #### Button 계열 공통
 
