@@ -32,6 +32,9 @@ const COMPILER_OPTIONS: ts.CompilerOptions = {
 
 const ELEMENT_TYPE_NAMES = new Set(['Element', 'ReactElement']);
 
+/** 상속 사슬을 따라갈 수 있는 타입만. 그 밖에는 `getBaseTypes` 를 부르지 않는다. */
+const INHERITABLE = ts.ObjectFlags.ClassOrInterface | ts.ObjectFlags.Reference;
+
 type Ctx = { checker: ts.TypeChecker; file: string };
 
 const unionParts = (type: ts.Type): ts.Type[] => (type.isUnion() ? type.types : [type]);
@@ -39,12 +42,35 @@ const unionParts = (type: ts.Type): ts.Type[] => (type.isUnion() ? type.types : 
 const isNullish = (type: ts.Type): boolean =>
   (type.flags & (ts.TypeFlags.Undefined | ts.TypeFlags.Null | ts.TypeFlags.Void)) !== 0;
 
+const baseTypes = (checker: ts.TypeChecker, type: ts.Type): readonly ts.Type[] => {
+  const isObject = (type.flags & ts.TypeFlags.Object) !== 0;
+  if (!isObject || ((type as ts.ObjectType).objectFlags & INHERITABLE) === 0) return [];
+  return checker.getBaseTypes(type as ts.InterfaceType) ?? [];
+};
+
+/**
+ * React element 타입인지 — **상속 사슬까지** 본다.
+ *
+ * 이름만 맞춰 보면 `createElement` 결과를 그대로 돌려주는 컴포넌트를 놓친다. `List` 의 반환
+ * 타입은 `JSX.Element` 가 아니라 `DetailedReactHTMLElement` 여서 함수로 분류됐고, 그래서
+ * 카탈로그에 prop 계약이 통째로 비어 있었다 (`ordered`·`marker` 를 조회할 수 없었다).
+ * 사슬은 `DetailedReactHTMLElement → DOMElement → ReactElement` 로 두 단계다.
+ */
+const isElementType = (
+  checker: ts.TypeChecker,
+  type: ts.Type,
+  seen: Set<ts.Type> = new Set(),
+): boolean => {
+  if (seen.has(type)) return false;
+  seen.add(type);
+  if (ELEMENT_TYPE_NAMES.has(type.getSymbol()?.getName() ?? '')) return true;
+  return baseTypes(checker, type).some((base) => isElementType(checker, base, seen));
+};
+
 /** JSX를 반환하는 호출 시그니처면 컴포넌트로 본다. */
-const returnsElement = (signature: ts.Signature): boolean => {
+const returnsElement = (checker: ts.TypeChecker, signature: ts.Signature): boolean => {
   const parts = unionParts(signature.getReturnType()).filter((t) => !isNullish(t));
-  return (
-    parts.length > 0 && parts.every((t) => ELEMENT_TYPE_NAMES.has(t.getSymbol()?.getName() ?? ''))
-  );
+  return parts.length > 0 && parts.every((t) => isElementType(checker, t));
 };
 
 /**
@@ -141,7 +167,7 @@ const kindOf = (ctx: Ctx, symbol: ts.Symbol, signatures: readonly ts.Signature[]
       ? 'value'
       : 'type';
   }
-  if (signatures.some(returnsElement)) return 'component';
+  if (signatures.some((signature) => returnsElement(ctx.checker, signature))) return 'component';
   return /^use[A-Z]/.test(symbol.getName()) ? 'hook' : 'function';
 };
 

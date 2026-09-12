@@ -125,6 +125,20 @@ describe('web catalog contents', () => {
     }
   });
 
+  /**
+   * `List` 는 `createElement` 결과를 그대로 돌려주므로 반환 타입이 `JSX.Element` 가 아니라
+   * `DetailedReactHTMLElement` 다. 이름만 맞춰 보던 판정에서는 함수로 분류되어 prop 계약이
+   * 통째로 비어 있었다 — README 가 catalog 를 정답으로 안내하는데 `ordered`·`marker` 를
+   * 조회할 수 없는 상태였다.
+   */
+  it('classifies a component that returns createElement output', () => {
+    const list = web.symbols.List;
+    expect(list.kind).toBe('component');
+    expect(list.propsType).toBe('ListProps');
+    expect(Object.keys(list.props ?? {})).toEqual(expect.arrayContaining(['ordered', 'marker']));
+    expect(list.props?.ordered).toMatchObject({ type: 'boolean', required: false });
+  });
+
   it('extracts library props and literal unions for a complex component', () => {
     const button = web.symbols.Button;
     expect(button.kind).toBe('component');
