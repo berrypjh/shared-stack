@@ -1,3 +1,5 @@
+import { List, ListItem } from '@berrypjh/react-ui';
+
 import { Link } from 'react-router-dom';
 
 import { Page, Section } from '../shell/ui';
@@ -39,9 +41,9 @@ export const OverviewPage = () => {
       </Section>
 
       <Section title="바로가기">
-        <ul className="grid gap-0 border-t border-stroke-light">
+        <List className="border-t border-stroke-light">
           {ENTRIES.map((e) => (
-            <li key={e.to} className="border-b border-stroke-light">
+            <ListItem key={e.to} className="border-b border-stroke-light">
               <Link
                 to={e.to}
                 className="flex flex-col sm:flex-row sm:items-baseline gap-2xs sm:gap-lg py-lg no-underline group"
@@ -51,9 +53,9 @@ export const OverviewPage = () => {
                 </span>
                 <span className="text-text-light text-xsm">{e.desc}</span>
               </Link>
-            </li>
+            </ListItem>
           ))}
-        </ul>
+        </List>
       </Section>
     </Page>
   );

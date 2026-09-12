@@ -1,3 +1,5 @@
+import { Table, TableScroll } from '@berrypjh/react-ui';
+
 import { Mono, Page, Section, Swatch } from '../shell/ui';
 import { CONTRAST_CHECKS, CONTRAST_VARS, contrastRatio } from '../verification/contrast';
 import { RuntimeVerification } from '../verification/RuntimeVerification';
@@ -23,15 +25,26 @@ export const VerifyPage = () => {
       </Section>
 
       <Section title="접근성" note="브라우저가 계산한 값으로 WCAG 2.1 대비를 다시 잽니다">
-        <div className="overflow-x-auto">
-          <table className="w-full text-xsm border-collapse">
+        <TableScroll label="WCAG 대비 측정 결과 표">
+          <Table hiddenCaption>
+            <caption>브라우저가 계산한 값으로 다시 잰 WCAG 2.1 대비 측정 결과</caption>
             <thead>
               <tr className="text-text-light text-xxsm">
-                <th className="text-left font-semiBold pb-md pr-lg">조합</th>
-                <th className="text-left font-semiBold pb-md pr-lg w-[80px]">색</th>
-                <th className="text-right font-semiBold pb-md pr-lg w-[90px]">대비</th>
-                <th className="text-right font-semiBold pb-md pr-lg w-[70px]">기준</th>
-                <th className="text-right font-semiBold pb-md w-[90px]">결과</th>
+                <th scope="col" className="text-left font-semiBold pb-md pr-lg">
+                  조합
+                </th>
+                <th scope="col" className="text-left font-semiBold pb-md pr-lg w-[80px]">
+                  색
+                </th>
+                <th scope="col" className="text-right font-semiBold pb-md pr-lg w-[90px]">
+                  대비
+                </th>
+                <th scope="col" className="text-right font-semiBold pb-md pr-lg w-[70px]">
+                  기준
+                </th>
+                <th scope="col" className="text-right font-semiBold pb-md w-[90px]">
+                  결과
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -42,15 +55,11 @@ export const VerifyPage = () => {
                 const exempt = c.need === 0;
                 const ok = ratio !== null && ratio >= c.need;
                 return (
-                  <tr
-                    key={c.label}
-                    data-testid={`contrast-${c.label}`}
-                    className="border-t border-stroke-light"
-                  >
-                    <td className="py-md pr-lg text-text-default">
+                  <tr key={c.label} data-testid={`contrast-${c.label}`}>
+                    <th scope="row" className="py-md pr-lg text-text-default font-regular">
                       {c.label}
                       {c.note && <span className="text-text-light text-xxsm ml-md">{c.note}</span>}
-                    </td>
+                    </th>
                     <td className="py-md pr-lg">
                       <span className="flex items-center gap-xs">
                         <Swatch color={bg} size={16} />
@@ -76,8 +85,8 @@ export const VerifyPage = () => {
                 );
               })}
             </tbody>
-          </table>
-        </div>
+          </Table>
+        </TableScroll>
       </Section>
 
       <Section title="E2E 측정 지점" note="Playwright가 computed style로 읽는 고정 앵커">
