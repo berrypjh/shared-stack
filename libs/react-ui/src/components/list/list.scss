@@ -1,0 +1,57 @@
+/**
+ * List — semantic HTML helper.
+ *
+ * 시각은 **최소한만** 한다: 브라우저 기본 여백·마커를 정리하고 간격 훅 하나를 둔다.
+ *
+ * 간격 기본값이 `0` 인 것은 의도다. 저장소의 실제 목록 두 곳(`demo-web` 의 사이드바 내비와
+ * 바로가기 목록)은 모두 항목 사이를 **테두리로** 가르고 간격은 0 이다. 기본값으로 여백을
+ * 밀어 넣으면 두 곳 모두 그것을 되돌려야 한다 — 그래서 훅만 두고 값은 소비자가 정한다.
+ *
+ * `display: flex` 를 쓰지 않는다. `<ul>` 을 flex 컨테이너로 만들면 native 마커 배치가 흐트러진다
+ * (`list-item` 자식이 flex item 이 된다). native 목록 레이아웃을 그대로 두고 간격은 인접
+ * 형제 여백으로 준다.
+ *
+ * 상호작용 규칙이 **없다** — `:hover`·`:active`·`:focus-visible` 을 두지 않는다. 목록 항목이
+ * 눌리는 경우 그 시각은 자식 control(`<a>`·`<button>`)이 소유한다.
+ *
+ * 마커 정책은 시각 결정이고, 목록이라는 **시맨틱**은 `List.tsx` 의 조건부 `role="list"` 가
+ * 지킨다 (WebKit 이 `list-style: none` 에서 목록 역할을 지우기 때문).
+ */
+.ui-list {
+  /* 간격 훅. 기본은 0 — 소비자가 className·style 로 정한다. */
+  --ui-list-gap: 0;
+
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/**
+ * native 마커를 보인다.
+ *
+ * 마커가 잘리지 않도록 들여쓰기를 되살린다. 바깥 마커를 유지하므로 긴 항목의 둘째 줄이
+ * 마커 아래로 흐르지 않고 글자 기준선에 맞춰 정렬된다.
+ */
+.ui-list--marker {
+  list-style: revert;
+  padding-inline-start: var(--ds-spacing-xl);
+}
+
+.ui-list__item {
+  /* 긴 내용이 컨테이너를 밀어내지 않는다. */
+  min-width: 0;
+}
+
+/* 간격은 인접 형제에만 — 첫 항목 위에 여백이 생기지 않는다. */
+.ui-list__item + .ui-list__item {
+  margin-block-start: var(--ui-list-gap);
+}
+
+/**
+ * 중첩 목록은 상위 항목 안에서 한 단계 들여쓴다.
+ *
+ * 마커 목록은 위 `--marker` 규칙이 이미 들여쓰기를 갖는다 — 여기서는 마커 없는 중첩만 들여쓴다.
+ */
+.ui-list__item > .ui-list:not(.ui-list--marker) {
+  padding-inline-start: var(--ds-spacing-md);
+}

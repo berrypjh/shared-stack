@@ -1,0 +1,227 @@
+/**
+ * Chip — compact label.
+ *
+ * passive 루트는 `<span>`, interactive 루트는 `<button>` 이지만 **시각은 한 벌**이다.
+ * 상태 규칙은 `.ui-chip--interactive` 로만 걸어서 passive chip 에 hover·pressed·focus 가
+ * 새지 않는다 — 누를 수 없는 것이 눌릴 것처럼 보이면 안 된다.
+ *
+ * 상태 색은 서로 **배타적**이다. `:not()` 으로 배제해 어떤 조합에서도 매칭되는 규칙이 정확히
+ * 하나가 되게 한다 (Input·Label·Checkbox 와 같은 순서: disabled > selected > hover > 평상시).
+ * 선언 순서에 기대지 않는 이유는 `styles.ts` 정렬이 바뀌면 조용히 깨지기 때문이다.
+ *
+ * pressed 는 **색이 아니라 위치**다 — `component.pressedOffset` 을 쓴다. 이 저장소의 정본
+ * 표현이고 `contrast.test.ts` 의 `pressed 상태 어휘` 가 `color.*pressed*` 토큰 생성을 막는다.
+ */
+.ui-chip {
+  --ui-chip-px: var(--ds-spacing-md);
+  --ui-chip-py: var(--ds-spacing-xs);
+  --ui-chip-gap: var(--ds-spacing-xs);
+
+  --ui-chip-font-family: var(--ds-body-small-font-family);
+  --ui-chip-font-size: var(--ds-body-small-font-size);
+  --ui-chip-font-weight: var(--ds-body-small-font-weight);
+  --ui-chip-letter-spacing: var(--ds-body-small-letter-spacing);
+  --ui-chip-line-height: var(--ds-body-small-line-height);
+
+  /* 평상시 */
+  --ui-chip-surface: transparent;
+  --ui-chip-border-color: var(--ds-field-border);
+  --ui-chip-fg: var(--ds-text-default);
+
+  /* 상태 */
+  --ui-chip-surface-hover: var(--ds-primary-btn-outlined-hover);
+  --ui-chip-border-hover: var(--ds-field-border-hover);
+  --ui-chip-surface-selected: var(--ds-background-selected);
+  --ui-chip-border-selected: var(--ds-selection-control-checked);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--ui-chip-gap);
+  box-sizing: border-box;
+  max-width: 100%;
+
+  padding: var(--ui-chip-py) var(--ui-chip-px);
+  border: var(--ds-border-primary-width) solid var(--ui-chip-border-color);
+  border-radius: var(--ds-radius-rounded);
+
+  background-color: var(--ui-chip-surface);
+  color: var(--ui-chip-fg);
+
+  font-family: var(--ui-chip-font-family);
+  font-size: var(--ui-chip-font-size);
+  font-weight: var(--ui-chip-font-weight);
+  letter-spacing: var(--ui-chip-letter-spacing);
+  line-height: var(--ui-chip-line-height);
+
+  /* passive 기본값 — interactive 가 아래에서 덮는다. */
+  cursor: default;
+  user-select: none;
+  text-align: start;
+}
+
+/* 라벨이 길면 잘린다. 상자가 컨테이너를 밀어내지 않는다. */
+.ui-chip__label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 글리프는 줄어들지 않는다. `aria-hidden` 이라 낭독되지 않는다(컴포넌트가 붙인다). */
+.ui-chip__leading {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+}
+
+/* =========================
+   Sizes
+========================= */
+.ui-chip--size-sm {
+  --ui-chip-px: var(--ds-spacing-sm);
+  --ui-chip-py: var(--ds-spacing-2xs);
+  --ui-chip-gap: var(--ds-spacing-2xs);
+
+  --ui-chip-font-family: var(--ds-body-tiny-font-family);
+  --ui-chip-font-size: var(--ds-body-tiny-font-size);
+  --ui-chip-font-weight: var(--ds-body-tiny-font-weight);
+  --ui-chip-letter-spacing: var(--ds-body-tiny-letter-spacing);
+  --ui-chip-line-height: var(--ds-body-tiny-line-height);
+}
+
+.ui-chip--size-md {
+  --ui-chip-px: var(--ds-spacing-md);
+  --ui-chip-py: var(--ds-spacing-xs);
+  --ui-chip-gap: var(--ds-spacing-xs);
+
+  --ui-chip-font-family: var(--ds-body-small-font-family);
+  --ui-chip-font-size: var(--ds-body-small-font-size);
+  --ui-chip-font-weight: var(--ds-body-small-font-weight);
+  --ui-chip-letter-spacing: var(--ds-body-small-letter-spacing);
+  --ui-chip-line-height: var(--ds-body-small-line-height);
+}
+
+/* =========================
+   Variants
+========================= */
+.ui-chip--variant-outlined {
+  --ui-chip-surface: transparent;
+}
+
+.ui-chip--variant-filled {
+  --ui-chip-surface: var(--ds-field-surface-subtle);
+}
+
+/* =========================
+   Interactive
+
+   모든 상태 규칙이 `.ui-chip--interactive` 를 요구한다 — passive 에는 새지 않는다.
+========================= */
+.ui-chip--interactive {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+
+  transition:
+    background-color var(--ds-motion-duration-normal) var(--ds-motion-easing-standard),
+    border-color var(--ds-motion-duration-normal) ease,
+    color var(--ds-motion-duration-normal) ease,
+    transform var(--ds-motion-duration-fast) ease;
+}
+
+/* 선택됨. 면과 테두리를 함께 바꾼다 — 색 하나에만 기대지 않는다. */
+.ui-chip--interactive.is-selected:not(:disabled) {
+  background-color: var(--ui-chip-surface-selected);
+  border-color: var(--ui-chip-border-selected);
+}
+
+/* 평상시 hover (선택 안 됨) */
+@media (hover: hover) {
+  .ui-chip--interactive:hover:not(:disabled):not(.is-selected) {
+    background-color: var(--ui-chip-surface-hover);
+    border-color: var(--ui-chip-border-hover);
+  }
+
+  /* 선택된 것의 hover — 면만 짙게, 테두리는 선택 강조를 유지한다. */
+  .ui-chip--interactive.is-selected:hover:not(:disabled) {
+    background-color: var(--ui-chip-surface-hover);
+    border-color: var(--ui-chip-border-selected);
+  }
+}
+
+/**
+ * pressed — 색이 아니라 위치다.
+ *
+ * `.ui-button:active` 와 같은 언어를 쓴다. 선택 여부와 무관하게 같은 깊이로 눌린다.
+ */
+.ui-chip--interactive:active:not(:disabled) {
+  transform: translateY(var(--ds-component-pressed-offset));
+}
+
+.ui-chip--interactive:focus {
+  outline: none;
+}
+
+/**
+ * 포커스는 outline 으로 그린다 — forced-colors 에서도 남고, Checkbox·Radio·Switch 와 같은
+ * 토큰(`component.field.focusRingWidth` + `border.primary.color`)을 쓴다.
+ */
+.ui-chip--interactive:focus-visible {
+  outline: var(--ds-component-field-focus-ring-width) solid var(--ds-border-primary-color);
+  outline-offset: var(--ds-spacing-2xs);
+}
+
+.ui-chip--interactive:disabled {
+  cursor: not-allowed;
+  background-color: transparent;
+  border-color: var(--ds-border-disabled-color);
+  color: var(--ds-text-disable);
+  transform: none;
+}
+
+/* 비활성이면서 선택된 것 — 선택 사실은 남기고 채도만 죽인다. */
+.ui-chip--interactive.is-selected:disabled {
+  background-color: var(--ds-background-disable);
+  border-color: var(--ds-border-disabled-color);
+}
+
+/**
+ * 끄는 것은 전환뿐이다.
+ *
+ * `:focus-visible` outline 과 `:active` 의 눌림 오프셋은 남긴다 — 오프셋은 전환 없이 즉시
+ * 적용되는 위치이지 애니메이션이 아니다 (`button-base.scss` 와 같은 판단).
+ */
+@media (prefers-reduced-motion: reduce) {
+  .ui-chip--interactive {
+    transition: none;
+  }
+}
+
+/**
+ * forced-colors(Windows 고대비) 대응.
+ *
+ * **선택 상태가 사라지는 것**이 여기서 가장 큰 문제다. selected 를 면·테두리 색으로만 표현하면
+ * 그 모드에서 둘 다 시스템 색으로 평탄화되어 어느 chip 이 선택됐는지 보이지 않는다.
+ * `SegmentControl` 과 같은 전략으로 그 모드에서만 `Highlight` 로 채운다.
+ *
+ * `:focus-visible` 은 손대지 않는다 — outline 으로 그려서 그 모드에서도 남는다.
+ * `Highlight`·`HighlightText`·`GrayText` 는 CSS 시스템 색 키워드지 하드코딩이 아니다.
+ */
+@media (forced-colors: active) {
+  .ui-chip--interactive.is-selected {
+    forced-color-adjust: none;
+    background-color: Highlight;
+    color: HighlightText;
+    border-color: Highlight;
+  }
+
+  .ui-chip--interactive.is-selected:disabled {
+    color: GrayText;
+    border-color: GrayText;
+  }
+
+  /* `forced-color-adjust: none` 이라 링 색도 강제되지 않는다 — 시스템 색을 직접 준다. */
+  .ui-chip--interactive.is-selected:focus-visible {
+    outline: var(--ds-component-field-focus-ring-width) solid Highlight;
+  }
+}

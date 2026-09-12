@@ -1,0 +1,17 @@
+export const badgeClasses = {
+  root: 'ui-badge',
+  indicator: 'ui-badge__indicator',
+  value: 'ui-badge__value',
+  variantCount: 'ui-badge--variant-count',
+  variantDot: 'ui-badge--variant-dot',
+  sizeSm: 'ui-badge--size-sm',
+  sizeMd: 'ui-badge--size-md',
+  intentPrimary: 'ui-badge--intent-primary',
+  intentSecondary: 'ui-badge--intent-secondary',
+  intentError: 'ui-badge--intent-error',
+  intentNeutral: 'ui-badge--intent-neutral',
+  placementTopEnd: 'ui-badge--placement-top-end',
+  placementTopStart: 'ui-badge--placement-top-start',
+  placementBottomEnd: 'ui-badge--placement-bottom-end',
+  placementBottomStart: 'ui-badge--placement-bottom-start',
+} as const;

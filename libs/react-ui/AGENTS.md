@@ -4,7 +4,7 @@
 
 - **웹 전용**: DOM API · CSS · React DOM이 전제. RN API 금지. 양 플랫폼이 쓸 코드는 ui-core로 올린다.
 - **ui-core 캡슐화**: react-ui 소비자는 `@berrypjh/ui-core`·`@berrypjh/design-tokens`를 모른다. 컴포넌트 prop은 시맨틱 계약을 wrap해 노출한다.
-- **시맨틱 계약의 소유자**: 양 렌더러가 같은 불변식을 실제로 구현하는 계약만 ui-core에 있다 (`box`·`button`·`fab`·`icon-button`·`field`). RN 구현이 없는 `menu-item`, 그리고 같은 계약 안에서도 한쪽에만 있는 키(`FieldProps`의 `required`·`margin`·`hiddenLabel`, `IconButtonProps`의 `edge`·`loading`)는 `src/types/`가 소유한다. RN 구현이 생기기 전에 ui-core로 올리지 않는다.
+- **시맨틱 계약의 소유자**: 양 렌더러가 같은 불변식을 실제로 구현하는 계약만 ui-core에 있다 (`avatar`·`badge`·`box`·`button`·`chip`·`fab`·`icon-button`·`field`). RN 구현이 없는 `menu-item`, 그리고 같은 계약 안에서도 한쪽에만 있는 키(`FieldProps`의 `required`·`margin`·`hiddenLabel`, `IconButtonProps`의 `edge`·`loading`)는 `src/types/`가 소유한다. RN 구현이 생기기 전에 ui-core로 올리지 않는다.
 - **accessibility는 필수**: keyboard/focus/aria 동작은 변경 시 보존. `describeConformance` 기반 conformance 테스트는 회귀 방지용.
 - **토큰만 사용**: 색·spacing·radius 하드코딩 금지. SCSS는 CSS 변수, JSX는 `getColor`/Tailwind class 활용.
 - **단일 사용처면 `src/utils`가 아님**: 한 컴포넌트만 쓰면 그 컴포넌트 폴더로 (`Select.navigation.ts`·`Select.selection.ts`·`SearchField.utils.ts`가 그 예). 양 플랫폼이 **실제로** 같은 의미로 쓸 때만 ui-core.

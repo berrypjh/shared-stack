@@ -1,0 +1,198 @@
+/**
+ * Badge — overlay indicator.
+ *
+ * 루트는 **위치 기준만** 만든다 (`position: relative`). 앵커는 그대로 흐르고 표시자만 절대
+ * 배치되므로 앵커의 레이아웃·시맨틱이 바뀌지 않는다.
+ *
+ * 위치는 **논리 방향**으로만 쓴다 (`inset-block-*`/`inset-inline-*`). `transform: translate` 를
+ * 쓰지 않는 이유가 있다 — `translate` 는 물리 좌표라 RTL 에서 배지가 앵커 안쪽으로 들어간다.
+ * 음수 논리 inset 은 쓰기 방향을 따라가므로 `[dir="rtl"]` 덮어쓰기가 필요 없다.
+ *
+ * 상호작용 규칙이 없다 — `:hover`·`:active`·`:focus-visible` 을 두지 않는다. 누를 수 있는
+ * 알림은 앵커가 `ButtonBase`/`IconButton` 이고 그 포커스 링은 그쪽이 그린다.
+ */
+.ui-badge {
+  position: relative;
+  display: inline-flex;
+  /* 앵커를 감싸는 최소 상자 — 래퍼가 레이아웃을 넓히지 않는다. */
+  flex: none;
+  vertical-align: middle;
+}
+
+.ui-badge__indicator {
+  /* size 클래스가 이 둘만 갈아끼우면 지름·오프셋·타이포가 함께 움직인다. */
+  --ui-badge-min-size: var(--ds-spacing-xl);
+  --ui-badge-padding-inline: var(--ds-spacing-xs);
+
+  --ui-badge-font-family: var(--ds-body-small-font-family);
+  --ui-badge-font-size: var(--ds-body-small-font-size);
+  --ui-badge-font-weight: var(--ds-body-small-strong-font-weight);
+  --ui-badge-letter-spacing: var(--ds-body-small-letter-spacing);
+
+  --ui-badge-surface: var(--ds-background-error);
+  --ui-badge-fg: var(--ds-text-contrast-text);
+
+  position: absolute;
+  /**
+   * 표시자는 앵커 위에 겹친다. `pointer-events: none` 이 없으면 앵커 모서리의 클릭·탭을
+   * 배지가 삼켜 버린다 — 이 컴포넌트에서 가장 조용하게 깨지는 자리다.
+   */
+  pointer-events: none;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+
+  min-inline-size: var(--ui-badge-min-size);
+  block-size: var(--ui-badge-min-size);
+  padding-inline: var(--ui-badge-padding-inline);
+  border-radius: var(--ds-radius-rounded);
+
+  background-color: var(--ui-badge-surface);
+  color: var(--ui-badge-fg);
+
+  /**
+   * 앵커와 배지를 가르는 링.
+   *
+   * 배지 면은 어떤 앵커 위에든 올라갈 수 있어서 인접색을 고정할 수 없다 (Avatar 의
+   * `background.grey` 위에서는 dark 계열에서 1.24 까지 떨어진다 — 실측). 링은 **색이 아니라
+   * 모양 경계**를 만들어 그 상황에서도 배지가 사라지지 않게 한다.
+   */
+  border: var(--ds-semantic-border-divider) solid var(--ds-background-default);
+
+  font-family: var(--ui-badge-font-family);
+  font-size: var(--ui-badge-font-size);
+  font-weight: var(--ui-badge-font-weight);
+  letter-spacing: var(--ui-badge-letter-spacing);
+  /* 상자 높이가 곧 줄 높이다 — 토큰 line-height 가 상자를 늘리지 않게 한다. */
+  line-height: 1;
+  user-select: none;
+}
+
+.ui-badge__value {
+  /* 긴 숫자가 상자를 밀어내되 넘치지는 않는다. */
+  white-space: nowrap;
+}
+
+/* =========================
+   Variants
+========================= */
+
+/* dot 은 내용이 없으므로 지름만 있는 정사각이다. 좌우 padding 은 아래 compound 규칙이 끈다. */
+.ui-badge--variant-dot {
+  min-inline-size: var(--ui-badge-min-size);
+  inline-size: var(--ui-badge-min-size);
+}
+
+/* =========================
+   Sizes
+========================= */
+.ui-badge--size-sm {
+  --ui-badge-min-size: var(--ds-spacing-lg);
+  --ui-badge-padding-inline: var(--ds-spacing-2xs);
+
+  --ui-badge-font-family: var(--ds-body-tiny-font-family);
+  --ui-badge-font-size: var(--ds-body-tiny-font-size);
+  --ui-badge-font-weight: var(--ds-body-tiny-strong-font-weight);
+  --ui-badge-letter-spacing: var(--ds-body-tiny-letter-spacing);
+}
+
+.ui-badge--size-md {
+  --ui-badge-min-size: var(--ds-spacing-xl);
+  --ui-badge-padding-inline: var(--ds-spacing-xs);
+
+  --ui-badge-font-family: var(--ds-body-small-font-family);
+  --ui-badge-font-size: var(--ds-body-small-font-size);
+  --ui-badge-font-weight: var(--ds-body-small-strong-font-weight);
+  --ui-badge-letter-spacing: var(--ds-body-small-letter-spacing);
+}
+
+/**
+ * dot 은 글자가 없어 지름이 typography 와 무관하다.
+ *
+ * 두 클래스를 겹쳐 **특정도를 한 단계 올린다** — size 규칙과 같은 커스텀 프로퍼티를 다시 잡아야
+ * 하고, 단일 클래스끼리는 선언 순서에 기대게 되어 `styles.ts` 정렬이 바뀌면 조용히 깨진다.
+ */
+.ui-badge--variant-dot.ui-badge--size-sm {
+  --ui-badge-min-size: var(--ds-spacing-sm);
+  --ui-badge-padding-inline: 0;
+}
+
+.ui-badge--variant-dot.ui-badge--size-md {
+  --ui-badge-min-size: var(--ds-spacing-md);
+  --ui-badge-padding-inline: 0;
+}
+
+/* =========================
+   Intents
+
+   `warning`·`success` 가 없는 것은 의도다 — 7개 테마 실측에서 그 면 위의
+   `text.contrast-text` 가 ember 에서 4.35·4.34 로 AA(4.5)에 미달한다.
+   `neutral` 만 전경이 다르다 (`background.grey` 위에서는 `text.default` 가 6.89 로 통과하고
+   `text.contrast-text` 는 1.77 로 실패한다).
+========================= */
+.ui-badge--intent-primary {
+  --ui-badge-surface: var(--ds-background-primary);
+  --ui-badge-fg: var(--ds-text-contrast-text);
+}
+
+.ui-badge--intent-secondary {
+  --ui-badge-surface: var(--ds-background-secondary);
+  --ui-badge-fg: var(--ds-text-contrast-text);
+}
+
+.ui-badge--intent-error {
+  --ui-badge-surface: var(--ds-background-error);
+  --ui-badge-fg: var(--ds-text-contrast-text);
+}
+
+.ui-badge--intent-neutral {
+  --ui-badge-surface: var(--ds-background-grey);
+  --ui-badge-fg: var(--ds-text-default);
+}
+
+/* =========================
+   Placement (논리 방향)
+
+   음수 논리 inset 으로 앵커 모서리에 걸친다. 오프셋은 지름의 절반이라 size·variant 가
+   바뀌면 함께 따라온다.
+========================= */
+.ui-badge--placement-top-end {
+  inset-block-start: calc(var(--ui-badge-min-size) / -2);
+  inset-inline-end: calc(var(--ui-badge-min-size) / -2);
+}
+
+.ui-badge--placement-top-start {
+  inset-block-start: calc(var(--ui-badge-min-size) / -2);
+  inset-inline-start: calc(var(--ui-badge-min-size) / -2);
+}
+
+.ui-badge--placement-bottom-end {
+  inset-block-end: calc(var(--ui-badge-min-size) / -2);
+  inset-inline-end: calc(var(--ui-badge-min-size) / -2);
+}
+
+.ui-badge--placement-bottom-start {
+  inset-block-end: calc(var(--ui-badge-min-size) / -2);
+  inset-inline-start: calc(var(--ui-badge-min-size) / -2);
+}
+
+/**
+ * forced-colors(Windows 고대비) 대응.
+ *
+ * 배지는 **면 색만으로** 자기를 식별시킨다. 그 모드에서 저자 색은 시스템 색으로 갈아끼워져
+ * 면과 링이 모두 `Canvas` 로 평탄화될 수 있고, 그러면 dot 은 통째로 사라지고 count 는 숫자만
+ * 허공에 남는다. 그 모드에서만 테두리를 `CanvasText` 로 켜서 경계를 되살린다.
+ *
+ * `CanvasText` 는 CSS 시스템 색 키워드지 하드코딩이 아니다 — 그 모드의 팔레트는 OS 가 소유해서
+ * 토큰을 써도 무시된다. 길이는 강제되지 않으므로 토큰을 그대로 쓴다.
+ *
+ * `forced-color-adjust: none` 으로 저자 색을 되살리지 않는다 — 사용자가 고른 고대비 팔레트를
+ * 끄는 셈이다.
+ */
+@media (forced-colors: active) {
+  .ui-badge__indicator {
+    border: var(--ds-border-primary-width) solid CanvasText;
+  }
+}
