@@ -14,6 +14,11 @@
 src/
   index.ts                    public re-export (components/theme + ui-core 패스스루)
   components/
+    avatar/                   정적 identity visual — View + Image. Pressable 이 아니고 터치 타깃도 없다
+      {Avatar.tsx, .types.ts, .styles.ts, index.ts}
+    badge/                    overlay indicator — 앵커를 감싸고 표시자만 절대 배치. 루트에
+                              accessible 을 걸지 않는다(앵커를 삼킨다)
+      {Badge.tsx, .types.ts, .styles.ts, index.ts}
     box/{Box.tsx, index.ts}
     button-base/              내부 Pressable 동작 원시 — 배럴 없음(비공개)
       {ButtonBase.tsx, ButtonBase.types.ts, ButtonBase.test.tsx}
@@ -22,6 +27,9 @@ src/
       {Checkbox.tsx, .types.ts, .styles.ts, index.ts}
     selection-control/        Checkbox·Radio 공유 스타일 리졸버(색 우선순위·터치 타깃·라벨) — 배럴 없음(비공개)
       {selectionControl.styles.ts}
+    chip/                     compact label. onPress 없으면 passive View, 있으면 ButtonBase
+                              (터치 타깃·disabled·button 역할을 거기서 얻는다)
+      {Chip.tsx, .types.ts, .styles.ts, index.ts}
     fab/{Fab.tsx, Fab.types.ts, Fab.styles.ts, index.ts}
     icon-button/{IconButton.tsx, IconButton.types.ts, IconButton.styles.ts, index.ts}
     form-control/             FormControl + 비공개 Context/hook
