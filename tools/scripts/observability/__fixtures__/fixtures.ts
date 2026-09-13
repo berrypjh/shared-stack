@@ -76,6 +76,9 @@ export const fixtureArtifact = (runId = 'fixture-01'): RunArtifact => ({
   tests: [],
   bundles: [],
   contexts: [],
+  evals: [],
+  designSystem: null,
+  packageSurfaces: [],
 });
 
 const write = async (root: string, relative: string, content: string) => {

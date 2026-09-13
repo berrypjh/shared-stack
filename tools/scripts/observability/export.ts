@@ -4,10 +4,13 @@ import {
   isPublicEvidencePath,
   publicIndexSchema,
   publicRunArtifactSchema,
+  type PublicRunIndex,
   publicRunPath,
+  publicSummaryPath,
   type RunArtifact,
-  type RunIndex,
+  runSummarySchema,
   SCHEMA_VERSION,
+  summarizeRun,
 } from '@berrypjh/observability-contracts';
 
 import { missingAs, readJson, replaceJson, withLock } from './safe-fs';
@@ -36,18 +39,22 @@ type ExportInput = { storeRoot: string; publicRoot: string; runId: string };
  */
 export const exportRun = async ({ storeRoot, publicRoot, runId }: ExportInput): Promise<string> => {
   const artifact = toPublicArtifact(await readRun(storeRoot, runId));
+  const summary = runSummarySchema.parse(summarizeRun(artifact));
   await fs.mkdir(publicRoot, { recursive: true });
 
   return withLock(publicRoot, async () => {
     const index = await readJson(publicRoot, 'index.json', publicIndexSchema).catch(
-      missingAs<RunIndex>({ version: SCHEMA_VERSION, runs: [] }),
+      missingAs<PublicRunIndex>({ version: SCHEMA_VERSION, runs: [] }),
     );
+    const entry = { id: runId, path: publicRunPath(runId), summary: publicSummaryPath(runId) };
     const runs = index.runs.some((run) => run.id === runId)
-      ? index.runs
-      : [...index.runs, { id: runId, path: publicRunPath(runId) }];
+      ? index.runs.map((run) => (run.id === runId ? entry : run))
+      : [...index.runs, entry];
     const nextIndex = publicIndexSchema.parse({ version: SCHEMA_VERSION, runs });
 
+    // run → 요약 → index 순서. index 가 가리키는 파일은 이미 있다.
     await replaceJson(publicRoot, publicRunPath(runId), artifact);
+    await replaceJson(publicRoot, publicSummaryPath(runId), summary);
     await replaceJson(publicRoot, 'index.json', nextIndex);
     return publicRunPath(runId);
   });

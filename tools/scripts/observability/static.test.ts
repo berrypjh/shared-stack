@@ -5,6 +5,7 @@ import { runArtifactSchema } from '@berrypjh/observability-contracts';
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
+import { makeDesignWorkspace } from './__fixtures__/design-workspace';
 import {
   clock,
   fakeGit,
@@ -15,6 +16,7 @@ import {
   tempDir,
   WORKFLOW_SOURCE,
 } from './__fixtures__/fixtures';
+import { collectDesignSystem } from './collectors/design-system';
 import { COMMANDS } from './registry';
 import { BoundaryError } from './safe-fs';
 import { collectStatic, readInventory, readSource } from './static';
@@ -185,5 +187,33 @@ describe('collectStatic', () => {
     const { raw } = await collect();
     expect(raw.map((file) => file.path)).toEqual(['static-inputs.json']);
     expect(JSON.stringify(raw[0].value)).toContain(sha256(WORKFLOW_SOURCE));
+  });
+
+  it('design 수집기를 받지 않으면 design system·package surface 는 수집하지 않은 것이다', async () => {
+    const { artifact } = await collect();
+    expect(artifact).toMatchObject({ designSystem: null, packageSurfaces: [] });
+  });
+
+  it('design 수집기를 받으면 그 결과를 싣는다 — 명령은 여전히 실행하지 않는다', async () => {
+    const workspaceDesign = await makeDesignWorkspace();
+    try {
+      const designSystem = await collectDesignSystem({ workspaceRoot: workspaceDesign });
+      const { artifact } = await collectStatic({
+        workspaceRoot: workspace,
+        runId: 'local-design-01',
+        git: fakeGit(),
+        env: {},
+        now: clock('2026-09-13T14:00:00.000Z'),
+        toolVersions: { node: 'v24.20.0' },
+        collectDesign: async () => ({ designSystem, packageSurfaces: [] }),
+      });
+      expect(runArtifactSchema.parse(artifact)).toEqual(artifact);
+      expect(artifact.designSystem).toEqual(designSystem);
+      expect(
+        artifact.observations.every((observation) => observation.availability === 'not-run'),
+      ).toBe(true);
+    } finally {
+      await fs.rm(workspaceDesign, { recursive: true, force: true });
+    }
   });
 });

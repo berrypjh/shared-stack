@@ -35,6 +35,22 @@ describe('parseArgs — 등록된 형태만 받는다', () => {
     });
   });
 
+  it('eval 은 이미 만든 consumer eval 산출물 디렉터리를 가져온다', () => {
+    expect(
+      parseArgs([
+        'collect',
+        '--profile=eval',
+        '--from=tmp/llm-evals/pr-smoke',
+        '--run-id=local-eval-01',
+      ]),
+    ).toEqual({
+      command: 'collect',
+      profile: 'eval',
+      runId: 'local-eval-01',
+      from: 'tmp/llm-evals/pr-smoke',
+    });
+  });
+
   it('export 는 run id 만 받는다', () => {
     expect(parseArgs(['export', '--run-id=local-static-01'])).toEqual({
       command: 'export',
@@ -88,6 +104,21 @@ describe('parseArgs — 등록된 형태만 받는다', () => {
       ],
     ],
     [['collect', '--profile=core', '--run-id=a', '--only-imports=yes']],
+    [['collect', '--profile=eval', '--run-id=a']],
+    [['collect', '--profile=eval', '--run-id=a', '--from=tmp/quality-lab/runs']],
+    [['collect', '--profile=eval', '--run-id=a', '--from=tmp/llm-evals']],
+    [
+      [
+        'collect',
+        '--profile=eval',
+        '--run-id=a',
+        '--from=tmp/llm-evals/a',
+        '--from=tmp/llm-evals/b',
+      ],
+    ],
+    [['collect', '--profile=eval', '--run-id=a', '--from=tmp/llm-evals/a', '--only-imports']],
+    [['collect', '--profile=core', '--run-id=a', '--from=tmp/llm-evals/a']],
+    [['export', '--run-id=a', '--from=tmp/llm-evals/a']],
   ])('%j 는 usage 오류다', (argv) => {
     expect(() => parseArgs(argv)).toThrow(CliUsageError);
   });

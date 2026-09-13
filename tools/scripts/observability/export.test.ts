@@ -1,7 +1,12 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
-import { publicIndexSchema, publicRunArtifactSchema } from '@berrypjh/observability-contracts';
+import {
+  publicIndexSchema,
+  publicRunArtifactSchema,
+  runSummarySchema,
+  summarizeRun,
+} from '@berrypjh/observability-contracts';
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
@@ -63,10 +68,19 @@ describe('exportRun', () => {
     expect(publicIndexSchema.parse(await readPublic('index.json'))).toEqual({
       version: 1,
       runs: [
-        { id: 'run-a', path: 'runs/run-a.json' },
-        { id: 'run-b', path: 'runs/run-b.json' },
+        { id: 'run-a', path: 'runs/run-a.json', summary: 'runs/run-a.summary.json' },
+        { id: 'run-b', path: 'runs/run-b.json', summary: 'runs/run-b.summary.json' },
       ],
     });
+  });
+
+  it('화면이 run 전체를 받기 전에 읽을 요약을 같은 계약 함수로 함께 쓴다', async () => {
+    await exportRun({ storeRoot: store, publicRoot, runId: 'run-a' });
+
+    const artifact = publicRunArtifactSchema.parse(await readPublic('runs/run-a.json'));
+    const summary = runSummarySchema.parse(await readPublic('runs/run-a.summary.json'));
+    expect(summary).toEqual(summarizeRun(artifact));
+    expect(JSON.stringify(summary)).not.toContain('raw/');
   });
 
   it('store 에 없는 run 은 missing 으로 실패하고 public 을 건드리지 않는다', async () => {

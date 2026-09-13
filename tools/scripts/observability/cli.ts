@@ -3,9 +3,12 @@ import { pathToFileURL } from 'node:url';
 
 import { type Profile, PROFILES, runIdSchema } from '@berrypjh/observability-contracts';
 
+import { readBaseline } from '../../evals/consumer/ci/baseline';
 import { VARIANTS } from '../../evals/consumer/variants/index';
 import { openAIModelFromEnv } from '../../lib/token-count';
-import { REPO_ROOT } from '../generate-consumer-catalog/config';
+import { REPO_ROOT, TARGETS } from '../generate-consumer-catalog/config';
+import { buildCatalog } from '../generate-consumer-catalog/generate';
+import { serializeCatalog } from '../generate-consumer-catalog/schema';
 import { MEASURE_TARGETS } from '../measure-tokens/registry';
 
 import {
@@ -14,8 +17,11 @@ import {
   readTokenizerVersion,
 } from './collectors/context';
 import { collectCore } from './collectors/core';
+import { collectDesignSystem } from './collectors/design-system';
+import { collectEval, EVAL_DIR_PATTERN, EVALS_DIR } from './collectors/eval';
 import { runArgv } from './collectors/exec';
 import { IMPORTS_DIR } from './collectors/imports';
+import { collectPackageSurfaces } from './collectors/package-surface';
 import { exportRun, PUBLIC_ROOT } from './export';
 import { PROFILE_COMMANDS } from './registry';
 import { collectStatic, gitReader, readToolVersions } from './static';
@@ -37,22 +43,24 @@ export class CliUsageError extends Error {}
 export type CliCommand =
   | {
       command: 'collect';
-      profile: Profile;
+      profile: Exclude<Profile, 'eval'>;
       runId: string;
       imports: Record<string, string>;
       onlyImports: boolean;
     }
+  | { command: 'collect'; profile: 'eval'; runId: string; from: string }
   | { command: 'export'; runId: string };
 
 const USAGE = [
   'usage:',
   '  quality:collect --profile=static --run-id=<id>',
   `  quality:collect --profile=core --run-id=<id> [--import=<command-id>:${IMPORTS_DIR}/<file>]... [--only-imports]`,
+  `  quality:collect --profile=eval --from=${EVALS_DIR}/<dir> --run-id=<id>`,
   '  quality:export --run-id=<id>',
 ].join('\n');
 
 const VALUE_FLAGS: Record<CliCommand['command'], readonly string[]> = {
-  collect: ['profile', 'run-id', 'import'],
+  collect: ['profile', 'run-id', 'import', 'from'],
   export: ['run-id'],
 };
 
@@ -108,6 +116,14 @@ export const parseArgs = (argv: string[]): CliCommand => {
   const profile = PROFILES.find((candidate) => candidate === flags.get('profile'));
   if (!profile)
     throw new CliUsageError(`--profile must be one of ${PROFILES.join(', ')}\n${USAGE}`);
+  const from = flags.get('from');
+  if (profile === 'eval') {
+    if (!from || !EVAL_DIR_PATTERN.test(from) || importSpecs.length > 0 || onlyImports) {
+      throw new CliUsageError(`--profile=eval needs only --from=${EVALS_DIR}/<dir>\n${USAGE}`);
+    }
+    return { command, profile, runId: runId.data, from };
+  }
+  if (from !== undefined) throw new CliUsageError(`--from is an eval profile option\n${USAGE}`);
   if (profile !== 'core' && (importSpecs.length > 0 || onlyImports)) {
     throw new CliUsageError(`--import and --only-imports are core profile options\n${USAGE}`);
   }
@@ -115,6 +131,12 @@ export const parseArgs = (argv: string[]): CliCommand => {
 };
 
 const COMMAND_TIMEOUT_MS = 15 * 60 * 1000;
+
+/** 기존 catalog generator 로 메모리에서만 다시 만든다. dist 에 쓰지 않는다. */
+const regenerateCatalog = async (packagePath: string): Promise<string | null> => {
+  const target = Object.values(TARGETS).find((candidate) => candidate.packageRoot === packagePath);
+  return target ? serializeCatalog(await buildCatalog(target)) : null;
+};
 
 const collect = async (args: Extract<CliCommand, { command: 'collect' }>) => {
   const common = {
@@ -125,7 +147,26 @@ const collect = async (args: Extract<CliCommand, { command: 'collect' }>) => {
     now: () => new Date(),
     toolVersions: readToolVersions(REPO_ROOT, process.env),
   };
-  if (args.profile === 'static') return collectStatic(common);
+  if (args.profile === 'eval') {
+    return collectEval({
+      ...common,
+      from: args.from,
+      tokenizerVersion: readTokenizerVersion(REPO_ROOT),
+      hasBaseline: async (split) => (await readBaseline(split)) !== null,
+    });
+  }
+  if (args.profile === 'static') {
+    return collectStatic({
+      ...common,
+      collectDesign: async () => ({
+        designSystem: await collectDesignSystem({ workspaceRoot: REPO_ROOT }),
+        packageSurfaces: await collectPackageSurfaces({
+          workspaceRoot: REPO_ROOT,
+          regenerateCatalog: regenerateCatalog,
+        }),
+      }),
+    });
+  }
 
   const tokenizerVersion = readTokenizerVersion(REPO_ROOT);
   return collectCore({
