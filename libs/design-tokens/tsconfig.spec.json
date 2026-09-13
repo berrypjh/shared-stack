@@ -7,6 +7,6 @@
     "module": "esnext",
     "moduleResolution": "bundler"
   },
-  "include": ["vitest.config.*", "src/**/*.ts"],
+  "include": ["vitest.config.*", "src/**/*.ts", "test/**/*.ts"],
   "exclude": ["src/.generated/**"]
 }

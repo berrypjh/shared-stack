@@ -4,11 +4,12 @@
     "rootDir": "src",
     "outDir": "dist",
     "tsBuildInfoFile": "dist/.tsbuildinfo",
+    "declarationMap": false,
     "emitDeclarationOnly": false,
     "module": "esnext",
     "moduleResolution": "bundler",
     "types": ["node"]
   },
   "include": ["src/**/*.ts", "src/.generated/**/*.ts"],
-  "exclude": ["src/build.ts", "src/extension/typeFixtures.ts", "**/*.test.ts"]
+  "exclude": ["src/build.ts", "src/lib/**", "src/extension/typeFixtures.ts", "**/*.test.ts"]
 }

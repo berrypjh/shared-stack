@@ -10,10 +10,10 @@ import { cssVarName, getTokenType } from './tokens.js';
 
 const PREFIX = 'ds';
 
-/** Tailwind alpha 유틸 호환 색상 표현식 (`rgb(var(--x-rgb) / <alpha-value>)`). */
+/** Tailwind alpha 유틸용 색상 표현식 (`--x-rgb` → `rgb(var(--x-rgb) / <alpha-value>)`) */
 const twAlphaColor = (rgbVar: string) => `rgb(var(${rgbVar}) / <alpha-value>)`;
 
-/** CSS 변수 참조식 (`var(--x)`). */
+/** CSS 변수 참조식 (`--x` → `var(--x)`) */
 const twVar = (cssVar: string) => `var(${cssVar})`;
 
 type Flat = {
@@ -22,7 +22,7 @@ type Flat = {
   cssVar: string;
 };
 
-/** SD 토큰을 preset 생성에 필요한 최소 필드(path/type/cssVar)로 평탄화. */
+/** SD 토큰 → preset 생성에 필요한 최소 필드 (path/type/cssVar) */
 const toFlat = (t: TransformedToken): Flat => ({
   path: t.path,
   type: getTokenType(t) ?? 'unknown',
@@ -31,10 +31,10 @@ const toFlat = (t: TransformedToken): Flat => ({
 
 type Rec = Record<string, unknown>;
 
-/** 배열·null이 아닌 평범한 record인지 검사. */
+/** 배열·null이 아닌 일반 객체인지 검사 */
 const isRec = (v: unknown): v is Rec => !!v && typeof v === 'object' && !Array.isArray(v);
 
-/** path를 따라 중첩 record 트리에 값을 설정. 중간 노드가 record가 아니면 새 record로 교체. */
+/** path를 따라 중첩 객체에 값 설정, 중간 노드가 객체가 아니면 새 객체로 교체 */
 const setDeep = (obj: Rec, p: string[], value: unknown) => {
   let cur = obj;
   for (let i = 0; i < p.length - 1; i++) {
@@ -49,7 +49,7 @@ const setDeep = (obj: Rec, p: string[], value: unknown) => {
   if (last) cur[last] = value;
 };
 
-/** color 토큰만 골라 path 트리에 alpha 호환 색상 표현식을 채운다. */
+/** color 토큰 → path 트리, 값은 alpha 유틸용 색상 표현식 */
 const buildColors = (tokens: Flat[]): Rec => {
   const out: Rec = {};
   for (const t of tokens) {
@@ -62,9 +62,9 @@ const buildColors = (tokens: Flat[]): Rec => {
 type SimpleMap = Record<string, string>;
 
 /**
- * path[0]이 `heads` 인 토큰을 평탄 record로 수집.
- * - dropFirst: head를 키에서 제거 (예: 'sm' vs 'spacing-sm')
- * - topLevelOnly: path 길이가 정확히 2인 토큰만 (typography composite 제외)
+ * path[0]이 `heads`인 토큰 → 평탄 map (값은 `var(--x)`).
+ * - `dropFirst`: head를 키에서 제거 (`spacing-sm` → `sm`)
+ * - `topLevelOnly`: path 길이가 정확히 2인 토큰만 (typography composite 제외)
  */
 const collect = (
   tokens: Flat[],
@@ -84,8 +84,8 @@ const collect = (
 };
 
 /**
- * shadow/elevation은 레이어 자식으로 분해되지만 `genCss`가 합성 변수를 함께 만든다.
- * 그 합성 변수를 Tailwind boxShadow 유틸에 연결한다 — 값을 굽지 않고 변수를 가리킨다.
+ * shadow/elevation 토큰 → boxShadow map (`shadow.lg` → `var(--ds-shadow-lg)`).
+ * 레이어 자식으로 분해되지만 `genCss`가 합성 변수를 함께 만들므로, 값을 굽지 않고 그 변수를 가리킨다.
  */
 const collectShadows = (tokens: Flat[], head: string): SimpleMap => {
   const out: SimpleMap = {};
@@ -97,14 +97,14 @@ const collectShadows = (tokens: Flat[], head: string): SimpleMap => {
   return out;
 };
 
-/** preset 파일에 들어갈 `const X = {...} as const;` 선언 문자열을 만든다. */
+/** preset 파일의 상수 선언 문자열 (`colors` → `const colors = {...} as const;`) */
 const tsConst = (name: string, obj: unknown) =>
   `const ${name} = ${JSON.stringify(obj, null, 2)} as const;\n\n`;
 
 /**
- * Tailwind preset(`.generated/tailwind/preset.ts`) 생성.
- * 모든 색상/사이즈는 CSS 변수 참조라 테마 무관 → base 사전만 사용한다.
- * boxShadow는 genCss가 만드는 합성 변수(--ds-shadow-lg 등)를 가리킨다.
+ * Tailwind preset 생성 (`.generated/tailwind/preset.ts`).
+ * 모든 값이 CSS 변수 참조라 테마와 무관하므로 base 사전만 사용한다.
+ * boxShadow는 `genCss`가 만드는 합성 변수(`--ds-shadow-lg` 등)를 가리킨다.
  */
 export const writeTailwindPreset = async (
   builds: ThemeBuild[],

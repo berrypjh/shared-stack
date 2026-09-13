@@ -56,11 +56,6 @@ describe('buildThemeDictionaries', () => {
 
 /**
  * Checkbox·Radio·Switch 의 선택 컨트롤 색 패밀리.
- *
- * 상태를 기계적으로 다 만들지 않는다. 기존 시맨틱과 뜻이 같은 상태는 그것을 쓴다 —
- * unchecked 경계 `field.border`, hover `field.borderHover`, error `stroke.error`,
- * focus `border.primary.color`, disabled `border.disabled.color`·`background.disable`.
- * 여기 있는 셋은 표현할 시맨틱이 없는 것뿐이다: 선택된 면, 그 위의 전경, 스위치 off 트랙.
  */
 const SELECTION_CONTROL_KEYS = ['checked', 'indicator', 'trackOff'];
 
@@ -84,9 +79,8 @@ describe('selection control family', () => {
   });
 
   /**
-   * base 의 램프 단계는 밝은 표면용이다. 표면이 뒤집히는 dark 에서만 다시 잡고, dark 를
-   * 중간 단계로 끼우는 ember·midnight 는 그것을 물려받는다. 나머지 테마는 base alias 가
-   * 자기 램프로 풀려 `contrast.test.ts` 를 통과한다 — 델타가 늘면 이 목록부터 다시 읽는다.
+   * base 램프 단계는 밝은 표면용이라 표면이 뒤집히는 dark 만 다시 잡는다.
+   * ember·midnight 는 dark 를 상속하고, 나머지는 base alias 로 대비를 통과한다.
    */
   it('overrides the family only in dark', () => {
     const overriding = themes

@@ -9,14 +9,17 @@ import { writeTailwindPreset } from './genTailwind.js';
 import { writeTsTokens } from './genTsTokens.js';
 import { buildThemeDictionaries } from './sd.js';
 
-/** 토큰 파이프라인의 입출력 경로. 모두 절대 경로. */
+/** 토큰 파이프라인의 입출력 경로 (모두 절대 경로) */
 export type BuildPaths = {
   tokensDir: string;
   distDir: string;
   generatedDir: string;
 };
 
-/** 산출물 디렉터리를 비우고 SD 사전 → CSS / Web TS / RN TS / Tailwind preset / catalog 를 차례로 생성한다. */
+/**
+ * 토큰 산출물 전체 생성.
+ * 산출물 디렉터리를 비운 뒤 SD 사전 → CSS / Web·RN TS / Tailwind preset / catalog 순으로 만든다.
+ */
 export const buildTokenOutputs = async ({
   tokensDir,
   distDir,

@@ -30,13 +30,12 @@ const RN_NUMERIC_TYPES = new Set([
 ]);
 
 /**
- * Web rem 변환 대상 토큰 타입.
- * tokens-studio align-types preprocessor가 spacing/borderRadius/borderWidth를 `dimension`으로 정규화하므로
- * `dimension`을 포함시켜야 spacing/radius/border-width가 px → rem 변환된다.
+ * Web px → rem 변환 대상 타입.
+ * spacing/radius/borderWidth는 전처리에서 `dimension`으로 합쳐지므로 `dimension`에 포함된다.
  */
 const WEB_REM_TYPES = new Set(['dimension', 'fontSize', 'lineHeight']);
 
-/** RN용 숫자형 토큰(spacing/radius/fontSize 등) 값을 number로 변환하는 SD transform. */
+/** RN: 숫자 문자열 → number (`'16'` → `16`) */
 const rnNumberTransform: Transform = {
   name: 'ds/rn/number',
   type: 'value',
@@ -48,10 +47,7 @@ const rnNumberTransform: Transform = {
   transform: (t: TransformedToken) => toRnNumeric(getTokenValue(t)),
 };
 
-/**
- * Web용 rem 변환 transform. spacing/fontSize/lineHeight 값을 px → rem으로 변환.
- * html font-size override에 반응하도록 unitless/px 값을 rem 기반으로 노출.
- */
+/** Web: px → rem (`16` → `1rem`) */
 const webRemTransform: Transform = {
   name: 'ds/web/rem',
   type: 'value',
@@ -63,7 +59,7 @@ const webRemTransform: Transform = {
   transform: (t: TransformedToken) => toWebRem(getTokenValue(t)),
 };
 
-/** duration 토큰을 Web에서 `140ms` 형태로 노출하는 transform. */
+/** Web: 숫자 → ms (`140` → `140ms`) */
 const webDurationTransform: Transform = {
   name: 'ds/web/duration',
   type: 'value',
@@ -72,7 +68,7 @@ const webDurationTransform: Transform = {
   transform: (t: TransformedToken) => toWebDuration(getTokenValue(t)),
 };
 
-/** fontFamily 토큰을 Web에서 fallback 스택으로 노출하는 transform. */
+/** Web: 서체 이름 → fallback 스택 (`Pretendard` → `Pretendard, 'Apple SD Gothic Neo', ...`) */
 const webFontFamilyTransform: Transform = {
   name: 'ds/web/fontFamily',
   type: 'value',
@@ -83,7 +79,7 @@ const webFontFamilyTransform: Transform = {
 
 let registered = false;
 
-/** Tokens Studio + 자체 transform을 SD에 1회만 등록. 중복 호출 안전. */
+/** SD에 transform 등록 (최초 1회만) */
 const registerOnce = () => {
   if (registered) return;
   registered = true;
@@ -94,7 +90,7 @@ const registerOnce = () => {
   StyleDictionary.registerTransform(webFontFamilyTransform);
 };
 
-/** `arr`에서 `rm`에 포함된 항목을 제거한 새 배열을 반환. */
+/** 배열에서 특정 항목 제외 */
 const without = (arr: string[], rm: string[]) => {
   const set = new Set(rm);
   return arr.filter((x) => !set.has(x));
@@ -118,10 +114,7 @@ const RN_TRANSFORMS = [
   'name/kebab',
 ];
 
-/**
- * 테마별로 web/rn 두 사전을 in-memory로 빌드한다.
- * SD 파일 출력은 사용하지 않고 후속 generator가 사전을 직접 소비한다.
- */
+/** 테마별 web/rn 토큰 사전 빌드 (in-memory) */
 export const buildThemeDictionaries = async (
   themes: readonly ThemeDef[],
   tokensDirAbs: string,

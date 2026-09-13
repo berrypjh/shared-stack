@@ -9,6 +9,7 @@ const PREFIX = 'ds';
 
 type Item = { cssVar: string; values: Record<string, unknown> };
 
+/** 전 테마의 web 토큰을 path id별로 모아 테마별 값 채우기 */
 const collectItems = (
   builds: ThemeBuild[],
 ): { items: Record<string, Item>; categories: Set<string>; themeOrder: string[] } => {
@@ -30,12 +31,8 @@ const collectItems = (
 };
 
 /**
- * 슬림 JSON 카탈로그 — `tokens[path] = [cssVar, ...valuesInThemesOrder]`.
- * 토큰 한 줄 직렬화로 들여쓰기·구두점 최소.
- *
- * baseline(d.ts 묶음) 대비 약 −21% AI 토큰 절약 (gpt-4o tiktoken 측정).
- * TSV 변형이 추가 −8% 가능하지만, 표준성·자기 기술성 손실로 채택하지 않음
- * (`tools/scripts/measure-tokens` 시나리오에 코드 주석으로 보존됨).
+ * 슬림 JSON 카탈로그 작성 (`tokens[path] = [cssVar, ...valuesInThemesOrder]`).
+ * 토큰을 한 줄씩 직렬화해 들여쓰기·구두점을 최소화한다.
  */
 export const writeTokensJson = async (builds: ThemeBuild[], outFileAbs: string): Promise<void> => {
   const { items, categories, themeOrder } = collectItems(builds);

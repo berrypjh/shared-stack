@@ -1,7 +1,3 @@
-/**
- * 공개 경계는 `package.json`의 exports map이 정한다.
- * dist에 internal 모듈이 있어도 subpath로는 들어올 수 없어야 한다.
- */
 import fs from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import path from 'node:path';
@@ -15,7 +11,6 @@ const require = createRequire(path.join(PKG_ROOT, 'package.json'));
 const readPkg = async () =>
   JSON.parse(await fs.readFile(path.join(PKG_ROOT, 'package.json'), 'utf8'));
 
-/** subpath가 해석되면 경로를, 막히면 에러 코드를 돌려준다. */
 const resolve = (subpath: string): string => {
   try {
     return path.relative(PKG_ROOT, require.resolve(subpath));
@@ -54,10 +49,8 @@ describe('internal modules are not reachable', () => {
 
 describe('publish configuration', () => {
   /**
-   * 이 패키지는 의도적으로 `private: true`다.
    * 직접 publish하지 않고 react-ui / react-native-ui 빌드 시 d.ts와 CSS로 번들되어
-   * 다운스트림에 전달된다. `nx.json`의 `release.projects`에는 남아 있어
-   * 버전·changelog는 함께 생성된다 (README의 Publish 절 참고).
+   * 다운스트림에 전달된다.
    */
   it('stays private — downstream gets tokens through react-ui / react-native-ui', async () => {
     expect((await readPkg()).private).toBe(true);
