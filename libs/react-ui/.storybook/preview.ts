@@ -35,6 +35,7 @@ const preview: Preview = {
       storySort: {
         order: [
           'Theme',
+          'Foundation',
           'Components',
           [
             'Layout',
