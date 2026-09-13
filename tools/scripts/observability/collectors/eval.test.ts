@@ -34,7 +34,7 @@ const collect = (from: string) =>
     now: () => new Date('2026-09-13T14:00:00.000Z'),
     toolVersions: { node: 'v24.20.0' },
     tokenizerVersion: '1.0.22',
-    hasBaseline: async () => false,
+    readBaseline: async () => ({ status: 'missing' }),
   });
 
 const evalDir = (name: string) => path.join(workspace, 'tmp/llm-evals', name);

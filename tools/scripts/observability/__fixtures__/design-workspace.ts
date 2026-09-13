@@ -120,7 +120,7 @@ export const designFiles = (): Record<string, string> => ({
       ],
     ]),
   ),
-  [`${DT}/src/lib/contrast.ts`]:
+  [`${DT}/test/contrast.ts`]:
     'export const relativeLuminance = () => 0;\n\nexport const WCAG_AA = { text: 4.5, nonText: 3 } as const;\n',
   [`${DT}/src/lib/contrast.test.ts`]: "import x from 'y';\n\nconst DIVIDER_MIN = 1.2;\n",
   [`${DT}/AGENTS.md`]: AGENTS_DOC,

@@ -3,7 +3,7 @@ import { pathToFileURL } from 'node:url';
 
 import { type Profile, PROFILES, runIdSchema } from '@berrypjh/observability-contracts';
 
-import { readBaseline } from '../../evals/consumer/ci/baseline';
+import { baselineFile } from '../../evals/consumer/ci/baseline';
 import { VARIANTS } from '../../evals/consumer/variants/index';
 import { openAIModelFromEnv } from '../../lib/token-count';
 import { REPO_ROOT, TARGETS } from '../generate-consumer-catalog/config';
@@ -19,6 +19,7 @@ import {
 import { collectCore } from './collectors/core';
 import { collectDesignSystem } from './collectors/design-system';
 import { collectEval, EVAL_DIR_PATTERN, EVALS_DIR } from './collectors/eval';
+import { readEvalBaselineFile } from './collectors/eval-baseline';
 import { runArgv } from './collectors/exec';
 import { IMPORTS_DIR } from './collectors/imports';
 import { collectPackageSurfaces } from './collectors/package-surface';
@@ -116,6 +117,11 @@ export const parseArgs = (argv: string[]): CliCommand => {
   const profile = PROFILES.find((candidate) => candidate === flags.get('profile'));
   if (!profile)
     throw new CliUsageError(`--profile must be one of ${PROFILES.join(', ')}\n${USAGE}`);
+  if (profile === 'a11y') {
+    throw new CliUsageError(
+      `--profile=a11y is collected by pnpm quality --base-url=http://localhost:4300\n${USAGE}`,
+    );
+  }
   const from = flags.get('from');
   if (profile === 'eval') {
     if (!from || !EVAL_DIR_PATTERN.test(from) || importSpecs.length > 0 || onlyImports) {
@@ -152,7 +158,7 @@ const collect = async (args: Extract<CliCommand, { command: 'collect' }>) => {
       ...common,
       from: args.from,
       tokenizerVersion: readTokenizerVersion(REPO_ROOT),
-      hasBaseline: async (split) => (await readBaseline(split)) !== null,
+      readBaseline: (split) => readEvalBaselineFile(baselineFile(split)),
     });
   }
   if (args.profile === 'static') {

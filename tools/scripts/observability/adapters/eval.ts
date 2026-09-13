@@ -128,8 +128,19 @@ const summarySchema = z.object({
   variants: z.array(variantMetricsSchema),
   routingConfusion: z.record(z.string(), confusionSchema).nullable(),
   conditions: conditionsSchema.nullable(),
-  /** 비교 결과는 상태만 본다. 나머지 필드는 그대로 둔다. */
-  comparison: z.looseObject({ status: z.enum(['no-baseline', 'compared']) }).nullable(),
+  /** evaluator 비교. 옮기는 상태·comparable·warnings 만 확인하고 나머지(deltas 등)는 그대로 둔다. */
+  comparison: z
+    .discriminatedUnion('status', [
+      z.looseObject({ status: z.literal('no-baseline') }),
+      z.looseObject({
+        status: z.literal('compared'),
+        comparable: z.boolean(),
+        warnings: z.array(
+          z.strictObject({ field: z.string(), baseline: z.string(), current: z.string() }),
+        ),
+      }),
+    ])
+    .nullable(),
 });
 
 const kinds = z.array(verificationKindSchema);

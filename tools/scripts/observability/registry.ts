@@ -169,4 +169,6 @@ export const PROFILE_COMMANDS: Record<Profile, readonly string[]> = {
     ['test', 'verification', 'bundle'].includes(command.domain),
   ).map((command) => command.id),
   eval: [],
+  /** a11y 는 `pnpm quality --base-url=…` 가 모은다. 등록 명령을 실행하지 않는다. */
+  a11y: [],
 };

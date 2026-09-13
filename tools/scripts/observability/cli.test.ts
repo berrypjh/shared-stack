@@ -63,6 +63,7 @@ describe('parseArgs — 등록된 형태만 받는다', () => {
     [['serve']],
     [['collect', '--run-id=a']],
     [['collect', '--profile=full', '--run-id=a']],
+    [['collect', '--profile=a11y', '--run-id=a']],
     [['collect', '--profile=static', '--run-id=../x']],
     [['export', '--run-id=a', '--argv=rm']],
     [['export', '--run-id=a', 'extra']],

@@ -17,6 +17,7 @@ import { buildConfusion, type ConfusionMatrix } from '../../../evals/consumer/re
 import type { GradedTrace } from '../../../evals/consumer/runner/trace';
 import type { VariantContext } from '../../../evals/consumer/variants/context';
 import { type VariantId, VARIANTS } from '../../../evals/consumer/variants/index';
+import type { EvalBaselineFile } from '../collectors/eval-baseline';
 
 /**
  * eval summary·trace → `EvalRun`. 값은 옮기기만 하고, 없는 값에 이유를 붙이고,
@@ -33,8 +34,8 @@ export type EvalImport = {
   traces: Imported<GradedTrace[]>;
   routing: Imported<{ split: string; matrix: ConfusionMatrix }>;
   context: Imported<VariantContext[]>;
-  /** 수집 시점에 `tools/evals/consumer/baseline/<split>.json` 이 있는지. */
-  baselineExists: boolean;
+  /** 수집 시점의 `tools/evals/consumer/baseline/<split>.json`. 없음·깨짐·있음을 나눈다. */
+  baseline: EvalBaselineFile;
 };
 
 type ExecutorClass = (typeof EXECUTOR_CLASSES)[number];
@@ -309,10 +310,10 @@ const noticesOf = (
   if (summary) {
     if (
       summary.comparison?.status === 'no-baseline' ||
-      (!summary.comparison && !input.baselineExists)
+      (!summary.comparison && input.baseline.status === 'missing')
     ) {
       add('no-baseline', NO_BASELINE_MESSAGE);
-    } else if (!summary.comparison) {
+    } else if (!summary.comparison && input.baseline.status === 'present') {
       add(
         'baseline-not-requested',
         `tools/evals/consumer/baseline/${summary.split}.json 이 있지만 이 run 은 baseline 비교를 요청하지 않았다`,
@@ -335,6 +336,41 @@ const noticesOf = (
     add('partial-import', 'summary 와 trace 중 일부만 가져왔다 — 전체 결과로 읽지 않는다');
   }
   return notices;
+};
+
+/**
+ * evaluator 의 원래 baseline 비교. summary 의 comparison 이 있으면 warnings 까지 그대로 옮기고,
+ * 없으면 baseline 파일 상태만 말한다 — 깨진 파일은 없는 파일과 다른 상태다. 있지만 비교를 요청하지
+ * 않은 run 은 비교 결과가 없다(null).
+ */
+const originalComparisonOf = (
+  summary: RunSummary | null,
+  baseline: EvalBaselineFile,
+): EvalRun['originalComparison'] => {
+  if (!summary) return null;
+  const empty = { comparable: null, warnings: [], reason: null };
+  const { comparison } = summary;
+  if (comparison?.status === 'compared') {
+    return {
+      source: 'summary',
+      status: 'compared',
+      comparable: comparison.comparable,
+      warnings: comparison.warnings,
+      reason: null,
+    };
+  }
+  if (comparison) return { source: 'summary', status: 'no-baseline', ...empty };
+  if (baseline.status === 'missing')
+    return { source: 'baseline-file', status: 'no-baseline', ...empty };
+  if (baseline.status === 'invalid') {
+    return {
+      source: 'baseline-file',
+      status: 'corrupt-baseline',
+      ...empty,
+      reason: baseline.reason,
+    };
+  }
+  return null;
 };
 
 export const normalizeEvalRun = (input: EvalImport): EvalRun => {
@@ -412,5 +448,6 @@ export const normalizeEvalRun = (input: EvalImport): EvalRun => {
     routing,
     traceCount: traces ? traces.length : null,
     traces: traces ? traces.map(traceOf) : [],
+    originalComparison: originalComparisonOf(summary, input.baseline),
   });
 };

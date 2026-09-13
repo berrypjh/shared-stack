@@ -29,7 +29,7 @@ const importOf = (overrides: Partial<EvalImport> = {}): EvalImport => ({
   traces: parsed(traces),
   routing: missing('routing.json 이 없다'),
   context: missing('context.json 이 없다'),
-  baselineExists: false,
+  baseline: { status: 'missing' },
   ...overrides,
 });
 
@@ -273,9 +273,50 @@ describe('executor 와 badge', () => {
 
   it('baseline 이 없으면 그렇게 말하고, 있지만 비교를 요청하지 않았으면 그것을 말한다', () => {
     expect(run.notices).toContainEqual({ code: 'no-baseline', message: NO_BASELINE_MESSAGE });
-    expect(codes(normalizeEvalRun(importOf({ baselineExists: true })))).toContain(
-      'baseline-not-requested',
+    expect(run.originalComparison).toEqual({
+      source: 'baseline-file',
+      status: 'no-baseline',
+      comparable: null,
+      warnings: [],
+      reason: null,
+    });
+    const present = normalizeEvalRun(importOf({ baseline: { status: 'present' } }));
+    expect(codes(present)).toContain('baseline-not-requested');
+    expect(present.originalComparison).toBeNull();
+  });
+
+  it('깨진 baseline 파일은 없는 baseline 으로 뭉개지 않는다', () => {
+    const reason = 'baseline 파일이 JSON 이 아니다';
+    const corrupt = normalizeEvalRun(importOf({ baseline: { status: 'invalid', reason } }));
+    expect(codes(corrupt)).not.toContain('no-baseline');
+    expect(corrupt.originalComparison).toEqual({
+      source: 'baseline-file',
+      status: 'corrupt-baseline',
+      comparable: null,
+      warnings: [],
+      reason,
+    });
+  });
+
+  it('evaluator 가 비교했으면 그 결과와 원래 warnings 를 그대로 옮긴다', () => {
+    const warnings = [{ field: 'model', baseline: '"a"', current: '"b"' }];
+    const compared = normalizeEvalRun(
+      importOf({
+        summary: parsed({
+          ...summary,
+          comparison: { status: 'compared', comparable: false, warnings, deltas: [] },
+        }),
+        baseline: { status: 'present' },
+      }),
     );
+    expect(compared.originalComparison).toEqual({
+      source: 'summary',
+      status: 'compared',
+      comparable: false,
+      warnings,
+      reason: null,
+    });
+    expect(codes(compared)).not.toContain('baseline-not-requested');
   });
 });
 

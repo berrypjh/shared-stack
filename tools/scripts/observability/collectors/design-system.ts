@@ -44,7 +44,7 @@ export const DESIGN_PATHS = {
   generated: `${DT}/src/.generated`,
   css: `${DT}/dist/css`,
   rnProvider: 'libs/react-native-ui/src/theme/ThemeProvider.tsx',
-  contrast: `${DT}/src/lib/contrast.ts`,
+  contrast: `${DT}/test/contrast.ts`,
   contrastTest: `${DT}/src/lib/contrast.test.ts`,
   docs: `${DT}/AGENTS.md`,
   genTsTokens: `${DT}/src/lib/genTsTokens.ts`,
@@ -124,7 +124,7 @@ const artifactOf = async (
       };
 };
 
-const contrastGuards = (
+export const contrastGuards = (
   contrast: string | null,
   contrastTest: string | null,
 ): DesignSystem['contrastGuards'] => {

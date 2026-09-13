@@ -19,6 +19,8 @@ import { ArtifactError, BoundaryError, readText, sha256 } from '../safe-fs';
 import { readSource, type StaticInput } from '../static';
 import type { RawFile } from '../store';
 
+import type { EvalBaselineFile } from './eval-baseline';
+
 /** consumer eval runner 의 출력 디렉터리. `tmp` 라 추적되지 않는다. */
 export const EVALS_DIR = 'tmp/llm-evals';
 /** `tmp/llm-evals/<run>` 한 단계만. traversal·중첩 경로는 받지 않는다. */
@@ -30,7 +32,7 @@ const OFFLINE_REASON = 'executor 를 돌리지 않은 offline 산출물이다 (r
 export type EvalCollectInput = StaticInput & {
   from: string;
   tokenizerVersion: string;
-  hasBaseline: (split: string) => Promise<boolean>;
+  readBaseline: (split: string) => Promise<EvalBaselineFile>;
 };
 
 type InputFile = { path: string; status: Imported<unknown>['status']; sha256: string | null };
@@ -100,9 +102,10 @@ export const collectEval = async (
     traces: offline ? notRun : traces.imported,
     routing: routing.imported,
     context: context.imported,
-    baselineExists:
-      summary.imported.status === 'parsed' &&
-      (await input.hasBaseline(summary.imported.value.split)),
+    baseline:
+      summary.imported.status === 'parsed'
+        ? await input.readBaseline(summary.imported.value.split)
+        : { status: 'missing' },
   });
 
   const source = await readSource(root, input.git, input.env);
