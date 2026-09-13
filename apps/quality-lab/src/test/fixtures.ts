@@ -60,6 +60,9 @@ export const publicArtifact = (runId: string, metadata: Overrides = {}) => ({
   tests: [],
   bundles: [],
   contexts: [],
+  evals: [],
+  designSystem: null,
+  packageSurfaces: [],
 });
 
 /** size-limit budget 초과 사례 (react-native-ui full, 실측 모양). */

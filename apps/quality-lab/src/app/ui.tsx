@@ -1,53 +1,45 @@
-import type { ReactNode } from 'react';
+import { type ReactNode, useEffect, useRef } from 'react';
 
-/** 경로·명령·ID 는 monospace. */
-export const Mono = ({ children }: { children: ReactNode }) => (
-  <code className="font-mono text-xxsm px-xs rounded-sm bg-background-default border border-stroke-light break-all">
-    {children}
-  </code>
-);
+import { useLocation } from 'react-router-dom';
 
-export const Page = ({
-  title,
-  lead,
-  children,
-}: {
-  title: string;
-  lead: string;
-  children: ReactNode;
-}) => (
-  <div className="mx-auto w-full max-w-[1100px]">
-    <header className="pb-xl mb-2xl border-b border-stroke-light">
-      <h1 className="text-text-default text-xxl leading-xxl font-bold tracking-tight">{title}</h1>
-      <p className="text-text-light text-sm leading-sm mt-sm break-keep">{lead}</p>
-    </header>
-    <div className="flex flex-col gap-2xl">{children}</div>
-  </div>
-);
+import { StatusNotice } from './components/StatusNotice';
+import { emptyState } from './data/status';
+import { navItem, type NavPath } from './nav';
 
-/** 공개된 run 이 없을 때. 숫자 seed 를 두지 않고 수집·export 명령만 안내한다. */
-export const EmptyRuns = ({ level = 3 }: { level?: 2 | 3 }) => {
-  const Heading = level === 2 ? 'h2' : 'h3';
+export { Mono } from './components/Mono';
+
+/**
+ * 한 화면. h1 과 설명은 NAV 에서 읽는다. 다른 화면에서 이동해 왔을 때만 h1 으로 포커스를 옮긴다 —
+ * 첫 진입이나 같은 화면의 필터 변경은 포커스를 건드리지 않는다.
+ */
+export const Page = ({ path, children }: { path: NavPath; children: ReactNode }) => {
+  const item = navItem(path);
+  const heading = useRef<HTMLHeadingElement>(null);
+  const location = useLocation();
+  const arrivedByNavigation = useRef(location.key !== 'default');
+
+  useEffect(() => {
+    if (arrivedByNavigation.current) heading.current?.focus();
+  }, []);
+
   return (
-    <section
-      aria-labelledby="empty-runs-title"
-      className="bg-background-surface border border-stroke-default rounded-md p-xl"
-    >
-      <Heading id="empty-runs-title" className="text-text-default text-lg leading-lg font-semiBold">
-        아직 수집한 실행이 없습니다
-      </Heading>
-      <p className="text-text-light text-xsm leading-xsm mt-sm break-keep">
-        Node 수집기가 만든 JSON 을 export 하면 이 화면이 공개 계약으로 검증한 뒤 보여줍니다.
-        브라우저는 명령을 실행하지 않습니다.
-      </p>
-      <ol className="mt-md flex flex-col gap-xs text-xsm text-text-default">
-        <li>
-          <Mono>pnpm quality:collect --profile=static --run-id=local-static-01</Mono>
-        </li>
-        <li>
-          <Mono>pnpm quality:export --run-id=local-static-01</Mono>
-        </li>
-      </ol>
-    </section>
+    <div className="mx-auto w-full max-w-[1200px]">
+      <header className="pb-lg mb-xl border-b border-stroke-light">
+        <h1
+          ref={heading}
+          tabIndex={-1}
+          className="text-text-default text-xxl leading-xxl font-bold tracking-tight"
+        >
+          {item.label}
+        </h1>
+        <p className="text-text-light text-sm leading-sm mt-sm break-keep">{item.lead}</p>
+      </header>
+      <div className="flex flex-col gap-xl">{children}</div>
+    </div>
   );
 };
+
+/** 공개된 run 이 없을 때. 숫자 seed 를 두지 않고 수집·export 명령만 안내한다. */
+export const EmptyRuns = ({ level = 3 }: { level?: 2 | 3 }) => (
+  <StatusNotice state={emptyState()} level={level} />
+);

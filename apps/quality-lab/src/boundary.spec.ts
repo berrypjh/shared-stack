@@ -1,23 +1,29 @@
 // @vitest-environment node
 import { readdirSync, readFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { dirname, join, relative, resolve } from 'node:path';
 
 import { createServer } from 'vite';
 import { describe, expect, it } from 'vitest';
 
 const appRoot = join(import.meta.dirname, '..');
+const srcRoot = join(appRoot, 'src');
 
-/** 앱 소스(spec 제외)가 쓰는 모든 import specifier. */
-const sourceSpecifiers = () =>
-  readdirSync(join(appRoot, 'src'), { recursive: true, encoding: 'utf8' })
+/** 앱 소스(spec 제외)가 쓰는 모든 import specifier 와 그 파일. */
+const sourceImports = () =>
+  readdirSync(srcRoot, { recursive: true, encoding: 'utf8' })
     .filter((file) => /\.tsx?$/.test(file) && !/\.spec\.tsx?$/.test(file))
     .flatMap((file) =>
-      [
-        ...readFileSync(join(appRoot, 'src', file), 'utf8').matchAll(
-          /(?:from|import)\s+'([^']+)'/g,
-        ),
-      ].map((match) => match[1]),
+      [...readFileSync(join(srcRoot, file), 'utf8').matchAll(/(?:from|import)\s+'([^']+)'/g)].map(
+        (match) => ({ file, specifier: match[1] }),
+      ),
     );
+
+const sourceSpecifiers = () => sourceImports().map((entry) => entry.specifier);
+
+/** 상대 경로는 문자열 모양이 아니라 실제로 가리키는 위치로 판단한다 — 앱 `src` 밖이면 새는 것이다. */
+const escapesSrc = ({ file, specifier }: { file: string; specifier: string }) =>
+  specifier.startsWith('.') &&
+  relative(srcRoot, resolve(dirname(join(srcRoot, file)), specifier)).startsWith('..');
 
 /**
  * 소비자는 `@berrypjh/react-ui` 의 공개 진입점만 안다. ui-core·design-tokens·다른 패키지의
@@ -34,7 +40,21 @@ describe('public package boundary', () => {
         '@berrypjh/react-ui/styles.css',
       ]),
     );
-    expect(specifiers.filter((s) => s.includes('libs/') || s.startsWith('../../'))).toEqual([]);
+    expect(specifiers.filter((s) => s.includes('libs/'))).toEqual([]);
+    expect(sourceImports().filter(escapesSrc)).toEqual([]);
+  });
+
+  it('상대 import 가 앱 src 밖으로 나가면 잡는다', () => {
+    expect(
+      escapesSrc({
+        file: 'app/pages/overview/OverviewPage.tsx',
+        specifier: '../../components/Mono',
+      }),
+    ).toBe(false);
+    expect(escapesSrc({ file: 'app/app.tsx', specifier: '../../../libs/react-ui/src/index' })).toBe(
+      true,
+    );
+    expect(escapesSrc({ file: 'main.tsx', specifier: '../vite.config.mts' })).toBe(true);
   });
 
   it.each(['tsconfig.app.json', 'tsconfig.spec.json'])(

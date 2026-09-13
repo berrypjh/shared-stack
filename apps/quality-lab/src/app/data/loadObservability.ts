@@ -6,8 +6,9 @@ import {
   type RunArtifact,
 } from '@berrypjh/observability-contracts';
 
-/** Vite 가 `apps/quality-lab/public/observability` 를 서빙하는 경로. */
-export const OBSERVABILITY_BASE = '/observability/';
+import { type Fetcher, fetchJson, issuesOf, type Problem } from './client';
+
+export { type Fetcher, OBSERVABILITY_BASE } from './client';
 
 export type LoadTarget = 'index' | 'run';
 
@@ -25,52 +26,14 @@ export type LoadResult =
       freshness: Freshness;
     };
 
-export type Fetcher = (url: string, init?: RequestInit) => Promise<Response>;
-
-type Fetched = { ok: true; value: unknown } | { ok: false; result: LoadResult };
-
-const issuesOf = (issues: readonly { path: PropertyKey[]; message: string }[]) =>
-  issues
-    .map((issue) => `${issue.path.map(String).join('.') || '(root)'}: ${issue.message}`)
-    .join('\n');
-
-/**
- * JSON 으로 요청한다. `accept` 를 주지 않으면 dev 서버가 없는 파일에 index.html 을 200 으로
- * 돌려줄 수 있다 — 그래도 JSON 이 아니면 데이터로 믿지 않는다.
- */
-const fetchJson = async (fetcher: Fetcher, target: LoadTarget, path: string): Promise<Fetched> => {
-  let response: Response;
-  try {
-    response = await fetcher(`${OBSERVABILITY_BASE}${path}`, {
-      headers: { accept: 'application/json' },
-    });
-  } catch (error) {
-    return {
-      ok: false,
-      result: {
-        status: 'unreachable',
-        message: error instanceof Error ? error.message : String(error),
-      },
-    };
-  }
-  if (response.status === 404) {
-    return { ok: false, result: { status: 'missing', target, message: `${path} 파일이 없습니다` } };
-  }
-  if (!response.ok) {
-    return {
-      ok: false,
-      result: { status: 'unreachable', message: `${path}: HTTP ${response.status}` },
-    };
-  }
-  try {
-    return { ok: true, value: JSON.parse(await response.text()) };
-  } catch {
-    return {
-      ok: false,
-      result: { status: 'invalid', target, message: `${path} 은 JSON 이 아닙니다` },
-    };
-  }
-};
+const resultOf = (problem: Problem): LoadResult =>
+  problem.status === 'unreachable'
+    ? { status: 'unreachable', message: problem.message }
+    : {
+        status: problem.status,
+        target: problem.target === 'index' ? 'index' : 'run',
+        message: problem.message,
+      };
 
 /**
  * index → 선택한 run 순서로 읽는다. 둘 다 unknown JSON 에서 공개 계약으로 검증하고,
@@ -82,7 +45,7 @@ export const loadObservability = async (
   runId?: string,
 ): Promise<LoadResult> => {
   const index = await fetchJson(fetcher, 'index', 'index.json');
-  if (!index.ok) return index.result;
+  if (!index.ok) return resultOf(index.problem);
   const parsedIndex = publicIndexSchema.safeParse(index.value);
   if (!parsedIndex.success) {
     return { status: 'invalid', target: 'index', message: issuesOf(parsedIndex.error.issues) };
@@ -96,7 +59,7 @@ export const loadObservability = async (
     return { status: 'missing', target: 'run', message: `index 에 ${selectedId} 실행이 없습니다` };
 
   const run = await fetchJson(fetcher, 'run', entry.path);
-  if (!run.ok) return run.result;
+  if (!run.ok) return resultOf(run.problem);
   const parsedRun = publicRunArtifactSchema.safeParse(run.value);
   if (!parsedRun.success) {
     return { status: 'invalid', target: 'run', message: issuesOf(parsedRun.error.issues) };

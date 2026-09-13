@@ -16,6 +16,8 @@ export const availabilityLabel = (availability: string) =>
 
 const integer = new Intl.NumberFormat('en-US');
 
+export const formatInteger = (value: number) => integer.format(value);
+
 /** 바이트와 십진 KB. size-limit 의 한도(`'11 KB'` = 11000 B)와 같은 단위다. */
 export const formatBytes = (bytes: number) =>
   bytes === 0 ? '0 B' : `${integer.format(bytes)} B (${(bytes / 1000).toFixed(2)} KB)`;

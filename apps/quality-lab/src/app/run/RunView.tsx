@@ -1,13 +1,14 @@
 import type {
   BundleMeasurement,
   ContextMeasurement,
+  EvalRun,
   Observation,
   TestSummary,
 } from '@berrypjh/observability-contracts';
-import { Table, TableScroll } from '@berrypjh/react-ui';
 
 import type { ReactNode } from 'react';
 
+import { DataTable } from '../components/DataTable';
 import {
   availabilityLabel,
   bundleRoleLabel,
@@ -16,64 +17,22 @@ import {
   headroomText,
   observationValueText,
 } from '../data/format';
+import {
+  DOMAIN_LABEL,
+  EXECUTION_LABEL,
+  EXECUTOR_LABEL,
+  FRESHNESS_LABEL,
+  NOTICE_LABEL,
+  OUTCOME_LABEL,
+  REPORT_LABEL,
+  SOURCE_KIND_LABEL,
+  STATE_LABEL,
+  VERIFICATION_LABEL,
+} from '../data/labels';
 import { Mono } from '../ui';
 
 import type { ReadyResult } from './useObservability';
 
-const DOMAIN_LABEL: Record<string, string> = {
-  test: '테스트',
-  bundle: '번들',
-  context: '컨텍스트',
-  eval: '평가',
-  verification: '검증',
-  a11y: '접근성',
-  browser: '브라우저',
-};
-
-const VERIFICATION_LABEL: Record<string, string> = {
-  passed: '통과',
-  failed: '실패',
-  timeout: '시간 초과',
-  'not-run': '실행 안 함',
-  unsupported: '지원 안 함',
-};
-
-const OUTCOME_LABEL: Record<string, string> = {
-  pass: '통과',
-  fail: '실패',
-  warn: '경고',
-  info: '정보',
-};
-const STATE_LABEL: Record<string, string> = {
-  running: '수집 중',
-  complete: '완료',
-  partial: 'partial — 일부 값 없음',
-  failed: '실패',
-  cancelled: '취소',
-};
-const SOURCE_KIND_LABEL: Record<string, string> = { local: '로컬', ci: 'CI', unknown: '모름' };
-const FRESHNESS_LABEL: Record<string, string> = {
-  fresh: 'fresh',
-  stale: 'stale',
-  unknown: '비교할 수 없음',
-};
-const EXECUTION_LABEL: Record<string, string> = {
-  completed: '완료',
-  failed: '실패 종료',
-  timeout: '시간 초과',
-  cancelled: '중단',
-  imported: 'import',
-  'not-run': '실행 안 함',
-  unsupported: '지원 안 함',
-  unavailable: '실행 불가',
-};
-const REPORT_LABEL: Record<string, string> = {
-  parsed: '읽음',
-  missing: '없음',
-  corrupt: '깨짐',
-  invalid: '형식 오류',
-  'not-requested': '요청 안 함',
-};
 const METHOD_LABEL: Record<string, string> = {
   'size-limit': 'size-limit (빈 프로젝트 상수 차감)',
   'treeshake-esbuild': 'esbuild 단독 번들',
@@ -94,39 +53,24 @@ const integer = new Intl.NumberFormat('en-US');
 const withReason = (label: string, reason: string | null) =>
   reason ? `${label} — ${reason}` : label;
 
-const Section = ({ id, title, children }: { id: string; title: string; children: ReactNode }) => (
-  <section aria-labelledby={id} className="flex flex-col gap-md">
+/** `anchor` 는 다른 화면의 `/runs?run=…#bundles` 같은 링크가 가리키는 id 다. */
+const Section = ({
+  id,
+  anchor,
+  title,
+  children,
+}: {
+  id: string;
+  anchor: string;
+  title: string;
+  children: ReactNode;
+}) => (
+  <section id={anchor} aria-labelledby={id} className="flex flex-col gap-md scroll-mt-[64px]">
     <h3 id={id} className="text-text-default text-sm leading-sm font-semiBold">
       {title}
     </h3>
     {children}
   </section>
-);
-
-const DataTable = ({
-  caption,
-  headers,
-  children,
-}: {
-  caption: string;
-  headers: string[];
-  children: ReactNode;
-}) => (
-  <TableScroll label={`${caption} 표`}>
-    <Table>
-      <caption>{caption}</caption>
-      <thead>
-        <tr>
-          {headers.map((header) => (
-            <th key={header} scope="col">
-              {header}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>{children}</tbody>
-    </Table>
-  </TableScroll>
 );
 
 const Notices = ({ run }: { run: ReadyResult }) => (
@@ -308,7 +252,7 @@ const BundleTable = ({ bundles }: { bundles: BundleMeasurement[] }) => (
           {measurement.budget ? (
             <BudgetBar value={measurement.value} limit={measurement.budget.limitBytes} />
           ) : (
-            '—'
+            '한도 없음'
           )}
         </td>
       </tr>
@@ -346,29 +290,64 @@ const ContextTable = ({ contexts }: { contexts: ContextMeasurement[] }) => (
   </DataTable>
 );
 
+const EVAL_PARTS = ['summary', 'traces', 'routing', 'context'] as const;
+
+/** eval import 상태만. 성공률 표는 다음 단계의 평가 화면이 원본 분자·분모와 함께 다룬다. */
+const EvalTable = ({ evals }: { evals: EvalRun[] }) => (
+  <DataTable
+    caption="eval import"
+    headers={['source', 'executor', ...EVAL_PARTS, 'notice', 'trace 수']}
+  >
+    {evals.map((evalRun) => (
+      <tr key={evalRun.sourceId}>
+        <th scope="row">
+          <Mono>{evalRun.sourceId}</Mono>
+        </th>
+        <td>
+          {evalRun.executorClass ? EXECUTOR_LABEL[evalRun.executorClass] : 'executor 결과 없음'}
+        </td>
+        {EVAL_PARTS.map((part) => (
+          <td key={part}>{withReason(evalRun.import[part].status, evalRun.import[part].reason)}</td>
+        ))}
+        <td>
+          {evalRun.notices.length > 0
+            ? evalRun.notices.map((notice) => NOTICE_LABEL[notice.code]).join(' · ')
+            : '없음'}
+        </td>
+        <td>{evalRun.traceCount === null ? '읽지 않음' : integer.format(evalRun.traceCount)}</td>
+      </tr>
+    ))}
+  </DataTable>
+);
+
 /** 검증된 run 하나. 값이 없는 행도 지우지 않고 상태·이유와 함께 남긴다. */
 export const RunView = ({ run }: { run: ReadyResult }) => {
-  const { observations, tests, bundles, contexts } = run.artifact;
+  const { observations, tests, bundles, contexts, evals } = run.artifact;
   return (
     <div className="flex flex-col gap-xl">
       <Notices run={run} />
       <Summary run={run} />
-      <Section id="observations-title" title="명령별 관측">
+      <Section id="observations-title" anchor="observations" title="명령별 관측">
         <ObservationTable observations={observations} />
       </Section>
       {tests.length > 0 && (
-        <Section id="tests-title" title="테스트">
+        <Section id="tests-title" anchor="tests" title="테스트">
           <TestTable tests={tests} />
         </Section>
       )}
       {bundles.length > 0 && (
-        <Section id="bundles-title" title="번들 (bytes, KB = 1000 B)">
+        <Section id="bundles-title" anchor="bundles" title="번들 (bytes, KB = 1000 B)">
           <BundleTable bundles={bundles} />
         </Section>
       )}
       {contexts.length > 0 && (
-        <Section id="contexts-title" title="컨텍스트 token">
+        <Section id="contexts-title" anchor="contexts" title="컨텍스트 token">
           <ContextTable contexts={contexts} />
+        </Section>
+      )}
+      {evals.length > 0 && (
+        <Section id="evals-title" anchor="evals" title="평가 import">
+          <EvalTable evals={evals} />
         </Section>
       )}
     </div>

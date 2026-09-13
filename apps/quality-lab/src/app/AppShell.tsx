@@ -2,8 +2,9 @@ import { type ReactNode, useEffect, useRef, useState } from 'react';
 
 import { IconButton, SkipLink, Switch, ThemeProvider } from '@berrypjh/react-ui';
 
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useSearchParams } from 'react-router-dom';
 
+import { queryString } from './data/query';
 import { isEnd, NAV } from './nav';
 
 export type ThemeMode = 'light' | 'dark';
@@ -48,6 +49,9 @@ export const AppShell = ({
   children: ReactNode;
 }) => {
   const { pathname } = useLocation();
+  // 보고 있는 실행은 화면을 옮겨도 유지한다. 필터(package·status·q)는 화면마다 뜻이 달라 가져가지 않는다.
+  const [searchParams] = useSearchParams();
+  const runQuery = queryString({ run: searchParams.get('run') ?? undefined });
   const [menuOpen, setMenuOpen] = useState(false);
   const toggleRef = useRef<HTMLButtonElement>(null);
 
@@ -105,7 +109,11 @@ export const AppShell = ({
           <ul className="list-none m-0 p-0">
             {NAV.map((item) => (
               <li key={item.path}>
-                <NavLink to={item.path} end={isEnd(item.path)} className={navLinkClass}>
+                <NavLink
+                  to={`${item.path}${runQuery}`}
+                  end={isEnd(item.path)}
+                  className={navLinkClass}
+                >
                   {item.label}
                 </NavLink>
               </li>

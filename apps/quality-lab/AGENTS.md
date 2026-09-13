@@ -23,18 +23,47 @@ src/
   styles.css             Tailwind entry (react-ui preset)
   global.d.ts            __QUALITY_LAB_SOURCE_SHA__ (vite define)
   app/
-    app.tsx              라우트. fetcher·기준 SHA 를 받는다
-    AppShell.tsx         header·nav·main (SkipLink 대상)
-    nav.ts               정보 구조. nav 라벨 = 페이지 h1
-    pages.tsx            Page·Mono·EmptyRuns·OverviewPage·RunsPage
+    app.tsx              라우트(화면별 lazy chunk). client 를 context 로 준다
+    AppShell.tsx         header·nav·main (SkipLink 대상). nav 는 `?run=` 만 이어 간다
+    nav.ts               정보 구조 한 벌. nav 라벨 = 페이지 h1 = 현재 항목
+    ui.tsx               Page(이동해 왔을 때만 h1 포커스)·EmptyRuns
     data/
-      loadObservability.ts  index → run 순서로 읽고 공개 계약으로 검증
-      format.ts             상태·바이트·headroom·이유 문장
+      client.ts             index → run 요약 → run 전체. 필요한 파일만 받고 계약으로 검증·캐시
+      useRunData.ts         화면이 필요한 수준(index·summary·run)만 읽는 hook. 필터는 렌더에서
+      query.ts              URL query 허용 목록 (run·base·package·variant·panel·platform·status·q)
+      status.ts             Empty·Loading·Error·Partial·Unsupported·N/A·Stale·No-match 상태 모델 (+ not-run)
+      labels.ts·format.ts   상태·값을 글로
+      links.ts              실패 행 → 근거 화면 주소 (bundle·context·eval 은 도메인 화면)
+      bundles.ts            size-limit budget 막대·baseline 비교(compareBundle)·treeshake 묶음
+      ai.ts                 metric 글(분자/분모·n)·4×5 confusion·retrieval N/A·verification kind×status
+      designSystem.ts       state 격자(component × state·platform)·theme × 산출물
+      loadObservability.ts  run 하나 전체 (실행 기록 상세가 쓴다)
+    components/          StatusNotice·CopyCommand·DataTable·Evidence·RunBar 등 (react-ui 조립)
+      BarChart.tsx          HTML+SVG 가로 막대. 값 글이 늘 보이고 null 은 막대를 그리지 않는다
+      useHashFocus.ts       `#id` 근거 행으로 스크롤·포커스
+    pages/
+      overview/          독립 카드 4개·최근 실패·기준선(해당 없음)
+      quality/           테스트·검증·패키지 표면
+      bundles/           size-limit budget·baseline delta·tree-shaking (not-run 이면 이유)
+      ai/                출처·primary scorecard·context panel·routing·retrieval·verification
+      design-system/     테마·산출물·state 근거·component token·contrast guard·demo-web 링크
+      runs/              실행 목록(요약만)·고른 실행 상세
     run/
       RunPanel.tsx          불러오기 상태·문제·마지막 검증 run 유지
-  test/fixtures.ts       test 전용 (tsconfig.app 에서 제외)
-public/observability/    export 산출물 (gitignore)
+      RunView.tsx           run 상세 표. section id(#bundles 등)가 다른 화면 링크의 대상
+  test/                  test 전용 fixture·render (tsconfig.app 에서 제외)
+public/observability/    export 산출물 (gitignore). run 마다 `<id>.json` + `<id>.summary.json`
 ```
+
+- **개요·목록은 run 요약만 읽는다.** 요약 파일은 export 가 계약 함수 `summarizeRun` 으로 쓴다.
+  요약이 없는 이전 export 는 run 전체를 몰래 받지 않고 다시 export 하라고 알린다.
+- **필터는 표시만 바꾼다.** source·run 요약의 count 는 원본 전체 값이고, 필터 결과 수는 따로 알린다.
+- **명령 버튼은 복사만 한다.** 브라우저가 실행하는 경로가 없다.
+- **차트는 같은 데이터의 표와 함께 둔다.** chart 의존성 없이 HTML/SVG 로 그리고, 한 차트에는 같은
+  조건·단위의 값만 둔다. 새 파생값(합산 점수·감소율 등)을 만들지 않는다 — delta 는 계약의
+  `compareBundle` 조건이 모두 같을 때만.
+- **요약으로 모르는 것은 말하지 않는다.** 요약에는 context scope·treeshake 여부가 없어서 그 대안
+  실행은 `alternatives: null` 로 생략한다.
 
 ## 검증
 

@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+
 import { Button } from '@berrypjh/react-ui';
 
 import type { Fetcher, LoadResult } from '../data/loadObservability';
@@ -70,18 +72,36 @@ export const LoadProblem = ({ problem, keptRun }: { problem: Problem; keptRun: b
   );
 };
 
-type RunPanelProps = { fetcher: Fetcher; expectedSha: string };
+type RunPanelProps = {
+  fetcher: Fetcher;
+  expectedSha: string;
+  /** 없으면 index 의 마지막 run. */
+  runId?: string;
+  title?: string;
+  /** 검증된 run 이 그려진 뒤. 다른 화면의 `#section` 링크를 따라갈 때 쓴다. */
+  onReady?: () => void;
+};
 
-/** 가장 최근에 export 한 run. 불러오는 중·문제·미수집·검증된 run 을 각각 다르게 보여준다. */
-export const RunPanel = ({ fetcher, expectedSha }: RunPanelProps) => {
-  const { loading, result, lastReady, reload } = useObservability(fetcher, expectedSha);
+/** run 하나의 상세. 불러오는 중·문제·미수집·검증된 run 을 각각 다르게 보여준다. */
+export const RunPanel = ({
+  fetcher,
+  expectedSha,
+  runId,
+  title = '최근 실행',
+  onReady,
+}: RunPanelProps) => {
+  const { loading, result, lastReady, reload } = useObservability(fetcher, expectedSha, runId);
   const problem = problemOf(result, lastReady !== null);
+
+  useEffect(() => {
+    if (lastReady) onReady?.();
+  }, [lastReady, onReady]);
 
   return (
     <section aria-labelledby="run-panel-title" aria-busy={loading} className="flex flex-col gap-lg">
       <div className="flex flex-wrap items-center justify-between gap-md">
         <h2 id="run-panel-title" className="text-text-default text-lg leading-lg font-semiBold">
-          최근 실행
+          {title}
         </h2>
         <Button variant="outlined" size="sm" onClick={reload} disabled={loading}>
           다시 불러오기
