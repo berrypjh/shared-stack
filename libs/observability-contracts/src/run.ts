@@ -2,6 +2,8 @@ import { z } from 'zod';
 
 import { bundleMeasurementSchema } from './bundle.js';
 import { contextMeasurementSchema } from './context.js';
+import { designSystemSchema, packageSurfaceSchema } from './design-system.js';
+import { evalRunSchema } from './eval.js';
 import { isPublicEvidencePath } from './evidence.js';
 import { DOMAINS, observationSchema } from './observation.js';
 import {
@@ -19,8 +21,11 @@ import {
 import { testSummarySchema } from './test-summary.js';
 
 export const RUN_STATES = ['running', 'complete', 'partial', 'failed', 'cancelled'] as const;
-/** `static` 은 정의만 읽는다. `core` 는 test·check·bundle·context 를 수집한다. */
-export const PROFILES = ['static', 'core'] as const;
+/**
+ * `static` 은 정의만 읽는다. `core` 는 test·check·bundle·context 를 수집한다.
+ * `eval` 은 이미 만든 consumer eval 산출물을 다시 실행하지 않고 가져온다.
+ */
+export const PROFILES = ['static', 'core', 'eval'] as const;
 export const SOURCE_KINDS = ['local', 'ci'] as const;
 export const CACHE_STATES = ['hit', 'miss', 'mixed', 'disabled'] as const;
 
@@ -109,6 +114,15 @@ export const runArtifactSchema = z
     bundles: z.array(bundleMeasurementSchema),
     /** 시나리오·variant·agent 입력 token. */
     contexts: z.array(contextMeasurementSchema),
+    /**
+     * consumer eval summary·trace import. live agent 결과가 아니면 notice 가 그렇게 말한다.
+     * eval import 이전에 수집된 run 에는 key 가 없다 — import 한 eval 이 없다는 뜻이라 `[]` 로 읽는다.
+     */
+    evals: z.array(evalRunSchema).default([]),
+    /** 토큰·테마·상태 근거. 수집하지 않은 run (이전 run 포함) 은 null. */
+    designSystem: designSystemSchema.nullable().default(null),
+    /** package exports·산출물·catalog 표면. 수집하지 않았으면 `[]`. */
+    packageSurfaces: z.array(packageSurfaceSchema).default([]),
   })
   .superRefine((artifact, ctx) => {
     const seen = new Set<string>();
@@ -149,41 +163,75 @@ export const publicRunArtifactSchema = runArtifactSchema.superRefine((artifact, 
       ctx.addIssue({ code: 'custom', path: ['inventory'], message: `${path} is not publishable` });
     }
   }
+  artifact.evals.forEach((run, i) =>
+    run.traces.forEach((trace, j) => {
+      const exposed =
+        trace.retrieval.required !== null ||
+        trace.retrieval.retrieved !== null ||
+        trace.verification.runs.some((verification) => verification.excerpt !== null);
+      if (trace.split === 'test' && exposed) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['evals', i, 'traces', j],
+          message: `${trace.id} is held-out: gold evidence and excerpts are not publishable`,
+        });
+      }
+    }),
+  );
 });
 
 export const storeRunPath = (id: string) => `runs/${id}/run.json`;
 export const publicRunPath = (id: string) => `runs/${id}.json`;
+/** 화면이 run 전체보다 먼저 읽는 요약 (`run-summary.ts`). 공개 export 에만 있다. */
+export const publicSummaryPath = (id: string) => `runs/${id}.summary.json`;
 
-/** index 는 version·id·상대 경로만 가진다. 경로는 그 id 의 artifact 만 가리킬 수 있다. */
-const indexSchema = (pathFor: (id: string) => string) =>
-  z
-    .strictObject({
-      version: schemaVersionSchema,
-      runs: z.array(z.strictObject({ id: runIdSchema, path: relativePathSchema })),
-    })
-    .superRefine((index, ctx) => {
-      const seen = new Set<string>();
-      index.runs.forEach((run, i) => {
-        if (seen.has(run.id)) {
-          ctx.addIssue({
-            code: 'custom',
-            path: ['runs', i, 'id'],
-            message: `duplicate run id ${run.id}`,
-          });
-        }
-        seen.add(run.id);
-        if (run.path !== pathFor(run.id)) {
-          ctx.addIssue({
-            code: 'custom',
-            path: ['runs', i, 'path'],
-            message: `run ${run.id} must point to ${pathFor(run.id)}`,
-          });
-        }
-      });
+const indexEntrySchema = z.strictObject({ id: runIdSchema, path: relativePathSchema });
+
+type IndexEntry = { id: string; path: string; summary?: string };
+
+/** 경로는 그 id 의 artifact·요약만 가리킬 수 있고 id 는 겹치지 않는다. */
+const indexIssues =
+  (pathFor: (id: string) => string, summaryPathFor?: (id: string) => string) =>
+  (index: { runs: IndexEntry[] }, ctx: z.RefinementCtx) => {
+    const seen = new Set<string>();
+    index.runs.forEach((run, i) => {
+      if (seen.has(run.id)) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['runs', i, 'id'],
+          message: `duplicate run id ${run.id}`,
+        });
+      }
+      seen.add(run.id);
+      if (run.path !== pathFor(run.id)) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['runs', i, 'path'],
+          message: `run ${run.id} must point to ${pathFor(run.id)}`,
+        });
+      }
+      if (run.summary !== undefined && run.summary !== summaryPathFor?.(run.id)) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['runs', i, 'summary'],
+          message: `run ${run.id} summary must point to ${summaryPathFor?.(run.id)}`,
+        });
+      }
     });
+  };
 
-export const storeIndexSchema = indexSchema(storeRunPath);
-export const publicIndexSchema = indexSchema(publicRunPath);
+/** store index 는 version·id·경로만 가진다. */
+export const storeIndexSchema = z
+  .strictObject({ version: schemaVersionSchema, runs: z.array(indexEntrySchema) })
+  .superRefine(indexIssues(storeRunPath));
+
+/** 공개 index 는 요약 경로를 더 가질 수 있다. 요약 이전에 export 한 항목에는 없다. */
+export const publicIndexSchema = z
+  .strictObject({
+    version: schemaVersionSchema,
+    runs: z.array(indexEntrySchema.extend({ summary: relativePathSchema.optional() })),
+  })
+  .superRefine(indexIssues(publicRunPath, publicSummaryPath));
 
 /** run 디렉터리에서 마지막에 쓰는 파일. 목록에 없는 파일은 run 에 속하지 않는다. */
 export const runManifestSchema = z.strictObject({
@@ -202,4 +250,5 @@ export type RunMetadata = z.infer<typeof runMetadataSchema>;
 export type Inventory = z.infer<typeof inventorySchema>;
 export type RunArtifact = z.infer<typeof runArtifactSchema>;
 export type RunIndex = z.infer<typeof storeIndexSchema>;
+export type PublicRunIndex = z.infer<typeof publicIndexSchema>;
 export type RunManifest = z.infer<typeof runManifestSchema>;

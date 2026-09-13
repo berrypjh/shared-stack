@@ -90,6 +90,9 @@ export const artifact = (overrides: Overrides = {}) => ({
   tests: [],
   bundles: [],
   contexts: [],
+  evals: [],
+  designSystem: null,
+  packageSurfaces: [],
   ...overrides,
 });
 
