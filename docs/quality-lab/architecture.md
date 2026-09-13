@@ -17,10 +17,18 @@ tools/scripts/observability     apps/quality-lab (Vite SPA)
 - 브라우저는 명령을 실행하지 않는다. 명령 endpoint 가 없다.
 - 앱은 `@berrypjh/react-ui` 공개 exports 와 계약 lib 만 import 한다.
 - `tmp/quality-lab` 과 `apps/quality-lab/public/observability` 는 gitignore 대상이다.
+- E2E 는 `apps/quality-lab-e2e`(implicit dependency → quality-lab)가 따로 한다. 앱 소스를 import 하지 않는다.
+
+같은 폴더의 문서: [metrics.md](./metrics.md) (metric·단위·분모·호환) · [collectors.md](./collectors.md)
+(profile·입력·store) · [verification.md](./verification.md) (gate·최근 결과) · [limitations.md](./limitations.md).
+사용법은 [apps/quality-lab/README.md](../../apps/quality-lab/README.md).
 
 ## 실행 순서
 
+저장소 root 에서 실행한다.
+
 ```bash
+pnpm build:libs                                           # core 는 lib 를 build 하지 않고 기존 dist 를 잰다
 pnpm nx build @berrypjh/observability-contracts          # quality:* 스크립트가 먼저 한다
 pnpm quality:collect --profile=static --run-id=local-static-01
 pnpm quality:collect --profile=core --run-id=local-quality-01
@@ -63,6 +71,19 @@ id·import 만 받고 argv 를 만들 방법이 없다. 실행은 `execFile` 계
 - **treeshake 는 보고 전용 진단이다.** raw·gzip 을 따로 남기고 한도·비율 게이트를 두지 않는다.
 - **비교는 조건이 같을 때만.** bundle 은 방법·압축·보정·entry·import·target·externals·도구·config
   해시, context 는 scope·provider·model·tokenizer 버전·내용 구성이 같아야 delta 를 준다.
+- **실행 비교는 명시한 두 run 만.** Level 1 현재 run, Level 2 사람이 고른 baseline(`baseline.json` 은
+  profile 마다 run ID 포인터 — `pnpm quality --run-id=<id>` 가 store·public 에 같은 내용으로 쓰고, 다른
+  run 으로 바꾸려면 `--replace-baseline`, history 는 쌓기만 한다), Level 3 불변 run + index 요약의 `series`.
+  최신 run 을 자동 baseline 으로 삼지 않는다. source SHA 차이는 비교 대상이라 막지 않고, 방법·압축·
+  tokenizer·scope·eval 조건(K·task 수·model 설정·timeout)은 metric 별 `comparableKey` 에 넣는다. 모르는
+  조건은 unknown, 함께 가진 지표가 없으면 incompatible 이다. delta 는 부호 있는 절대 차이, 기준 0 의 상대
+  차이는 N/A, 비율은 %p 이고, median 차이는 통계 검정이 아니며 threshold 를 만들지 않는다.
+- **evaluator 원래 비교를 따로 둔다.** summary 의 `comparison`(warnings 포함)을 그대로 옮기고, 없으면
+  baseline 파일이 없음(no-baseline)·깨짐(corrupt-baseline)·있지만 요청 안 함을 나눈다 — evaluator 의
+  `readBaseline` 은 모든 오류를 없음으로 돌리므로 importer 가 먼저 읽는다.
+- **export 는 같은 ID 의 다른 run 을 덮어쓰지 않는다.** 공개 run 의 metadata 가 다르면 거부한다.
+- **E2E 는 별도 프로젝트다.** `apps/quality-lab-e2e` 는 앱 소스를 import 하지 않고, 계약으로 만든
+  fixture 를 `page.route` 로만 주입한다 (public export 에 쓰지 않는다).
 - **context scope 를 나눈다.** `package-scenario`(measure-tokens 등록부), `variant-initial`·
   `variant-routed`(consumer eval `measureVariantContext`), `agent-input`. 입력이 하나라도 없으면
   `missing-input` 으로 부분 합계를 두지 않는다.

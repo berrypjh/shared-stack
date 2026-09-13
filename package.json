@@ -21,6 +21,7 @@
     "lint:fix": "nx run-many -t lint --fix",
     "local-registry": "nx local-registry",
     "prepare": "husky install",
+    "quality": "nx run @berrypjh/observability-contracts:build && tsx tools/scripts/observability/quality.ts",
     "quality:collect": "nx run @berrypjh/observability-contracts:build && tsx tools/scripts/observability/cli.ts collect",
     "quality:export": "nx run @berrypjh/observability-contracts:build && tsx tools/scripts/observability/cli.ts export",
     "quality:lab": "nx serve @berrypjh/quality-lab",
