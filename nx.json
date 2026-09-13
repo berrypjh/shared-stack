@@ -13,8 +13,7 @@
       "!{projectRoot}/**/*.stories.@(js|jsx|ts|tsx|mdx)",
       "!{projectRoot}/.storybook/**/*",
       "!{projectRoot}/tsconfig.storybook.json",
-      "!{projectRoot}/**/*.spec.[jt]s?(x)",
-      "!{projectRoot}/playwright.config.[jt]s"
+      "!{projectRoot}/**/*.spec.[jt]s?(x)"
     ],
     "sharedGlobals": [
       "{workspaceRoot}/tsconfig.base.json",
@@ -185,10 +184,6 @@
       "inputs": ["default", "^default"]
     },
     "lint": {
-      "cache": true,
-      "inputs": ["default", "^default"]
-    },
-    "e2e": {
       "cache": true,
       "inputs": ["default", "^default"]
     }

@@ -163,6 +163,9 @@ storybook-static
 # log
 *.log
 
+# quality-lab 수집·export 산출물 (tmp/quality-lab 는 위의 tmp 가 덮는다)
+apps/quality-lab/public/observability/
+
 # 플러그인 배포 산출물
 !plugins/*/dist
 !plugins/*/dist/**

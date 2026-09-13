@@ -24,7 +24,6 @@ Agents must optimize for:
 
 - `apps/demo-mobile`: Expo / React Native demo app
 - `apps/demo-web`: React + Vite demo app
-- `apps/demo-web-e2e`: Playwright E2E tests for the web demo
 - `libs/design-tokens`: design token sources, transforms, and generated outputs
 - `libs/ui-core`: platform-agnostic contracts, shared logic, and foundational utilities
 - `libs/react-ui`: React web UI component library

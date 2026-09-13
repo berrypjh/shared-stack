@@ -104,7 +104,6 @@ libs/
 
 apps/
 ├── demo-web/             # 웹 라이브러리 데모 (React)
-├── demo-web-e2e/         # 웹 E2E 테스트 (Playwright)
 └── demo-mobile/          # 모바일 라이브러리 데모 (Expo)
 
 plugins/
