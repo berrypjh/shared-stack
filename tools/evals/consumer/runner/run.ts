@@ -1,21 +1,20 @@
 import { execFileSync } from 'node:child_process';
+import fs from 'node:fs/promises';
 import path from 'node:path';
 
-import { resolvePlatform } from '../../../consumer-retrieval/platform';
 import { toBaseline, writeBaseline } from '../ci/baseline';
 import { SMOKE_TASK_IDS, smokeOutcome } from '../ci/smoke-fixture';
 import { DEFAULT_K } from '../graders';
-import { buildConfusion, renderConfusion } from '../reporters/confusion';
+import { renderConfusion } from '../reporters/confusion';
 import { renderMarkdown } from '../reporters/markdown';
-import { measureVariantContext } from '../variants/context';
-import { resolveVariants, VARIANT_IDS } from '../variants/index';
+import type { VariantContext } from '../variants/context';
+import { VARIANT_IDS } from '../variants/index';
 
-import { loadDataset } from './dataset';
 import { createReplayExecutor, type EvalExecutor, unavailableExecutor } from './executor';
-import { type FixtureContext, loadFixtureContext, toPlatformInput } from './fixture-context';
+import { measureContexts, resolveRouting, type RoutingReport } from './offline';
 import { REPO_ROOT } from './paths';
 import { runEval, writeRunArtifacts } from './pipeline';
-import { type Split, splitSchema } from './schema';
+import { splitSchema } from './schema';
 import { readTraces } from './trace';
 
 /**
@@ -49,9 +48,8 @@ const gitSha = (): string | null => {
   }
 };
 
-const printContexts = async (variantIds: string[]): Promise<void> => {
-  for (const variant of resolveVariants(variantIds)) {
-    const ctx = await measureVariantContext(variant);
+const printContexts = (contexts: VariantContext[]): void => {
+  for (const ctx of contexts) {
     const line = (
       label: string,
       size: { files: string[]; chars: number | null; tokens: number | null },
@@ -60,7 +58,7 @@ const printContexts = async (variantIds: string[]): Promise<void> => {
       `  chars=${(size.chars === null ? 'N/A' : size.chars.toLocaleString()).padStart(9)}` +
       `  tokens=${(size.tokens === null ? 'N/A' : size.tokens.toLocaleString()).padStart(8)}`;
 
-    console.log(line(variant.id, ctx));
+    console.log(line(ctx.variant, ctx));
     if (ctx.missingPaths.length) console.log(`  missing: ${ctx.missingPaths.join(', ')}`);
     for (const [platform, size] of Object.entries(ctx.routed ?? {})) {
       console.log(line(`  └ routed:${platform}`, size));
@@ -72,31 +70,27 @@ const printContexts = async (variantIds: string[]): Promise<void> => {
  * executor 없이 deterministic platform resolver만 돌려 routing raw data를 만든다.
  * fixture에서 관측 가능한 근거(dependencies, project tree)와 prompt만 본다.
  */
-const printRouting = async (split: Split): Promise<void> => {
-  const tasks = await loadDataset(split);
-  const contexts = new Map<string, FixtureContext>();
-  const pairs = [];
-  const mismatches: string[] = [];
+const printRouting = (report: RoutingReport): void => {
+  const mismatches = report.decisions
+    .filter((d) => d.predicted !== d.expected)
+    .map(
+      (d) =>
+        `  ${d.taskId}: expected ${d.expected}, got ${d.diagnosis}` +
+        ` (${d.confidence}) — ${d.evidence.map((e) => `${e.kind}:${e.value}`).join(', ')}`,
+    );
 
-  for (const task of tasks) {
-    let context = contexts.get(task.fixture);
-    if (!context) {
-      context = await loadFixtureContext(task.fixture);
-      contexts.set(task.fixture, context);
-    }
-    const decision = resolvePlatform(toPlatformInput(task.prompt, context));
-    pairs.push({ expected: task.expected.platform, predicted: decision.canonical });
-    if (decision.canonical !== task.expected.platform) {
-      mismatches.push(
-        `  ${task.taskId}: expected ${task.expected.platform}, got ${decision.platform}` +
-          ` (${decision.confidence}) — ${decision.evidence.map((e) => `${e.kind}:${e.value}`).join(', ')}`,
-      );
-    }
-  }
-
-  console.log(`split: ${split}  resolver: deterministic (no executor)\n`);
-  console.log(renderConfusion(buildConfusion(pairs)));
+  console.log(`split: ${report.split}  resolver: deterministic (no executor)\n`);
+  console.log(renderConfusion(report.matrix));
   if (mismatches.length) console.log(`\nmismatches:\n${mismatches.join('\n')}`);
+};
+
+/** `--json=<file>` 이면 콘솔 출력과 같은 데이터를 JSON 으로도 남긴다. 판정·측정은 다시 하지 않는다. */
+const writeJson = async (args: Args, data: unknown): Promise<void> => {
+  if (typeof args.json !== 'string') return;
+  const file = path.resolve(REPO_ROOT, args.json);
+  await fs.mkdir(path.dirname(file), { recursive: true });
+  await fs.writeFile(file, `${JSON.stringify(data, null, 2)}\n`);
+  console.error(`json written to ${path.relative(REPO_ROOT, file)}`);
 };
 
 const main = async (): Promise<void> => {
@@ -104,12 +98,16 @@ const main = async (): Promise<void> => {
   const variantIds = str(args, 'variants', VARIANT_IDS.join(',')).split(',');
 
   if (args['context-only']) {
-    await printContexts(variantIds);
+    const contexts = await measureContexts(variantIds);
+    printContexts(contexts);
+    await writeJson(args, { kind: 'context-only', executor: null, contexts });
     return;
   }
 
   if (args['routing-only']) {
-    await printRouting(splitSchema.parse(str(args, 'split', 'dev')));
+    const report = await resolveRouting(splitSchema.parse(str(args, 'split', 'dev')));
+    printRouting(report);
+    await writeJson(args, { kind: 'routing-only', executor: null, ...report });
     return;
   }
 
