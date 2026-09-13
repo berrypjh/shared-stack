@@ -1,0 +1,24 @@
+{
+  "name": "@berrypjh/quality-lab-e2e",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/quality-lab-e2e/src",
+  "projectType": "application",
+  "tags": [],
+  "implicitDependencies": ["@berrypjh/quality-lab"],
+  "targets": {
+    "e2e": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "playwright test",
+        "cwd": "apps/quality-lab-e2e"
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "tsc --noEmit -p tsconfig.json",
+        "cwd": "apps/quality-lab-e2e"
+      }
+    }
+  }
+}
