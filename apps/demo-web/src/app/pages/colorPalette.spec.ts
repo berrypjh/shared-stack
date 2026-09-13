@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { tokenIdsInCategory } from '../presentation/tokenCatalog';
 
-import { colorFamilies, rampsOf, semanticOf } from './colorPalette';
+import { colorFamilies, isBaselineStep, rampsOf, semanticOf } from './colorPalette';
 
 /**
  * 계열 분류는 **키 모양**에서 나온다. 계열 이름 목록을 테스트에 다시 적지 않는다 — 적으면
@@ -57,5 +57,26 @@ describe('색 팔레트 분류', () => {
 
   it('계열이 없거나 키가 없는 id 는 무시한다', () => {
     expect(colorFamilies(['color', 'color.orphan'])).toEqual([]);
+  });
+
+  it('브랜드 램프를 앞에 두고 나머지는 artifact 순서를 지킨다', () => {
+    const ids = [
+      'color.error.er100',
+      'color.neutral.ne100',
+      'color.zeta.ze100',
+      'color.primary.pr100',
+    ];
+    expect(rampsOf(colorFamilies(ids)).map((f) => f.name)).toEqual([
+      'primary',
+      'neutral',
+      'error',
+      'zeta',
+    ]);
+  });
+
+  it('500 단계만 기준 단계다', () => {
+    expect(isBaselineStep('pr500')).toBe(true);
+    expect(isBaselineStep('pr400')).toBe(false);
+    expect(isBaselineStep('default')).toBe(false);
   });
 });

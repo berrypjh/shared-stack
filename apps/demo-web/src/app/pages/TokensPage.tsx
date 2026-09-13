@@ -6,6 +6,7 @@ import { cssVarOf } from '../presentation/tokenCatalog';
 import { Mono, Page, Section } from '../shell/ui';
 
 import { TokenPreview } from './TokenPreview';
+import { magnitude } from './tokenScales';
 
 /**
  * 토큰 탐색.
@@ -50,17 +51,6 @@ const flatten = (node: unknown, path: string[] = []): Row[] => {
   return Object.entries(node as Record<string, unknown>).flatMap(([k, v]) =>
     flatten(v, [...path, k]),
   );
-};
-
-/** 정렬 가능한 값의 크기. 같은 차원끼리만 비교하려고 차원을 함께 돌려준다. */
-const magnitude = (value: string): [dimension: string, size: number] | null => {
-  const v = value.trim();
-  const length = /^(-?[\d.]+)(rem|em|px)$/.exec(v);
-  if (length) return ['length', Number(length[1]) / (length[2] === 'px' ? 16 : 1)];
-  const time = /^([\d.]+)(ms|s)$/.exec(v);
-  if (time) return ['time', Number(time[1]) * (time[2] === 's' ? 1000 : 1)];
-  if (/^-?[\d.]+$/.test(v)) return ['number', Number(v)];
-  return null;
 };
 
 const parentOf = (path: string) => path.slice(0, path.lastIndexOf('.'));

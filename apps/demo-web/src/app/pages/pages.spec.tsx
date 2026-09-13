@@ -10,9 +10,10 @@ import { resolveToken, tokenIdsInCategory } from '../presentation/tokenCatalog';
 import { NAV } from '../shell/nav';
 
 import { colorFamilies } from './colorPalette';
+import { SCALE_SECTIONS } from './tokenScales';
 
 /**
- * 라우팅 스모크. 각 화면이 예외 없이 그려지고, E2E 가 의존하는 앵커가 살아있는지 본다.
+ * 라우팅 스모크. 각 화면이 예외 없이 그려지고 핵심 앵커가 살아있는지 본다.
  * 계산 로직은 verification/checks.spec.ts, 값 정합성은 design-tokens 가 담당한다.
  */
 const at = (path: string) =>
@@ -151,7 +152,7 @@ describe('사이드바 묶음', () => {
     const bg = (el: Element, prefix = '') =>
       el.className.split(/\s+/).find((c) => c.startsWith(`${prefix}bg-`));
     const active = bg(nav().getByRole('link', { name: 'Tokens' }));
-    const hover = bg(nav().getByRole('link', { name: 'Styles' }), 'hover:')?.slice('hover:'.length);
+    const hover = bg(nav().getByRole('link', { name: 'Scales' }), 'hover:')?.slice('hover:'.length);
     expect(active).toBeTruthy();
     expect(hover).toBeTruthy();
     expect(active).not.toBe(hover);
@@ -202,28 +203,11 @@ describe('사이드바 현재 위치', () => {
   });
 });
 
-describe('E2E 앵커', () => {
-  it.each([
-    ['/', 'overview-page'],
-    ['/verify', 'verify-page'],
-    ['/tokens', 'tokens-page'],
-    ['/foundation', 'foundation-page'],
-  ])('%s 가 %s 앵커를 갖는다', (path, testId) => {
-    at(path);
-    expect(screen.getByTestId(testId)).toBeTruthy();
-  });
-
-  it('Runtime 화면이 계약 상태 앵커를 갖는다', async () => {
+describe('Runtime 화면', () => {
+  it('통합 계약 항목을 모두 그린다', async () => {
     at('/verify');
     for (const id of ['themed', 'shared', 'derived', 'react-ui', 'tailwind']) {
       expect(await screen.findByTestId(`check-${id}`)).toBeTruthy();
-    }
-  });
-
-  it('Runtime 화면이 측정 probe 를 갖는다', () => {
-    at('/verify');
-    for (const id of ['probe-background-primary', 'probe-background-error', 'probe-spacing-md']) {
-      expect(screen.getByTestId(id)).toBeTruthy();
     }
   });
 });
@@ -495,5 +479,32 @@ describe('색 팔레트', () => {
     expect(chip()).not.toContain(light.token.value);
     // identity 는 테마와 무관하다.
     expect(chip()).toContain('--ds-text-default');
+  });
+});
+
+/** 스케일. 분류와 정렬은 tokenScales.spec.ts 가 보고, 여기서는 카드가 실제로 그려지는지 본다. */
+describe('스케일', () => {
+  it('섹션마다 제목을 그린다', () => {
+    at('/scales');
+    for (const section of SCALE_SECTIONS) {
+      expect(screen.getByRole('heading', { level: 2, name: section.title })).toBeTruthy();
+    }
+  });
+
+  it('잎 카드는 값과 catalog 의 CSS 변수를 글자로 갖는다', () => {
+    at('/scales');
+    const resolved = resolveToken('spacing.md', 'light');
+    expect(resolved.ok).toBe(true);
+    if (!resolved.ok) return;
+
+    const card = screen.getByTestId('scale-card-spacing.md').textContent ?? '';
+    expect(card).toContain(resolved.token.value);
+    expect(card).toContain(resolved.token.cssVar);
+  });
+
+  it('합성 카드는 CSS 변수를 지어내지 않는다', () => {
+    at('/scales');
+    const card = screen.getByTestId('scale-card-shadow.xs').textContent ?? '';
+    expect(card).not.toContain('--ds-');
   });
 });

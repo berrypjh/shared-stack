@@ -16,9 +16,9 @@ const ENTRIES = [
   },
   { to: '/tokens', name: 'Tokens', desc: '현재 테마의 토큰을 이름이나 CSS 변수로 찾습니다.' },
   {
-    to: '/foundation',
-    name: 'Styles',
-    desc: '토큰 계층, 버튼 색 역할, 필드 상태, elevation, motion.',
+    to: '/scales',
+    name: 'Scales',
+    desc: '간격, 모서리, 테두리, 글자, 그림자, 움직임 토큰을 카드로 봅니다.',
   },
   {
     to: '/components/button',

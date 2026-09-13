@@ -290,7 +290,7 @@ describe('사이드바 컴포넌트 검색', () => {
     at('/components/button?view=designer');
     await userEvent.type(search(), 'zzzz');
     expect(nav().getByRole('link', { name: 'Tokens' })).toBeTruthy();
-    expect(nav().getByRole('link', { name: 'Styles' })).toBeTruthy();
+    expect(nav().getByRole('link', { name: 'Scales' })).toBeTruthy();
     expect(nav().getByRole('link', { name: '개요' })).toBeTruthy();
   });
 

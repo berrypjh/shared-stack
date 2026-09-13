@@ -13,12 +13,10 @@ pnpm nx test @berrypjh/demo-web        # vitest
 pnpm nx typecheck @berrypjh/demo-web   # tsc (의존 패키지를 먼저 빌드합니다)
 ```
 
-브라우저 E2E 는 별도 프로젝트입니다 — `apps/demo-web-e2e`.
-
 ## 구조
 
 `src/app/shell` 이 사이드바·topbar·페이지 primitive 를, `src/app/pages` 가 화면 하나씩을
 가집니다. 정보 구조의 정답은 `src/app/shell/nav.ts` 이고, 페이지를 거기 등록하면 라우트
-스모크와 E2E 이동 테스트가 자동으로 덮습니다.
+스모크가 자동으로 덮습니다.
 
 작업 규칙·함정은 `AGENTS.md` 에 있습니다.

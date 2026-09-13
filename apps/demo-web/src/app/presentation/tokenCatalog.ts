@@ -77,6 +77,9 @@ export const tokenIdsInCategory = (category: string): readonly string[] =>
 
 export const tokenCount = (): number => Object.keys(tokenTable()).length;
 
+/** 모든 token id. artifact 의 id 순서다. */
+export const allTokenIds = (): readonly string[] => Object.keys(tokenTable());
+
 /** catalog 가 적어 둔 정확한 CSS 변수. 유도하지 않는다. */
 export const cssVarOf = (id: string): string | undefined => {
   const row = rowOf(id);

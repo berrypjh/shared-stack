@@ -1,6 +1,6 @@
 import { Table, TableScroll } from '@berrypjh/react-ui';
 
-import { Mono, Page, Section, Swatch } from '../shell/ui';
+import { Page, Section, Swatch } from '../shell/ui';
 import { CONTRAST_CHECKS, CONTRAST_VARS, contrastRatio } from '../verification/contrast';
 import { RuntimeVerification } from '../verification/RuntimeVerification';
 import { useCurrentTheme } from '../verification/useCurrentTheme';
@@ -87,50 +87,6 @@ export const VerifyPage = () => {
             </tbody>
           </Table>
         </TableScroll>
-      </Section>
-
-      <Section title="E2E 측정 지점" note="Playwright가 computed style로 읽는 고정 앵커">
-        <div className="flex flex-wrap gap-2xl">
-          {[
-            { id: 'probe-background-primary', v: '--ds-background-primary' },
-            { id: 'probe-background-error', v: '--ds-background-error' },
-            { id: 'probe-text-default', v: '--ds-text-default' },
-            { id: 'probe-stroke-default', v: '--ds-stroke-default' },
-          ].map((p) => (
-            <div key={p.id} className="flex flex-col gap-sm">
-              <div
-                data-testid={p.id}
-                className="w-[112px] h-[36px] rounded-sm border border-stroke-light"
-                style={{ background: `var(${p.v})` }}
-              />
-              <Mono>{p.v}</Mono>
-            </div>
-          ))}
-          <div className="flex flex-col gap-sm">
-            <div
-              data-testid="probe-background-primary-rgb"
-              className="w-[112px] h-[36px] rounded-sm border border-stroke-light"
-              style={{ background: 'rgb(var(--ds-background-primary-rgb) / 0.5)' }}
-            />
-            <Mono>--ds-background-primary-rgb @ 50%</Mono>
-          </div>
-          <div className="flex flex-col gap-sm">
-            <div
-              data-testid="probe-spacing-md"
-              className="w-[112px] rounded-sm border border-stroke-light bg-background-grey"
-              style={{ padding: 'var(--ds-spacing-md)' }}
-            />
-            <Mono>--ds-spacing-md</Mono>
-          </div>
-          <div className="flex flex-col gap-sm">
-            <div
-              data-testid="probe-radius-lg"
-              className="w-[112px] h-[36px] border border-stroke-light bg-background-grey"
-              style={{ borderRadius: 'var(--ds-radius-lg)' }}
-            />
-            <Mono>--ds-radius-lg</Mono>
-          </div>
-        </div>
       </Section>
     </Page>
   );

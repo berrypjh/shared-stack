@@ -57,7 +57,7 @@ src/
       {Name}Page.tsx       컴포넌트 페이지. Page/Section/Preview 를 조립만 한다
       TokensPage.tsx       토큰 검색·조회
       TokenPreview.tsx     토큰 값의 시각 미리보기
-      FoundationPage.tsx   타이포·간격 등 foundation
+      ScalesPage.tsx       간격·글자·그림자 등 색 밖의 토큰 카드
       OverviewPage.tsx     첫 화면
       VerifyPage.tsx       Runtime 검증 화면
     verification/
@@ -93,15 +93,12 @@ src/
 pnpm nx test @berrypjh/demo-web        # vitest — 라우팅 스모크 · 정보 구조 · 검증 로직
 pnpm nx typecheck @berrypjh/demo-web   # tsc (의존 패키지를 먼저 빌드한다)
 pnpm nx build @berrypjh/demo-web
-pnpm nx e2e @berrypjh/demo-web-e2e     # Playwright (dev 서버를 자동으로 띄운다)
 ```
-
-E2E 쪽 규칙은 `apps/demo-web-e2e/AGENTS.md` 가 가진다.
 
 | 변경           | 최소 검증                          |
 | -------------- | ---------------------------------- |
 | 페이지 추가    | `test` (라우트 스모크가 자동 포함) |
-| 정보 구조 변경 | `test` + `e2e`                     |
+| 정보 구조 변경 | `test`                             |
 | prop 사용 변경 | `typecheck` + 브라우저 확인        |
 | 검증 로직 변경 | `test`                             |
 
@@ -110,10 +107,8 @@ E2E 쪽 규칙은 `apps/demo-web-e2e/AGENTS.md` 가 가진다.
 ## Gotcha
 
 - **정보 구조를 테스트에 다시 적지 않는다.** `pages.spec.tsx` 의 라우트 스모크와 묶음 단언은
-  `NAV` 에서, E2E 이동 테스트는 **렌더된 사이드바**에서 목적지를 읽는다 (Nx 프로젝트 경계 때문에
-  E2E 는 demo-web 소스를 import 할 수 없고, 어차피 확인해야 할 것은 브라우저에 그려진
-  목록이다). 페이지를 `nav.ts` 에 등록하면 두 테스트가 자동으로 덮는다.
-- **사이드바 라벨과 페이지 h1 은 같은 문장이다.** 두 테스트가 이 규칙으로 도착지를 확인한다.
+  `NAV` 에서 목적지를 읽는다. 페이지를 `nav.ts` 에 등록하면 스모크가 자동으로 덮는다.
+- **사이드바 라벨과 페이지 h1 은 같은 문장이다.** 라우트 스모크가 이 규칙으로 도착지를 확인한다.
   다르게 두면 누른 이름과 도착한 화면의 이름이 갈린다.
 - **`end` 를 손으로 적지 않는다.** 다른 항목의 상위 경로인지로 계산한다. 박아 두면 하위 경로가
   생길 때 함께 낡는다.
@@ -121,7 +116,6 @@ E2E 쪽 규칙은 `apps/demo-web-e2e/AGENTS.md` 가 가진다.
   있다(WCAG 4.1.2). `pages.spec.tsx` 가 렌더 결과에서 접근 가능한 이름을 확인한다.
 - **`ch` 로 최대 폭을 걸지 않는다.** `ch` 는 라틴 `0` 폭 기준이라 한글에서는 의도한 글자 수의
   절반에서 줄이 꺾인다. `break-keep` 만 쓴다.
-- **E2E 는 픽셀을 단언하지 않는다.** 동작과 가시성까지만 본다.
 - **테마 셀렉터만 네이티브 `select` 로 남긴다** (`shell/controls.tsx`). 크롬이 검사 대상에
   의존하면 그 컴포넌트가 깨질 때 테마 전환 자체가 죽고, 이 앱이 무엇을 확인하려 했는지까지
   같이 사라진다. `Select` 의 통합 확인은 `/components/select` 페이지가 맡는다.

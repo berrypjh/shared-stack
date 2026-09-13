@@ -48,7 +48,7 @@ const FIXED: NavSource[] = [
     items: [
       { label: 'Tokens', path: '/tokens' },
       { label: 'Palette', path: '/palette' },
-      { label: 'Styles', path: '/foundation' },
+      { label: 'Scales', path: '/scales' },
     ],
   },
 ];

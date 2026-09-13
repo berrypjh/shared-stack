@@ -9,11 +9,11 @@ import { DesignerWorkspace } from './designer/DesignerWorkspace';
 import { ButtonPage } from './pages/ButtonPage';
 import { DividerPage } from './pages/DividerPage';
 import { FabPage } from './pages/FabPage';
-import { FoundationPage } from './pages/FoundationPage';
 import { IconButtonPage } from './pages/IconButtonPage';
 import { OverviewPage } from './pages/OverviewPage';
 import { PalettePage } from './pages/PalettePage';
 import { PopoverPage } from './pages/PopoverPage';
+import { ScalesPage } from './pages/ScalesPage';
 import { SearchFieldPage } from './pages/SearchFieldPage';
 import { SelectPage } from './pages/SelectPage';
 import { StackPage } from './pages/StackPage';
@@ -49,7 +49,7 @@ const DeveloperRoutes = () => (
     <Route path="/verify" element={<VerifyPage />} />
     <Route path="/tokens" element={<TokensPage />} />
     <Route path="/palette" element={<PalettePage />} />
-    <Route path="/foundation" element={<FoundationPage />} />
+    <Route path="/scales" element={<ScalesPage />} />
     <Route path="/components/button" element={<ButtonPage />} />
     <Route path="/components/text-field" element={<TextFieldPage />} />
     <Route path="/components/select" element={<SelectPage />} />

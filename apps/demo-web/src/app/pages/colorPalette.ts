@@ -50,8 +50,19 @@ export const colorFamilies = (tokenIds: readonly string[]): readonly PaletteFami
   }));
 };
 
+/** 문서 첫머리에 두는 브랜드 램프. 여기 없는 계열도 빠지지 않고 artifact 순서대로 뒤에 온다. */
+const LEADING_RAMPS = ['primary', 'secondary', 'neutral'];
+
+const leadRank = (name: string) => {
+  const index = LEADING_RAMPS.indexOf(name);
+  return index < 0 ? LEADING_RAMPS.length : index;
+};
+
 export const rampsOf = (families: readonly PaletteFamily[]): readonly PaletteFamily[] =>
-  families.filter((f) => f.kind === 'ramp');
+  families.filter((f) => f.kind === 'ramp').sort((a, b) => leadRank(a.name) - leadRank(b.name));
+
+/** 램프의 기준 단계(`pr500`). 스케일은 이 단계를 중심으로 밝고 어두워진다. */
+export const isBaselineStep = (key: string): boolean => /^[a-z]{2}500$/.test(key);
 
 export const semanticOf = (families: readonly PaletteFamily[]): readonly PaletteFamily[] =>
   families.filter((f) => f.kind === 'semantic');
