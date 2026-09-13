@@ -15,6 +15,7 @@
  *
  * 사용:
  *   pnpm treeshake <target> [symbol] [symbol] ...
+ *   pnpm treeshake <target> [symbol]... --json   # scenario 별 raw·gzip 또는 오류 (quality-lab 수집용)
  *
  * 예:
  *   pnpm treeshake react-ui Button
@@ -24,38 +25,11 @@
  *   pnpm treeshake design-tokens themes
  */
 
-import { spawnSync } from 'node:child_process';
-import fs from 'node:fs/promises';
-import os from 'node:os';
-import path from 'node:path';
-import zlib from 'node:zlib';
-
-type Target = {
-  pkg: string;
-  external: string[];
-};
-
-const TARGETS: Record<string, Target> = {
-  'design-tokens': {
-    pkg: '@berrypjh/design-tokens',
-    external: [],
-  },
-  'ui-core': {
-    pkg: '@berrypjh/ui-core',
-    external: [],
-  },
-  'react-ui': {
-    pkg: '@berrypjh/react-ui',
-    external: ['react', 'react-dom', 'react/jsx-runtime'],
-  },
-  'react-native-ui': {
-    pkg: '@berrypjh/react-native-ui',
-    external: ['react', 'react-native', 'react/jsx-runtime'],
-  },
-};
+import { BundleError, measure, type Row, type Scenario, scenariosFor, TARGETS } from './measure';
 
 const args = process.argv.slice(2);
-const [targetName, ...symbols] = args;
+const json = args.includes('--json');
+const [targetName, ...symbols] = args.filter((arg) => arg !== '--json');
 
 if (!targetName || !TARGETS[targetName]) {
   console.error(`usage: pnpm treeshake <target> [symbol]...`);
@@ -70,55 +44,6 @@ const pct = (cur: number, base: number): string => {
   if (cur === base) return '—';
   const sign = cur < base ? '−' : '+';
   return `${sign}${((Math.abs(cur - base) / base) * 100).toFixed(1)}%`;
-};
-
-const writeEntry = async (content: string): Promise<string> => {
-  const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'treeshake-'));
-  const file = path.join(dir, 'entry.mjs');
-  await fs.writeFile(file, content, 'utf8');
-  return file;
-};
-
-const bundleSize = (entry: string): { raw: number; gzip: number } => {
-  const out = spawnSync(
-    'pnpm',
-    [
-      'exec',
-      'esbuild',
-      entry,
-      '--bundle',
-      '--minify',
-      '--format=esm',
-      '--tree-shaking=true',
-      '--platform=neutral',
-      ...target.external.map((e) => `--external:${e}`),
-    ],
-    { encoding: 'utf8', cwd: process.cwd() },
-  );
-  if (out.status !== 0) {
-    console.error(out.stderr);
-    throw new Error('esbuild failed');
-  }
-  const code = out.stdout;
-  const raw = Buffer.byteLength(code, 'utf8');
-  const gzip = zlib.gzipSync(code).length;
-  return { raw, gzip };
-};
-
-type Row = {
-  name: string;
-  raw: number;
-  gzip: number;
-};
-
-const measure = async (scenarioName: string, entryContent: string): Promise<Row> => {
-  const entry = await writeEntry(entryContent);
-  try {
-    const { raw, gzip } = bundleSize(entry);
-    return { name: scenarioName, raw, gzip };
-  } finally {
-    await fs.rm(path.dirname(entry), { recursive: true, force: true });
-  }
 };
 
 const printTable = (rows: Row[]) => {
@@ -144,28 +69,27 @@ const printTable = (rows: Row[]) => {
   }
 };
 
+/** human 모드는 기존처럼 esbuild 실패 시 stderr 를 찍고 종료 코드 1 로 끝난다. */
+const measureOrThrow = async (scenario: Scenario): Promise<Row> => {
+  try {
+    return await measure(target, scenario);
+  } catch (e) {
+    if (e instanceof BundleError) {
+      console.error(e.stderr);
+      throw new Error('esbuild failed');
+    }
+    throw e;
+  }
+};
+
 const main = async () => {
   console.log(`target:  ${targetName} (${target.pkg})`);
   console.log(`external: ${target.external.join(', ') || '(none)'}\n`);
 
   const rows: Row[] = [];
-
-  // 사용자 지정 심볼이 있으면 single-symbol scenarios 측정
-  if (symbols.length > 0) {
-    for (const sym of symbols) {
-      const entry = `import { ${sym} } from '${target.pkg}';\nconsole.log(${sym});\n`;
-      rows.push(await measure(`single: ${sym}`, entry));
-    }
-
-    if (symbols.length > 1) {
-      const entry = `import { ${symbols.join(', ')} } from '${target.pkg}';\nconsole.log(${symbols.join(', ')});\n`;
-      rows.push(await measure(`multi: ${symbols.join('+')}`, entry));
-    }
+  for (const scenario of scenariosFor(target, symbols)) {
+    rows.push(await measureOrThrow(scenario));
   }
-
-  // 항상 baseline (전체 re-export, 트리셰이킹 무력화)
-  const allEntry = `export * from '${target.pkg}';\n`;
-  rows.push(await measure('all-exports (baseline)', allEntry));
 
   printTable(rows);
 
@@ -182,7 +106,32 @@ const main = async () => {
   }
 };
 
-main().catch((e) => {
+/**
+ * `--json`: scenario 마다 raw·gzip 또는 오류를 담는다. 선행 build 결손·없는 export·임시 entry
+ * 실패가 그 scenario 의 `error` 로 남고 나머지 scenario 는 계속 잰다. 비율·임계값은 넣지 않는다.
+ */
+const mainJson = async () => {
+  const scenarios = [];
+  for (const scenario of scenariosFor(target, symbols)) {
+    const { name, kind } = scenario;
+    try {
+      const row = await measure(target, scenario);
+      scenarios.push({ name, kind, symbols: scenario.symbols, raw: row.raw, gzip: row.gzip });
+    } catch (e) {
+      const error = e instanceof BundleError ? e.stderr.trim() || e.message : (e as Error).message;
+      scenarios.push({ name, kind, symbols: scenario.symbols, error });
+    }
+  }
+  console.log(
+    JSON.stringify(
+      { target: targetName, pkg: target.pkg, external: target.external, scenarios },
+      null,
+      2,
+    ),
+  );
+};
+
+(json ? mainJson() : main()).catch((e) => {
   console.error(e);
   process.exit(1);
 });
