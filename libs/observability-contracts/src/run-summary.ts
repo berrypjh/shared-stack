@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 import { EVAL_NOTICE_CODES, EXECUTOR_CLASSES } from './eval.js';
 import { isPublicEvidencePath } from './evidence.js';
+import { metricPoints, seriesPointSchema } from './metrics.js';
 import { type Observation, observationSchema } from './observation.js';
 import { countSchema, reasonSchema } from './primitives.js';
 import { type RunArtifact, runMetadataSchema } from './run.js';
@@ -43,6 +44,8 @@ export const runSummarySchema = z
       evals: countSchema,
       designSystem: z.boolean(),
       packageSurfaces: countSchema,
+      /** 요약 이전 export 에는 없다 — 접근성 결과가 없던 run 이다. */
+      accessibility: countSchema.default(0),
     }),
     failures: z.array(failureSchema),
     /** eval 은 executor 종류와 notice 만. 성공률은 run detail 에서 원본으로 읽는다. */
@@ -53,6 +56,8 @@ export const runSummarySchema = z
         notices: z.array(z.enum(EVAL_NOTICE_CODES)),
       }),
     ),
+    /** 추세용 metric 점. 이 필드 이전 요약은 null — 추세를 모른다(빈 목록이 아니다). */
+    series: z.array(seriesPointSchema).nullable().default(null),
   })
   .superRefine((summary, ctx) => {
     const seen = new Set<string>();
@@ -174,6 +179,7 @@ export const summarizeRun = (artifact: RunArtifact): RunSummary => ({
     evals: artifact.evals.length,
     designSystem: artifact.designSystem !== null,
     packageSurfaces: artifact.packageSurfaces.length,
+    accessibility: artifact.accessibility.length,
   },
   failures: failuresOf(artifact),
   evals: artifact.evals.map((evalRun) => ({
@@ -181,4 +187,5 @@ export const summarizeRun = (artifact: RunArtifact): RunSummary => ({
     executorClass: evalRun.executorClass,
     notices: evalRun.notices.map((notice) => notice.code),
   })),
+  series: metricPoints(artifact),
 });

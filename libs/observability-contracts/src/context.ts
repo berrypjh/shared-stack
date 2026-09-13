@@ -93,7 +93,7 @@ export type ContextComparison = {
   relativeDelta: number | null;
 };
 
-const CONTEXT_CONDITIONS = [
+export const CONTEXT_CONDITIONS = [
   'scope',
   'provider',
   'tokenModel',

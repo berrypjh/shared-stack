@@ -41,6 +41,7 @@ describe('summarizeRun — 화면이 run 전체를 받기 전에 읽는 요약',
       evals: 1,
       designSystem: false,
       packageSurfaces: 1,
+      accessibility: 0,
     });
   });
 

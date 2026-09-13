@@ -126,7 +126,7 @@ export type BundleComparison = {
   relativeDelta: number | null;
 };
 
-const BUNDLE_CONDITIONS = [
+export const BUNDLE_CONDITIONS = [
   'package',
   'method',
   'compression',

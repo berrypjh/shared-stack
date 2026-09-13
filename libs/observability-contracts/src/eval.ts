@@ -476,6 +476,42 @@ const runIssues = (run: EvalRunShape): string[] => {
   return issues;
 };
 
+export const ORIGINAL_COMPARISON_STATUSES = [
+  'no-baseline',
+  'corrupt-baseline',
+  'compared',
+] as const;
+
+/**
+ * evaluator 가 낸 baseline 비교(`compareToBaseline`)를 그대로 옮긴다. 대시보드 비교 가능성과 섞지 않는다.
+ * `summary` 는 summary.json 의 comparison, `baseline-file` 은 수집기가 baseline 파일만 확인한 결과다.
+ * 깨진 baseline 은 없는 baseline 과 다른 상태이고 이유가 있다.
+ */
+export const originalEvalComparisonSchema = z
+  .strictObject({
+    source: z.enum(['summary', 'baseline-file']),
+    status: z.enum(ORIGINAL_COMPARISON_STATUSES),
+    comparable: z.boolean().nullable(),
+    warnings: z.array(
+      z.strictObject({
+        field: safeText(100),
+        baseline: z.string().max(2000),
+        current: z.string().max(2000),
+      }),
+    ),
+    reason: reasonSchema.nullable(),
+  })
+  .refine(
+    (comparison) => (comparison.status === 'corrupt-baseline') === (comparison.reason !== null),
+    'only a corrupt baseline carries a reason',
+  )
+  .refine(
+    (comparison) => (comparison.status === 'compared') === (comparison.comparable !== null),
+    'comparable is known exactly when compared',
+  );
+
+export type OriginalEvalComparison = z.infer<typeof originalEvalComparisonSchema>;
+
 /** eval 산출물 한 벌 (summary·traces·resolver routing·context) 을 import 한 결과. */
 export const evalRunSchema = z
   .strictObject({
@@ -515,6 +551,8 @@ export const evalRunSchema = z
     ),
     traceCount: countSchema.nullable(),
     traces: z.array(evalTraceSchema),
+    /** evaluator 원래 비교. 이 필드 이전 export 는 null — 가져오지 않았다. */
+    originalComparison: originalEvalComparisonSchema.nullable().default(null),
   })
   .superRefine((run, ctx) => {
     for (const message of runIssues(run)) ctx.addIssue({ code: 'custom', message });
