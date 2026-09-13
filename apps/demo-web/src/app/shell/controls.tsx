@@ -14,6 +14,10 @@ import { VisuallyHidden } from '@berrypjh/react-ui';
  * 예전에는 Tailwind `sr-only` 로 직접 숨겼다. 라이브러리에 같은 일을 하는 컴포넌트가 생긴
  * 뒤로는 그쪽을 쓴다 — 이 앱의 규칙("라이브러리에 있는 것을 손으로 다시 만들지 않는다")이
  * 접근성 기법에도 그대로 적용된다.
+ *
+ * 포커스 outline 을 지우지 않는다. 예전에는 `focus:outline-none` 으로 UA outline 을 끄고 테두리
+ * 색만 바꿨는데, 1px 테두리 색 변화만으로는 포커스 위치가 잘 드러나지 않는다 (WCAG 2.4.7).
+ * UA outline 을 그대로 두고 테두리 색 변화는 보조 신호로만 남긴다.
  */
 export const SelectControl = <T extends string>({
   label,
@@ -35,7 +39,7 @@ export const SelectControl = <T extends string>({
       value={value}
       onChange={(e) => onChange(e.target.value as T)}
       data-testid={testId}
-      className="px-md py-xs text-xxsm rounded-sm border border-stroke-default bg-background-surface text-text-default cursor-pointer focus:outline-none focus:border-stroke-primary"
+      className="px-md py-xs text-xxsm rounded-sm border border-stroke-default bg-background-surface text-text-default cursor-pointer focus:border-stroke-primary"
     >
       {options.map((o) => (
         <option key={o.value} value={o.value}>

@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 
 import { Checkbox, Chip, SearchField, Table, TableScroll, Web } from '@berrypjh/react-ui';
 
+import { cssVarOf } from '../presentation/tokenCatalog';
 import { Mono, Page, Section } from '../shell/ui';
 
 import { TokenPreview } from './TokenPreview';
@@ -14,7 +15,8 @@ import { TokenPreview } from './TokenPreview';
  * 세 열은 각각 끄고 켤 수 있다 — 값만 대조할 때와 눈으로 훑을 때 필요한 열이 다르다.
  */
 
-type Row = { path: string; value: string; cssVar: string; category: string };
+/** `cssVar` 는 catalog 에 없으면 undefined 다 — 이름 규칙으로 지어내지 않는다. */
+type Row = { path: string; value: string; cssVar: string | undefined; category: string };
 
 type ColumnId = 'preview' | 'value' | 'cssVar';
 
@@ -24,21 +26,23 @@ const COLUMNS: { id: ColumnId; label: string; width: string }[] = [
   { id: 'preview', label: '미리보기', width: 'w-[140px]' },
 ];
 
-const kebab = (s: string) =>
-  s
-    .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
-    .replace(/[\s_]+/g, '-')
-    .toLowerCase();
-
-/** 토큰 트리를 평탄한 행으로. `Web.Light.tokens` 는 ui-core 패스스루로 노출된다. */
+/**
+ * 토큰 트리를 평탄한 행으로. `Web.Light.tokens` 는 ui-core 패스스루로 노출된다.
+ *
+ * CSS 변수는 **공개 token catalog 에서 읽는다.** 이전에는 경로에서 이름 규칙으로 유도했는데
+ * 첫 세그먼트를 항상 떼는 방식이라 565개 중 281개가 실제 변수와 달랐다
+ * (`spacing.md` → `--ds-md`, 실제는 `--ds-spacing-md`). 유도 규칙을 고치는 대신 생성된
+ * artifact 를 믿는다 — Designer Token Inspector 와 같은 source 다.
+ */
 const flatten = (node: unknown, path: string[] = []): Row[] => {
   if (node === null || typeof node !== 'object') {
     const category = path[0] ?? '';
+    const id = path.join('.');
     return [
       {
-        path: path.join('.'),
+        path: id,
         value: String(node),
-        cssVar: `--ds-${kebab(path.slice(1).join('-'))}`,
+        cssVar: cssVarOf(id),
         category,
       },
     ];
@@ -100,7 +104,7 @@ export const TokensPage = () => {
     return ALL.filter(
       (r) =>
         (category === 'all' || r.category === category) &&
-        (q === '' || r.path.toLowerCase().includes(q) || r.cssVar.includes(q)),
+        (q === '' || r.path.toLowerCase().includes(q) || (r.cssVar ?? '').includes(q)),
     );
   }, [query, category]);
 
@@ -192,7 +196,8 @@ export const TokensPage = () => {
                     )}
                     {isOn('cssVar') && (
                       <td className="py-md pr-lg align-middle">
-                        <Mono>{r.cssVar}</Mono>
+                        {/* catalog 에 없으면 지어내지 않고 없음을 표시한다. */}
+                        <Mono>{r.cssVar ?? '—'}</Mono>
                       </td>
                     )}
                     {isOn('preview') && (

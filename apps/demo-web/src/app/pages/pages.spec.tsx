@@ -6,7 +6,10 @@ import { MemoryRouter } from 'react-router-dom';
 import { describe, expect, it } from 'vitest';
 
 import App from '../app';
+import { resolveToken, tokenIdsInCategory } from '../presentation/tokenCatalog';
 import { NAV } from '../shell/nav';
+
+import { colorFamilies } from './colorPalette';
 
 /**
  * 라우팅 스모크. 각 화면이 예외 없이 그려지고, E2E 가 의존하는 앵커가 살아있는지 본다.
@@ -397,5 +400,100 @@ describe('토큰 열 표시', () => {
       await userEvent.click(screen.getByTestId(`token-column-${id}`));
     }
     expect(header()).toEqual(['토큰']);
+  });
+});
+
+/**
+ * CSS 변수는 공개 token catalog 에서 온다.
+ *
+ * 예전에는 경로에서 이름 규칙으로 유도했고, 첫 세그먼트를 항상 떼는 방식이라 565개 중 281개가
+ * 실제 변수와 달랐다 — `spacing.md` 의 변수를 `--ds-md` 로 보여 주고 있었다. 규칙을 고치는
+ * 대신 artifact 를 읽게 했으므로, 그 회귀를 여기서 고정한다.
+ */
+describe('토큰 CSS 변수', () => {
+  const rowFor = async (path: string) => {
+    at('/tokens');
+    await userEvent.type(screen.getByTestId('token-search'), path);
+    return screen.getAllByRole('row').find((tr) => tr.querySelector('td')?.textContent === path);
+  };
+
+  it.each([
+    ['spacing.md', '--ds-spacing-md'],
+    ['color.text.default', '--ds-text-default'],
+    ['component.pressedOffset', '--ds-component-pressed-offset'],
+  ])('%s 의 변수는 %s 다', async (path, cssVar) => {
+    const row = await rowFor(path);
+    expect(row?.textContent).toContain(cssVar);
+  });
+
+  it('첫 세그먼트를 떼는 옛 유도 결과를 보여주지 않는다', async () => {
+    const row = await rowFor('spacing.md');
+    expect(row?.textContent).not.toMatch(/--ds-md\b/);
+  });
+});
+
+/**
+ * 색 팔레트.
+ *
+ * 값·CSS 변수를 페이지가 들고 있지 않다 — 공개 token artifact 에서 읽는다. 그래서 테스트도
+ * 기대값을 손으로 적지 않고 adapter 에서 가져와 비교한다.
+ */
+describe('색 팔레트', () => {
+  it('램프와 시맨틱 두 묶음을 그린다', () => {
+    at('/palette');
+    expect(screen.getByRole('heading', { level: 1, name: 'Palette' })).toBeTruthy();
+    expect(screen.getByTestId('palette-ramps')).toBeTruthy();
+    expect(screen.getByTestId('palette-semantic')).toBeTruthy();
+  });
+
+  it('registry 의 모든 색 계열을 담는다', () => {
+    at('/palette');
+    const families = colorFamilies(tokenIdsInCategory('color'));
+    expect(families.length).toBeGreaterThan(5);
+    for (const family of families) {
+      expect(screen.getByRole('heading', { level: 3, name: family.name })).toBeTruthy();
+    }
+  });
+
+  it('catalog 의 정확한 CSS 변수를 보여준다 — 이름 규칙으로 유도하지 않는다', () => {
+    at('/palette');
+    const chip = screen.getByTestId('palette-chip-color.text.default').textContent ?? '';
+    expect(chip).toContain('--ds-text-default');
+    expect(chip).toContain('default');
+  });
+
+  /** 색만으로 뜻을 전달하지 않는다 — 이름과 값이 글자로 함께 있다. */
+  it('칩마다 키와 해석된 값을 글자로 적는다', () => {
+    at('/palette');
+    const light = resolveToken('color.neutral.ne100', 'light');
+    expect(light.ok).toBe(true);
+    if (!light.ok) return;
+
+    const ramps = screen.getByTestId('palette-ramps').textContent ?? '';
+    expect(ramps).toContain('ne100');
+    expect(ramps).toContain(light.token.value);
+  });
+
+  /**
+   * 같은 칩을 보고 비교한다. 묶음 전체 글자로 비교하면 안 된다 — 한 테마에서 다른 역할이
+   * 같은 hex 를 쓰는 일이 정상이라 "사라졌는지" 를 판정할 수 없다.
+   */
+  it('테마를 바꾸면 값만 바뀌고 token 이름과 변수는 그대로다', async () => {
+    at('/palette');
+    const light = resolveToken('color.text.default', 'light');
+    const dark = resolveToken('color.text.default', 'dark');
+    expect(light.ok && dark.ok).toBe(true);
+    if (!light.ok || !dark.ok) return;
+    expect(light.token.value).not.toBe(dark.token.value);
+
+    const chip = () => screen.getByTestId('palette-chip-color.text.default').textContent ?? '';
+    expect(chip()).toContain(light.token.value);
+
+    await userEvent.selectOptions(screen.getByTestId('theme-select'), 'dark');
+
+    expect(chip()).toContain(dark.token.value);
+    expect(chip()).not.toContain(light.token.value);
+    // identity 는 테마와 무관하다.
+    expect(chip()).toContain('--ds-text-default');
   });
 });

@@ -67,11 +67,14 @@ export const Section = ({
 export const Panel = ({
   children,
   className = '',
+  testId,
 }: {
   children: ReactNode;
   className?: string;
+  testId?: string;
 }) => (
   <div
+    data-testid={testId}
     className={`bg-background-surface border border-stroke-default rounded-md p-xl ${className}`}
   >
     {children}
