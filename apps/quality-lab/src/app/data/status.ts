@@ -55,7 +55,7 @@ export const loadingState = (what: string): ViewState => ({
 
 export type LoadProblem = {
   status: 'missing' | 'invalid' | 'unreachable';
-  target?: 'index' | 'run' | 'summary';
+  target?: 'index' | 'run' | 'summary' | 'baseline';
   message: string;
 };
 

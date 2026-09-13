@@ -95,6 +95,15 @@ describe('parseQuery — 도메인 화면 key', () => {
     expect(parse('variant=Bad%20Name', DOMAIN).ok).toBe(false);
   });
 
+  it('target 은 audit target id 형식만 받는다', () => {
+    const spec = { keys: ['run', 'target'] } as const;
+    expect(parse('target=quality-lab%3A%2Fbundles%3Adark%3Amobile', spec)).toEqual({
+      ok: true,
+      value: { target: 'quality-lab:/bundles:dark:mobile' },
+    });
+    expect(parse('target=%3Cscript%3E', spec).ok).toBe(false);
+  });
+
   it('도메인 key 도 정해진 순서로 쓴다', () => {
     expect(queryString({ panel: 'routed', variant: 'v-1', base: 'run-b', run: 'run-a' })).toBe(
       '?run=run-a&base=run-b&variant=v-1&panel=routed',

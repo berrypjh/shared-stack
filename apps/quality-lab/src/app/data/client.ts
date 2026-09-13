@@ -1,5 +1,7 @@
 import {
   assessFreshness,
+  type BaselinePointer,
+  baselinePointerSchema,
   type Freshness,
   publicIndexSchema,
   publicRunArtifactSchema,
@@ -20,7 +22,7 @@ import {
 export const OBSERVABILITY_BASE = '/observability/';
 
 export type Fetcher = (url: string, init?: RequestInit) => Promise<Response>;
-export type LoadTarget = 'index' | 'summary' | 'run';
+export type LoadTarget = 'index' | 'summary' | 'run' | 'baseline';
 
 export type Problem = {
   status: 'missing' | 'invalid' | 'unreachable';
@@ -36,6 +38,7 @@ export type SummaryResult =
   | { status: 'ready'; source: 'summary' | 'run'; value: RunSummary }
   | Problem;
 export type RunResult = { status: 'ready'; value: RunArtifact } | Problem;
+export type BaselinePointerResult = { status: 'ready'; value: BaselinePointer } | Problem;
 
 type Fetched = { ok: true; value: unknown } | { ok: false; problem: Problem };
 
@@ -177,10 +180,22 @@ export const createClient = (fetcher: Fetcher, expectedSha: string) => {
       return { status: 'ready', source: 'summary', value: parsed.data };
     });
 
+  /** baseline 포인터. 파일이 없으면 missing(아무도 고르지 않음)이고, 깨졌으면 invalid 다 — 둘을 섞지 않는다. */
+  const baselinePointer = () =>
+    once('baseline', async (): Promise<BaselinePointerResult> => {
+      const fetched = await fetchJson(fetcher, 'baseline', 'baseline.json');
+      if (!fetched.ok) return fetched.problem;
+      const parsed = baselinePointerSchema.safeParse(fetched.value);
+      return parsed.success
+        ? { status: 'ready', value: parsed.data }
+        : { status: 'invalid', target: 'baseline', message: issuesOf(parsed.error.issues) };
+    });
+
   return {
     index,
     summary,
     run,
+    baselinePointer,
     clear: () => cache.clear(),
     freshness: (metadata: Pick<RunMetadata, 'source'>): Freshness =>
       assessFreshness(metadata, expectedSha),

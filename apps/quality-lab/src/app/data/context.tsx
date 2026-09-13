@@ -1,8 +1,16 @@
 import { createContext, type ReactNode, useContext } from 'react';
 
+import type { BrowserEnv } from '../../probes/env';
+
 import type { Client, Fetcher } from './client';
 
-export type QualityLab = { client: Client; fetcher: Fetcher; expectedSha: string };
+/** `browserEnv` 는 브라우저 세션 화면이 읽는 API 표면이다. artifact client 와 출처가 다르다. */
+export type QualityLab = {
+  client: Client;
+  fetcher: Fetcher;
+  expectedSha: string;
+  browserEnv: BrowserEnv;
+};
 
 const QualityLabContext = createContext<QualityLab | null>(null);
 

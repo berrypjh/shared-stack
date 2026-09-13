@@ -99,15 +99,35 @@ describe('narrow navigation', () => {
   });
 });
 
-/** 수집기가 없으므로 어떤 화면도 숫자 표를 그리지 않는다. */
+/** 수집기가 없으므로 artifact 를 읽는 어떤 화면도 숫자 표를 그리지 않는다. */
 describe('empty state', () => {
-  it.each(NAV)('$path 는 미수집 상태와 명령을 말하고 table 을 그리지 않는다', async ({ path }) => {
-    renderAt(path);
-    const main = within(screen.getByRole('main'));
-    expect(await main.findByRole('heading', { name: '아직 수집한 실행이 없습니다' })).toBeTruthy();
-    expect(main.getByText('pnpm quality:export --run-id=<새-run-id>')).toBeTruthy();
-    expect(main.queryByRole('table')).toBeNull();
+  const artifactScreens = NAV.filter((item) => item.source === 'artifact');
+
+  it('브라우저 세션 화면만 artifact 가 아니라 이 탭을 읽는다', () => {
+    expect(
+      NAV.filter((item) => item.source === 'browser-session').map((item) => item.path),
+    ).toEqual(['/browser']);
   });
+
+  it('브라우저 세션 화면은 수집 없이 이 탭의 출처를 말하고 미수집 안내를 하지 않는다', async () => {
+    renderAt('/browser');
+    const main = within(screen.getByRole('main'));
+    expect(await main.findByRole('region', { name: '세션 출처' })).toBeTruthy();
+    expect(main.queryByText('아직 수집한 실행이 없습니다')).toBeNull();
+  });
+
+  it.each(artifactScreens)(
+    '$path 는 미수집 상태와 명령을 말하고 table 을 그리지 않는다',
+    async ({ path }) => {
+      renderAt(path);
+      const main = within(screen.getByRole('main'));
+      expect(
+        await main.findByRole('heading', { name: '아직 수집한 실행이 없습니다' }),
+      ).toBeTruthy();
+      expect(main.getByText('pnpm quality:export --run-id=<새-run-id>')).toBeTruthy();
+      expect(main.queryByRole('table')).toBeNull();
+    },
+  );
 });
 
 describe('theme', () => {

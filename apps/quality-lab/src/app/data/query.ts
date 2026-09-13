@@ -12,8 +12,10 @@ export const QUERY_KEYS = [
   'variant',
   'panel',
   'platform',
+  'target',
   'status',
   'q',
+  'series',
 ] as const;
 export type QueryKey = (typeof QUERY_KEYS)[number];
 export type Query = Partial<Record<QueryKey, string>>;
@@ -50,10 +52,14 @@ const valueIssue = (key: QueryKey, raw: string, spec: QuerySpec): string | null 
       return oneOf('panel', raw, spec.panels);
     case 'platform':
       return oneOf('platform', raw, PLATFORMS);
+    case 'target':
+      return /^[\w.:/@-]{1,200}$/.test(raw) ? null : `target 은 검사 대상 id 형식이어야 합니다`;
     case 'status':
       return spec.statuses?.includes(raw)
         ? null
         : `status 는 ${(spec.statuses ?? []).join(', ')} 중 하나여야 합니다`;
+    case 'series':
+      return /^[\w.:/@-]{1,300}$/.test(raw) ? null : 'series 는 지표 id 형식이어야 합니다';
     case 'q':
       return raw.length <= Q_MAX && !/\p{Cc}/u.test(raw)
         ? null

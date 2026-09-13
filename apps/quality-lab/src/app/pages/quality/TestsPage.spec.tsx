@@ -2,7 +2,7 @@ import { screen, waitFor, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
 import { locationOf, renderApp } from '../../../test/render';
-import { designArtifact, publicFiles, qualityArtifact } from '../../../test/runs';
+import { designArtifact, publicFiles, qualityArtifact, testSummary } from '../../../test/runs';
 
 const files = () => publicFiles([designArtifact('run-design'), qualityArtifact('run-quality')]);
 const caseRows = () =>
@@ -107,5 +107,57 @@ describe('테스트 — 이 run 에 없음', () => {
     expect(await screen.findByText('run-design 에는 테스트 결과 이 없습니다')).toBeTruthy();
     await user.click(await screen.findByRole('link', { name: 'run-quality' }));
     expect(locationOf(router)).toBe('/quality/tests?run=run-quality');
+  });
+});
+
+describe('테스트 — 끝나지 않은 실행', () => {
+  it('시간 초과는 report·count·판정을 만들지 않고 이유를 보여준다', async () => {
+    const base = testSummary('@berrypjh/react-ui', []);
+    const reason = 'report 를 쓰기 전에 시간 초과로 끝났다';
+    const noReport = { value: null, provenance: null, reason };
+    const reportKeys = [
+      'reportedFiles',
+      'suites',
+      'cases',
+      'passed',
+      'failed',
+      'skipped',
+      'todo',
+      'retriedCases',
+      'attempts',
+    ];
+    const timedOut = {
+      ...base,
+      execution: {
+        ...base.execution,
+        status: 'timeout',
+        exitCode: null,
+        reason: '600000ms 안에 끝나지 않았다',
+      },
+      report: { status: 'missing', format: 'vitest-json', path: null, sha256: null, reason },
+      counts: { ...base.counts, ...Object.fromEntries(reportKeys.map((key) => [key, noReport])) },
+      durations: { ...base.durations, caseSumMs: noReport },
+      outcome: null,
+      outcomeReason: '실행이 timeout 으로 끝나 결과가 없다',
+    };
+    renderApp(
+      '/quality/tests?run=run-timeout',
+      publicFiles([{ ...qualityArtifact('run-timeout'), tests: [timedOut] }]),
+    );
+
+    const table = await screen.findByRole('table', { name: 'test source 요약' });
+    const headers = within(table)
+      .getAllByRole('columnheader')
+      .map((header) => header.textContent);
+    const row = within(table).getByRole('row', { name: /vitest:@berrypjh\/react-ui/ });
+    const cells = within(row).getAllByRole('cell');
+    const column = (name: string) => cells[headers.indexOf(name) - 1].textContent ?? '';
+    expect(column('실행')).toBe('시간 초과');
+    for (const name of ['case (실행)', '통과', '실패']) {
+      expect(column(name)).not.toBe('0');
+      expect(column(name)).toContain(reason);
+    }
+    expect(column('report')).toContain(reason);
+    expect(column('결과')).toContain('판정 없음');
   });
 });

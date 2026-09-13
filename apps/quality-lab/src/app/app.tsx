@@ -2,6 +2,8 @@ import { lazy, Suspense, useMemo, useState } from 'react';
 
 import { Route, Routes } from 'react-router-dom';
 
+import { type BrowserEnv, realBrowserEnv } from '../probes/env';
+
 import { createClient, type Fetcher } from './data/client';
 import { QualityLabProvider } from './data/context';
 import { AppShell, type ThemeMode } from './AppShell';
@@ -32,6 +34,14 @@ const PAGES: Record<NavPath, ReturnType<typeof lazy>> = {
       default: m.DesignSystemPage,
     })),
   ),
+  '/accessibility': lazy(() =>
+    import('./pages/accessibility/AccessibilityPage').then((m) => ({
+      default: m.AccessibilityPage,
+    })),
+  ),
+  '/browser': lazy(() =>
+    import('./pages/browser/BrowserPage').then((m) => ({ default: m.BrowserPage })),
+  ),
   '/runs': lazy(() => import('./pages/runs/RunsPage').then((m) => ({ default: m.RunsPage }))),
 };
 
@@ -42,16 +52,20 @@ type AppProps = {
   fetcher?: Fetcher;
   /** freshness 를 비교할 source SHA. */
   expectedSha?: string;
+  /** 브라우저 세션 화면이 읽는 API 표면. test 는 가짜를 넣는다. */
+  browserEnv?: BrowserEnv;
 };
 
 export const App = ({
   fetcher = browserFetch,
   expectedSha = __QUALITY_LAB_SOURCE_SHA__,
+  browserEnv,
 }: AppProps) => {
   const [theme, setTheme] = useState<ThemeMode>('light');
+  const env = useMemo(() => browserEnv ?? realBrowserEnv(), [browserEnv]);
   const value = useMemo(
-    () => ({ client: createClient(fetcher, expectedSha), fetcher, expectedSha }),
-    [fetcher, expectedSha],
+    () => ({ client: createClient(fetcher, expectedSha), fetcher, expectedSha, browserEnv: env }),
+    [fetcher, expectedSha, env],
   );
 
   return (

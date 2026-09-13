@@ -18,7 +18,9 @@ import { useRunData, useSummaries } from '../../data/useRunData';
 import { RunPanel } from '../../run/RunPanel';
 import { Page } from '../../ui';
 
-const SPEC = { keys: ['run'] } as const;
+import { RunsCompare } from './RunsCompare';
+
+const SPEC = { keys: ['run', 'base', 'series'] } as const;
 const LINK = 'text-text-link underline underline-offset-2';
 
 const RunRow = ({
@@ -125,6 +127,15 @@ export const RunsPage = () => {
               ))}
             </DataTable>
           </Section>
+          {data.selectedRunId && (
+            <RunsCompare
+              runIds={data.runIds}
+              summaries={summaries}
+              currentId={data.selectedRunId}
+              query={data.query}
+              setQuery={data.setQuery}
+            />
+          )}
           {data.selectedRunId && (
             <RunPanel
               fetcher={fetcher}

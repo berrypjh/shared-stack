@@ -204,7 +204,7 @@ export const designSystem = () => ({
       label: 'WCAG 2.1 AA 텍스트 대비 (1.4.3)',
       ratio: 4.5,
       basis: 'wcag-2.1-aa',
-      source: ref('libs/design-tokens/src/lib/contrast.ts', 55),
+      source: ref('libs/design-tokens/test/contrast.ts', 55),
     },
     {
       id: 'divider-visibility',
