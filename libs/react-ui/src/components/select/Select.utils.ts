@@ -6,22 +6,12 @@ import { selectClasses } from './Select.constants';
 import { hasDisplayValue, stringifyValue } from './Select.selection';
 import type { SelectChangeEvent, SelectLikeChildProps, SelectOptionElement } from './Select.types';
 
-/**
- * option이 비활성화되었는지 확인합니다.
- *
- * @param option 확인 대상 option
- * @returns 비활성화 여부
- */
+/** option 비활성 여부 */
 export const isOptionDisabled = (option: SelectOptionElement) => !!option.props.disabled;
 
 /**
- * children에서 선택 가능한 option element만 평탄화해서 추출합니다.
- *
- * Fragment는 재귀적으로 펼치고,
- * `value` prop이 있는 요소만 옵션으로 간주합니다.
- *
- * @param children 순회할 children
- * @returns 평탄화된 option element 배열
+ * children → 선택 가능한 option element 평탄 배열.
+ * Fragment는 재귀적으로 펼치고, `value` prop이 있는 요소만 옵션으로 간주한다.
  */
 export const flattenOptionChildren = (children: ReactNode): SelectOptionElement[] => {
   const result: SelectOptionElement[] = [];
@@ -50,16 +40,7 @@ export const flattenOptionChildren = (children: ReactNode): SelectOptionElement[
   return result;
 };
 
-/**
- * Select의 초기 값을 계산합니다.
- *
- * defaultValue가 명시되면 이를 우선 사용하고,
- * 그렇지 않으면 multiple 여부에 따라 빈 배열 또는 빈 문자열을 반환합니다.
- *
- * @param multiple 다중 선택 여부
- * @param defaultValue 기본값
- * @returns 초기 값
- */
+/** Select 초기 값, `defaultValue`가 없으면 multiple은 `[]`, 단일 선택은 `''` */
 export const getDefaultSelectValue = (multiple: boolean, defaultValue: unknown): unknown => {
   if (defaultValue !== undefined) {
     return defaultValue;
@@ -68,17 +49,7 @@ export const getDefaultSelectValue = (multiple: boolean, defaultValue: unknown):
   return multiple ? [] : '';
 };
 
-/**
- * hidden input에 넣을 문자열 배열을 생성합니다.
- *
- * multiple 모드에서는 모든 값을 문자열 배열로 변환하고,
- * 단일 선택 모드에서는 길이 1인 배열로 반환합니다.
- *
- * @param params 계산에 필요한 값 묶음
- * @param params.multiple 다중 선택 여부
- * @param params.value 현재 값
- * @returns hidden input용 문자열 배열
- */
+/** hidden input용 문자열 배열, 단일 선택 모드는 길이 1 */
 export const getHiddenValues = ({ multiple, value }: { multiple: boolean; value: unknown }) => {
   if (multiple) {
     return Array.isArray(value) ? value.map((item) => stringifyValue(item)) : [];
@@ -88,19 +59,8 @@ export const getHiddenValues = ({ multiple, value }: { multiple: boolean; value:
 };
 
 /**
- * Select trigger에 표시할 값을 계산합니다.
- *
- * renderValue가 있으면 이를 우선 사용하고,
- * 선택 값/placeholder/displayEmpty 조건에 따라 적절한 표시값을 반환합니다.
- *
- * @param params 계산에 필요한 값 묶음
- * @param params.displayEmpty 비어 있어도 표시할지 여부
- * @param params.multiple 다중 선택 여부
- * @param params.placeholder placeholder 노드
- * @param params.renderValue 사용자 정의 렌더 함수
- * @param params.selectedOptions 현재 선택된 옵션 배열
- * @param params.value 현재 값
- * @returns trigger에 표시할 값
+ * Select trigger 표시값 계산.
+ * `renderValue`가 있으면 그것을 우선하고, 없으면 선택 값·`placeholder`·`displayEmpty` 조건에 따라 표시값을 고른다.
  */
 export const getDisplayValue = ({
   displayEmpty,
@@ -149,13 +109,7 @@ export const getDisplayValue = ({
   return null;
 };
 
-/**
- * Select용 synthetic change event 객체를 생성합니다.
- *
- * @param name 필드 이름
- * @param value 다음 값
- * @returns SelectChangeEvent 형태의 이벤트 객체
- */
+/** Select용 synthetic change event (`{ target: { name, value } }`) */
 export const createSyntheticChangeEvent = (
   name: string | undefined,
   value: unknown,
@@ -166,24 +120,7 @@ export const createSyntheticChangeEvent = (
   },
 });
 
-/**
- * Select root className을 계산합니다.
- *
- * 상태값과 변형 정보를 바탕으로 modifier class를 조합합니다.
- *
- * @param params className 계산에 필요한 값 묶음
- * @param params.className 추가 className
- * @param params.color 색상
- * @param params.disabled 비활성화 여부
- * @param params.error 에러 여부
- * @param params.focused 포커스 여부
- * @param params.fullWidth 전체 너비 여부
- * @param params.multiple 다중 선택 여부
- * @param params.open 열림 여부
- * @param params.size 크기
- * @param params.variant variant 종류
- * @returns 조합된 className 문자열
- */
+/** Select root className 조합, 상태·변형별 modifier class를 붙인다 */
 export const getSelectRootClassNames = ({
   className,
   color,

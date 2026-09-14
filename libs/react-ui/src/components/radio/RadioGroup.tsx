@@ -10,14 +10,11 @@ import type { RadioGroupProps } from './RadioGroup.types';
 import { RadioGroupContext } from './RadioGroupContext';
 
 /**
- * native `<fieldset>`·`<legend>` 로 Radio 를 묶는다.
- *
- * 그룹 시맨틱·이름·`disabled` 전파는 fieldset 이, 단일 선택·방향키·Tab 정지·form reset 은
- * 같은 `name` 의 native radio 가 소유한다. 그룹이 하는 일은 `name`·선택 값·`required`·오류를
- * 자식에게 내려보내는 것뿐이다 — 키보드를 가로채지 않고 roving tabindex 를 만들지 않는다.
- *
- * FormControl 에서 `disabled`·`error`·`required` 를 상속한다. RadioGroup 은 그 자체로 하나의
- * 필드라 `required` 의 뜻이 같다 (Checkbox 는 받지 않는다).
+ * native `<fieldset>`·`<legend>`로 Radio를 묶는다.
+ * 그룹 시맨틱·이름·`disabled` 전파는 fieldset이, 단일 선택·방향키·Tab 정지·form reset은 같은 `name`의 native radio가 소유한다.
+ * 그룹이 하는 일은 `name`·선택 값·`required`·오류를 자식에게 내려보내는 것뿐이다 — 키보드를 가로채지 않고 roving tabindex를 만들지 않는다.
+ * FormControl에서 `disabled`·`error`·`required`를 상속한다.
+ * RadioGroup은 그 자체로 하나의 필드라 `required`의 뜻이 같다 (Checkbox는 받지 않는다).
  */
 export const RadioGroup = ({
   label,

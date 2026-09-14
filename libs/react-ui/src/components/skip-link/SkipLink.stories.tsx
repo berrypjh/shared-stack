@@ -46,8 +46,8 @@ export const Playground: Story = {
         Header (반복 영역)
       </header>
       {/*
-        대상은 소비자가 소유한다. `tabIndex={-1}` 이 있어야 fragment 이동이 실제로 포커스를
-        옮긴다 — 없으면 순차 포커스 시작점만 바뀐다.
+        대상은 소비자가 소유한다.
+        `tabIndex={-1}`이 있어야 fragment 이동이 실제로 포커스를 옮긴다 — 없으면 순차 포커스 시작점만 바뀐다.
       */}
       <main id="main-content" style={region} tabIndex={-1}>
         Main content. Tab 키로 페이지에 진입해 SkipLink가 노출되는지 확인합니다.
@@ -71,10 +71,9 @@ export const Default: Story = {
 };
 
 /**
- * Bypass Blocks 의 전체 경로를 한 번에 돈다 (WCAG 2.4.1).
- *
- * Tab 으로 링크가 포커스를 받고 → 숨은 상태에서 드러나고 → Enter 로 fragment 이동이
- * 일어나고 → 대상이 포커스를 받는다. 마지막 단계는 대상의 `tabIndex={-1}` 덕분이다.
+ * Bypass Blocks의 전체 경로를 한 번에 돈다 (WCAG 2.4.1).
+ * Tab으로 링크가 포커스를 받고 → 숨은 상태에서 드러나고 → Enter로 fragment 이동이 일어나고 → 대상이 포커스를 받는다.
+ * 마지막 단계는 대상의 `tabIndex={-1}` 덕분이다.
  */
 export const KeyboardBypass: Story = {
   render: () => (
@@ -96,7 +95,7 @@ export const KeyboardBypass: Story = {
     // 1. 포커스 전에는 시각적으로 숨어 있다.
     await expect(link.getBoundingClientRect().width).toBeLessThanOrEqual(2);
 
-    // 2. 첫 Tab 이 우회 링크에 닿는다 — 그것이 이 컴포넌트의 존재 이유다.
+    // 2. 첫 Tab이 우회 링크에 닿는다 — 그것이 이 컴포넌트의 존재 이유다.
     await userEvent.tab();
     await expect(link).toHaveFocus();
 
@@ -104,13 +103,13 @@ export const KeyboardBypass: Story = {
     await waitFor(() => expect(link.getBoundingClientRect().width).toBeGreaterThan(2));
     await expect(getComputedStyle(link).outlineStyle).not.toBe('none');
 
-    // 4. 대상 계약: href 가 실제로 존재하는 포커스 가능한 element 를 가리킨다.
+    // 4. 대상 계약 — href가 실제로 존재하는 포커스 가능한 element를 가리킨다.
     const target = canvasElement.querySelector<HTMLElement>('#main-bypass');
     await expect(link).toHaveAttribute('href', '#main-bypass');
     await expect(target).not.toBeNull();
     await expect(target).toHaveAttribute('tabindex', '-1');
 
-    // 5. Enter 로 이동하면 대상이 포커스를 받는다 — 4번의 `tabIndex={-1}` 덕분이다.
+    // 5. Enter로 이동하면 대상이 포커스를 받는다 — 4번의 `tabIndex={-1}` 덕분이다.
     //    fragment 이동은 브라우저가 수행하므로 단언 시점보다 늦을 수 있다.
     await userEvent.keyboard('{Enter}');
     await waitFor(() => expect(target).toHaveFocus());
@@ -149,7 +148,7 @@ export const A11y: Story = {
   render: () => (
     <div style={layoutStyle}>
       <header style={region}>
-        {/* 접근 가능한 이름이 보이는 텍스트를 포함한다 (WCAG 2.5.3 Label in Name). */}
+        {/* 접근 가능한 이름이 보이는 텍스트를 포함한다 (WCAG 2.5.3 Label in Name) */}
         <SkipLink targetId="a11y-main" aria-label="페이지 본문으로 건너뛰기">
           본문으로 건너뛰기
         </SkipLink>
@@ -164,10 +163,8 @@ export const A11y: Story = {
 
 /**
  * 고정 헤더 아래로 대상이 가리지 않게 하는 소비자 계약 (WCAG 2.4.11 Focus Not Obscured).
- *
- * 헤더 높이는 앱이 알고 이 컴포넌트는 모른다. 그래서 오프셋은 **대상 쪽**
- * `scroll-margin-block-start` 가 갖는다 — 여기서 헤더 높이를 추측하거나 전역 토큰을
- * 만들지 않는다.
+ * 헤더 높이는 앱이 알고 이 컴포넌트는 모른다.
+ * 그래서 오프셋은 대상 쪽 `scroll-margin-block-start`가 갖는다 — 여기서 헤더 높이를 추측하거나 전역 토큰을 만들지 않는다.
  */
 export const StickyHeaderTarget: Story = {
   render: () => (
@@ -193,10 +190,10 @@ export const StickyHeaderTarget: Story = {
 };
 
 /**
- * RTL. 위치는 `inset-inline-start`·`inset-block-start` 라 방향을 따라 반대편으로 간다.
- *
- * 기하 단언은 두지 않는다 — 뷰포트 폭에 흔들린다. 논리 속성을 쓴다는 **규칙 자체**는
- * `SkipLink.test.tsx` 의 컴파일된 CSS 검사가 지키고, 이 스토리는 눈으로 보는 회귀면이다.
+ * RTL.
+ * 위치는 `inset-inline-start`·`inset-block-start`라 방향을 따라 반대편으로 간다.
+ * 기하 단언은 두지 않는다 — 뷰포트 폭에 흔들린다.
+ * 논리 속성을 쓴다는 규칙 자체는 `SkipLink.test.tsx`의 컴파일된 CSS 검사가 지키고, 이 스토리는 눈으로 보는 회귀면이다.
  */
 export const RightToLeft: Story = {
   render: () => (
@@ -214,9 +211,8 @@ export const RightToLeft: Story = {
 
 /**
  * 좁은 뷰포트에서 드러난 링크가 화면 밖으로 나가거나 글자가 잘리지 않는지 보는 면.
- *
- * 현재 `white-space: nowrap` 이라 아주 긴 라벨은 가로로 넘칠 수 있다. 재현 가능한 문제가
- * 확인되기 전에는 CSS 를 바꾸지 않는다 — 이 스토리가 그 판단의 근거면이다.
+ * 현재 `white-space: nowrap`이라 아주 긴 라벨은 가로로 넘칠 수 있다.
+ * 재현 가능한 문제가 확인되기 전에는 CSS를 바꾸지 않는다 — 이 스토리가 그 판단의 근거면이다.
  */
 export const NarrowViewport: Story = {
   parameters: {

@@ -79,7 +79,7 @@ describe('<RadioGroup />', () => {
     it('이름 없이는 컴파일되지 않는다', () => {
       void (
         (
-          // @ts-expect-error — 보이는 라벨도 aria 이름도 없다.
+          // @ts-expect-error 보이는 라벨도 aria 이름도 없다
           <RadioGroup>
             <Radio value="s">S</Radio>
           </RadioGroup>
@@ -260,8 +260,8 @@ describe('<RadioGroup />', () => {
 
   describe('FormControl', () => {
     /**
-     * RadioGroup 은 그 자체로 하나의 필드다. 그래서 Checkbox 와 달리 `required` 도 받는다 —
-     * native radio 의 required 가 곧 "하나는 골라야 한다"라서 FormControl 의 뜻과 같다.
+     * RadioGroup은 그 자체로 하나의 필드다.
+     * 그래서 Checkbox와 달리 `required`도 받는다 — native radio의 required가 곧 "하나는 골라야 한다"라서 FormControl의 뜻과 같다.
      */
     it('disabled·error·required 를 상속한다', () => {
       render(

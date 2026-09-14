@@ -6,16 +6,13 @@ import { Stack } from '../stack/Stack';
 import { Divider } from './Divider';
 
 /**
- * `Divider` 는 **선 하나**를 그린다.
- *
- * 두께와 색은 토큰이 정한다 (`semanticBorder.divider`, `stroke.light`). 굵기·색 prop 이
- * 없으므로 그것들을 바꿔 보는 story 도 없다.
- *
- * **주변 여백을 갖지 않는다.** 아래 story 의 간격은 전부 `Stack` 의 `gap` 이 만든 것이다 —
- * 실제 사용도 그렇게 합성한다.
- *
- * hover·focus·pressed story 가 없다 — 그런 API 가 없다. Divider 는 비상호작용이고 포커스를
- * 받지 않는다.
+ * `Divider`는 선 하나를 그린다.
+ * 두께와 색은 토큰이 정한다 (`semanticBorder.divider`, `stroke.light`).
+ * 굵기·색 prop이 없으므로 그것들을 바꿔 보는 story도 없다.
+ * 주변 여백을 갖지 않는다.
+ * 아래 story의 간격은 전부 `Stack`의 `gap`이 만든 것이다 — 실제 사용도 그렇게 합성한다.
+ * hover·focus·pressed story가 없다 — 그런 API가 없다.
+ * Divider는 비상호작용이고 포커스를 받지 않는다.
  */
 const meta = {
   title: 'Components/Layout/Divider',
@@ -46,7 +43,7 @@ const textStyle: CSSProperties = {
 
 const Paragraph = ({ children }: { children: ReactNode }) => <p style={textStyle}>{children}</p>;
 
-/** 기본은 가로선이고 시맨틱이다 — `<hr>` 의 native separator 역할이 그대로 남는다. */
+/** 기본은 가로선이고 시맨틱이다 — `<hr>`의 native separator 역할이 그대로 남는다 */
 export const Default: Story = {
   args: {},
   render: (args) => (
@@ -60,9 +57,8 @@ export const Default: Story = {
 
 /**
  * 세로선은 가로 `Stack` 안에서 형제 높이만큼 늘어난다.
- *
- * 높이를 주지 않는다 — `align-self: stretch` 가 형제를 따라간다. `aria-orientation="vertical"`
- * 은 이때만 붙는다 (separator 의 기본 방향이 horizontal 이라 가로에는 적지 않는다).
+ * 높이를 주지 않는다 — `align-self: stretch`가 형제를 따라간다.
+ * `aria-orientation="vertical"`은 이때만 붙는다 (separator의 기본 방향이 horizontal이라 가로에는 적지 않는다).
  */
 export const Vertical: Story = {
   args: { orientation: 'vertical' },
@@ -78,10 +74,9 @@ export const Vertical: Story = {
 };
 
 /**
- * 순수 장식이면 `decorative` 로 native separator 시맨틱을 끈다.
- *
- * 접근성 트리에 구분자를 하나 더 만들 이유가 없을 때 — 카드 테두리·행 경계 같은 크롬 — 에
- * 쓴다. 시각은 기본과 **똑같다**: 바뀌는 것은 보조 기술에 보이는 구조뿐이다.
+ * 순수 장식이면 `decorative`로 native separator 시맨틱을 끈다.
+ * 접근성 트리에 구분자를 하나 더 만들 이유가 없을 때(카드 테두리·행 경계 같은 크롬) 쓴다.
+ * 시각은 기본과 똑같다 — 바뀌는 것은 보조 기술에 보이는 구조뿐이다.
  */
 export const Decorative: Story = {
   args: { decorative: true },
@@ -96,8 +91,8 @@ export const Decorative: Story = {
 
 /**
  * 목록 항목 사이에 끼워 넣는 실제 모양.
- *
- * 간격은 Divider 가 아니라 `Stack` 의 `gap` 이 만든다. 그래서 소비자가 한 곳에서만 조절한다.
+ * 간격은 Divider가 아니라 `Stack`의 `gap`이 만든다.
+ * 그래서 소비자가 한 곳에서만 조절한다.
  */
 export const BetweenItems: Story = {
   args: {},

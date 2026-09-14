@@ -119,14 +119,12 @@ export const WithLongText: Story = {
 };
 
 /**
- * 헬퍼가 입력의 **설명**이 되는 방법은 하나다: 자기 `id` 를 Input 의 `aria-describedby` 가
- * 가리키게 하는 것. `FormHelperText` 는 그 연결을 스스로 만들지 않는다 — id 는 소비자 것이고,
- * `TextField` 를 쓰면 합성 계층이 대신 만들어 준다.
- *
- * 오류 고지(`aria-invalid`)는 Input 의 `error` 가 소유한다. 여기서 손으로 달지 않는다.
- *
- * 마지막 예시의 `role="alert"` 는 **소비자가 직접 고른 것**이다. 라이브러리는 error 헬퍼를
- * 자동으로 live region 으로 만들지 않는다 — 화면에 오류가 여럿이면 서로를 덮어쓰기 때문이다.
+ * 헬퍼가 입력의 설명이 되는 방법은 하나다 — 자기 `id`를 Input의 `aria-describedby`가 가리키게 하는 것.
+ * `FormHelperText`는 그 연결을 스스로 만들지 않는다 — id는 소비자 것이고, `TextField`를 쓰면 합성 계층이 대신 만들어 준다.
+ * 오류 고지(`aria-invalid`)는 Input의 `error`가 소유한다.
+ * 여기서 손으로 달지 않는다.
+ * 마지막 예시의 `role="alert"`는 소비자가 직접 고른 것이다.
+ * 라이브러리는 error 헬퍼를 자동으로 live region으로 만들지 않는다 — 화면에 오류가 여럿이면 서로를 덮어쓰기 때문이다.
  * 제출 직후처럼 즉시 읽혀야 하는 자리에서만 소비자가 켠다.
  */
 export const A11y: Story = {

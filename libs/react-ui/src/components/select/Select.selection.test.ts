@@ -32,7 +32,7 @@ describe('isValueEqual', () => {
   });
 
   it('null 과 undefined 는 둘 다 빈 문자열이라 같다고 본다', () => {
-    // 문자열 정규화의 알려진 결과다. `''` 도 같은 부류로 취급된다.
+    // 문자열 정규화의 알려진 결과다. `''`도 같은 부류로 취급된다.
     expect(isValueEqual(null, undefined)).toBe(true);
     expect(isValueEqual(null, '')).toBe(true);
   });
@@ -54,7 +54,7 @@ describe('isValueEqual', () => {
   });
 
   it('객체와 원시값을 문자열로 뭉개 비교하지 않는다', () => {
-    // 둘 다 `stringifyValue` 로 넘기면 '[object Object]' 끼리 같아져 버린다.
+    // 둘 다 `stringifyValue`로 넘기면 '[object Object]'끼리 같아져 버린다.
     expect(isValueEqual({}, '[object Object]')).toBe(false);
   });
 });

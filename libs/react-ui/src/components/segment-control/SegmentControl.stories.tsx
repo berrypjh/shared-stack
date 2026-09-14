@@ -168,8 +168,8 @@ const viewOptionsWithDisabled: readonly SegmentOption<View>[] = [
 ];
 
 /**
- * controlled 하네스로 선택이 바뀌는 것을 보이고, disabled 옵션은 활성화되지 않으며,
- * 키보드 포커스가 보이는 상태로 끝난다 (Chromatic 이 `:focus-visible` 링을 찍는다).
+ * controlled 하네스로 선택이 바뀌는 것을 보이고, disabled 옵션은 활성화되지 않으며, 키보드 포커스가 보이는 상태로 끝난다.
+ * Chromatic이 `:focus-visible` 링을 찍는다.
  */
 export const Interaction: Story = {
   render: () => {
@@ -193,20 +193,20 @@ export const Interaction: Story = {
     await expect(grid).toHaveAttribute('aria-pressed', 'true');
     await expect(list).toHaveAttribute('aria-pressed', 'false');
 
-    // 키보드: native button 이라 Shift+Tab 으로 옮기고 Space 로 고른다.
+    // native button이라 키보드로는 Shift+Tab으로 옮기고 Space로 고른다.
     await userEvent.tab({ shift: true });
     await expect(list).toHaveFocus();
     await userEvent.keyboard(' ');
     await expect(list).toHaveAttribute('aria-pressed', 'true');
 
-    // disabled 옵션은 눌러도 활성화되지 않는다. (비활성 버튼을 누른 뒤 포커스가 어디 남는지는
-    // 브라우저마다 달라 이 경로는 포커스를 가정하지 않는다.)
+    // disabled 옵션은 눌러도 활성화되지 않는다.
+    // 비활성 버튼을 누른 뒤 포커스가 어디 남는지는 브라우저마다 달라 이 경로는 포커스를 가정하지 않는다.
     await expect(gallery).toBeDisabled();
     await userEvent.click(gallery);
     await expect(gallery).toHaveAttribute('aria-pressed', 'false');
     await expect(list).toHaveAttribute('aria-pressed', 'true');
 
-    // 키보드로 들어온 포커스로 끝낸다 — Chromatic 이 `:focus-visible` 링을 찍는다.
+    // 키보드로 들어온 포커스로 끝낸다 — Chromatic이 `:focus-visible` 링을 찍는다.
     await userEvent.tab();
     await expect(list).toHaveFocus();
   },
@@ -234,7 +234,7 @@ export const LongLabels: Story = {
   },
 };
 
-/** 모든 테마에서 선택·비활성·선택+비활성(비활성 글자색이 이긴다)을 한 장에 담는다. */
+/** 모든 테마에서 선택·비활성·선택+비활성(비활성 글자색이 이긴다)을 한 장에 담는다 */
 export const ThemeMatrix: Story = {
   parameters: themeGalleryParameters,
   render: () => (

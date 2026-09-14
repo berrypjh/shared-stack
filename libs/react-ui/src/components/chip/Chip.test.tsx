@@ -1,17 +1,11 @@
 /**
  * Chip 계약.
- *
- * 두 모드만 있다:
- *
- * 1. **passive** — `<span>`. 포커스 대상이 아니고 상태가 없다.
- * 2. **interactive** — `onClick` 을 주면 native `<button type="button">`. `selected` 를 함께
- *    주면 `aria-pressed` toggle 이 된다.
- *
- * `div role="button"` 으로 native button 을 재구현하지 않는다 — Enter/Space·disabled·폼 밖
- * 클릭 동작을 브라우저가 이미 옳게 한다.
- *
- * `selected`·`disabled` 는 타입 수준에서 **interactive 에만** 허용된다. 누를 수 없는 것에 선택
- * 시각을 주면 시맨틱 없는 상태가 되고, 그것이 이 컴포넌트에서 가장 쉽게 잘못되는 자리다.
+ * 두 모드만 있다.
+ * - passive: `<span>`, 포커스 대상이 아니고 상태가 없다
+ * - interactive: `onClick`을 주면 native `<button type="button">`, `selected`를 함께 주면 `aria-pressed` toggle이 된다
+ * `div role="button"`으로 native button을 재구현하지 않는다 — Enter/Space·disabled·폼 밖 클릭 동작을 브라우저가 이미 옳게 한다.
+ * `selected`·`disabled`는 타입 수준에서 interactive에만 허용된다.
+ * 누를 수 없는 것에 선택 시각을 주면 시맨틱 없는 상태가 되고, 그것이 이 컴포넌트에서 가장 쉽게 잘못되는 자리다.
  */
 import { createRef } from 'react';
 
@@ -30,8 +24,9 @@ describe('<Chip />', () => {
 
   describe('passive 모드', () => {
     /**
-     * `refInstanceof` 가 `HTMLSpanElement` 다 — passive 루트는 span 이다. interactive 루트는
-     * button 이라 아래에서 따로 본다. 한 conformance 호출로는 두 루트를 덮을 수 없다.
+     * `refInstanceof`가 `HTMLSpanElement`다 — passive 루트는 span이다.
+     * interactive 루트는 button이라 아래에서 따로 본다.
+     * 한 conformance 호출로는 두 루트를 덮을 수 없다.
      */
     describeConformance(<Chip>태그</Chip>, () => ({
       render,
@@ -96,7 +91,7 @@ describe('<Chip />', () => {
       const button = screen.getByRole('button', { name: '필터' });
 
       expect(button).toHaveProperty('nodeName', 'BUTTON');
-      // 폼 안에서 submit 으로 동작하지 않아야 한다.
+      // 폼 안에서 submit으로 동작하지 않아야 한다.
       expect(button).toHaveAttribute('type', 'button');
       expect(button).toHaveClass(chipClasses.interactive);
     });
@@ -171,7 +166,7 @@ describe('<Chip />', () => {
         </Chip>,
       );
 
-      // button 안에 button 이 생기면 키보드·스크린리더가 둘 다 깨진다.
+      // button 안에 button이 생기면 키보드·스크린리더가 둘 다 깨진다.
       expect(screen.getAllByRole('button')).toHaveLength(1);
       expect(screen.getByRole('button').querySelectorAll('button')).toHaveLength(0);
     });
@@ -199,8 +194,8 @@ describe('<Chip />', () => {
     });
 
     /**
-     * `selected` 를 주지 않으면 toggle 이 아니라 단순 action chip 이다. 없는 토글 시맨틱을
-     * 지어내면 스크린리더가 "누름 안 됨" 을 읽어 상태가 있다고 오해하게 만든다.
+     * `selected`를 주지 않으면 toggle이 아니라 단순 action chip이다.
+     * 없는 토글 시맨틱을 지어내면 스크린리더가 "누름 안 됨"을 읽어 상태가 있다고 오해하게 만든다.
      */
     it('selected 가 없으면 aria-pressed 를 달지 않는다', () => {
       render(<Chip onClick={() => undefined}>실행</Chip>);
@@ -342,8 +337,8 @@ describe('<Chip />', () => {
     });
 
     /**
-     * interactive 모드에서 접근 가능한 이름은 **내용에서 계산된다.** 글리프가 트리에 남으면
-     * 이름이 "◆ 필터" 로 오염되므로 leading 슬롯은 `aria-hidden` 이다.
+     * interactive 모드에서 접근 가능한 이름은 내용에서 계산된다.
+     * 글리프가 트리에 남으면 이름이 "◆ 필터"로 오염되므로 leading 슬롯은 `aria-hidden`이다.
      */
     it('leading 이 접근 가능한 이름을 오염시키지 않는다', () => {
       render(
@@ -364,10 +359,8 @@ describe('<Chip />', () => {
 
   /**
    * 상태 색이 서로 배타적인지 본다.
-   *
-   * jsdom 은 specificity 를 계산하지 않으므로 `getComputedStyle` 로 "이긴 색" 을 묻지 않는다.
-   * 대신 **셀렉터 매칭**만 쓴다 — 상태 규칙이 배타적이면 어떤 조합에서도 매칭되는 규칙이
-   * 정확히 하나이고, 그러면 결과가 선언 순서에 좌우되지 않는다 (`componentStyles` docstring).
+   * jsdom은 specificity를 계산하지 않으므로 `getComputedStyle`로 "이긴 색"을 묻지 않는다.
+   * 대신 셀렉터 매칭만 쓴다 — 상태 규칙이 배타적이면 어떤 조합에서도 매칭되는 규칙이 정확히 하나이고, 그러면 결과가 선언 순서에 좌우되지 않는다 (`componentStyles` docstring).
    */
   describe('상태 규칙 배타성', () => {
     beforeAll(() => {
@@ -384,7 +377,7 @@ describe('<Chip />', () => {
       const chip = screen.getByTestId('chip');
 
       expect(chip.matches(`.${chipClasses.selected}`)).toBe(true);
-      // 평상시 면 규칙은 `:not(.is-selected)` 로 배제되어야 한다.
+      // 평상시 면 규칙은 `:not(.is-selected)`로 배제되어야 한다.
       expect(chip.matches(`.${chipClasses.interactive}:not(.${chipClasses.selected})`)).toBe(false);
     });
   });

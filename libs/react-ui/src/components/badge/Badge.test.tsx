@@ -1,14 +1,11 @@
 /**
  * Badge 계약.
- *
- * Badge 는 **overlay indicator** 다 — 앵커(`children`)를 감싸고 그 위에 알림/개수/점을 얹는다.
- * standalone status pill 이 아니다 (그 역할은 Chip 이 가진다).
- *
- * 세 가지가 이 컴포넌트의 존재 이유이고, 그래서 가장 두껍게 검사한다:
- *
- * 1. **앵커를 건드리지 않는다.** 래퍼가 자식의 role·이름·키보드·포인터를 바꾸면 안 된다.
- * 2. **색만으로 의미를 전달하지 않는다.** 장식(dot)과 의미 있는 정보(count·label)를 분리한다.
- * 3. **`role="status"` 를 기본으로 붙이지 않는다.** live region 은 소비자가 고를 일이다.
+ * Badge는 overlay indicator다 — 앵커(`children`)를 감싸고 그 위에 알림/개수/점을 얹는다.
+ * standalone status pill이 아니다 (그 역할은 Chip이 가진다).
+ * 세 가지가 이 컴포넌트의 존재 이유이고, 그래서 가장 두껍게 검사한다.
+ * - 앵커를 건드리지 않는다: 래퍼가 자식의 role·이름·키보드·포인터를 바꾸면 안 된다
+ * - 색만으로 의미를 전달하지 않는다: 장식(dot)과 의미 있는 정보(count·label)를 분리한다
+ * - `role="status"`를 기본으로 붙이지 않는다: live region은 소비자가 고를 일이다
  */
 import { createRef } from 'react';
 
@@ -23,9 +20,9 @@ import { badgeClasses } from './Badge.constants';
 import * as barrel from './index';
 
 /**
- * 표시자는 공개 이름이 없는 내부 요소라 **클래스로 찾는다** — 프로덕션 코드에 `data-testid` 를
- * 심지 않는다 (소비자 번들로 새는 테스트 전용 속성이 된다). `badgeClasses` 가 공개 계약이므로
- * 이 조회는 구현 세부에 기대지 않는다.
+ * 표시자는 공개 이름이 없는 내부 요소라 클래스로 찾는다.
+ * 프로덕션 코드에 `data-testid`를 심지 않는다 (소비자 번들로 새는 테스트 전용 속성이 된다).
+ * `badgeClasses`가 공개 계약이므로 이 조회는 구현 세부에 기대지 않는다.
  */
 const indicator = (): HTMLElement => {
   const el = document.querySelector<HTMLElement>(`.${badgeClasses.indicator}`);
@@ -50,8 +47,8 @@ describe('<Badge />', () => {
   const { render } = createRenderer();
 
   /**
-   * `polymorphicProp` 은 제외한다 — Badge 는 `component` prop 을 열지 않는다. 루트는 위치
-   * 기준(`position: relative`)을 만드는 래퍼일 뿐이고, 바꿀 이유가 생기면 그때 계약을 다시 본다.
+   * `polymorphicProp`은 제외한다 — Badge는 `component` prop을 열지 않는다.
+   * 루트는 위치 기준(`position: relative`)을 만드는 래퍼일 뿐이고, 바꿀 이유가 생기면 그때 계약을 다시 본다.
    */
   describeConformance(<Badge count={1}>anchor</Badge>, () => ({
     render,
@@ -109,8 +106,9 @@ describe('<Badge />', () => {
     });
 
     /**
-     * **기본값이 중립이어야 한다.** `role="status"` 는 live region 이라 값이 바뀔 때마다
-     * 스크린리더가 말을 끊고 끼어든다. 알림 배지가 그것을 원하는지는 소비자가 정할 일이다.
+     * 기본값이 중립이어야 한다.
+     * `role="status"`는 live region이라 값이 바뀔 때마다 스크린리더가 말을 끊고 끼어든다.
+     * 알림 배지가 그것을 원하는지는 소비자가 정할 일이다.
      */
     it('role="status" 를 기본으로 붙이지 않는다', () => {
       render(
@@ -168,10 +166,8 @@ describe('<Badge />', () => {
     });
 
     /**
-     * overlay 가 앵커 위에 절대 배치되므로 **포인터를 삼킬 수 있다.** 표시자는 CSS 로
-     * `pointer-events: none` 을 갖는다 — 그 규칙이 컴파일된 CSS 에 있는지는
-     * `forcedColors.test.ts` 가 아니라 여기서 보는 것이 맞지만, jsdom 은 specificity 를
-     * 계산하지 않으므로 **선언 자체**를 인라인 스타일이 아닌 클래스로 확인한다.
+     * overlay가 앵커 위에 절대 배치되므로 포인터를 삼킬 수 있다.
+     * 표시자는 CSS로 `pointer-events: none`을 갖는다 — 그 규칙이 컴파일된 CSS에 있는지는 `forcedColors.test.ts`가 아니라 여기서 보는 것이 맞지만, jsdom은 specificity를 계산하지 않으므로 선언 자체를 인라인 스타일이 아닌 클래스로 확인한다.
      */
     it('표시자가 포인터를 가로채지 않는다', () => {
       render(
@@ -180,7 +176,7 @@ describe('<Badge />', () => {
         </Badge>,
       );
 
-      // 클래스가 붙어 있어야 CSS 의 pointer-events 규칙이 적용된다.
+      // 클래스가 붙어 있어야 CSS의 pointer-events 규칙이 적용된다.
       expect(indicator()).toHaveClass(badgeClasses.indicator);
       // 표시자 자체가 버튼을 품지 않는다 — 앵커와 형제다.
       expect(indicator().querySelector('button')).toBeNull();
@@ -304,7 +300,7 @@ describe('<Badge />', () => {
         </Badge>,
       );
 
-      // DOM 에 없으므로 AT 로도, 스타일로도 새지 않는다.
+      // DOM에 없으므로 AT로도, 스타일로도 새지 않는다.
       expect(queryIndicator()).toBeNull();
       expect(screen.getByText('anchor')).toBeInTheDocument();
     });
@@ -389,9 +385,8 @@ describe('<Badge />', () => {
 
   /**
    * 장식과 의미 있는 정보를 분리한다.
-   *
-   * `label` 이 유일한 "의미 있는 정보" 통로다. 이름을 **지어내지 않는다** — `99+` 를
-   * "99개 이상" 으로 자동 번역하지도, count 로 문장을 만들지도 않는다 (Avatar 와 같은 원칙).
+   * `label`이 유일한 "의미 있는 정보" 통로다.
+   * 이름을 지어내지 않는다 — `99+`를 "99개 이상"으로 자동 번역하지도, count로 문장을 만들지도 않는다 (Avatar와 같은 원칙).
    */
   describe('접근성', () => {
     it('label 을 주면 표시자가 role="img" + aria-label 로 이름을 갖는다', () => {
@@ -407,9 +402,9 @@ describe('<Badge />', () => {
     });
 
     /**
-     * **시각 축약과 낭독 내용이 갈리는 지점이다.** 화면은 `99+`, 스크린리더는 실제 수를 담은
-     * `label` 을 읽는다 — "구십구 플러스" 는 정보가 아니다. 그래서 label 이 있으면 시각 글자를
-     * 트리에서 감춰 중복·모호한 낭독을 막는다.
+     * 시각 축약과 낭독 내용이 갈리는 지점이다.
+     * 화면은 `99+`, 스크린리더는 실제 수를 담은 `label`을 읽는다 — "구십구 플러스"는 정보가 아니다.
+     * 그래서 label이 있으면 시각 글자를 트리에서 감춰 중복·모호한 낭독을 막는다.
      */
     it('label 이 있으면 축약된 시각 글자를 트리에서 감춘다', () => {
       render(
@@ -432,9 +427,9 @@ describe('<Badge />', () => {
     });
 
     /**
-     * 이름 없는 dot 은 **순수 장식**이다. 읽을 것이 없는데 트리에 남기면 스크린리더가
-     * 빈 요소를 지나가며 잡음을 만든다. 색만으로 상태를 말하는 것도 막는다 — 의미가 있으면
-     * `label` 을 주어야 한다.
+     * 이름 없는 dot은 순수 장식이다.
+     * 읽을 것이 없는데 트리에 남기면 스크린리더가 빈 요소를 지나가며 잡음을 만든다.
+     * 색만으로 상태를 말하는 것도 막는다 — 의미가 있으면 `label`을 주어야 한다.
      */
     it('label 없는 dot 은 접근성 트리에서 감춘다', () => {
       render(<Badge variant="dot">anchor</Badge>);

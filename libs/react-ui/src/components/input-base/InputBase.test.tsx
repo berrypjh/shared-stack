@@ -65,7 +65,7 @@ describe('<InputBase />', () => {
       expect(screen.getByTestId('root')).toHaveClass(inputBaseClasses.sizeSm);
     });
 
-    /** 시맨틱 prop 을 명시적으로 `undefined` 로 주는 것은 생략과 같아야 한다. */
+    /** 시맨틱 prop을 명시적으로 `undefined`로 주는 것은 생략과 같아야 한다 */
     it('색·크기를 undefined로 줘도 기본값으로 렌더링해야 한다', () => {
       render(<InputBase data-testid="root" color={undefined} size={undefined} />);
 
@@ -170,9 +170,8 @@ describe('<InputBase />', () => {
 
   /**
    * 제어/비제어 소유권.
-   *
-   * `value`·`defaultValue` 는 native 요소로 그대로 내려가고 Base 는 자기 값 상태를 두지
-   * 않습니다. 그 사실은 속성으로는 보이지 않습니다 — 실제로 타이핑해 봐야 드러납니다.
+   * `value`·`defaultValue`는 native 요소로 그대로 내려가고 Base는 자기 값 상태를 두지 않는다.
+   * 그 사실은 속성으로는 보이지 않는다 — 실제로 타이핑해 봐야 드러난다.
    */
   describe('controlled / uncontrolled', () => {
     it('비제어 입력은 소비자 개입 없이 타이핑을 반영한다', async () => {
@@ -181,7 +180,7 @@ describe('<InputBase />', () => {
       const input = screen.getByRole('textbox') as HTMLInputElement;
       await user.type(input, 'c');
 
-      // Base 가 value 를 붙잡으면 "ab" 에서 멈춘다.
+      // Base가 value를 붙잡으면 "ab"에서 멈춘다.
       expect(input.value).toBe('abc');
     });
 
@@ -191,7 +190,7 @@ describe('<InputBase />', () => {
       const input = screen.getByRole('textbox') as HTMLInputElement;
       await user.type(input, 'c');
 
-      // 비제어의 지문: DOM 속성은 기본값에 머물고 프로퍼티만 움직인다.
+      // 비제어의 지문 — DOM 속성은 기본값에 머물고 프로퍼티만 움직인다.
       // 제어로 승격되면 둘이 함께 움직이거나 프로퍼티가 기본값에 묶인다.
       expect(input.getAttribute('value')).toBe('ab');
       expect(input.value).toBe('abc');
@@ -210,9 +209,8 @@ describe('<InputBase />', () => {
   });
 
   /**
-   * `disabled` 와 `readOnly` 는 둘 다 편집을 막지만 **같은 상태가 아닙니다.**
-   * 속성만 보면 구분되지 않아서, 포커스를 받는지까지 봅니다 — readOnly 는 읽을 수 있어야
-   * 하므로 탐색 가능한 채로 남고, disabled 는 상호작용 대상에서 빠집니다.
+   * `disabled`와 `readOnly`는 둘 다 편집을 막지만 같은 상태가 아니다.
+   * 속성만 보면 구분되지 않아서, 포커스를 받는지까지 본다 — readOnly는 읽을 수 있어야 하므로 탐색 가능한 채로 남고, disabled는 상호작용 대상에서 빠진다.
    */
   describe('편집 가능성', () => {
     it('disabled 는 타이핑을 막는다', async () => {
@@ -248,14 +246,12 @@ describe('<InputBase />', () => {
     });
 
     /**
-     * disabled 를 풀어도 focus 가 되살아나면 안 된다.
-     *
-     * disabled 동안 실제 포커스는 이미 떠났다 (`InputBase` 가 활성 요소를 blur 시킨다).
-     * 로컬 focus 상태가 남아 있으면 다시 켜는 순간 아무것도 포커스를 갖지 않았는데 루트가
-     * `--focused` 를 주장한다 — 시맨틱과 시각이 어긋난다.
-     *
-     * 이 경로는 **FormControl 밖**이라 InputBase 가 focus 의 소유자다. 안쪽에서는
-     * FormControl 이 같은 이유로 자기 상태를 버린다. RN `InputBase` 도 같은 계약이다.
+     * disabled를 풀어도 focus가 되살아나면 안 된다.
+     * disabled 동안 실제 포커스는 이미 떠났다 (`InputBase`가 활성 요소를 blur시킨다).
+     * 로컬 focus 상태가 남아 있으면 다시 켜는 순간 아무것도 포커스를 갖지 않았는데 루트가 `--focused`를 주장한다 — 시맨틱과 시각이 어긋난다.
+     * 이 경로는 FormControl 밖이라 InputBase가 focus의 소유자다.
+     * 안쪽에서는 FormControl이 같은 이유로 자기 상태를 버린다.
+     * RN `InputBase`도 같은 계약이다.
      */
     it('disabled 를 풀어도 focus 시각 상태가 되살아나지 않는다', async () => {
       const { user, setProps } = render(<InputBase data-testid="root" />);
@@ -750,8 +746,8 @@ describe('<InputBase />', () => {
     });
 
     /**
-     * 장식이 스스로 포커스를 가지는 요소면 루트가 뺏어오면 안 된다 — 지우기 버튼을 눌렀는데
-     * 포커스가 입력으로 튀면 버튼의 상태 변화를 스크린리더가 놓치고 키보드 위치도 잃는다.
+     * 장식이 스스로 포커스를 가지는 요소면 루트가 뺏어오면 안 된다.
+     * 지우기 버튼을 눌렀는데 포커스가 입력으로 튀면 버튼의 상태 변화를 스크린리더가 놓치고 키보드 위치도 잃는다.
      */
     it('상호작용 장식 클릭은 루트가 포커스를 뺏지 않는다', () => {
       const handleClear = spy();
@@ -819,8 +815,8 @@ describe('<InputBase />', () => {
     });
 
     /**
-     * `inputProps`는 native 요소로 가는 유일한 통로다. 최상위에서 같은 prop을 주지 않았는데도
-     * 값이 사라지면 통로가 아니라 함정이 된다.
+     * `inputProps`는 native 요소로 가는 유일한 통로다.
+     * 최상위에서 같은 prop을 주지 않았는데도 값이 사라지면 통로가 아니라 함정이 된다.
      */
     it.each([
       ['aria-label', '이름'],
@@ -843,9 +839,8 @@ describe('<InputBase />', () => {
     });
 
     /**
-     * `inputMode`·`enterKeyHint`는 상속되지 않는 편집 전용 속성이다 — 래퍼 div에 놓이면
-     * 가상 키보드에 아무것도 전달되지 않는다. `spellCheck`·`autoCapitalize`는 자손 편집 요소로
-     * 상속되므로 래퍼에 남겨도 동작한다.
+     * `inputMode`·`enterKeyHint`는 상속되지 않는 편집 전용 속성이다 — 래퍼 div에 놓이면 가상 키보드에 아무것도 전달되지 않는다.
+     * `spellCheck`·`autoCapitalize`는 자손 편집 요소로 상속되므로 래퍼에 남겨도 동작한다.
      */
     it('inputMode는 native input으로 간다', () => {
       render(<InputBase data-testid="root" inputMode="numeric" />);
@@ -872,10 +867,10 @@ describe('<InputBase />', () => {
   });
 
   /**
-   * 타입 수준 계약. vitest 는 타입을 지우므로 이 블록은 `tsc -p tsconfig.spec.json` 이 검증한다.
-   *
-   * `inputRef` 는 native input/textarea 로 가는 ref 다. `unknown` 이면 아무 값이나 받아 놓고
-   * 런타임에 조용히 무시하므로, 잘못 연결한 ref 를 컴파일에서 잡지 못한다.
+   * 타입 수준 계약.
+   * vitest는 타입을 지우므로 이 블록은 `tsc -p tsconfig.spec.json`이 검증한다.
+   * `inputRef`는 native input/textarea로 가는 ref다.
+   * `unknown`이면 아무 값이나 받아 놓고 런타임에 조용히 무시하므로, 잘못 연결한 ref를 컴파일에서 잡지 못한다.
    */
   describe('타입: inputRef', () => {
     it('올바른 ref 형태를 받는다', () => {
@@ -900,9 +895,9 @@ describe('<InputBase />', () => {
     it('ref 가 아닌 값은 타입에서 막힌다', () => {
       const reject = () => (
         <>
-          {/* @ts-expect-error 문자열은 ref 가 아니다. */}
+          {/* @ts-expect-error 문자열은 ref가 아니다 */}
           <InputBase inputRef="input" />
-          {/* @ts-expect-error 엉뚱한 요소의 ref 는 연결되지 않는다. */}
+          {/* @ts-expect-error 엉뚱한 요소의 ref는 연결되지 않는다 */}
           <InputBase inputRef={React.createRef<HTMLDivElement>()} />
         </>
       );
@@ -918,7 +913,7 @@ describe('<InputBase />', () => {
       expect(screen.getByTestId('root')).toHaveAttribute('role', 'presentation');
     });
 
-    /** 받아 놓고 무시하면 소비자는 왜 안 되는지 알 수 없다. */
+    /** 받아 놓고 무시하면 소비자는 왜 안 되는지 알 수 없다 */
     it('소비자가 준 role이 이긴다', () => {
       render(<InputBase data-testid="root" role="group" />);
 
@@ -926,11 +921,9 @@ describe('<InputBase />', () => {
     });
 
     /**
-     * 위젯 role 은 래퍼의 것이 아니다.
-     *
-     * 이름 prop(`aria-label` 등)은 native 요소로 가므로, 래퍼에 `searchbox`·`textbox` 같은
-     * 위젯 role 을 얹으면 **이름 없는 위젯**이 만들어지고 진짜 입력을 자식으로 품는다
-     * (axe `aria-input-field-name`). 검색 필드는 native `type` 으로 만든다.
+     * 위젯 role은 래퍼의 것이 아니다.
+     * 이름 prop(`aria-label` 등)은 native 요소로 가므로, 래퍼에 `searchbox`·`textbox` 같은 위젯 role을 얹으면 이름 없는 위젯이 만들어지고 진짜 입력을 자식으로 품는다 (axe `aria-input-field-name`).
+     * 검색 필드는 native `type`으로 만든다.
      */
     it('검색 필드는 native type이 만든다 — 래퍼 role이 아니라', () => {
       render(<InputBase data-testid="root" type="search" aria-label="검색" />);

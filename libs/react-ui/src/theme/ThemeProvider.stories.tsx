@@ -6,7 +6,7 @@ import { Button } from '../components/button/Button';
 
 import { ThemeProvider } from './ThemeProvider';
 
-/** 등록된 테마 이름. 하드코딩하면 design-tokens 에 테마가 늘어도 스토리만 낡는다. */
+/** 등록된 테마 이름. 하드코딩하면 design-tokens에 테마가 늘어도 스토리만 낡는다. */
 const themeNames = themes.map(({ name }) => name);
 
 const meta = {
@@ -36,8 +36,8 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * 표면은 시맨틱 토큰으로만 칠한다. `data-theme` 캐스케이드가 테마마다 올바른 짝을 이미
- * 갖고 있어서, light/dark 를 분기하면 나머지 5개 테마가 그 분기에서 빠진다.
+ * 표면은 시맨틱 토큰으로만 칠한다.
+ * `data-theme` 캐스케이드가 테마마다 올바른 짝을 이미 갖고 있어서, light/dark를 분기하면 나머지 5개 테마가 그 분기에서 빠진다.
  */
 const surfaceStyle = {
   display: 'grid',
@@ -146,8 +146,8 @@ export const AllModes: Story = {
 };
 
 /**
- * 보여주려는 것은 **중첩 자체**다 — 안쪽 scope 가 자기 `data-theme` 을 열고 캐스케이드가
- * 그 안에서 이긴다. 어떤 두 테마인지는 본질이 아니라서 레지스트리의 앞 두 개를 쓴다.
+ * 보여주려는 것은 중첩 자체다 — 안쪽 scope가 자기 `data-theme`을 열고 캐스케이드가 그 안에서 이긴다.
+ * 어떤 두 테마인지는 본질이 아니라서 레지스트리의 앞 두 개를 쓴다.
  */
 export const NestedThemeExample: Story = {
   args: {

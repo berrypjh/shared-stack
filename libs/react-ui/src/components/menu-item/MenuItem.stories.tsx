@@ -6,12 +6,10 @@ import { Select } from '../select';
 import { MenuItem } from './MenuItem';
 
 /**
- * `MenuItem` 은 **슬롯 마커**다. 스스로는 `null` 을 렌더하고, `value`·`children`·`disabled` 를
- * 부모인 `Select` 가 children 으로 읽어 옵션을 만든다.
- *
- * 그래서 이 페이지의 story 는 전부 `Select` 안에 넣은 모습이다 — 홀로 둔 `MenuItem` 은 화면에
- * 아무것도 남기지 않는다 (`RendersNothingAlone` 가 그 사실을 검사한다). 옵션의 시각·키보드
- * 동작은 `Select` 가 소유하므로 상태 story 는 `Components/Selection/Select` 에 있다.
+ * `MenuItem`은 슬롯 마커다.
+ * 스스로는 `null`을 렌더하고, `value`·`children`·`disabled`를 부모인 `Select`가 children으로 읽어 옵션을 만든다.
+ * 그래서 이 페이지의 story는 전부 `Select` 안에 넣은 모습이다 — 홀로 둔 `MenuItem`은 화면에 아무것도 남기지 않는다 (`RendersNothingAlone`가 그 사실을 검사한다).
+ * 옵션의 시각·키보드 동작은 `Select`가 소유하므로 상태 story는 `Components/Selection/Select`에 있다.
  */
 const meta = {
   title: 'Components/Selection/MenuItem',
@@ -57,8 +55,8 @@ export const DisabledOption: Story = {
 };
 
 /**
- * `Select` 밖의 `MenuItem` 은 DOM 에 아무것도 만들지 않는다. 실수로 단독 사용했을 때
- * "왜 안 보이지" 로 시간을 쓰지 않도록 이 계약을 눈과 검사 양쪽에 남겨 둔다.
+ * `Select` 밖의 `MenuItem`은 DOM에 아무것도 만들지 않는다.
+ * 실수로 단독 사용했을 때 "왜 안 보이지"로 시간을 쓰지 않도록 이 계약을 눈과 검사 양쪽에 남겨 둔다.
  */
 export const RendersNothingAlone: Story = {
   args: { value: 'solo', children: 'Solo' },

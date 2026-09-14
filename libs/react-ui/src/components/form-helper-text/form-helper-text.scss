@@ -20,9 +20,8 @@
 
 /**
  * 상태 색 우선순위: disabled > error > 평상시.
- *
- * `InputLabel`·Input chrome·RN `FormHelperText.styles.ts` 와 같은 순서다. `:not()` 으로
- * 배타를 만들어 특정도·선언 순서에 기대지 않는다.
+ * `InputLabel`·Input chrome·RN `FormHelperText.styles.ts`와 같은 순서다.
+ * `:not()`으로 배타를 만들어 특정도·선언 순서에 기대지 않는다.
  */
 .ui-form-helper-text--error:not(.ui-form-helper-text--disabled) {
   color: var(--ds-text-error);

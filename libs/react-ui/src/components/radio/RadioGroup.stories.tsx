@@ -46,11 +46,10 @@ const Options = () => (
 );
 
 /**
- * 정적으로 그릴 수 있는 상태 전부 — 미선택·선택, 비활성 선택지(미선택), 비활성 그룹(선택),
- * 그룹 오류, 보이는 라벨 없는 그룹. hover 는 CSS `:hover` 라서 스크린샷에 담기지 않고
- * `Radio.test.tsx` 의 스타일 계약이 소스 수준에서 본다. 포커스는 `Keyboard` 가 play 로 켠다.
- *
- * `name` 은 그룹마다 `useId` 로 생긴다 — 테마마다 반복해도 그룹끼리 섞이지 않는다.
+ * 정적으로 그릴 수 있는 상태 전부 — 미선택·선택, 비활성 선택지(미선택), 비활성 그룹(선택), 그룹 오류, 보이는 라벨 없는 그룹.
+ * hover는 CSS `:hover`라서 스크린샷에 담기지 않고 `Radio.test.tsx`의 스타일 계약이 소스 수준에서 본다.
+ * 포커스는 `Keyboard`가 play로 켠다.
+ * `name`은 그룹마다 `useId`로 생긴다 — 테마마다 반복해도 그룹끼리 섞이지 않는다.
  */
 const RadioMatrix = () => (
   <div style={matrixStyle}>
@@ -76,7 +75,7 @@ const RadioMatrix = () => (
   </div>
 );
 
-/** controlled — 그룹 `value` 가 선택을 정한다. */
+/** controlled — 그룹 `value`가 선택을 정한다 */
 export const Playground: Story = {
   render: () => {
     const [value, setValue] = useState('express');
@@ -91,7 +90,7 @@ export const Playground: Story = {
   },
 };
 
-/** 등록된 모든 테마에서 같은 상태 매트릭스를 한 스크린샷에 담는다. */
+/** 등록된 모든 테마에서 같은 상태 매트릭스를 한 스크린샷에 담는다 */
 export const ThemeMatrix: Story = {
   parameters: themeGalleryParameters,
   render: () => <ThemeGallery>{() => <RadioMatrix />}</ThemeGallery>,
@@ -99,10 +98,9 @@ export const ThemeMatrix: Story = {
 
 /**
  * 키보드는 브라우저가 소유한다 — 컴포넌트는 키를 가로채지 않는다.
- *
- * Tab 은 선택된 radio 에 한 번 멈추고, 방향키(Down·Right 다음, Up·Left 이전)가 비활성을
- * 건너뛰며 선택을 옮기고, 포커스는 `:focus-visible` outline 으로 보인다. Shift+Tab 은 그룹을
- * 다시 한 정지점으로 돌아온다. (키 입력은 user-event 시뮬레이션이다.)
+ * Tab은 선택된 radio에 한 번 멈추고, 방향키(Down·Right 다음, Up·Left 이전)가 비활성을 건너뛰며 선택을 옮기고, 포커스는 `:focus-visible` outline으로 보인다.
+ * Shift+Tab은 그룹을 다시 한 정지점으로 돌아온다.
+ * 키 입력은 user-event 시뮬레이션이다.
  */
 export const Keyboard: Story = {
   parameters: { chromatic: { prefersReducedMotion: 'reduce' } },
@@ -154,8 +152,8 @@ export const Keyboard: Story = {
 };
 
 /**
- * 그룹 수준의 필수·오류·설명. `required` 는 모든 선택지에 native 로 가고, 오류는 FormControl
- * 에서 상속하며, 설명은 그룹의 `aria-describedby` 로 잇는다.
+ * 그룹 수준의 필수·오류·설명.
+ * `required`는 모든 선택지에 native로 가고, 오류는 FormControl에서 상속하며, 설명은 그룹의 `aria-describedby`로 잇는다.
  */
 export const Validation: Story = {
   name: 'Validation / Description',
@@ -184,15 +182,16 @@ export const LongLabels: Story = {
 };
 
 /**
- * Windows 고대비. native 외형으로 돌아가 OS 가 경계·점·비활성을 시스템 색으로 그린다.
- * Chromatic 이 `forcedColors` 로 찍고, 로컬에서는 DevTools 렌더링 에뮬레이션으로 본다.
+ * Windows 고대비.
+ * native 외형으로 돌아가 OS가 경계·점·비활성을 시스템 색으로 그린다.
+ * Chromatic이 `forcedColors`로 찍고, 로컬에서는 DevTools 렌더링 에뮬레이션으로 본다.
  */
 export const ForcedColors: Story = {
   parameters: { chromatic: { forcedColors: 'active', prefersReducedMotion: 'reduce' } },
   render: () => <RadioMatrix />,
   play: async ({ canvasElement }) => {
-    // 매트릭스의 여러 그룹이 같은 선택지 이름을 쓴다 — 첫 그룹 안으로 좁혀서, Tab 이 그 그룹의
-    // **선택된** radio(`defaultValue="express"`)에 멈추는지 본다.
+    // 매트릭스의 여러 그룹이 같은 선택지 이름을 쓴다.
+    // 첫 그룹 안으로 좁혀서, Tab이 그 그룹의 선택된 radio(`defaultValue="express"`)에 멈추는지 본다.
     const firstGroup = within(canvasElement).getByRole('group', { name: '미선택 · 선택' });
 
     await userEvent.tab();

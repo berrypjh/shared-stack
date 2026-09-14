@@ -495,13 +495,10 @@ describe('<FormControl />', () => {
 
   /**
    * 중첩 시 상속 값의 격리.
-   *
-   * web 은 React Context 로 값을 내려보내므로 가장 가까운 Provider 가 이긴다 — RN 과 같은
-   * 계약이다 (`react-native-ui` FormControl.test.tsx 의 '중첩' describe).
-   *
-   * **focus 는 이 테스트의 범위가 아니다.** web 은 루트에서 DOM focus 를 버블로 받는데
-   * 버블링은 Context 경계를 모른다. 중첩 시 focus 거동은 두 렌더러가 갈리며, 그 결정은
-   * 아직 열려 있다 — 여기서 고정하지 않는다.
+   * web은 React Context로 값을 내려보내므로 가장 가까운 Provider가 이긴다 — RN과 같은 계약이다 (`react-native-ui` FormControl.test.tsx의 '중첩' describe).
+   * focus는 이 테스트의 범위가 아니다.
+   * web은 루트에서 DOM focus를 버블로 받는데 버블링은 Context 경계를 모른다.
+   * 중첩 시 focus 거동은 두 렌더러가 갈리며, 그 결정은 아직 열려 있다 — 여기서 고정하지 않는다.
    */
   describe('중첩', () => {
     it('가장 가까운 FormControl 이 이긴다 — 안쪽이 바깥 값을 상속하지 않는다', () => {

@@ -2,15 +2,7 @@ import type { CSSProperties } from 'react';
 
 import type { BoxRadiusValue, BoxSpacingValue, BoxStyleProps, ColorToken } from './Box.types';
 
-/**
- * spacing 토큰 또는 숫자 값을 CSS spacing 값으로 변환합니다.
- *
- * 숫자는 px 단위로 변환하고,
- * 문자열 토큰은 디자인 토큰 CSS 변수로 변환합니다.
- *
- * @param value 변환할 spacing 값
- * @returns CSS spacing 문자열 또는 undefined
- */
+/** spacing 토큰·숫자 → CSS 값, 숫자는 px (`12` → `12px`, `md` → `var(--ds-spacing-md)`) */
 export const spacingToCss = (value: BoxSpacingValue | undefined): string | undefined => {
   if (value === undefined) {
     return undefined;
@@ -23,15 +15,7 @@ export const spacingToCss = (value: BoxSpacingValue | undefined): string | undef
   return `var(--ds-spacing-${value})`;
 };
 
-/**
- * radius 토큰 또는 숫자 값을 CSS border-radius 값으로 변환합니다.
- *
- * 숫자는 px 단위로 변환하고,
- * 문자열 토큰은 디자인 토큰 CSS 변수로 변환합니다.
- *
- * @param value 변환할 radius 값
- * @returns CSS border-radius 문자열 또는 undefined
- */
+/** radius 토큰·숫자 → CSS border-radius 값, 숫자는 px (`24` → `24px`, `md` → `var(--ds-radius-md)`) */
 export const radiusToCss = (value: BoxRadiusValue | undefined): string | undefined => {
   if (value === undefined) {
     return undefined;
@@ -44,15 +28,7 @@ export const radiusToCss = (value: BoxRadiusValue | undefined): string | undefin
   return `var(--ds-radius-${value})`;
 };
 
-/**
- * 컬러 토큰을 디자인 토큰 CSS 변수 문자열로 변환합니다.
- *
- * 예를 들어 `primary.default` 같은 토큰은
- * `var(--ds-primary-default)` 형태로 변환됩니다.
- *
- * @param token 변환할 컬러 토큰
- * @returns CSS 변수 문자열 또는 undefined
- */
+/** color 토큰 → CSS 변수 참조 (`primary.default` → `var(--ds-primary-default)`) */
 export const colorTokenToCssVar = (token: ColorToken | undefined): string | undefined => {
   if (!token) {
     return undefined;
@@ -62,17 +38,9 @@ export const colorTokenToCssVar = (token: ColorToken | undefined): string | unde
 };
 
 /**
- * Box 스타일 props를 기반으로 실제 inline style 객체를 생성합니다.
- *
- * padding, margin, backgroundColor, borderRadius 값을 계산해
- * React에서 사용할 수 있는 CSSProperties 객체로 반환합니다.
- *
- * 우선순위는 다음과 같습니다.
- * - padding: 방향값 > 축약 축값 > 공통값
- * - margin: 방향값 > 축약 축값 > 공통값
- *
- * @param props Box 스타일 계산에 사용할 props
- * @returns 계산된 CSSProperties 객체
+ * Box 스타일 prop → inline style 객체.
+ * padding·margin·backgroundColor·borderRadius 중 값이 있는 선언만 만든다.
+ * padding·margin의 우선순위는 방향값 > 축약 축값 > 공통값이다.
  */
 export const getBoxComputedStyle = ({
   p,

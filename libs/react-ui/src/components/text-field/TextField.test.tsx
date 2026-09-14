@@ -131,12 +131,10 @@ describe('<TextField />', () => {
     });
 
     /**
-     * 소비자가 준 `aria-describedby` 는 helper text 와 **합성**되어 input 에 닿아야 한다.
-     *
-     * 설명은 여러 요소를 가리킬 수 있는 공백 구분 id 목록이다. 둘 중 하나를 버리면
-     * 스크린리더가 설명 하나를 통째로 잃는데, 타입도 런타임도 아무 말을 하지 않는다.
-     *
-     * TextField 가 이 합성의 소유자다 — helper 의 id 를 만드는 유일한 층이기 때문이다.
+     * 소비자가 준 `aria-describedby`는 helper text와 합성되어 input에 닿아야 한다.
+     * 설명은 여러 요소를 가리킬 수 있는 공백 구분 id 목록이다.
+     * 둘 중 하나를 버리면 스크린리더가 설명 하나를 통째로 잃는데, 타입도 런타임도 아무 말을 하지 않는다.
+     * TextField가 이 합성의 소유자다 — helper의 id를 만드는 유일한 층이기 때문이다.
      */
     it('소비자 aria-describedby 를 helper text id 와 합성해 input 에 건다', () => {
       render(
@@ -165,11 +163,9 @@ describe('<TextField />', () => {
   });
 
   /**
-   * `readOnly` 는 ui-core `InputFieldSemanticProps` 가 소유한 공유 시맨틱이고 TextField 에
-   * 타입으로 선언되어 있다. 진짜 입력에 닿지 않으면 타입은 통과하는데 필드는 그대로
-   * 편집 가능한 채 남는다 — 조용한 계약 위반이다.
-   *
-   * `disabled` 와 갈리는 지점이기도 하다: readOnly 는 편집만 막고 포커스와 값 제출은 살린다.
+   * `readOnly`는 ui-core `InputFieldSemanticProps`가 소유한 공유 시맨틱이고 TextField에 타입으로 선언되어 있다.
+   * 진짜 입력에 닿지 않으면 타입은 통과하는데 필드는 그대로 편집 가능한 채 남는다 — 조용한 계약 위반이다.
+   * `disabled`와 갈리는 지점이기도 하다 — readOnly는 편집만 막고 포커스와 값 제출은 살린다.
    */
   describe('prop: readOnly', () => {
     it('readOnly 가 실제 input 에 닿는다 — disabled 로 바뀌지 않는다', () => {
@@ -366,15 +362,15 @@ describe('<TextField />', () => {
 
     it('select 모드는 Select 에 뜻이 없는 입력 전용 prop 을 타입에서 거부한다', () => {
       const elements = [
-        // @ts-expect-error select 의 포커스 대상은 native input 이 아니다
+        // @ts-expect-error select의 포커스 대상은 native input이 아니다
         <TextField key="ref" select label="L" inputRef={() => undefined} />,
-        // @ts-expect-error Select 에는 readOnly 가 없다
+        // @ts-expect-error Select에는 readOnly가 없다
         <TextField key="readOnly" select label="L" readOnly />,
-        // @ts-expect-error Select 에는 multiline 이 없다
+        // @ts-expect-error Select에는 multiline이 없다
         <TextField key="multiline" select label="L" multiline />,
-        // @ts-expect-error Select 에는 rows 가 없다
+        // @ts-expect-error Select에는 rows가 없다
         <TextField key="rows" select label="L" rows={3} />,
-        // @ts-expect-error Select 에는 input type 이 없다
+        // @ts-expect-error Select에는 input type이 없다
         <TextField key="type" select label="L" type="email" />,
       ];
 

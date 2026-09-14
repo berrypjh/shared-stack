@@ -1,16 +1,11 @@
 /**
  * Table·TableScroll 계약.
- *
- * **native HTML table 을 감싸는 최소 wrapper** 다. `<caption>`·`<thead>`·`<tbody>`·`<tfoot>`·
- * `<tr>`·`<th>`·`<td>` 는 소비자가 직접 쓴다 — HTML 이 `<table>` 과 `<tr>` 사이에 다른 요소를
- * 허용하지 않으므로 `TableRow`·`TableCell` 같은 wrapper 는 **시맨틱을 더하지 못하고 공개
- * 심볼만 늘린다**.
- *
- * 아닌 것: grid·spreadsheet·virtualized data grid. `role="grid"` 를 붙이지 않고 셀 간
- * 키보드 내비게이션을 구현하지 않는다 — 단순 data table 은 브라우저가 이미 옳게 읽는다.
- *
- * **정렬 상태는 소비자가 소유한다.** Table 은 정렬 로직·상태를 갖지 않고, `<th aria-sort>` 와
- * 그 안의 `<button>` 이 각자 책임을 진다.
+ * native HTML table을 감싸는 최소 wrapper다.
+ * `<caption>`·`<thead>`·`<tbody>`·`<tfoot>`·`<tr>`·`<th>`·`<td>`는 소비자가 직접 쓴다 — HTML이 `<table>`과 `<tr>` 사이에 다른 요소를 허용하지 않으므로 `TableRow`·`TableCell` 같은 wrapper는 시맨틱을 더하지 못하고 공개 심볼만 늘린다.
+ * grid·spreadsheet·virtualized data grid가 아니다.
+ * `role="grid"`를 붙이지 않고 셀 간 키보드 내비게이션을 구현하지 않는다 — 단순 data table은 브라우저가 이미 옳게 읽는다.
+ * 정렬 상태는 소비자가 소유한다.
+ * Table은 정렬 로직·상태를 갖지 않고, `<th aria-sort>`와 그 안의 `<button>`이 각자 책임을 진다.
  */
 import { createRef } from 'react';
 
@@ -24,7 +19,7 @@ import { Table } from './Table';
 import { tableClasses } from './Table.constants';
 import { TableScroll } from './TableScroll';
 
-/** 최소 유효 table. 헤더 셀은 `scope` 를 가져야 한다. */
+/** 최소 유효 table. 헤더 셀은 `scope`를 가져야 한다. */
 const Basic = () => (
   <Table>
     <caption>2026년 분기 매출</caption>
@@ -173,8 +168,9 @@ describe('<Table />', () => {
     });
 
     /**
-     * caption 은 접근성상 권장이지만 시각 디자인에서는 원치 않는 경우가 많다. 지우는 대신
-     * **시각만 숨긴다** — 이름은 남는다. 저장소의 정본 패턴(`form-control` 의 `hiddenLabel`)을 쓴다.
+     * caption은 접근성상 권장이지만 시각 디자인에서는 원치 않는 경우가 많다.
+     * 지우는 대신 시각만 숨긴다 — 이름은 남는다.
+     * 저장소의 정본 패턴(`form-control`의 `hiddenLabel`)을 쓴다.
      */
     it('시각만 숨기고 접근 가능한 이름은 남긴다', () => {
       render(
@@ -191,17 +187,16 @@ describe('<Table />', () => {
       const table = screen.getByRole('table', { name: '숨은 설명' });
 
       expect(table).toHaveClass(tableClasses.hiddenCaption);
-      // DOM 에서 제거하지 않는다 — 제거하면 이름이 사라진다.
+      // DOM에서 제거하지 않는다 — 제거하면 이름이 사라진다.
       expect(table.querySelector('caption')).toHaveTextContent('숨은 설명');
     });
   });
 
   /**
-   * 정렬은 **합성**이다. Table 이 상태도 로직도 갖지 않으므로 여기서 검사하는 것은
-   * "소비자가 native 하게 조립할 수 있는가" 다.
-   *
-   * 책임 분리: `aria-sort` 는 **`<th>`** 가(정렬된 열이라는 사실), 활성화는 **`<button>`** 이
-   * (누를 수 있는 컨트롤) 진다. 둘을 한 요소에 몰면 스크린리더가 버튼 이름에 상태를 섞어 읽는다.
+   * 정렬은 합성이다.
+   * Table이 상태도 로직도 갖지 않으므로 여기서 검사하는 것은 "소비자가 native하게 조립할 수 있는가"다.
+   * 책임 분리 — `aria-sort`는 `<th>`가(정렬된 열이라는 사실), 활성화는 `<button>`이(누를 수 있는 컨트롤) 진다.
+   * 둘을 한 요소에 몰면 스크린리더가 버튼 이름에 상태를 섞어 읽는다.
    */
   describe('정렬 합성', () => {
     const Sortable = ({ onSort }: { onSort?: () => void }) => (
@@ -267,7 +262,7 @@ describe('<Table />', () => {
       render(<Sortable />);
 
       expect(screen.getAllByRole('columnheader')).toHaveLength(3);
-      // 정렬 불가 열에는 button 도 aria-sort 도 없다.
+      // 정렬 불가 열에는 button도 aria-sort도 없다.
       expect(screen.getByRole('columnheader', { name: '설명' })).not.toHaveAttribute('aria-sort');
     });
 
@@ -290,11 +285,10 @@ describe('<TableScroll />', () => {
   }));
 
   /**
-   * 가로로 넘치는 영역은 **키보드로도 스크롤할 수 있어야 한다** (WCAG 2.1.1). 마우스 휠·드래그만
-   * 되는 영역은 키보드 사용자에게 잘린 내용이 도달 불가가 된다. 그래서 `tabIndex=0` 으로
-   * 포커스를 받고, 포커스 가능한 영역은 이름이 있어야 하므로 `role="region"` + `aria-label` 을 둔다.
-   *
-   * `label` 이 필수인 이유다 — 이름 없는 region 은 스크린리더에서 정체불명의 랜드마크가 된다.
+   * 가로로 넘치는 영역은 키보드로도 스크롤할 수 있어야 한다 (WCAG 2.1.1).
+   * 마우스 휠·드래그만 되는 영역은 키보드 사용자에게 잘린 내용이 도달 불가가 된다.
+   * 그래서 `tabIndex=0`으로 포커스를 받고, 포커스 가능한 영역은 이름이 있어야 하므로 `role="region"` + `aria-label`을 둔다.
+   * `label`이 필수인 이유다 — 이름 없는 region은 스크린리더에서 정체불명의 랜드마크가 된다.
    */
   describe('키보드 스크롤 접근', () => {
     it('포커스를 받을 수 있다', async () => {
@@ -350,7 +344,7 @@ describe('<TableScroll />', () => {
         </TableScroll>,
       );
 
-      // region 이 table 을 감쌌어도 이름·역할이 온전하다.
+      // region이 table을 감쌌어도 이름·역할이 온전하다.
       expect(screen.getByRole('table', { name: '설명' })).toBeInTheDocument();
       expect(screen.getByRole('rowheader', { name: '행' })).toBeInTheDocument();
       expect(screen.getByRole('cell', { name: '값' })).toBeInTheDocument();
@@ -381,8 +375,8 @@ describe('공개 표면', () => {
   });
 
   /**
-   * `<table>` 과 `<tr>` 사이에는 다른 요소가 들어갈 수 없다. 그래서 `TableRow`·`TableCell` 같은
-   * wrapper 는 시맨틱을 더하지 못하고 공개 심볼·카탈로그·번들만 늘린다.
+   * `<table>`과 `<tr>` 사이에는 다른 요소가 들어갈 수 없다.
+   * 그래서 `TableRow`·`TableCell` 같은 wrapper는 시맨틱을 더하지 못하고 공개 심볼·카탈로그·번들만 늘린다.
    */
   it('native 요소를 덮는 speculative wrapper 를 만들지 않는다', () => {
     for (const name of [

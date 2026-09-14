@@ -310,14 +310,12 @@ describe('<InputLabel />', () => {
 
   /**
    * 상태가 겹쳤을 때 어떤 색이 이기는지.
-   *
-   * 클래스가 붙었는지가 아니라 **실제 cascade 결과**를 본다. 상태 클래스는 셋 다 붙어 있고
-   * 사용자가 보는 색은 그중 하나뿐이라, 클래스 존재 검사로는 이 계약을 지킬 수 없다.
-   *
-   * 목표 순서 `disabled > error > focused > 평상시` 의 근거:
-   * - RN `InputLabel.styles.ts` 의 `labelColor` 가 같은 순서다
-   * - 같은 필드의 Input chrome(`boxed-input.scss`)도 disabled 를 가장 앞에 둔다
-   * - disabled 는 "편집 불가" 라는 더 강한 사실이라 오류·포커스보다 먼저 읽혀야 한다
+   * 클래스가 붙었는지가 아니라 실제 cascade 결과를 본다.
+   * 상태 클래스는 셋 다 붙어 있고 사용자가 보는 색은 그중 하나뿐이라, 클래스 존재 검사로는 이 계약을 지킬 수 없다.
+   * 목표 순서 `disabled > error > focused > 평상시`의 근거는 다음과 같다.
+   * - RN `InputLabel.styles.ts`의 `labelColor`가 같은 순서다
+   * - 같은 필드의 Input chrome(`boxed-input.scss`)도 disabled를 가장 앞에 둔다
+   * - disabled는 "편집 불가"라는 더 강한 사실이라 오류·포커스보다 먼저 읽혀야 한다
    */
   describe('동시 상태 색 우선순위', () => {
     const STATE_CLASSES = [

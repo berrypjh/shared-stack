@@ -38,8 +38,8 @@ describe('<Button />', () => {
   });
 
   /**
-   * Button은 자체 prop만 구조분해하고 나머지를 ButtonBase로 흘린다. 시맨틱 어휘가 그 목록에
-   * 잘못 들어가면 ButtonBase 테스트는 그대로 통과하고 Button만 조용히 prop을 삼킨다.
+   * Button은 자체 prop만 구조분해하고 나머지를 ButtonBase로 흘린다.
+   * 시맨틱 어휘가 그 목록에 잘못 들어가면 ButtonBase 테스트는 그대로 통과하고 Button만 조용히 prop을 삼킨다.
    * conformance `propsSpread`는 임의의 `data-*` 하나만 보므로 이 경로를 덮지 않는다.
    */
   describe('시맨틱 prop 전달', () => {
@@ -208,9 +208,9 @@ describe('<Button />', () => {
     });
 
     /**
-     * center loading 은 라벨을 `opacity: 0` 으로 가립니다 — `display: none` 이 아니라서
-     * 접근성 트리에 남습니다. 세 위치를 모두 도는 이유는 위치마다 loader 가 라벨 앞뒤로
-     * 옮겨 다니기 때문입니다: 어느 배치에서도 이름이 사라지거나 두 번 읽히면 안 됩니다.
+     * center loading은 라벨을 `opacity: 0`으로 가린다 — `display: none`이 아니라서 접근성 트리에 남는다.
+     * 세 위치를 모두 도는 이유는 위치마다 loader가 라벨 앞뒤로 옮겨 다니기 때문이다.
+     * 어느 배치에서도 이름이 사라지거나 두 번 읽히면 안 된다.
      */
     it.each([['start'], ['center'], ['end']] as const)(
       'loadingPosition=%s 에서도 접근 가능한 이름이 정확히 라벨 하나다',
@@ -221,7 +221,7 @@ describe('<Button />', () => {
           </Button>,
         );
 
-        // 이름이 "Submit Submit" 이 되면 exact 매치가 실패한다.
+        // 이름이 "Submit Submit"이 되면 exact 매치가 실패한다.
         expect(screen.getByRole('button', { name: 'Submit' })).toBeInTheDocument();
       },
     );

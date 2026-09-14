@@ -198,11 +198,11 @@ describe('<Fab />', () => {
 });
 
 /**
- * 타입 수준 계약. `tsc -p tsconfig.spec.json` 이 검증합니다.
- *
- * shape 이 곧 의미다 — circular 은 보이는 글자가 없는 아이콘 전용 액션이고, extended 는
- * 보이는 라벨이 이름을 만든다. RN 은 같은 의미를 discriminated union 으로 이미 강제한다.
- * 여기서는 같은 **의미**를 web 의 이름 통로(`aria-label`/`aria-labelledby`)로 표현한다.
+ * 타입 수준 계약.
+ * `tsc -p tsconfig.spec.json`이 검증한다.
+ * shape이 곧 의미다 — circular은 보이는 글자가 없는 아이콘 전용 액션이고, extended는 보이는 라벨이 이름을 만든다.
+ * RN은 같은 의미를 discriminated union으로 이미 강제한다.
+ * 여기서는 같은 의미를 web의 이름 통로(`aria-label`/`aria-labelledby`)로 표현한다.
  */
 type Expect<T extends true> = T;
 type Accepts<T> = T extends FabRenderableProps ? true : false;
@@ -218,7 +218,7 @@ export type CircularRequiresIconAndName = [
   Expect<Accepts<{ 'aria-label': 'Add' }> extends false ? true : false>,
   // 이름 없는 아이콘 전용 컨트롤은 스크린리더에서 정체불명이 된다.
   Expect<Accepts<{ icon: ReactNode }> extends false ? true : false>,
-  // 원형 Fab 에 보이는 라벨을 넣으면 원판 밖으로 새거나 잘린다 — extended 를 써야 한다.
+  // 원형 Fab에 보이는 라벨을 넣으면 원판 밖으로 새거나 잘린다 — extended를 써야 한다.
   Expect<
     Accepts<{ icon: ReactNode; 'aria-label': 'Add'; children: 'Create' }> extends false
       ? true
@@ -229,18 +229,18 @@ export type CircularRequiresIconAndName = [
 export type ExtendedRequiresVisibleLabel = [
   Expect<Accepts<{ shape: 'extended'; children: 'Create' }>>,
   Expect<Accepts<{ shape: 'extended'; children: 'Create'; icon: ReactNode }>>,
-  // 보이는 라벨이 이름이 되므로 명시 aria 는 선택이다.
+  // 보이는 라벨이 이름이 되므로 명시 aria는 선택이다.
   Expect<Accepts<{ shape: 'extended'; children: 'Create'; 'aria-label': 'Create project' }>>,
   Expect<Accepts<{ shape: 'extended' }> extends false ? true : false>,
 ];
 
-/** 이름·shape 요구가 기존 다형성·auto-anchor·ref·web prop 을 깨뜨리지 않는다. */
+/** 이름·shape 요구가 기존 다형성·auto-anchor·ref·web prop을 깨뜨리지 않는다 */
 export type KeepsExistingWebContract = [
   Expect<Accepts<{ icon: ReactNode; 'aria-label': 'Docs'; href: '/docs' }>>,
   Expect<Accepts<{ icon: ReactNode; 'aria-label': 'Docs'; component: 'a'; href: '/docs' }>>,
   Expect<Accepts<{ icon: ReactNode; 'aria-label': 'Add'; ref: Ref<HTMLButtonElement> }>>,
   Expect<Accepts<{ shape: 'extended'; children: 'Create'; className: 'x'; disabled: true }>>,
-  // union 이 any 로 뭉개져 공허하게 통과하지 않는다.
+  // union이 any로 뭉개져 공허하게 통과하지 않는다.
   Expect<IsAny<FabRenderableProps> extends false ? true : false>,
 ];
 
@@ -252,7 +252,7 @@ export type RejectsUnknownVocabulary = [
   Expect<
     Accepts<{ icon: ReactNode; 'aria-label': 'A'; color: 'error' }> extends false ? true : false
   >,
-  // Fab 은 항상 contained 다 — variant·fullWidth 는 공개 표면이 아니다.
+  // Fab은 항상 contained다 — variant·fullWidth는 공개 표면이 아니다.
   Expect<HasProp<'variant'> extends false ? true : false>,
   Expect<HasProp<'fullWidth'> extends false ? true : false>,
 ];

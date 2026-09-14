@@ -36,12 +36,11 @@ const matrixStyle = {
 const stackStyle = { display: 'grid', gap: '8px', justifyItems: 'start' } as const;
 
 /**
- * 정적으로 그릴 수 있는 상태 전부. hover·pressed 는 여기 없다 — CSS `:hover`·`:active` 는
- * play 의 합성 이벤트로 켜지지 않아 스크린샷에 담기지 않고, 그 규칙은 `Checkbox.test.tsx` 의
- * 스타일 계약이 소스 수준에서 본다. pressed 는 시각이 없다(색이 아니라 위치라는 토큰 결정).
- * 포커스는 `Keyboard` 가 play 로 켠다.
- *
- * 테마마다 반복되므로 id 를 쓰지 않는다 — 문서 안에서 id 가 겹친다.
+ * 정적으로 그릴 수 있는 상태 전부.
+ * hover·pressed는 여기 없다 — CSS `:hover`·`:active`는 play의 합성 이벤트로 켜지지 않아 스크린샷에 담기지 않고, 그 규칙은 `Checkbox.test.tsx`의 스타일 계약이 소스 수준에서 본다.
+ * pressed는 시각이 없다 (색이 아니라 위치라는 토큰 결정).
+ * 포커스는 `Keyboard`가 play로 켠다.
+ * 테마마다 반복되므로 id를 쓰지 않는다 — 문서 안에서 id가 겹친다.
  */
 const CheckboxMatrix = () => (
   <div style={matrixStyle}>
@@ -65,15 +64,15 @@ const CheckboxMatrix = () => (
 
 export const Playground: Story = {};
 
-/** 등록된 모든 테마에서 같은 상태 매트릭스를 한 스크린샷에 담는다. */
+/** 등록된 모든 테마에서 같은 상태 매트릭스를 한 스크린샷에 담는다 */
 export const ThemeMatrix: Story = {
   parameters: themeGalleryParameters,
   render: () => <ThemeGallery>{() => <CheckboxMatrix />}</ThemeGallery>,
 };
 
 /**
- * `indeterminate` 는 DOM property 다. 누르면 브라우저가 지우고 checked 를 뒤집는다 —
- * 컴포넌트는 그 뒤 소비자가 다시 렌더할 때 prop 을 다시 적용할 뿐이다.
+ * `indeterminate`는 DOM property다.
+ * 누르면 브라우저가 지우고 checked를 뒤집는다 — 컴포넌트는 그 뒤 소비자가 다시 렌더할 때 prop을 다시 적용할 뿐이다.
  */
 export const Indeterminate: Story = {
   parameters: { chromatic: { prefersReducedMotion: 'reduce' } },
@@ -91,7 +90,7 @@ export const Indeterminate: Story = {
   },
 };
 
-/** FormControl 의 `error` 를 상속해 `aria-invalid` 를 말하고, 헬퍼는 `aria-describedby` 로 잇는다. */
+/** FormControl의 `error`를 상속해 `aria-invalid`를 말하고, 헬퍼는 `aria-describedby`로 잇는다 */
 export const Validation: Story = {
   name: 'Validation / Description',
   render: () => (
@@ -115,8 +114,9 @@ export const LongLabel: Story = {
 };
 
 /**
- * 키보드·라벨 클릭은 native 가 소유한다. Tab 이 들어오면 `:focus-visible` outline 이 보이고
- * Space 가 토글하며, 보이는 라벨을 누르면 토글된다. (키 입력은 user-event 시뮬레이션이다.)
+ * 키보드·라벨 클릭은 native가 소유한다.
+ * Tab이 들어오면 `:focus-visible` outline이 보이고 Space가 토글하며, 보이는 라벨을 누르면 토글된다.
+ * 키 입력은 user-event 시뮬레이션이다.
  */
 export const Keyboard: Story = {
   parameters: { chromatic: { prefersReducedMotion: 'reduce' } },
@@ -144,8 +144,9 @@ export const Keyboard: Story = {
 };
 
 /**
- * Windows 고대비. 이 모드에서는 native 외형으로 돌아가 OS 가 경계·체크·혼합·비활성을 시스템
- * 색으로 그린다. Chromatic 이 `forcedColors` 로 찍고, 로컬에서는 DevTools 렌더링 에뮬레이션으로 본다.
+ * Windows 고대비.
+ * 이 모드에서는 native 외형으로 돌아가 OS가 경계·체크·혼합·비활성을 시스템 색으로 그린다.
+ * Chromatic이 `forcedColors`로 찍고, 로컬에서는 DevTools 렌더링 에뮬레이션으로 본다.
  */
 export const ForcedColors: Story = {
   parameters: { chromatic: { forcedColors: 'active', prefersReducedMotion: 'reduce' } },

@@ -14,11 +14,10 @@ import { Radio } from './Radio';
 import { radioClasses } from './Radio.constants';
 
 /**
- * Radio·RadioGroup 이 기대는 native `<input type="radio">`·`<fieldset>` 의 사실.
- *
- * 컴포넌트는 이 동작을 JS 로 다시 만들지 않는다. 먼저 jsdom 이 무엇을 모델링하는지 고정한다.
- * 방향키·Tab 그룹 정지는 user-event 가 재현하지만 그것은 브라우저가 아니다 — 실제 브라우저
- * 동작은 스토리 play 가 다시 본다.
+ * Radio·RadioGroup이 기대는 native `<input type="radio">`·`<fieldset>`의 사실.
+ * 컴포넌트는 이 동작을 JS로 다시 만들지 않는다.
+ * 먼저 jsdom이 무엇을 모델링하는지 고정한다.
+ * 방향키·Tab 그룹 정지는 user-event가 재현하지만 그것은 브라우저가 아니다 — 실제 브라우저 동작은 스토리 play가 다시 본다.
  */
 describe('native radio 사실 (characterization)', () => {
   const Group = ({ disabled = false }: { disabled?: boolean }) => (
@@ -140,7 +139,7 @@ describe('<Radio />', () => {
 
   const radio = (name = 'probe') => screen.getByRole<HTMLInputElement>('radio', { name });
 
-  // Checkbox 와 같은 배분이다: className 은 루트 label, 나머지 prop 과 ref 는 native input.
+  // Checkbox와 같은 배분이다. className은 루트 label로, 나머지 prop과 ref는 native input으로 간다.
   describeConformance(<Radio value="a" aria-label="probe" />, () => ({
     render,
     classes: radioClasses,
@@ -195,11 +194,11 @@ describe('<Radio />', () => {
     });
 
     it('이름·value 없이는 컴파일되지 않는다', () => {
-      // @ts-expect-error — 보이는 라벨도 aria 이름도 없다.
+      // @ts-expect-error 보이는 라벨도 aria 이름도 없다
       void (<Radio value="a" />);
-      // @ts-expect-error — value 는 필수다.
+      // @ts-expect-error value는 필수다
       void (<Radio aria-label="probe" />);
-      // @ts-expect-error — type 은 Radio 가 소유한다.
+      // @ts-expect-error type은 Radio가 소유한다
       void (<Radio value="a" aria-label="probe" type="checkbox" />);
       void (<Radio value="a">일반</Radio>);
     });
@@ -281,8 +280,8 @@ describe('<Radio />', () => {
 });
 
 /**
- * 스타일 계약 — Checkbox 와 같은 방식으로 컴파일된 CSS 텍스트를 읽는다.
- * 실제 브라우저에서의 포커스·방향키는 스토리 play 가 본다.
+ * 스타일 계약 — Checkbox와 같은 방식으로 컴파일된 CSS 텍스트를 읽는다.
+ * 실제 브라우저에서의 포커스·방향키는 스토리 play가 본다.
  */
 describe('radio.scss', () => {
   const css = compile(

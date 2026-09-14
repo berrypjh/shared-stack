@@ -6,9 +6,8 @@ import { Avatar } from './Avatar';
 
 /**
  * 결정적 스토리만 둔다.
- *
- * Avatar 는 상호작용이 없어 hover·pressed·focus 스토리가 없다. 이미지 실패는 **존재하지 않는
- * URL** 로 재현한다 — 네트워크에 기대지 않으므로 Chromatic 에서도 같은 결과가 나온다.
+ * Avatar는 상호작용이 없어 hover·pressed·focus 스토리가 없다.
+ * 이미지 실패는 존재하지 않는 URL로 재현한다 — 네트워크에 기대지 않으므로 Chromatic에서도 같은 결과가 나온다.
  */
 const LOADABLE =
   'data:image/svg+xml;utf8,' +
@@ -16,7 +15,7 @@ const LOADABLE =
     `<svg xmlns="http://www.w3.org/2000/svg" width="96" height="96"><rect width="96" height="96" fill="#10B981"/><circle cx="48" cy="36" r="16" fill="#F2F4F7"/><ellipse cx="48" cy="84" rx="28" ry="22" fill="#F2F4F7"/></svg>`,
   );
 
-/** 절대 로드되지 않는다 — data URI 라 네트워크도 타지 않고 즉시 error 로 떨어진다. */
+/** 절대 로드되지 않는다 — data URI라 네트워크도 타지 않고 즉시 error로 떨어진다 */
 const BROKEN = 'data:image/png;base64,!!!not-an-image!!!';
 
 const meta = {
@@ -52,22 +51,20 @@ export const Default: Story = {
   args: { src: LOADABLE },
 };
 
-/** `src` 가 없으면 이니셜이 그려진다. `alt` 가 이름이 되고 시각 글자는 트리에서 감춰진다. */
+/** `src`가 없으면 이니셜이 그려진다. `alt`가 이름이 되고 시각 글자는 트리에서 감춰진다. */
 export const Fallback: Story = {
   args: { src: undefined },
 };
 
 /**
- * 이미지가 실패하면 fallback 으로 넘어간다.
- *
- * `src` 를 주었는데도 이니셜이 보이는 것이 이 스토리의 계약이다 — 깨진 이미지 아이콘이
- * 남지 않아야 한다.
+ * 이미지가 실패하면 fallback으로 넘어간다.
+ * `src`를 주었는데도 이니셜이 보이는 것이 이 스토리의 계약이다 — 깨진 이미지 아이콘이 남지 않아야 한다.
  */
 export const ImageError: Story = {
   args: { src: BROKEN },
 };
 
-/** 이름 없는 장식 Avatar. `alt=""` 라 접근성 트리에 아무것도 남기지 않는다. */
+/** 이름 없는 장식 Avatar. `alt=""`라 접근성 트리에 아무것도 남기지 않는다. */
 export const Decorative: Story = {
   args: { src: LOADABLE, alt: '' },
 };
@@ -94,8 +91,8 @@ export const Shapes: Story = {
 };
 
 /**
- * 이니셜 Avatar 의 면·글자는 테마를 따라 움직인다 (`background.grey` / `text.default`).
- * 사진 Avatar 는 테마와 무관하므로 여기서는 fallback 만 본다.
+ * 이니셜 Avatar의 면·글자는 테마를 따라 움직인다 (`background.grey` / `text.default`).
+ * 사진 Avatar는 테마와 무관하므로 여기서는 fallback만 본다.
  */
 export const ThemeMatrix: Story = {
   args: { src: undefined },
@@ -116,9 +113,8 @@ export const ThemeMatrix: Story = {
 
 /**
  * 경계 조건.
- *
  * 상자는 고정이고 넘치는 이니셜만 잘린다 — 긴 글자가 원을 밀어내 레이아웃을 흔들지 않는다.
- * fallback 이 아예 없으면 빈 면이 자리만 지킨다.
+ * fallback이 아예 없으면 빈 면이 자리만 지킨다.
  */
 export const EdgeCases: Story = {
   args: { src: undefined },

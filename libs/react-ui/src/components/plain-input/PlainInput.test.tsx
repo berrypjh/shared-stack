@@ -9,11 +9,9 @@ import { PlainInput } from './PlainInput';
 import { plainInputClasses } from './PlainInput.constants';
 
 /**
- * PlainInput 는 `InputBase` 에 밑줄 클래스를 더하는 시각 래퍼다.
- *
- * 동작은 전부 `InputBase` 가 가지고 그 테스트가 지킨다 — 여기서 같은 것을 다시 확인하면
- * 래퍼가 얇다는 사실이 아니라 테스트 개수만 늘어난다. 그래서 **래퍼 고유의 계약**만 본다:
- * 클래스 합성과, 받은 것을 그대로 넘기는지.
+ * PlainInput은 `InputBase`에 밑줄 클래스를 더하는 시각 래퍼다.
+ * 동작은 전부 `InputBase`가 가지고 그 테스트가 지킨다 — 여기서 같은 것을 다시 확인하면 래퍼가 얇다는 사실이 아니라 테스트 개수만 늘어난다.
+ * 그래서 래퍼 고유의 계약만 본다 — 클래스 합성과, 받은 것을 그대로 넘기는지.
  */
 describe('<PlainInput />', () => {
   const { render } = createRenderer();

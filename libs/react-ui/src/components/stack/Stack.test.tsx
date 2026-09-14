@@ -67,11 +67,9 @@ describe('<Stack />', () => {
   });
 
   /**
-   * 계약이 정한 기본값은 **두 가지뿐**이다: `display: flex` 와 세로 축.
-   *
-   * `flex-direction` 을 항상 내보내는 이유는 CSS 기본값이 `row` 이기 때문이다 — RN Yoga 기본값
-   * (`column`)과 갈리므로 web 렌더러는 기본값에 기댈 수 없다. 나머지 축은 주지 않으면 건드리지
-   * 않는다 (Box 의 "미지정은 미적용" 과 같은 규칙).
+   * 계약이 정한 기본값은 `display: flex`와 세로 축 두 가지뿐이다.
+   * `flex-direction`을 항상 내보내는 이유는 CSS 기본값이 `row`이기 때문이다 — RN Yoga 기본값(`column`)과 갈리므로 web 렌더러는 기본값에 기댈 수 없다.
+   * 나머지 축은 주지 않으면 건드리지 않는다 (Box의 "미지정은 미적용"과 같은 규칙).
    */
   describe('기본 시맨틱', () => {
     it('display: flex 와 세로 축을 적용해야 한다', () => {
@@ -113,7 +111,7 @@ describe('<Stack />', () => {
     it('spacing 토큰을 디자인 토큰 CSS 변수로 변환해야 한다', () => {
       render(<Stack gap="md">Hello</Stack>);
 
-      // 브라우저가 계산한 px 가 아니라 변수 참조 자체가 계약이다 — 값은 테마가 정한다.
+      // 브라우저가 계산한 px가 아니라 변수 참조 자체가 계약이다 — 값은 테마가 정한다.
       expect(screen.getByText('Hello').style.gap).toBe('var(--ds-spacing-md)');
     });
 
@@ -136,7 +134,7 @@ describe('<Stack />', () => {
     });
   });
 
-  /** 계약 어휘(`start`·`end`)를 CSS 어휘(`flex-start`·`flex-end`)로 푸는 것은 렌더러 몫이다. */
+  /** 계약 어휘(`start`·`end`)를 CSS 어휘(`flex-start`·`flex-end`)로 푸는 것은 렌더러 몫이다 */
   describe('align', () => {
     it.each([
       ['start', 'flex-start'],
@@ -170,7 +168,7 @@ describe('<Stack />', () => {
       expect(screen.getByText('Hello').style.flexWrap).toBe('wrap');
     });
 
-    /** 명시한 `false` 는 미지정과 다르다 — `gap={0}` 과 같은 취급이다. */
+    /** 명시한 `false`는 미지정과 다르다 — `gap={0}`과 같은 취급이다 */
     it('wrap={false} 는 nowrap 을 명시해야 한다', () => {
       render(<Stack wrap={false}>Hello</Stack>);
 
@@ -179,8 +177,8 @@ describe('<Stack />', () => {
   });
 
   /**
-   * 소비자 `style` 이 **마지막에 이긴다**. Stack 이 계산한 레이아웃도 덮을 수 있어야 escape
-   * hatch 가 성립한다 (Box 와 같은 순서).
+   * 소비자 `style`이 마지막에 이긴다.
+   * Stack이 계산한 레이아웃도 덮을 수 있어야 escape hatch가 성립한다 (Box와 같은 순서).
    */
   describe('style 우선순위', () => {
     it('소비자 style 이 계산된 레이아웃을 이겨야 한다', () => {
@@ -212,8 +210,8 @@ describe('<Stack />', () => {
   });
 
   /**
-   * 시맨틱 prop 은 **스타일로만** 드러나야 한다. DOM 속성으로 새면 `<div align>` 처럼 폐기된
-   * HTML 속성이 되살아나거나 React 가 알 수 없는 속성 경고를 낸다.
+   * 시맨틱 prop은 스타일로만 드러나야 한다.
+   * DOM 속성으로 새면 `<div align>`처럼 폐기된 HTML 속성이 되살아나거나 React가 알 수 없는 속성 경고를 낸다.
    */
   describe('prop 누수', () => {
     it('시맨틱 prop 을 DOM 속성으로 내보내지 않아야 한다', () => {
@@ -234,8 +232,8 @@ describe('<Stack />', () => {
   });
 
   /**
-   * Stack 은 비상호작용 레이아웃 primitive 다. 시맨틱을 **지어내지 않고**, 소비자가 준 것은
-   * 그대로 전달한다.
+   * Stack은 비상호작용 레이아웃 primitive다.
+   * 시맨틱을 지어내지 않고, 소비자가 준 것은 그대로 전달한다.
    */
   describe('접근성', () => {
     it('소비자가 준 접근성 prop 을 전달해야 한다', () => {
@@ -271,16 +269,13 @@ describe('<Stack />', () => {
     });
   });
 
-  /**
-   * 상태 API 가 없다는 사실을 타입으로 고정한다 — `tsc -p tsconfig.spec.json` 이 확인하고,
-   * 생기면 "unused directive" 로 실패한다.
-   */
+  /** 상태 API가 없다는 사실을 타입으로 고정한다 — `tsc -p tsconfig.spec.json`이 확인하고, 생기면 "unused directive"로 실패한다 */
   describe('상호작용 API 가 없다', () => {
     it('상태 prop 을 받지 않는다', () => {
       const nodes = [
         // @ts-expect-error 레이아웃 컨테이너에 눌림 상태가 없다
         <Stack key="pressed" pressed />,
-        // @ts-expect-error hover 상태를 prop 으로 두지 않는다
+        // @ts-expect-error hover 상태를 prop으로 두지 않는다
         <Stack key="hovered" hovered />,
         // @ts-expect-error 비활성화할 동작이 없다
         <Stack key="disabled" disabled />,
@@ -291,13 +286,13 @@ describe('<Stack />', () => {
 
     it('Box 의 visual prop 과 자식 자리 prop 을 받지 않는다', () => {
       const nodes = [
-        // @ts-expect-error 여백·면은 Box 가 가진다
+        // @ts-expect-error 여백·면은 Box가 가진다
         <Stack key="p" p="md" />,
-        // @ts-expect-error 같은 이유로 Box 가 가진다
+        // @ts-expect-error 같은 이유로 Box가 가진다
         <Stack key="bg" bg="background.surface" />,
         // @ts-expect-error 자식이 얼마나 자라는지는 자식이 정한다
         <Stack key="grow" grow={1} />,
-        // @ts-expect-error 2차원 배치는 Stack 의 역할이 아니다
+        // @ts-expect-error 2차원 배치는 Stack의 역할이 아니다
         <Stack key="columns" columns={3} />,
       ];
 

@@ -17,10 +17,9 @@ import { Checkbox } from './Checkbox';
 import { checkboxClasses } from './Checkbox.constants';
 
 /**
- * Checkbox 가 기대는 native `<input type="checkbox">` 의 사실.
- *
- * 컴포넌트는 이 동작을 JS 로 다시 만들지 않는다 — 그래서 먼저 테스트 환경(jsdom)이 이 사실을
- * 실제로 모델링하는지 고정한다. 여기서 깨지면 아래 컴포넌트 테스트의 근거가 사라진다.
+ * Checkbox가 기대는 native `<input type="checkbox">`의 사실.
+ * 컴포넌트는 이 동작을 JS로 다시 만들지 않는다 — 그래서 먼저 테스트 환경(jsdom)이 이 사실을 실제로 모델링하는지 고정한다.
+ * 여기서 깨지면 아래 컴포넌트 테스트의 근거가 사라진다.
  */
 describe('native checkbox 사실 (characterization)', () => {
   it('indeterminate 는 attribute 가 아니라 DOM property 다', () => {
@@ -111,8 +110,8 @@ describe('<Checkbox />', () => {
 
   const box = () => screen.getByRole<HTMLInputElement>('checkbox');
 
-  // className 은 루트 label 로, 나머지 prop 과 ref 는 native input 으로 간다. 그래서
-  // "className 과 data-* 가 같은 요소에 있다"를 전제하는 두 항목은 여기 해당하지 않는다.
+  // className은 루트 label로, 나머지 prop과 ref는 native input으로 간다.
+  // 그래서 "className과 data-*가 같은 요소에 있다"를 전제하는 두 항목은 여기 해당하지 않는다.
   describeConformance(<Checkbox aria-label="probe" />, () => ({
     render,
     classes: checkboxClasses,
@@ -163,9 +162,9 @@ describe('<Checkbox />', () => {
     });
 
     it('접근 가능한 이름 없이는 컴파일되지 않는다', () => {
-      // @ts-expect-error — 보이는 라벨도 aria 이름도 없다.
+      // @ts-expect-error 보이는 라벨도 aria 이름도 없다
       void (<Checkbox />);
-      // @ts-expect-error — type 은 Checkbox 가 소유한다.
+      // @ts-expect-error type은 Checkbox가 소유한다
       void (<Checkbox aria-label="probe" type="radio" />);
       void (<Checkbox>약관 동의</Checkbox>);
       void (<Checkbox aria-labelledby="terms-title" />);
@@ -324,8 +323,8 @@ describe('<Checkbox />', () => {
     });
 
     /**
-     * 그룹의 "필수"는 적어도 하나를 고르라는 뜻이고, native `required` 는 이 체크박스 자체를
-     * 체크하라는 뜻이다. 둘을 이어 붙이면 그룹 안의 모든 체크박스가 필수가 된다.
+     * 그룹의 "필수"는 적어도 하나를 고르라는 뜻이고, native `required`는 이 체크박스 자체를 체크하라는 뜻이다.
+     * 둘을 이어 붙이면 그룹 안의 모든 체크박스가 필수가 된다.
      */
     it('required 는 상속하지 않는다', () => {
       render(
@@ -414,9 +413,9 @@ describe('<Checkbox />', () => {
 });
 
 /**
- * 스타일 계약. jsdom 은 레이아웃·포커스 링을 그리지 않으므로 컴파일된 CSS 텍스트를 읽는다
- * (`forcedColors.test.ts`·`inputVariantStates.test.ts` 와 같은 방식). 실제 브라우저에서의
- * 포커스 표시는 스토리의 play 가 본다.
+ * 스타일 계약.
+ * jsdom은 레이아웃·포커스 링을 그리지 않으므로 컴파일된 CSS 텍스트를 읽는다 (`forcedColors.test.ts`·`inputVariantStates.test.ts`와 같은 방식).
+ * 실제 브라우저에서의 포커스 표시는 스토리의 play가 본다.
  */
 describe('checkbox.scss', () => {
   const css = compile(

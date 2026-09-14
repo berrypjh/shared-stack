@@ -614,14 +614,13 @@ describe('<Select />', () => {
   });
 
   /**
-   * 선택된 위젯 모델: APG select-only combobox.
-   *
-   * DOM 포커스는 언제나 trigger(`role="combobox"`)에 남고, 목록 안의 활성 위치는
-   * `aria-activedescendant` 로 알린다. option 은 탭 순서에 없다.
+   * 선택된 위젯 모델은 APG select-only combobox다.
+   * DOM 포커스는 언제나 trigger(`role="combobox"`)에 남고, 목록 안의 활성 위치는 `aria-activedescendant`로 알린다.
+   * option은 탭 순서에 없다.
    */
   describe('keyboard and focus model', () => {
-    // Fragment 요소여야 한다 — Select 는 children 을 훑어 `value` 를 가진 요소만 option 으로 쓰고,
-    // 컴포넌트 요소(`{fruits}`)는 펼치지 않는다.
+    // Fragment 요소여야 한다.
+    // Select는 children을 훑어 `value`를 가진 요소만 option으로 쓰고, 컴포넌트 요소(`{fruits}`)는 펼치지 않는다.
     const fruits = (
       <React.Fragment>
         <MenuItem value="apple">Apple</MenuItem>

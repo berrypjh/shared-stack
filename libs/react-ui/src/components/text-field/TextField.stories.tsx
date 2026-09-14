@@ -142,10 +142,10 @@ export const Disabled: Story = {
 };
 
 /**
- * `readOnly` 와 `disabled` 를 나란히 둔다 — 둘은 다른 상태다.
- *
- * readOnly 는 편집만 막고 포커스·탐색·값 제출은 살린다. disabled 는 셋 다 막고 비활성으로
- * 고지된다. 시각이 거의 같아서 회귀가 눈에 띄지 않으므로 한 화면에서 비교한다.
+ * `readOnly`와 `disabled`를 나란히 둔다 — 둘은 다른 상태다.
+ * readOnly는 편집만 막고 포커스·탐색·값 제출은 살린다.
+ * disabled는 셋 다 막고 비활성으로 고지된다.
+ * 시각이 거의 같아서 회귀가 눈에 띄지 않으므로 한 화면에서 비교한다.
  */
 export const ReadOnly: Story = {
   render: () => (
@@ -255,7 +255,7 @@ export const WithSelect: Story = {
       </TextField>
     </div>
   ),
-  // select 모드의 목록도 라벨로 이름을 갖고, Escape 는 포커스를 trigger 에 둔다.
+  // select 모드의 목록도 라벨로 이름을 갖고, Escape는 포커스를 trigger에 둔다.
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const trigger = canvas.getByRole('combobox', { name: 'Notification frequency' });
@@ -376,14 +376,11 @@ const themeLabel = (name: string) =>
 
 /**
  * 등록된 모든 테마를 한 화면에 나란히 세운다.
- *
- * 테마마다 스토리를 복사하면 design-tokens 에 테마가 늘어도 Storybook 만 조용히 낡는다 —
- * 툴바가 이미 겪은 문제다. 여기서는 `themes` 레지스트리를 순회하므로 새 테마가 자동으로 들어온다.
- *
- * 툴바 데코레이터를 끄는 것은 **정확성 때문**이다. light 는 CSS 선택자가 `:root` 하나뿐이라
- * `data-theme="light"` 에 대응하는 규칙이 없다 — 바깥이 dark 로 감싸여 있으면 light 칸이
- * dark 를 물려받아 매트릭스가 거짓말을 한다. 데코레이터를 끄면 `:root` 가 light 를 맡고
- * 나머지 여섯은 각자의 `data-theme` 로 스코프된다.
+ * 테마마다 스토리를 복사하면 design-tokens에 테마가 늘어도 Storybook만 조용히 낡는다 — 툴바가 이미 겪은 문제다.
+ * 여기서는 `themes` 레지스트리를 순회하므로 새 테마가 자동으로 들어온다.
+ * 툴바 데코레이터를 끄는 것은 정확성 때문이다.
+ * light는 CSS 선택자가 `:root` 하나뿐이라 `data-theme="light"`에 대응하는 규칙이 없다 — 바깥이 dark로 감싸여 있으면 light 칸이 dark를 물려받아 매트릭스가 거짓말을 한다.
+ * 데코레이터를 끄면 `:root`가 light를 맡고 나머지 여섯은 각자의 `data-theme`로 스코프된다.
  */
 export const ThemeMatrix: Story = {
   parameters: {

@@ -98,9 +98,8 @@ export const Default: Story = {
 };
 
 /**
- * `variant` 는 chrome 을 **컴포넌트 정체성**으로 고른다 — FormControl 의 `variant` 가 자식
- * Input 의 외형을 바꾸지 않는다. 그래서 각 열에 실제로 그 variant 의 Input 을 세운다.
- * (`TextField` 는 이 매핑을 대신 해 준다.)
+ * `variant`는 chrome을 컴포넌트 정체성으로 고른다 — FormControl의 `variant`가 자식 Input의 외형을 바꾸지 않는다.
+ * 그래서 각 열에 실제로 그 variant의 Input을 세운다 (`TextField`는 이 매핑을 대신 해 준다).
  */
 export const AllVariants: Story = {
   render: () => (
@@ -278,15 +277,11 @@ export const WithLongText: Story = {
 };
 
 /**
- * 라벨·설명·오류가 각각 **누구 소유인지** 보여준다.
- *
+ * 라벨·설명·오류가 각각 누구 소유인지 보여준다.
  * - 이름: `InputLabel htmlFor` ↔ Input `id`
  * - 설명: `FormHelperText id` ↔ Input `aria-describedby`
- * - 오류 고지: `FormControl error` → InputBase 가 native 요소에 `aria-invalid` 를 단다.
- *   스토리에서 손으로 다시 달지 않는다 — 소유자가 둘로 보이면 계약이 흐려진다.
- * - 필수: `FormControl required` → native `required`(암묵 `aria-required`).
- *   라벨의 `*` 는 `aria-hidden` 이라 이름을 오염시키지 않는 **시각 표시**다.
- *
+ * - 오류 고지: `FormControl error` → InputBase가 native 요소에 `aria-invalid`를 단다, 스토리에서 손으로 다시 달지 않는다 (소유자가 둘로 보이면 계약이 흐려진다)
+ * - 필수: `FormControl required` → native `required`(암묵 `aria-required`), 라벨의 `*`는 `aria-hidden`이라 이름을 오염시키지 않는 시각 표시다
  * 오류는 색만으로 전달되지 않는다 — 읽을 수 있는 문구가 설명으로 붙는다 (WCAG 1.4.1).
  */
 export const A11y: Story = {
@@ -312,7 +307,7 @@ export const A11y: Story = {
       <FormControl disabled>
         <InputLabel htmlFor="a11y-disabled">Account ID</InputLabel>
         <FilledInput id="a11y-disabled" value="USR-00142" aria-describedby="a11y-disabled-helper" />
-        {/* disabled 는 read-only 가 아니다 — 편집 불가 **이면서** 비활성 고지까지 한다. */}
+        {/* disabled는 read-only가 아니다 — 편집 불가이면서 비활성 고지까지 한다. */}
         <FormHelperText id="a11y-disabled-helper">
           This field is disabled while your account is under review.
         </FormHelperText>
@@ -322,10 +317,9 @@ export const A11y: Story = {
 };
 
 /**
- * 소비자가 `aria-invalid` 를 직접 정하는 경우.
- *
- * 명시값이 `error` 에서 파생된 값을 이긴다 — 서버 검증이 끝나기 전처럼, 시각적으로는 오류를
- * 보여주되 아직 고지하고 싶지 않을 때 쓴다. 기본값을 바꾸는 것이 아니라 **덮는** 예시다.
+ * 소비자가 `aria-invalid`를 직접 정하는 경우.
+ * 명시값이 `error`에서 파생된 값을 이긴다 — 서버 검증이 끝나기 전처럼, 시각적으로는 오류를 보여주되 아직 고지하고 싶지 않을 때 쓴다.
+ * 기본값을 바꾸는 것이 아니라 덮는 예시다.
  */
 export const ExplicitAriaInvalidOverride: Story = {
   render: () => (
@@ -338,16 +332,12 @@ export const ExplicitAriaInvalidOverride: Story = {
 };
 
 /**
- * **진짜 포커스**로 본 합성 상태.
- *
- * 다른 스토리는 `focused` prop 으로 시각만 흉내 낸다. 그 경로로는 소비자가 실제로 밟는 길 —
- * DOM 포커스가 루트로 버블링되어 FormControl 이 받고, 라벨·입력·헬퍼가 함께 상태를 바꾸는
- * 과정 — 이 한 번도 그려지지 않는다. 입력 variant 스토리에 `play` 포커스가 있지만 그쪽은
- * 입력 단독이라 라벨·헬퍼 협응이 빠진다.
- *
- * `play` 는 저장소의 기존 관용구를 따른다 (`BoxedInput`·`FilledInput`·`PlainInput` 스토리).
- * 비활성 필드를 나란히 둬서 `disabled > focused` 우선순위를 눈으로도 확인한다 —
- * `inputVariantStates.test.ts` 가 CSS 규칙 수준에서 지키는 것과 같은 계약이다.
+ * 진짜 포커스로 본 합성 상태.
+ * 다른 스토리는 `focused` prop으로 시각만 흉내 낸다.
+ * 그 경로로는 소비자가 실제로 밟는 길이 한 번도 그려지지 않는다 — DOM 포커스가 루트로 버블링되어 FormControl이 받고, 라벨·입력·헬퍼가 함께 상태를 바꾸는 과정이다.
+ * 입력 variant 스토리에 `play` 포커스가 있지만 그쪽은 입력 단독이라 라벨·헬퍼 협응이 빠진다.
+ * `play`는 저장소의 기존 관용구를 따른다 (`BoxedInput`·`FilledInput`·`PlainInput` 스토리).
+ * 비활성 필드를 나란히 둬서 `disabled > focused` 우선순위를 눈으로도 확인한다 — `inputVariantStates.test.ts`가 CSS 규칙 수준에서 지키는 것과 같은 계약이다.
  */
 export const FocusedByInteraction: Story = {
   render: () => (
@@ -386,11 +376,9 @@ export const FocusedByInteraction: Story = {
 
 /**
  * 등록된 모든 테마에서 대표 상태를 한눈에 본다.
- *
  * 목록은 `themes` 레지스트리에서 만든다 — 테마가 늘면 이 스토리도 저절로 늘어난다.
- * variant 축은 곱하지 않는다: chrome 은 `AllVariants` 가 이미 보여주고, 여기서 보려는 것은
- * **상태별 토큰 색이 테마마다 성립하는가** 다. `contrast.test.ts` 의 "page" 표면과 같은 조건이라
- * 그 테스트가 수치로 지키는 것을 여기서 눈으로 확인할 수 있다.
+ * variant 축은 곱하지 않는다 — chrome은 `AllVariants`가 이미 보여주고, 여기서 보려는 것은 상태별 토큰 색이 테마마다 성립하는가다.
+ * `contrast.test.ts`의 "page" 표면과 같은 조건이라 그 테스트가 수치로 지키는 것을 여기서 눈으로 확인할 수 있다.
  */
 export const ThemeMatrix: Story = {
   parameters: {

@@ -24,10 +24,9 @@ import {
 
 /**
  * 검색 입력 + (선택) 지우기 버튼 + (선택) 제안 목록.
- *
- * 제안 목록은 APG list-autocomplete combobox 다. DOM 포커스는 언제나 입력에 남고, 활성 제안은
- * `aria-activedescendant` 로 알린다. 제안 행은 상호작용 요소를 품지 않는 `role="option"` 이며,
- * 누르면(mousedown 기본 동작을 막아) 포커스를 입력에서 빼앗지 않은 채 선택된다.
+ * 제안 목록은 APG list-autocomplete combobox다.
+ * DOM 포커스는 언제나 입력에 남고, 활성 제안은 `aria-activedescendant`로 알린다.
+ * 제안 행은 상호작용 요소를 품지 않는 `role="option"`이며, 누르면(mousedown 기본 동작을 막아) 포커스를 입력에서 빼앗지 않은 채 선택된다.
  */
 export const SearchField = ({
   className,
@@ -231,7 +230,7 @@ export const SearchField = ({
           className={cx(searchFieldClasses.suggestions, searchFieldClasses.suggestionsOpen)}
         >
           {rows.map((suggestion, index) => (
-            // aria-activedescendant 패턴: 키보드는 입력(combobox)이 처리하고 option 은 포커스를 받지 않는다.
+            // aria-activedescendant 패턴 — 키보드는 입력(combobox)이 처리하고 option은 포커스를 받지 않는다.
             // eslint-disable-next-line jsx-a11y/click-events-have-key-events
             <li
               key={suggestion.id}

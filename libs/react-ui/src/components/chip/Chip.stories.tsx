@@ -9,16 +9,13 @@ import { Avatar } from '../avatar';
 import { Chip } from './Chip';
 
 /**
- * Chip 은 두 모드만 있다.
- *
- * - **passive** (`onClick` 없음) — 태그·라벨. 포커스 대상이 아니다.
- * - **interactive** (`onClick` 있음) — native `<button>`. `selected` 를 주면 `aria-pressed` toggle.
- *
- * `Intents` 스토리가 없다 — V1 에 `intent` 가 없다. 선택 강조가 이미
- * `selectionControl.checked`(= `{primary.pr700}`)라서 `intent='primary'` 와 `selected` 가 같은
- * 색으로 겹친다. 카테고리 색은 `Badge` 가 가진다.
- *
- * `onDelete` 스토리도 없다 — DEFER 했다 (중첩 상호작용 문제).
+ * Chip은 두 모드만 있다.
+ * - passive (`onClick` 없음): 태그·라벨, 포커스 대상이 아니다
+ * - interactive (`onClick` 있음): native `<button>`, `selected`를 주면 `aria-pressed` toggle
+ * `Intents` 스토리가 없다 — V1에 `intent`가 없다.
+ * 선택 강조가 이미 `selectionControl.checked`(= `{primary.pr700}`)라서 `intent='primary'`와 `selected`가 같은 색으로 겹친다.
+ * 카테고리 색은 `Badge`가 가진다.
+ * `onDelete` 스토리도 없다 — DEFER했다 (중첩 상호작용 문제).
  */
 const meta = {
   title: 'Components/Data Display/Chip',
@@ -47,30 +44,27 @@ type Story = StoryObj<typeof meta>;
 const rowStyle = { display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' } as const;
 const stackStyle = { display: 'grid', gap: '16px', justifyItems: 'start' } as const;
 
-/** 태그·라벨. `<span>` 이고 포커스 대상이 아니다. */
+/** 태그·라벨. `<span>`이고 포커스 대상이 아니다. */
 export const Passive: Story = {};
 
-/** `onClick` 을 주면 native `<button type="button">` 이 된다. */
+/** `onClick`을 주면 native `<button type="button">`이 된다 */
 export const Interactive: Story = {
   args: { onClick: () => undefined },
 };
 
 /**
- * `selected` 를 주면 `aria-pressed` toggle 이 된다.
- *
- * 선택 표시는 **면과 테두리를 함께** 바꾼다 — 색 하나에만 기대면 그 색을 구분하지 못하는
- * 사용자에게 상태가 사라진다.
+ * `selected`를 주면 `aria-pressed` toggle이 된다.
+ * 선택 표시는 면과 테두리를 함께 바꾼다 — 색 하나에만 기대면 그 색을 구분하지 못하는 사용자에게 상태가 사라진다.
  */
 export const Selected: Story = {
   args: { onClick: () => undefined, selected: true },
 };
 
 /**
- * 여기부터 `onClick` 을 얹는 story 는 args 에서 `ref` 를 떼고 편다.
- *
- * `ChipProps` 는 passive(`span`)·interactive(`button`) 판별 유니온이고 두 분기의 `ref` 타입이
- * 다르다. args 를 통째로 펴면서 `onClick` 을 더하면 passive 분기의 `Ref<HTMLSpanElement>` 가
- * button 분기로 넘어가 타입이 깨진다. 모드는 story 가 정하므로 컨트롤에서 ref 를 받을 일이 없다.
+ * 여기부터 `onClick`을 얹는 story는 args에서 `ref`를 떼고 편다.
+ * `ChipProps`는 passive(`span`)·interactive(`button`) 판별 유니온이고 두 분기의 `ref` 타입이 다르다.
+ * args를 통째로 펴면서 `onClick`을 더하면 passive 분기의 `Ref<HTMLSpanElement>`가 button 분기로 넘어가 타입이 깨진다.
+ * 모드는 story가 정하므로 컨트롤에서 ref를 받을 일이 없다.
  */
 export const Disabled: Story = {
   render: ({ ref: _ref, ...args }) => (
@@ -135,9 +129,8 @@ export const LeadingIcon: Story = {
 };
 
 /**
- * `leading` 은 그냥 노드다 — `Avatar` 에 강결합하지 않는다.
- *
- * 슬롯은 `aria-hidden` 이라 Avatar 의 이름이 chip 의 접근 가능한 이름을 오염시키지 않는다.
+ * `leading`은 그냥 노드다 — `Avatar`에 강결합하지 않는다.
+ * 슬롯은 `aria-hidden`이라 Avatar의 이름이 chip의 접근 가능한 이름을 오염시키지 않는다.
  */
 export const WithAvatar: Story = {
   render: ({ ref: _ref, ...args }) => (
@@ -172,8 +165,7 @@ export const WithAvatar: Story = {
 
 /**
  * 실제 filter set — 소비자가 선택 상태를 소유한다.
- *
- * play 로 키보드 경로를 확인한다: 탭으로 도달하고 Space 로 토글되며 `aria-pressed` 가 따라온다.
+ * play로 키보드 경로를 확인한다 — 탭으로 도달하고 Space로 토글되며 `aria-pressed`가 따라온다.
  */
 export const KeyboardFocus: Story = {
   render: () => {
@@ -206,7 +198,7 @@ export const KeyboardFocus: Story = {
     await expect(design).toHaveFocus();
     await expect(design).toHaveAttribute('aria-pressed', 'true');
 
-    // native button 이라 Space 로 활성화된다.
+    // native button이라 Space로 활성화된다.
     await userEvent.keyboard(' ');
     await expect(design).toHaveAttribute('aria-pressed', 'false');
 
@@ -242,10 +234,9 @@ export const ThemeMatrix: Story = {
 
 /**
  * forced-colors(Windows 고대비) 검토용.
- *
- * 그 모드에서 가장 위험한 것은 **선택 상태가 사라지는 것**이다. `chip.scss` 가 그 모드에서만
- * `Highlight` 로 채우므로 선택된 chip 이 구분되어야 한다. 스크린샷으로는 강제 모드를 켤 수 없어
- * 검토 대상을 한 화면에 모아 두는 것이 이 스토리의 역할이다 (규칙은 `forcedColors.test.ts` 가 검사).
+ * 그 모드에서 가장 위험한 것은 선택 상태가 사라지는 것이다.
+ * `chip.scss`가 그 모드에서만 `Highlight`로 채우므로 선택된 chip이 구분되어야 한다.
+ * 스크린샷으로는 강제 모드를 켤 수 없어 검토 대상을 한 화면에 모아 두는 것이 이 스토리의 역할이다 (규칙은 `forcedColors.test.ts`가 검사).
  */
 export const ForcedColors: Story = {
   render: ({ ref: _ref, ...args }) => (
@@ -264,7 +255,7 @@ export const ForcedColors: Story = {
   ),
 };
 
-/** 긴 라벨은 잘린다 — chip 이 컨테이너를 밀어내지 않는다. */
+/** 긴 라벨은 잘린다 — chip이 컨테이너를 밀어내지 않는다 */
 export const LongLabel: Story = {
   render: ({ ref: _ref, ...args }) => (
     <div style={{ ...stackStyle, maxWidth: '240px' }}>

@@ -7,11 +7,9 @@ import { List } from './List';
 import { ListItem } from './ListItem';
 
 /**
- * `List`·`ListItem` 은 **semantic HTML helper** 다 — `<ul>`/`<ol>` 과 `<li>` 에 토큰 여백과
- * 마커 정책을 붙이는 것이 전부다.
- *
- * hover·selected 스토리가 없다 — 그런 API 가 없다. 목록 항목이 눌려야 하면 소비자가 `<a>`/
- * `<button>` 을 자식으로 넣고, 그 시각은 그 control 이 소유한다 (`WithInteractiveChildren`).
+ * `List`·`ListItem`은 semantic HTML helper다 — `<ul>`/`<ol>`과 `<li>`에 토큰 여백과 마커 정책을 붙이는 것이 전부다.
+ * hover·selected 스토리가 없다 — 그런 API가 없다.
+ * 목록 항목이 눌려야 하면 소비자가 `<a>`/`<button>`을 자식으로 넣고, 그 시각은 그 control이 소유한다 (`WithInteractiveChildren`).
  */
 const meta = {
   title: 'Components/Data Display/List',
@@ -37,9 +35,8 @@ const FRAME = { maxWidth: '360px' } as const;
 
 /**
  * 간격 훅.
- *
- * `--ui-list-gap` 기본값은 `0` 이다 — 저장소의 실제 목록들이 항목을 테두리로 가르고 간격은
- * 0 이라서, 기본으로 여백을 밀어 넣으면 그것을 되돌려야 한다. 여백이 필요한 쪽이 켠다.
+ * `--ui-list-gap` 기본값은 `0`이다 — 저장소의 실제 목록들이 항목을 테두리로 가르고 간격은 0이라서, 기본으로 여백을 밀어 넣으면 그것을 되돌려야 한다.
+ * 여백이 필요한 쪽이 켠다.
  */
 const gapStyle = { '--ui-list-gap': 'var(--ds-spacing-xs)' } as CSSProperties;
 
@@ -61,7 +58,7 @@ export const Unordered: Story = {
   },
 };
 
-/** 순서가 의미를 갖는 목록만 `ordered` 를 켠다. 마커를 함께 보이는 것이 보통이다. */
+/** 순서가 의미를 갖는 목록만 `ordered`를 켠다. 마커를 함께 보이는 것이 보통이다. */
 export const Ordered: Story = {
   args: {
     ordered: true,
@@ -78,10 +75,8 @@ export const Ordered: Story = {
 };
 
 /**
- * 마커 정책은 **시각 결정**이다.
- *
- * 마커를 지워도 목록이라는 시맨틱은 남는다 — `list-style: none` 이 WebKit 에서 목록 역할을
- * 지우기 때문에 그 경우에만 `role="list"` 로 복구한다.
+ * 마커 정책은 시각 결정이다.
+ * 마커를 지워도 목록이라는 시맨틱은 남는다 — `list-style: none`이 WebKit에서 목록 역할을 지우기 때문에 그 경우에만 `role="list"`로 복구한다.
  */
 export const WithMarkers: Story = {
   args: {
@@ -95,7 +90,7 @@ export const WithMarkers: Story = {
   },
 };
 
-/** 중첩 목록은 상위 `<li>` 안에 둔다 — 그것이 유효한 HTML 이다. */
+/** 중첩 목록은 상위 `<li>` 안에 둔다 — 그것이 유효한 HTML이다 */
 export const Nested: Story = {
   args: {
     marker: true,
@@ -127,10 +122,9 @@ export const Nested: Story = {
 };
 
 /**
- * 상호작용은 **자식이 가진다.**
- *
- * `ListItem` 에 `onClick` 이 없다 — native control 을 넣으면 키보드·포커스·disabled 를 브라우저가
- * 이미 옳게 한다. 탭 순서도 `<li>` 가 아니라 링크·버튼이 가진다.
+ * 상호작용은 자식이 가진다.
+ * `ListItem`에 `onClick`이 없다 — native control을 넣으면 키보드·포커스·disabled를 브라우저가 이미 옳게 한다.
+ * 탭 순서도 `<li>`가 아니라 링크·버튼이 가진다.
  */
 export const WithInteractiveChildren: Story = {
   args: {
@@ -155,7 +149,7 @@ export const WithInteractiveChildren: Story = {
   },
 };
 
-/** 긴 내용은 줄바꿈되고 목록이 컨테이너를 밀어내지 않는다. */
+/** 긴 내용은 줄바꿈되고 목록이 컨테이너를 밀어내지 않는다 */
 export const LongContent: Story = {
   args: {
     marker: true,

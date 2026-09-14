@@ -10,14 +10,10 @@ import { tableClasses } from './Table.constants';
 import { TableScroll } from './TableScroll';
 
 /**
- * `Table` 은 native HTML table 을 감싸는 **최소 wrapper** 다.
- *
- * `<caption>`·`<thead>`·`<tbody>`·`<tfoot>`·`<tr>`·`<th>`·`<td>` 는 소비자가 직접 쓴다 —
- * HTML 이 `<table>` 과 `<tr>` 사이에 다른 요소를 허용하지 않으므로 `TableRow`·`TableCell` 같은
- * wrapper 는 시맨틱을 더하지 못한다.
- *
- * **정렬 상태는 소비자 것이다.** `SortableHeaders` 가 그 합성을 보여 준다 — Table 에는 정렬
- * 로직도, 상태도, 핸들러도 없다.
+ * `Table`은 native HTML table을 감싸는 최소 wrapper다.
+ * `<caption>`·`<thead>`·`<tbody>`·`<tfoot>`·`<tr>`·`<th>`·`<td>`는 소비자가 직접 쓴다 — HTML이 `<table>`과 `<tr>` 사이에 다른 요소를 허용하지 않으므로 `TableRow`·`TableCell` 같은 wrapper는 시맨틱을 더하지 못한다.
+ * 정렬 상태는 소비자 것이다.
+ * `SortableHeaders`가 그 합성을 보여 준다 — Table에는 정렬 로직도, 상태도, 핸들러도 없다.
  */
 const meta = {
   title: 'Components/Data Display/Table',
@@ -80,10 +76,9 @@ export const Basic: Story = {
 };
 
 /**
- * `<caption>` 은 table 의 접근 가능한 이름이다.
- *
- * 시각 디자인에서 원치 않으면 `hiddenCaption` 으로 **시각만** 숨긴다 — DOM 에서 지우면 이름이
- * 사라진다. `form-control` 의 `hiddenLabel` 과 같은 정본 패턴이다.
+ * `<caption>`은 table의 접근 가능한 이름이다.
+ * 시각 디자인에서 원치 않으면 `hiddenCaption`으로 시각만 숨긴다 — DOM에서 지우면 이름이 사라진다.
+ * `form-control`의 `hiddenLabel`과 같은 정본 패턴이다.
  */
 export const WithCaption: Story = {
   args: {
@@ -113,10 +108,9 @@ export const WithCaption: Story = {
 };
 
 /**
- * 행의 첫 셀이 그 행을 식별하면 `<th scope="row">` 다.
- *
- * 그러면 스크린리더가 셀을 읽을 때 "2분기, 매출, 148" 처럼 **행·열 머리를 함께** 말한다.
- * `<td>` 로 두면 그 관계가 사라진다.
+ * 행의 첫 셀이 그 행을 식별하면 `<th scope="row">`다.
+ * 그러면 스크린리더가 셀을 읽을 때 "2분기, 매출, 148"처럼 행·열 머리를 함께 말한다.
+ * `<td>`로 두면 그 관계가 사라진다.
  */
 export const RowHeaders: Story = {
   args: {
@@ -156,10 +150,10 @@ export const RowHeaders: Story = {
 };
 
 /**
- * **정렬 합성.** 상태는 소비자가 소유하고 Table 은 관여하지 않는다.
- *
- * 책임 분리: `aria-sort` 는 `<th>` 가(정렬된 열이라는 사실), 활성화는 `<button>` 이 진다.
- * 방향 표시자는 `aria-sort` 속성 선택자가 그리므로 **접근성 상태와 시각이 갈라질 수 없다.**
+ * 정렬 합성.
+ * 상태는 소비자가 소유하고 Table은 관여하지 않는다.
+ * 책임 분리 — `aria-sort`는 `<th>`가(정렬된 열이라는 사실), 활성화는 `<button>`이 진다.
+ * 방향 표시자는 `aria-sort` 속성 선택자가 그리므로 접근성 상태와 시각이 갈라질 수 없다.
  */
 export const SortableHeaders: Story = {
   render: () => {
@@ -227,31 +221,31 @@ export const SortableHeaders: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
-    // 정렬 컨트롤이 실제 button 이고 키보드로 닿는다.
+    // 정렬 컨트롤이 실제 button이고 키보드로 닿는다.
     await userEvent.tab();
     const quarter = canvas.getByRole('button', { name: '분기' });
 
     await expect(quarter).toHaveFocus();
 
-    // aria-sort 는 th 에 있고 button 에는 없다.
+    // aria-sort는 th에 있고 button에는 없다.
     const revenue = canvas.getByRole('columnheader', { name: '매출' });
 
     await expect(revenue).toHaveAttribute('aria-sort', 'descending');
     await expect(canvas.getByRole('button', { name: '매출' })).not.toHaveAttribute('aria-sort');
 
-    // Enter 로 정렬이 바뀌고 aria-sort 가 따라온다.
+    // Enter로 정렬이 바뀌고 aria-sort가 따라온다.
     await userEvent.keyboard('{Enter}');
     await expect(canvas.getByRole('columnheader', { name: '분기' })).toHaveAttribute(
       'aria-sort',
       'ascending',
     );
 
-    // grid 로 승격되지 않는다.
+    // grid로 승격되지 않는다.
     await expect(canvas.queryByRole('grid')).toBeNull();
   },
 };
 
-/** 긴 셀 내용은 줄바꿈된다 — 잘리지 않는다. */
+/** 긴 셀 내용은 줄바꿈된다 — 잘리지 않는다 */
 export const LongContent: Story = {
   decorators: [
     (Story) => (
@@ -284,7 +278,7 @@ export const LongContent: Story = {
   },
 };
 
-/** 행이 많을 때의 밀도 확인. 페이지네이션·가상화를 만들지 않는다 — 그것은 data grid 의 개념이다. */
+/** 행이 많을 때의 밀도 확인. 페이지네이션·가상화를 만들지 않는다 — 그것은 data grid의 개념이다. */
 export const DenseDataset: Story = {
   args: {
     children: (
@@ -316,10 +310,10 @@ export const DenseDataset: Story = {
 };
 
 /**
- * 좁은 컨테이너 — `TableScroll` 이 가로 스크롤을 맡는다.
- *
- * 그 영역은 `tabIndex=0` 이라 **키보드로도 스크롤된다** (WCAG 2.1.1). 포커스를 받으므로
- * 포커스 링이 보여야 하고, 이름이 있어야 해서 `label` 이 필수다. 감싸도 table 시맨틱은 그대로다.
+ * 좁은 컨테이너 — `TableScroll`이 가로 스크롤을 맡는다.
+ * 그 영역은 `tabIndex=0`이라 키보드로도 스크롤된다 (WCAG 2.1.1).
+ * 포커스를 받으므로 포커스 링이 보여야 하고, 이름이 있어야 해서 `label`이 필수다.
+ * 감싸도 table 시맨틱은 그대로다.
  */
 export const NarrowContainer: Story = {
   render: () => (
@@ -354,7 +348,7 @@ export const NarrowContainer: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
-    // 스크롤 영역이 이름을 가진 region 이고 키보드로 닿는다.
+    // 스크롤 영역이 이름을 가진 region이고 키보드로 닿는다.
     await userEvent.tab();
     await expect(canvas.getByRole('region', { name: '분기별 상세 지표 표' })).toHaveFocus();
 
@@ -407,10 +401,9 @@ export const ThemeMatrix: Story = {
 
 /**
  * forced-colors(Windows 고대비) 검토용.
- *
- * 그 모드에서 가장 위험한 것은 **격자가 사라지는 것**이다 — 경계가 시스템 색으로 평탄화되면
- * 어느 값이 어느 열인지 읽을 수 없다. `table.scss` 가 `CanvasText` 로 되살린다.
- * 정렬 표시자는 테두리 삼각형이라 그 모드에서도 남는다 (규칙은 `forcedColors.test.ts` 가 검사).
+ * 그 모드에서 가장 위험한 것은 격자가 사라지는 것이다 — 경계가 시스템 색으로 평탄화되면 어느 값이 어느 열인지 읽을 수 없다.
+ * `table.scss`가 `CanvasText`로 되살린다.
+ * 정렬 표시자는 테두리 삼각형이라 그 모드에서도 남는다 (규칙은 `forcedColors.test.ts`가 검사).
  */
 export const ForcedColors: Story = {
   args: {

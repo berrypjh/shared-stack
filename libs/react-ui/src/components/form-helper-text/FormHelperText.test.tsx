@@ -169,10 +169,9 @@ describe('<FormHelperText />', () => {
   });
 
   /**
-   * 상태가 겹쳤을 때 어떤 색이 이기는지. 클래스가 아니라 실제 cascade 결과를 본다.
-   *
-   * 목표 순서 `disabled > error > 평상시` — RN `FormHelperText.styles.ts` 와 같고,
-   * 같은 필드의 `InputLabel`·Input chrome 과도 같다.
+   * 상태가 겹쳤을 때 어떤 색이 이기는지.
+   * 클래스가 아니라 실제 cascade 결과를 본다.
+   * 목표 순서 `disabled > error > 평상시`는 RN `FormHelperText.styles.ts`와 같고, 같은 필드의 `InputLabel`·Input chrome과도 같다.
    */
   describe('동시 상태 색 우선순위', () => {
     const STATE_CLASSES = [formHelperTextClasses.disabled, formHelperTextClasses.error];

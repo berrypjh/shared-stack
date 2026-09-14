@@ -1,15 +1,11 @@
 /**
  * List·ListItem 계약.
- *
- * 이 둘은 **semantic HTML helper** 다 — `<ul>`/`<ol>` 과 `<li>` 의 의미를 보존하고 토큰 기반
- * 여백·마커 정책을 붙이는 것이 전부다.
- *
- * 아닌 것: menu·listbox·select options·navigation 프레임워크. 그 셋은 각각 다른 ARIA 계약과
- * 키보드 모델을 요구하고 이미 `Select`(listbox)·`SearchField`(combobox 제안 목록)가 소유한다.
- * `MenuItem` 도 여기 쓰이지 않는다 — 그것은 `Select` 의 선언적 슬롯 마커(`return null`)다.
- *
- * **상호작용은 자식이 가진다.** `ListItem` 에 `onClick` 을 두어 버튼을 흉내 내지 않는다 —
- * 소비자가 `<a>`/`<button>` 을 자식으로 넣는다.
+ * 이 둘은 semantic HTML helper다 — `<ul>`/`<ol>`과 `<li>`의 의미를 보존하고 토큰 기반 여백·마커 정책을 붙이는 것이 전부다.
+ * menu·listbox·select options·navigation 프레임워크가 아니다.
+ * 그 셋은 각각 다른 ARIA 계약과 키보드 모델을 요구하고 이미 `Select`(listbox)·`SearchField`(combobox 제안 목록)가 소유한다.
+ * `MenuItem`도 여기 쓰이지 않는다 — 그것은 `Select`의 선언적 슬롯 마커(`return null`)다.
+ * 상호작용은 자식이 가진다.
+ * `ListItem`에 `onClick`을 두어 버튼을 흉내 내지 않는다 — 소비자가 `<a>`/`<button>`을 자식으로 넣는다.
  */
 import { createRef } from 'react';
 
@@ -98,8 +94,7 @@ describe('<List />', () => {
   });
 
   /**
-   * ARIA 를 덧붙이지 않는 것이 기본이다.
-   *
+   * ARIA를 덧붙이지 않는 것이 기본이다.
    * 예외가 하나 있고 그것은 조건부다 — 아래 `마커 없는 목록의 시맨틱 보존` 참조.
    */
   describe('불필요한 ARIA 를 붙이지 않는다', () => {
@@ -153,12 +148,10 @@ describe('<List />', () => {
   });
 
   /**
-   * `list-style: none` 은 **WebKit 에서 목록 시맨틱을 지운다** — Safari·VoiceOver 가 그 `<ul>` 을
-   * 목록으로 알리지 않아 "항목 3개 중 1번째" 를 잃는다. 디자인 시스템 기본값이 마커 없음이라
-   * 이 컴포넌트의 존재 이유(시맨틱 보존)가 기본 경로에서 사라지는 셈이다.
-   *
-   * 그래서 **마커를 지운 경우에만** `role="list"` 로 복구한다. 무조건 붙이지 않는다 — 원인이
-   * 있는 곳에만 정확히 대응하고, `marker` 를 켜면 role 이 사라진다(위 테스트).
+   * `list-style: none`은 WebKit에서 목록 시맨틱을 지운다 — Safari·VoiceOver가 그 `<ul>`을 목록으로 알리지 않아 "항목 3개 중 1번째"를 잃는다.
+   * 디자인 시스템 기본값이 마커 없음이라 이 컴포넌트의 존재 이유(시맨틱 보존)가 기본 경로에서 사라지는 셈이다.
+   * 그래서 마커를 지운 경우에만 `role="list"`로 복구한다.
+   * 무조건 붙이지 않는다 — 원인이 있는 곳에만 정확히 대응하고, `marker`를 켜면 role이 사라진다 (위 테스트).
    */
   describe('마커 없는 목록의 시맨틱 보존', () => {
     it('기본값(마커 없음)에서 목록으로 알린다', () => {
@@ -169,7 +162,7 @@ describe('<List />', () => {
         </List>,
       );
 
-      // role="list" 든 native ul 이든 접근성 트리에서는 list 다.
+      // role="list"든 native ul이든 접근성 트리에서는 list다.
       expect(screen.getByRole('list')).toBeInTheDocument();
       expect(screen.getAllByRole('listitem')).toHaveLength(2);
     });
@@ -211,7 +204,7 @@ describe('<List />', () => {
       const outerItem = screen.getByTestId('outer-item');
       const inner = screen.getByTestId('inner');
 
-      // 중첩 목록은 상위 li 안에 있어야 유효한 HTML 이다.
+      // 중첩 목록은 상위 li 안에 있어야 유효한 HTML이다.
       expect(outerItem).toContainElement(inner);
       expect(screen.getAllByRole('list')).toHaveLength(2);
       expect(screen.getAllByRole('listitem')).toHaveLength(2);
@@ -234,8 +227,8 @@ describe('<List />', () => {
   });
 
   /**
-   * 상호작용은 **자식이 가진다.** `ListItem` 이 클릭을 받는 것이 아니라 소비자가 native
-   * control 을 넣는다 — 그래서 키보드·포커스·disabled 를 브라우저가 이미 옳게 한다.
+   * 상호작용은 자식이 가진다.
+   * `ListItem`이 클릭을 받는 것이 아니라 소비자가 native control을 넣는다 — 그래서 키보드·포커스·disabled를 브라우저가 이미 옳게 한다.
    */
   describe('상호작용 자식', () => {
     it('링크 자식이 그대로 링크로 남는다', () => {

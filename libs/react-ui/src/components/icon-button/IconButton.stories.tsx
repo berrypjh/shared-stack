@@ -13,8 +13,8 @@ const meta = {
     layout: 'centered',
   },
   args: {
-    // 아이콘 전용 컨트롤은 접근 가능한 이름이 타입 요구사항이다. meta 에 두면 모든 스토리가
-    // 물려받고 Playground 의 control 로도 노출된다.
+    // 아이콘 전용 컨트롤은 접근 가능한 이름이 타입 요구사항이다.
+    // meta에 두면 모든 스토리가 물려받고 Playground의 control로도 노출된다.
     'aria-label': 'Search',
     size: 'md',
     color: 'primary',
@@ -256,8 +256,7 @@ export const A11y: Story = {
           <ShareIcon />
         </IconButton>
       </div>
-      {/* 로딩 상태 — 고지는 컴포넌트가 그리는 progressbar 가 맡는다. aria-busy 를 덧붙이면
-          같은 상태를 두 번 읽는다. */}
+      {/* 로딩 상태 — 고지는 컴포넌트가 그리는 progressbar가 맡는다. aria-busy를 덧붙이면 같은 상태를 두 번 읽는다. */}
       <div style={rowStyle}>
         <IconButton loading={true} aria-label="Saving bookmark">
           <BookmarkIcon />
@@ -268,11 +267,9 @@ export const A11y: Story = {
 };
 
 /**
- * 등록된 모든 테마 × 대표 상태. 테마 목록은 레지스트리에서 순회한다 — 손으로 적으면
- * design-tokens 에 테마가 늘어도 여기만 조용히 낡는다.
- *
- * 아이콘 전용 컨트롤이라 **모든 예시가 `aria-label` 을 갖는다** — 갤러리라고 이름을 빼면
- * axe 가 잡을 뿐 아니라 스크린샷도 실제 사용례가 아니게 된다.
+ * 등록된 모든 테마 × 대표 상태.
+ * 테마 목록은 레지스트리에서 순회한다 — 손으로 적으면 design-tokens에 테마가 늘어도 여기만 조용히 낡는다.
+ * 아이콘 전용 컨트롤이라 모든 예시가 `aria-label`을 갖는다 — 갤러리라고 이름을 빼면 axe가 잡을 뿐 아니라 스크린샷도 실제 사용례가 아니게 된다.
  */
 export const ThemeMatrix: Story = {
   parameters: themeGalleryParameters,
@@ -306,10 +303,8 @@ export const ThemeMatrix: Story = {
 
 /**
  * 키보드로 도달하고 활성화된다.
- *
- * 아이콘만 있는 컨트롤이라 "무엇에 포커스가 갔는지"를 눈으로 확인할 수 없다 — 이름으로
- * 단언해야 의미가 있다. `.focus()` 가 아니라 Tab 을 쓰는 이유는 `:focus-visible` 이
- * 키보드 경로에서만 켜지기 때문이다.
+ * 아이콘만 있는 컨트롤이라 "무엇에 포커스가 갔는지"를 눈으로 확인할 수 없다 — 이름으로 단언해야 의미가 있다.
+ * `.focus()`가 아니라 Tab을 쓰는 이유는 `:focus-visible`이 키보드 경로에서만 켜지기 때문이다.
  */
 export const KeyboardFocus: Story = {
   render: () => (

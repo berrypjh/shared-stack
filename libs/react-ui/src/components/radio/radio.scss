@@ -1,12 +1,9 @@
 /**
  * Radio.
- *
- * Checkbox 와 같은 방식이다: native input 자체를 `appearance: none` 으로 원형 상자로 그리고,
- * 상태는 native 선택자(`:checked`·`:disabled`·`:focus-visible`)가 정한다. 색은 같은
- * `selectionControl` 토큰이고 다른 것은 모양(원)과 표시자(가운데 점)뿐이다.
- *
- * 테두리 색은 상태마다 한 규칙만 매칭되게 `:not()` 으로 배제한다 (disabled > error > checked >
- * hover > 평상시). 오류는 그룹이 input 에 다는 `data-invalid` 라서 같은 요소 위에서 배제된다.
+ * Checkbox와 같은 방식이다 — native input 자체를 `appearance: none`으로 원형 상자로 그리고, 상태는 native 선택자(`:checked`·`:disabled`·`:focus-visible`)가 정한다.
+ * 색은 같은 `selectionControl` 토큰이고 다른 것은 모양(원)과 표시자(가운데 점)뿐이다.
+ * 테두리 색은 상태마다 한 규칙만 매칭되게 `:not()`으로 배제한다 (disabled > error > checked > hover > 평상시).
+ * 오류는 그룹이 input에 다는 `data-invalid`라서 같은 요소 위에서 배제된다.
  */
 .ui-radio {
   --ui-radio-size: var(--ds-spacing-lg);
@@ -51,7 +48,7 @@
     border-color var(--ds-motion-duration-fast) var(--ds-motion-easing-standard);
 }
 
-/* 선택 표시자: 가운데 점. 평소에는 보이지 않는다. */
+/* 선택 표시자 (가운데 점). 평소에는 보이지 않는다. */
 .ui-radio__input::before {
   content: '';
   inline-size: var(--ds-spacing-sm);
@@ -73,7 +70,7 @@
   border-color: var(--ds-selection-control-checked);
 }
 
-/* 그룹 오류. `RadioGroup` 이 input 에 `data-invalid` 를 단다 — radio 는 aria-invalid 를 지원하지 않는다. */
+/* 그룹 오류. `RadioGroup`이 input에 `data-invalid`를 단다 — radio는 aria-invalid를 지원하지 않는다. */
 .ui-radio__input[data-invalid='true']:not(:disabled) {
   border-color: var(--ds-stroke-error);
 }
@@ -87,7 +84,7 @@
   background-color: var(--ds-background-disable);
 }
 
-/* 포커스는 outline 으로 그린다 — forced-colors 에서도 남고 루트가 잘라내지 않는다. */
+/* 포커스는 outline으로 그린다 — forced-colors에서도 남고 루트가 잘라내지 않는다 */
 .ui-radio__input:focus-visible {
   outline: var(--ds-component-field-focus-ring-width) solid var(--ds-border-primary-color);
   outline-offset: var(--ds-spacing-2xs);
@@ -98,14 +95,14 @@
   overflow-wrap: anywhere;
 }
 
-/* 터치에서는 hover 가 탭 뒤에 남는다. hover 가능한 포인터에서만 켠다. */
+/* 터치에서는 hover가 탭 뒤에 남는다. hover 가능한 포인터에서만 켠다. */
 @media (hover: hover) {
   .ui-radio:hover .ui-radio__input:not(:disabled):not(:checked):not([data-invalid='true']) {
     border-color: var(--ds-field-border-hover);
   }
 }
 
-/* 끄는 것은 전환뿐이다. 포커스 outline 은 그대로 남는다. */
+/* 끄는 것은 전환뿐이다. 포커스 outline은 그대로 남는다. */
 @media (prefers-reduced-motion: reduce) {
   .ui-radio__input {
     transition: none;
@@ -113,8 +110,8 @@
 }
 
 /**
- * forced-colors 에서는 토큰 배경·테두리가 시스템 색으로 평탄화되어 선택이 사라진다.
- * native 외형으로 되돌려 OS 가 상태를 직접 그리게 한다 (Checkbox 와 같은 결정).
+ * forced-colors에서는 토큰 배경·테두리가 시스템 색으로 평탄화되어 선택이 사라진다.
+ * native 외형으로 되돌려 OS가 상태를 직접 그리게 한다 (Checkbox와 같은 결정).
  */
 @media (forced-colors: active) {
   .ui-radio__input {

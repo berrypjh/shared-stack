@@ -8,10 +8,9 @@ import { IconButton } from '../icon-button';
 import { Badge } from './Badge';
 
 /**
- * Badge 는 **overlay indicator** 다 — 앵커 위에 얹는 알림/개수/점.
- *
- * 상호작용이 없어 hover·pressed·focus 스토리가 없다. 대신 **앵커가 계속 살아 있는지**를
- * `WithInteractiveChild` 가 play 로 확인한다 — 이 컴포넌트가 조용히 깨지는 자리다.
+ * Badge는 overlay indicator다 — 앵커 위에 얹는 알림/개수/점.
+ * 상호작용이 없어 hover·pressed·focus 스토리가 없다.
+ * 대신 앵커가 계속 살아 있는지를 `WithInteractiveChild`가 play로 확인한다 — 이 컴포넌트가 조용히 깨지는 자리다.
  */
 const meta = {
   title: 'Components/Data Display/Badge',
@@ -60,9 +59,8 @@ export const Dot: Story = {
 };
 
 /**
- * 화면은 축약(`99+`), 낭독은 `label` 의 실제 수.
- *
- * "구십구 플러스" 는 정보가 아니라서 둘을 일부러 갈라 둔다.
+ * 화면은 축약(`99+`), 낭독은 `label`의 실제 수.
+ * "구십구 플러스"는 정보가 아니라서 둘을 일부러 갈라 둔다.
  */
 export const Max: Story = {
   args: { count: 137, max: 99, label: '읽지 않은 알림 137개' },
@@ -99,8 +97,8 @@ export const Sizes: Story = {
 };
 
 /**
- * `warning`·`success` 가 없는 것은 의도다 — 7개 테마 실측에서 그 면 위의 `text.contrastText`
- * 가 ember 에서 4.35·4.34 로 WCAG AA(4.5)에 미달한다. 어휘에서 빼는 편이 기준을 낮추는 것보다 낫다.
+ * `warning`·`success`가 없는 것은 의도다 — 7개 테마 실측에서 그 면 위의 `text.contrastText`가 ember에서 4.35·4.34로 WCAG AA(4.5)에 미달한다.
+ * 어휘에서 빼는 편이 기준을 낮추는 것보다 낫다.
  */
 export const Intents: Story = {
   render: (args) => (
@@ -114,10 +112,9 @@ export const Intents: Story = {
 };
 
 /**
- * **회귀 방지 스토리.** 배지가 앵커를 감싸도 앵커는 계속 버튼이고, 이름도 클릭도 그대로다.
- *
- * 표시자가 `pointer-events: none` 을 잃으면 이 play 가 깨진다 — Storybook 은 실제 브라우저라
- * jsdom 이 못 보는 그 회귀를 여기서 잡는다.
+ * 회귀 방지 스토리.
+ * 배지가 앵커를 감싸도 앵커는 계속 버튼이고, 이름도 클릭도 그대로다.
+ * 표시자가 `pointer-events: none`을 잃으면 이 play가 깨진다 — Storybook은 실제 브라우저라 jsdom이 못 보는 그 회귀를 여기서 잡는다.
  */
 export const WithInteractiveChild: Story = {
   args: {
@@ -164,11 +161,9 @@ export const ThemeMatrix: Story = {
 
 /**
  * forced-colors(Windows 고대비) 검토용.
- *
- * 그 모드에서 배지 면과 링은 시스템 색으로 평탄화된다. `badge.scss` 가 `CanvasText` 테두리를
- * 켜므로 dot 이 사라지지 않고 count 도 경계를 유지해야 한다. 스크린샷으로는 강제 모드를 켤 수
- * 없어 **검토 대상을 한 화면에 모아 두는** 것이 이 스토리의 역할이다
- * (규칙 자체는 `forcedColors.test.ts` 가 검사한다).
+ * 그 모드에서 배지 면과 링은 시스템 색으로 평탄화된다.
+ * `badge.scss`가 `CanvasText` 테두리를 켜므로 dot이 사라지지 않고 count도 경계를 유지해야 한다.
+ * 스크린샷으로는 강제 모드를 켤 수 없어 검토 대상을 한 화면에 모아 두는 것이 이 스토리의 역할이다 (규칙 자체는 `forcedColors.test.ts`가 검사한다).
  */
 export const ForcedColors: Story = {
   render: (args) => (
@@ -190,9 +185,9 @@ export const ForcedColors: Story = {
 
 /**
  * 경계 조건.
- *
- * `count={0}` 은 유효한 값이라 렌더된다 (미지정과 다르다). `content` 는 `max` 를 받지 않는다 —
- * 축약은 숫자 규칙이다. 앵커가 없으면 배지만 남는다.
+ * `count={0}`은 유효한 값이라 렌더된다 (미지정과 다르다).
+ * `content`는 `max`를 받지 않는다 — 축약은 숫자 규칙이다.
+ * 앵커가 없으면 배지만 남는다.
  */
 export const EdgeCases: Story = {
   render: ({ children: _children, ...args }) => (

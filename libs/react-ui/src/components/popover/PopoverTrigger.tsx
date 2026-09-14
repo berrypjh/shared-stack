@@ -44,8 +44,8 @@ export const PopoverTrigger = ({ children }: PopoverTriggerProps) => {
       childProps.onClick?.(event);
       if (!event.defaultPrevented) setOpen(!open);
     },
-    // 트리거에 포커스가 있을 때의 Escape. 중첩이면 안쪽 트리거가 바깥 패널 **안**에 있으므로
-    // 여기서 전파를 끊어야 바깥까지 함께 닫히지 않는다.
+    // 트리거에 포커스가 있을 때의 Escape.
+    // 중첩이면 안쪽 트리거가 바깥 패널 안에 있으므로 여기서 전파를 끊어야 바깥까지 함께 닫히지 않는다.
     onKeyDown: (event: KeyboardEvent<HTMLElement>) => {
       childProps.onKeyDown?.(event);
       if (event.defaultPrevented || event.key !== 'Escape' || !open) return;
@@ -54,8 +54,7 @@ export const PopoverTrigger = ({ children }: PopoverTriggerProps) => {
     },
     'aria-expanded': open,
     'aria-controls': open ? panelId : undefined,
-    // disclosure 는 `aria-haspopup` 을 붙이지 않는다 — ARIA 에서 `true` 는 menu 와 같은
-    // 뜻이라 일반 팝업에 쓰면 없는 메뉴를 약속하게 된다.
+    // disclosure는 `aria-haspopup`을 붙이지 않는다 — ARIA에서 `true`는 menu와 같은 뜻이라 일반 팝업에 쓰면 없는 메뉴를 약속하게 된다.
     'aria-haspopup': childProps['aria-haspopup'] ?? (semantics === 'dialog' ? 'dialog' : undefined),
   } as Partial<TriggerChildProps> & Record<string, unknown>);
 };

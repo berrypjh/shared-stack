@@ -154,12 +154,9 @@ export const WithLongText: Story = {
 };
 
 /**
- * `InputLabel` 이 혼자 책임지는 것은 **`htmlFor` 연결과 시각 표시** 뿐이다.
- *
- * 나머지는 각자의 소유자가 있다 — native `required` 와 `aria-invalid` 는 Input 이,
- * 설명은 `FormHelperText` 의 `id` ↔ Input `aria-describedby` 가 만든다. 그래서 이 스토리는
- * raw `<input>`/`<p>` 대신 라이브러리 컴포넌트로 세운다: 소유자가 드러나야 계약이 읽힌다.
- *
+ * `InputLabel`이 혼자 책임지는 것은 `htmlFor` 연결과 시각 표시뿐이다.
+ * 나머지는 각자의 소유자가 있다 — native `required`와 `aria-invalid`는 Input이, 설명은 `FormHelperText`의 `id` ↔ Input `aria-describedby`가 만든다.
+ * 그래서 이 스토리는 raw `<input>`/`<p>` 대신 라이브러리 컴포넌트로 세운다 — 소유자가 드러나야 계약이 읽힌다.
  * 여기서는 `FormControl` 없이 상태를 직접 준다 — 상속 경로는 FormControl 스토리의 몫이다.
  */
 export const A11y: Story = {
@@ -171,7 +168,7 @@ export const A11y: Story = {
         <BoxedInput id="a11y-email" type="email" placeholder="you@example.com" />
       </div>
 
-      {/* 필수: 라벨의 `*` 는 aria-hidden 시각 표시이고, 고지는 Input 의 native required 가 한다 */}
+      {/* 필수: 라벨의 `*`는 aria-hidden 시각 표시이고, 고지는 Input의 native required가 한다 */}
       <div>
         <InputLabel htmlFor="a11y-name" required>
           Full name
@@ -179,7 +176,7 @@ export const A11y: Story = {
         <BoxedInput id="a11y-name" required placeholder="Jane Smith" />
       </div>
 
-      {/* 오류: 색이 아니라 문구가 이유를 말한다. aria-invalid 는 Input 의 `error` 가 만든다 */}
+      {/* 오류: 색이 아니라 문구가 이유를 말한다. aria-invalid는 Input의 `error`가 만든다. */}
       <div>
         <InputLabel htmlFor="a11y-password" error>
           Password

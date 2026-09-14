@@ -16,22 +16,22 @@ const dsViewports = {
   desktop: { name: 'Desktop', styles: { width: '1440px', height: '900px' }, type: 'desktop' },
 } as const;
 
-/** `deepSea` 같은 합성어도 읽히도록 띄어 쓴다. demo-web 의 테마 셀렉터와 같은 규칙. */
+/** `deepSea` 같은 합성어도 읽히도록 띄어 쓴다. demo-web의 테마 셀렉터와 같은 규칙이다. */
 const themeLabel = (name: string) =>
   name.replace(/([a-z0-9])([A-Z])/g, '$1 $2').replace(/^./, (c) => c.toUpperCase());
 
 /**
- * 토글 목록은 테마 레지스트리에서 만든다. 하드코딩하면 design-tokens 에 테마가 늘어도
- * Storybook 만 조용히 낡는다 — 실제로 7개 중 3개만 보이고 있었다.
+ * 토글 목록은 테마 레지스트리에서 만든다.
+ * 하드코딩하면 design-tokens에 테마가 늘어도 Storybook만 조용히 낡는다 — 실제로 7개 중 3개만 보이고 있었다.
  */
 const themeItems = themes.map(({ name }) => ({ value: name, title: themeLabel(name) }));
 
 const preview: Preview = {
   parameters: {
     options: {
-      // 사이드바 순서. 적지 않으면 알파벳순이라 `Buttons` 가 `Layout` 앞에 온다.
-      // Storybook 이 이 파일을 **정적 파싱**해 읽으므로 배열은 반드시 리터럴이어야 한다 —
-      // 변수로 빼면 `Unexpected 'sidebarOrder'` 로 빌드가 멈춘다. 목록에 없는 그룹은 뒤에 붙는다.
+      // 사이드바 순서다. 적지 않으면 알파벳순이라 `Buttons`가 `Layout` 앞에 온다.
+      // Storybook이 이 파일을 정적 파싱해 읽으므로 배열은 반드시 리터럴이어야 한다 — 변수로 빼면 `Unexpected 'sidebarOrder'`로 빌드가 멈춘다.
+      // 목록에 없는 그룹은 뒤에 붙는다.
       storySort: {
         order: [
           'Theme',
@@ -79,7 +79,7 @@ const preview: Preview = {
   decorators: [
     (Story, context) => {
       const story = createElement(Story);
-      // 시맨틱 토큰이 테마마다 이미 올바른 짝을 갖는다 — dark 만 분기하면 나머지 5개가 틀어진다.
+      // 시맨틱 토큰이 테마마다 이미 올바른 짝을 갖는다 — dark만 분기하면 나머지 5개가 틀어진다.
       const content = createElement(
         'div',
         {

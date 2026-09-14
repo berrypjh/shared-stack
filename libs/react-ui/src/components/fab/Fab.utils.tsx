@@ -6,24 +6,15 @@ import { fabClasses } from './Fab.constants';
 import type { FabAutoAnchorProps, FabRenderableProps } from './Fab.types';
 
 /**
- * Fab 컴포넌트에서 auto-anchor props인지 판별합니다.
- *
- * auto-anchor는 `component`를 명시하지 않았고, `href`가 존재하는 경우를 의미합니다.
- * 이 경우 `FabBase`는 기본적으로 anchor 렌더링 경로를 탑니다.
- *
- * @param props 판별할 Fab props
- * @returns auto-anchor props 여부
+ * Fab props가 auto-anchor인지 판별.
+ * auto-anchor는 `component`를 명시하지 않고 `href`가 있는 경우다.
+ * 이 경우 `FabBase`는 기본적으로 anchor 렌더링 경로를 탄다.
  */
 export const isAutoAnchorProps = (props: FabRenderableProps): props is FabAutoAnchorProps => {
   return props.component == null && 'href' in props && props.href != null;
 };
 
-/**
- * Fab root className 문자열을 생성합니다.
- *
- * @param params Fab 시각적 상태와 추가 className
- * @returns 조합된 className 문자열
- */
+/** Fab 시각 상태와 추가 className → root className */
 export const getFabClassNames = ({
   className,
   color,
@@ -42,12 +33,7 @@ export const getFabClassNames = ({
     className,
   );
 
-/**
- * Fab content를 생성합니다.
- *
- * @param params Fab children과 icon
- * @returns content
- */
+/** Fab children과 icon → content */
 export const getFabContent = ({ children, icon }: { children?: ReactNode; icon?: ReactNode }) => {
   return (
     <span className={fabClasses.content}>

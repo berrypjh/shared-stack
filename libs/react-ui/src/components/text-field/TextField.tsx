@@ -66,10 +66,8 @@ export const TextField = ({
   });
 
   /**
-   * 설명은 소비자 값과 helper text 를 **합쳐서** 진짜 입력에 건다.
-   *
-   * `...rest` 로 흘려보내면 `aria-describedby` 가 FormControl 래퍼 `div` 에 얹혀 아무것도
-   * 설명하지 못한 채 사라진다 — 입력은 helper 만 알게 된다.
+   * 설명은 소비자 값과 helper text를 합쳐서 진짜 입력에 건다.
+   * `...rest`로 흘려보내면 `aria-describedby`가 FormControl 래퍼 `div`에 얹혀 아무것도 설명하지 못한 채 사라진다 — 입력은 helper만 알게 된다.
    */
   const describedBy = composeDescribedBy(ariaDescribedby, helperTextId);
 
@@ -96,7 +94,7 @@ export const TextField = ({
         </InputLabel>
       ) : null}
 
-      {/* 타입이 `select` 로 모드를 가르므로 각 분기의 `onChange` 는 그 모드의 계약이다. */}
+      {/* 타입이 `select`로 모드를 가르므로 각 분기의 `onChange`는 그 모드의 계약이다 */}
       {select ? (
         <Select
           aria-describedby={describedBy}

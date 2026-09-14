@@ -31,13 +31,11 @@ import {
 
 /**
  * APG select-only combobox.
- *
- * DOM 포커스는 언제나 trigger(`role="combobox"`)에 남고, 목록 안의 활성 위치는
- * `aria-activedescendant` 로 알린다. option 은 탭 순서에 없는 `role="option"` 요소이며, 목록을
- * 누를 때 mousedown 기본 동작을 막아 포커스를 trigger 에서 빼앗지 않는다.
- *
- * 포커스 정책: 선택·Escape 뒤에도 포커스는 trigger 에 있다. 바깥을 눌러 닫히면 포커스는 누른 곳을
- * 따라간다(trigger 로 끌어오지 않는다). Tab 은 목록을 닫고 다음 요소로 간다.
+ * DOM 포커스는 언제나 trigger(`role="combobox"`)에 남고, 목록 안의 활성 위치는 `aria-activedescendant`로 알린다.
+ * option은 탭 순서에 없는 `role="option"` 요소이며, 목록을 누를 때 mousedown 기본 동작을 막아 포커스를 trigger에서 빼앗지 않는다.
+ * 포커스 정책 — 선택·Escape 뒤에도 포커스는 trigger에 있다.
+ * 바깥을 눌러 닫히면 포커스는 누른 곳을 따라간다 (trigger로 끌어오지 않는다).
+ * Tab은 목록을 닫고 다음 요소로 간다.
  */
 export const Select = ({
   'aria-describedby': ariaDescribedby,
@@ -97,7 +95,7 @@ export const Select = ({
 
   const isControlledOpen = openProp != null;
   const open = openProp ?? uncontrolledOpen;
-  // disabled 는 open 보다 우선한다 — 비활성 컨트롤은 목록을 보여 주지도, 값을 바꾸지도 않는다.
+  // disabled는 open보다 우선한다 — 비활성 컨트롤은 목록을 보여 주지도, 값을 바꾸지도 않는다.
   const listOpen = open && !resolvedDisabled;
 
   const isControlledValue = valueProp !== undefined;
@@ -120,8 +118,8 @@ export const Select = ({
 
   const [highlightedIndex, setHighlightedIndex] = useState<number>(getInitialIndex);
 
-  // 활성 위치는 목록이 **열릴 때만** 선택값으로 맞춘다. 열린 동안 값이 바뀌어도(multiple 토글)
-  // 사용자가 옮겨 둔 위치를 되돌리지 않는다.
+  // 활성 위치는 목록이 열릴 때만 선택값으로 맞춘다.
+  // 열린 동안 값이 바뀌어도(multiple 토글) 사용자가 옮겨 둔 위치를 되돌리지 않는다.
   const [prevListOpen, setPrevListOpen] = useState(listOpen);
 
   if (listOpen !== prevListOpen) {
@@ -394,7 +392,7 @@ export const Select = ({
     className,
     color: resolvedColor,
     disabled: resolvedDisabled,
-    // 상태 표시 우선순위: disabled > error > focused (입력 variant 와 같다).
+    // 상태 표시 우선순위: disabled > error > focused (입력 variant와 같다).
     error: resolvedError && !resolvedDisabled,
     focused: focused && !resolvedDisabled,
     fullWidth: resolvedFullWidth,
@@ -482,7 +480,7 @@ export const Select = ({
       </button>
 
       {listOpen ? (
-        // aria-activedescendant 패턴: DOM 포커스는 trigger 에 남으므로 listbox 는 포커스를 받지 않는다.
+        // aria-activedescendant 패턴 — DOM 포커스는 trigger에 남으므로 listbox는 포커스를 받지 않는다.
         // eslint-disable-next-line jsx-a11y/interactive-supports-focus
         <div
           aria-label={listboxLabelledBy ? undefined : ariaLabel}
@@ -500,7 +498,7 @@ export const Select = ({
             const disabledOption = Boolean(child.props.disabled);
 
             return (
-              // 키보드는 trigger(combobox)가 처리하고 option 은 탭 순서에도 포커스 대상에도 들지 않는다.
+              // 키보드는 trigger(combobox)가 처리하고 option은 탭 순서에도 포커스 대상에도 들지 않는다.
               // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/interactive-supports-focus
               <div
                 aria-disabled={disabledOption ? 'true' : undefined}

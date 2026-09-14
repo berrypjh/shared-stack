@@ -66,11 +66,9 @@ describe('<ButtonBase />', () => {
   });
 
   /**
-   * 시각 어휘 클래스는 공개 스타일 계약이다 — `dist/index.css` 가 이 이름으로 팔레트를 싣고
-   * 소비자가 같은 이름으로 덮어쓴다. 그래서 상수가 아니라 문자열 리터럴로 고정한다.
-   *
-   * `getButtonBaseClassNames` 가 세 호스트 분기 모두에서 이 클래스를 만드는 유일한 지점인데
-   * 지금까지 어느 테스트도 결과를 검사하지 않았다.
+   * 시각 어휘 클래스는 공개 스타일 계약이다 — `dist/index.css`가 이 이름으로 팔레트를 싣고 소비자가 같은 이름으로 덮어쓴다.
+   * 그래서 상수가 아니라 문자열 리터럴로 고정한다.
+   * `getButtonBaseClassNames`가 세 호스트 분기 모두에서 이 클래스를 만드는 유일한 지점인데 지금까지 어느 테스트도 결과를 검사하지 않았다.
    */
   describe('prop: variant', () => {
     it('기본값은 contained다', () => {
@@ -307,7 +305,7 @@ describe('<ButtonBase />', () => {
 
       const button = screen.getByRole('button', { name: 'Hello' });
 
-      // touch 이벤트를 지원하는 환경에서만 실행
+      // touch 이벤트를 지원하는 환경에서만 실행한다.
       if (supportsTouch()) {
         fireEvent.touchStart(button, {
           touches: [{ identifier: 0, target: button, clientX: 0, clientY: 0 }],
@@ -320,7 +318,7 @@ describe('<ButtonBase />', () => {
         expect(onTouchEnd.callCount).toBe(1);
       }
 
-      // drag 이벤트를 생성할 수 있는 환경에서만 실행
+      // drag 이벤트를 생성할 수 있는 환경에서만 실행한다.
       if (canFireDragEvents) {
         fireEvent.dragEnd(button);
         expect(onDragEnd.callCount).toBe(1);
@@ -440,16 +438,14 @@ describe('<ButtonBase />', () => {
 
   /**
    * 키보드 활성화의 불변식.
-   *
-   * ButtonBase 는 native 가 이미 하는 일을 다시 구현하지 않는다 — emulation 은 native 활성화가
-   * **없는** host 에서만 켠다(`activateWithKeyboard: !isLinkLike`, native button 분기는 아예
-   * 핸들러를 붙이지 않는다). 아래는 그 경계가 어긋나면 바로 깨지는 자리들이다.
+   * ButtonBase는 native가 이미 하는 일을 다시 구현하지 않는다 — emulation은 native 활성화가 없는 host에서만 켠다 (`activateWithKeyboard: !isLinkLike`, native button 분기는 아예 핸들러를 붙이지 않는다).
+   * 아래는 그 경계가 어긋나면 바로 깨지는 자리들이다.
    */
   describe('키보드 활성화 불변식', () => {
     /**
-     * 여기도 click 횟수로는 검사할 수 없다. emulation 을 잘못 붙이면 `preventDefault` 가
-     * native 활성화를 지우고 자기 click 을 대신 넣어, 총합은 여전히 1로 보인다. 관찰 가능한
-     * 차이는 "native 의 기본 동작을 가로챘는가" 하나뿐이다.
+     * 여기도 click 횟수로는 검사할 수 없다.
+     * emulation을 잘못 붙이면 `preventDefault`가 native 활성화를 지우고 자기 click을 대신 넣어, 총합은 여전히 1로 보인다.
+     * 관찰 가능한 차이는 "native의 기본 동작을 가로챘는가" 하나뿐이다.
      */
     it.each([
       ['Enter', 'Enter'],
@@ -491,15 +487,13 @@ describe('<ButtonBase />', () => {
 
       const host = screen.getByRole('button');
 
-      // dispatchEvent 는 preventDefault 되면 false 를 돌려준다.
+      // dispatchEvent는 preventDefault되면 false를 돌려준다.
       expect(fireEvent.keyDown(host, { key: ' ' })).toBe(false);
     });
 
     /**
-     * click 횟수로는 이것을 검사할 수 없다 — jsdom 은 anchor 의 기본 활성화를 구현하지 않아
-     * "native 가 1 + emulation 이 0" 과 "native 가 0 + emulation 이 1" 이 똑같이 1로 보인다.
-     * 대신 emulation 의 관찰 가능한 부작용인 `preventDefault` 를 본다: anchor 의 Enter 를
-     * 가로채면 네이티브 이동이 죽는다.
+     * click 횟수로는 이것을 검사할 수 없다 — jsdom은 anchor의 기본 활성화를 구현하지 않아 "native가 1 + emulation이 0"과 "native가 0 + emulation이 1"이 똑같이 1로 보인다.
+     * 대신 emulation의 관찰 가능한 부작용인 `preventDefault`를 본다 — anchor의 Enter를 가로채면 네이티브 이동이 죽는다.
      */
     it('href 를 가진 anchor 의 Enter 를 가로채지 않는다', () => {
       render(<ButtonBase href="/next">Hello</ButtonBase>);
@@ -510,7 +504,7 @@ describe('<ButtonBase />', () => {
     it('emulation 이 필요한 host 의 Enter 는 가로챈다', () => {
       render(<ButtonBase component="div">Hello</ButtonBase>);
 
-      // 위 anchor 검사가 "아무도 preventDefault 하지 않는다" 로 공허해지지 않게 짝을 둔다.
+      // 위 anchor 검사가 "아무도 preventDefault하지 않는다"로 공허해지지 않게 짝을 둔다.
       expect(fireEvent.keyDown(screen.getByRole('button'), { key: 'Enter' })).toBe(false);
     });
 

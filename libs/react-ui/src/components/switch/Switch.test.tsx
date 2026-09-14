@@ -17,10 +17,9 @@ import { Switch } from './Switch';
 import { switchClasses } from './Switch.constants';
 
 /**
- * Switch 가 기대는 native `<input type="checkbox" role="switch">` 의 사실.
- *
- * role 만 switch 로 바꾸고 나머지(checked·Space·label 클릭·폼)는 native checkbox 가 소유한다.
- * 먼저 jsdom 이 그 조합을 모델링하는지 고정한다.
+ * Switch가 기대는 native `<input type="checkbox" role="switch">`의 사실.
+ * role만 switch로 바꾸고 나머지(checked·Space·label 클릭·폼)는 native checkbox가 소유한다.
+ * 먼저 jsdom이 그 조합을 모델링하는지 고정한다.
  */
 describe('native switch 사실 (characterization)', () => {
   it('switch 역할로 드러나고 감싸는 label 이 이름이 된다', () => {
@@ -95,7 +94,7 @@ describe('<Switch />', () => {
 
   const control = (name = 'probe') => screen.getByRole<HTMLInputElement>('switch', { name });
 
-  // Checkbox 와 같은 배분이다: className 은 루트 label, 나머지 prop 과 ref 는 native input.
+  // Checkbox와 같은 배분이다. className은 루트 label로, 나머지 prop과 ref는 native input으로 간다.
   describeConformance(<Switch aria-label="probe" />, () => ({
     render,
     classes: switchClasses,
@@ -159,11 +158,11 @@ describe('<Switch />', () => {
     });
 
     it('이름 없이는 컴파일되지 않고 type·role 을 받지 않는다', () => {
-      // @ts-expect-error — 보이는 라벨도 aria 이름도 없다.
+      // @ts-expect-error 보이는 라벨도 aria 이름도 없다
       void (<Switch />);
-      // @ts-expect-error — type 은 Switch 가 소유한다.
+      // @ts-expect-error type은 Switch가 소유한다
       void (<Switch aria-label="probe" type="radio" />);
-      // @ts-expect-error — role 은 Switch 가 소유한다.
+      // @ts-expect-error role은 Switch가 소유한다
       void (<Switch aria-label="probe" role="checkbox" />);
       void (<Switch>알림 받기</Switch>);
     });
@@ -324,8 +323,8 @@ describe('<Switch />', () => {
 });
 
 /**
- * 스타일 계약 — 컴파일된 CSS 텍스트를 읽는다. 실제 브라우저에서의 thumb 위치(LTR/RTL)와
- * 포커스는 스토리 play 가 본다.
+ * 스타일 계약 — 컴파일된 CSS 텍스트를 읽는다.
+ * 실제 브라우저에서의 thumb 위치(LTR/RTL)와 포커스는 스토리 play가 본다.
  */
 describe('switch.scss', () => {
   const css = compile(

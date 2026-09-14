@@ -260,7 +260,7 @@ export const WithNoSuggestionsText: Story = {
       />
     </div>
   ),
-  // 빈 상태는 focus 해야 그려진다. 선택할 수 없는 안내라 option 이 아니라 status 로 나온다.
+  // 빈 상태는 focus해야 그려진다. 선택할 수 없는 안내라 option이 아니라 status로 나온다.
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const input = canvas.getByRole('combobox', { name: 'Search' });
@@ -360,11 +360,9 @@ const frameworkSuggestions: SearchFieldSuggestion[] = [
 ];
 
 /**
- * list-autocomplete combobox 의 키보드·포커스 계약.
- *
- * DOM 포커스는 끝까지 입력에 남고, 활성 제안은 `aria-activedescendant` 로 알린다.
- * 단위 테스트가 규칙을 고정하고, 이 스토리는 실제 브라우저에서 같은 경로를 한 번 돈다 —
- * test-runner 가 play 를 실행한 뒤 axe 가 끝 상태를 검사한다.
+ * list-autocomplete combobox의 키보드·포커스 계약.
+ * DOM 포커스는 끝까지 입력에 남고, 활성 제안은 `aria-activedescendant`로 알린다.
+ * 단위 테스트가 규칙을 고정하고, 이 스토리는 실제 브라우저에서 같은 경로를 한 번 돈다 — test-runner가 play를 실행한 뒤 axe가 끝 상태를 검사한다.
  */
 export const KeyboardInteraction: Story = {
   render: () => (
@@ -415,7 +413,7 @@ export const KeyboardInteraction: Story = {
 
 /**
  * 모든 테마에서 필드 상태(값·지우기 버튼·오류·비활성)를 한 장에 담는다.
- * 열린 제안 목록은 포커스가 있어야 그려져 정적 갤러리에 담을 수 없다 — `KeyboardInteraction` 이 맡는다.
+ * 열린 제안 목록은 포커스가 있어야 그려져 정적 갤러리에 담을 수 없다 — `KeyboardInteraction`이 맡는다.
  */
 export const ThemeMatrix: Story = {
   parameters: themeGalleryParameters,

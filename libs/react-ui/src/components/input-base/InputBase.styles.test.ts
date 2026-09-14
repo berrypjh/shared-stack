@@ -1,9 +1,7 @@
 /**
  * SCSS 셀렉터가 실제로 방출되는 클래스만 가리키는지 확인한다.
- *
- * jsdom 은 SCSS 를 적용하지 않아서 스타일 회귀를 렌더링으로 잡을 수 없다. 오타 하나로 규칙
- * 전체가 죽어도 테스트는 전부 통과한다 — 실제로 `plain-input.scss` 의 hover·focus·error·
- * disabled 규칙이 `ui-plain-input-base--` 라는 존재하지 않는 접두사를 가리키며 죽어 있었다.
+ * jsdom은 SCSS를 적용하지 않아서 스타일 회귀를 렌더링으로 잡을 수 없다.
+ * 오타 하나로 규칙 전체가 죽어도 테스트는 전부 통과한다 — 실제로 `plain-input.scss`의 hover·focus·error·disabled 규칙이 `ui-plain-input-base--`라는 존재하지 않는 접두사를 가리키며 죽어 있었다.
  * 그래서 소스를 직접 훑는 결정적 검사를 둔다.
  */
 import fs from 'node:fs';
@@ -27,7 +25,7 @@ const STYLESHEETS = [
   'boxed-input/boxed-input.scss',
 ];
 
-/** 컴포넌트가 실제로 DOM 에 붙이는 클래스 전부. */
+/** 컴포넌트가 실제로 DOM에 붙이는 클래스 전부 */
 const emitted = new Set<string>([
   ...Object.values(inputBaseClasses),
   ...Object.values(plainInputClasses),

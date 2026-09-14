@@ -386,9 +386,8 @@ export const A11y: Story = {
 };
 
 /**
- * select-only combobox 의 키보드·포커스 계약.
- *
- * DOM 포커스는 끝까지 trigger 에 남고, 목록 안의 위치는 `aria-activedescendant` 로 알린다.
+ * select-only combobox의 키보드·포커스 계약.
+ * DOM 포커스는 끝까지 trigger에 남고, 목록 안의 위치는 `aria-activedescendant`로 알린다.
  * 단위 테스트가 규칙을 고정하고, 이 스토리는 실제 브라우저에서 같은 경로를 한 번 돈다.
  */
 export const KeyboardInteraction: Story = {
@@ -433,7 +432,7 @@ export const KeyboardInteraction: Story = {
   },
 };
 
-/** 열린 목록의 선택·활성(outline)·비활성 옵션. axe 와 Chromatic 이 열린 상태를 보게 한다. */
+/** 열린 목록의 선택·활성(outline)·비활성 옵션. axe와 Chromatic이 열린 상태를 보게 한다. */
 export const OpenWithStates: Story = {
   render: () => (
     <div style={{ minHeight: '240px' }}>
@@ -448,7 +447,7 @@ export const OpenWithStates: Story = {
   ),
 };
 
-/** 값은 소비자가 소유한다 — `onChange` 의 `event.target.value` 로 갱신한다. */
+/** 값은 소비자가 소유한다 — `onChange`의 `event.target.value`로 갱신한다 */
 export const Controlled: Story = {
   render: () => {
     const [value, setValue] = useState<unknown>('weekly');
@@ -471,7 +470,7 @@ export const Controlled: Story = {
   },
 };
 
-/** 모든 테마에서 trigger 상태(평상시·오류·비활성)와 열린 목록을 한 장에 담는다. */
+/** 모든 테마에서 trigger 상태(평상시·오류·비활성)와 열린 목록을 한 장에 담는다 */
 export const ThemeMatrix: Story = {
   parameters: themeGalleryParameters,
   render: () => (

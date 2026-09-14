@@ -22,7 +22,7 @@ export interface FormControlContextValue {
   onEmpty: () => void;
 }
 
-// PURE annotation: 트리셰이커가 미사용 시 떨어내도록 사이드이펙트 없음을 명시.
+// PURE annotation은 사이드이펙트가 없음을 명시해 트리셰이커가 미사용 시 떨어내게 한다.
 export const FormControlContext = /*#__PURE__*/ createContext<FormControlContextValue | undefined>(
   undefined,
 );

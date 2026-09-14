@@ -4,20 +4,17 @@ import path from 'node:path';
 import { getStoryContext, type TestRunnerConfig } from '@storybook/test-runner';
 import { checkA11y, configureAxe, getAxeResults, injectAxe } from 'axe-playwright';
 
-// Storybook test-runner + axe-playwright 기반 WCAG 자동 검사.
-// WCAG 2.0/2.1/2.2 Level A + AA. 위반 시 CI fail.
-// 기존 위반은 stories의 `parameters.a11y.disable = true`로 baseline 처리 — 후속 PR에서 점진 수정.
-//
-// `wcag22aa` 는 설치된 axe-core 에 실제로 있는지 확인하고 넣었다 (4.11.1 기준 규칙 하나 —
-// `target-size`, WCAG 2.5.8 Target Size Minimum). `wcag22a`·`wcag22aaa` 태그는 axe 에 **없다**
-// — 없는 태그를 적으면 조용히 아무것도 검사하지 않으므로 넣지 않는다.
-//
-// 2.4.13 Focus Appearance 는 WCAG 2.2 에서 **AAA** 다. 품질 목표로 삼을 수는 있어도 이 AA
-// 게이트에 넣지 않는다.
-//
-// `QUALITY_A11Y_RESULTS` 가 있을 때만 story 마다 skip 여부와 axe 원본 결과를 JSONL 로 남긴다
-// (quality-lab 수집용, `tmp/quality-lab/imports` 안). 검사·skip·실패 기준은 그대로다 — 같은
-// 범위·옵션으로 결과를 한 번 더 읽어 저장할 뿐이고, 판정은 아래 `checkA11y` 가 한다.
+/**
+ * Storybook test-runner + axe-playwright 기반 WCAG 자동 검사.
+ * 범위는 WCAG 2.0/2.1/2.2 Level A + AA이고, 위반하면 CI가 실패한다.
+ * 기존 위반은 stories의 `parameters.a11y.disable = true`로 baseline 처리한다 — 후속 PR에서 점진 수정한다.
+ * `wcag22aa`는 설치된 axe-core에 실제로 있는지 확인하고 넣었다 (4.11.1 기준 규칙 하나 — `target-size`, WCAG 2.5.8 Target Size Minimum).
+ * `wcag22a`·`wcag22aaa` 태그는 axe에 없다 — 없는 태그를 적으면 조용히 아무것도 검사하지 않으므로 넣지 않는다.
+ * 2.4.13 Focus Appearance는 WCAG 2.2에서 AAA다.
+ * 품질 목표로 삼을 수는 있어도 이 AA 게이트에 넣지 않는다.
+ * `QUALITY_A11Y_RESULTS`가 있을 때만 story마다 skip 여부와 axe 원본 결과를 JSONL로 남긴다 (quality-lab 수집용, `tmp/quality-lab/imports` 안).
+ * 검사·skip·실패 기준은 그대로다 — 같은 범위·옵션으로 결과를 한 번 더 읽어 저장할 뿐이고, 판정은 아래 `checkA11y`가 한다.
+ */
 const AXE_RUN_OPTIONS = {
   runOnly: {
     type: 'tag' as const,

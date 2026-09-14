@@ -1,15 +1,13 @@
 /**
- * FormControl ↔ InputLabel ↔ Input ↔ FormHelperText 통합 계약. 공개 컴포넌트만 조립한다.
- *
- * 단위 테스트는 각 컴포넌트가 상태를 **어떻게 푸는지**를 본다 (`prop ?? context ?? 기본값`).
- * 여기서는 조립이 끝난 필드가 **사용자와 보조 기술에게 무엇으로 보이는지**만 본다 —
- * 접근 가능한 이름·설명, `required`, `aria-invalid`, native `disabled`, 그리고 진짜 포커스 이동.
- *
- * 클래스는 focus 에만 쓴다. web 에서 focus 는 CSS 로만 드러나서 그것이 관찰면이기 때문이다.
- * 나머지는 전부 DOM 속성과 접근성 트리로 단언한다. 동시 상태의 **색** 우선순위는 마지막
- * describe 가 실제 SCSS 를 적용해 따로 본다.
- *
- * 여기서 **주장하지 않는 것**: `filled`·`adornedStart` 처럼 읽는 곳이 없는 context 상태.
+ * FormControl ↔ InputLabel ↔ Input ↔ FormHelperText 통합 계약.
+ * 공개 컴포넌트만 조립한다.
+ * 단위 테스트는 각 컴포넌트가 상태를 어떻게 푸는지를 본다 (`prop ?? context ?? 기본값`).
+ * 여기서는 조립이 끝난 필드가 사용자와 보조 기술에게 무엇으로 보이는지만 본다 — 접근 가능한 이름·설명, `required`, `aria-invalid`, native `disabled`, 그리고 진짜 포커스 이동.
+ * 클래스는 focus에만 쓴다.
+ * web에서 focus는 CSS로만 드러나서 그것이 관찰면이기 때문이다.
+ * 나머지는 전부 DOM 속성과 접근성 트리로 단언한다.
+ * 동시 상태의 색 우선순위는 마지막 describe가 실제 SCSS를 적용해 따로 본다.
+ * 여기서 주장하지 않는 것은 `filled`·`adornedStart`처럼 읽는 곳이 없는 context 상태다.
  * 단위 테스트가 이미 현재 동작을 고정하고 있다.
  */
 import { act, screen } from '@testing-library/react';
@@ -43,8 +41,8 @@ type FieldProps = {
 };
 
 /**
- * 소비자가 실제로 쓰는 수동 합성. TextField 와 달리 id 연결을 소비자가 소유한다
- * (`apps/demo-web` 의 SelectPage 가 쓰는 모양이다).
+ * 소비자가 실제로 쓰는 수동 합성.
+ * TextField와 달리 id 연결을 소비자가 소유한다 (`apps/demo-web`의 SelectPage가 쓰는 모양이다).
  */
 const Field = (props: FieldProps) => (
   <FormControl {...props}>
@@ -86,8 +84,8 @@ describe('FormControl 필드 통합', () => {
     it('hiddenLabel 이어도 이름 관계는 그대로다', () => {
       render(<Field hiddenLabel />);
 
-      // 시각적 은닉은 `.ui-form-control--hidden-label .ui-input-label` 이 clip 으로 한다.
-      // jsdom 은 SCSS 를 적용하지 않으므로 은닉 자체는 Storybook·Chromatic 몫이다.
+      // 시각적 은닉은 `.ui-form-control--hidden-label .ui-input-label`이 clip으로 한다.
+      // jsdom은 SCSS를 적용하지 않으므로 은닉 자체는 Storybook·Chromatic 몫이다.
       // 여기서 지키는 것은 "숨김이 접근성 트리에서 라벨을 지우지 않는다" 하나다.
       expect(label()).toBeInTheDocument();
       expect(label()).not.toHaveAttribute('aria-hidden');
@@ -125,7 +123,7 @@ describe('FormControl 필드 통합', () => {
     it('시각 필수 표시가 접근 가능한 이름을 오염시키지 않는다', () => {
       render(<Field required />);
 
-      // `*` 는 보이지만 `aria-hidden` 이라 이름 계산에서 빠진다. 이름은 라벨 텍스트 그대로다.
+      // `*`는 보이지만 `aria-hidden`이라 이름 계산에서 빠진다. 이름은 라벨 텍스트 그대로다.
       expect(label()).toHaveTextContent('*');
       expect(input()).toHaveAccessibleName(LABEL_TEXT);
     });
@@ -166,8 +164,8 @@ describe('FormControl 필드 통합', () => {
         clear.focus();
       });
 
-      // 포커스는 지우기 버튼이 가졌지만 필드를 떠난 것은 아니다. 라벨이 평상시로 돌아가면
-      // 사용자는 편집 맥락을 잃는다.
+      // 포커스는 지우기 버튼이 가졌지만 필드를 떠난 것은 아니다.
+      // 라벨이 평상시로 돌아가면 사용자는 편집 맥락을 잃는다.
       expect(document.activeElement).toBe(clear);
       expect(label()).toHaveClass(inputLabelClasses.focused);
     });
@@ -236,7 +234,7 @@ describe('FormControl 필드 통합', () => {
         </FormControl>,
       );
 
-      // 안쪽 FormControl 은 disabled 를 물려받지 않는다 — 자기 기본값(false)을 내려보낸다.
+      // 안쪽 FormControl은 disabled를 물려받지 않는다 — 자기 기본값(false)을 내려보낸다.
       expect(input()).not.toBeDisabled();
       expect(input()).toHaveAttribute('aria-invalid', 'true');
     });
@@ -257,20 +255,17 @@ describe('FormControl 필드 통합', () => {
     it('helperText 가 없으면 aria-describedby 를 지어내지 않는다', () => {
       render(<TextField label={LABEL_TEXT} />);
 
-      // 가리킬 대상이 없는 id 를 붙이면 보조 기술이 빈 설명을 읽는다.
+      // 가리킬 대상이 없는 id를 붙이면 보조 기술이 빈 설명을 읽는다.
       expect(screen.getByRole('textbox')).not.toHaveAttribute('aria-describedby');
     });
   });
 
   /**
-   * 상태가 겹쳤을 때 **필드 전체가 한 가지 이야기를 하는지.**
-   *
-   * 단위 테스트는 각 컴포넌트에 prop 을 직접 줘서 우선순위를 고정한다. 여기서는 소비자가
-   * 실제로 만드는 상황 — `<FormControl error>` 안에서 입력에 포커스가 갔을 때 — 라벨과 헬퍼가
-   * 함께 오류를 유지하는지 본다. 오류 필드에 커서를 놓는 순간 라벨만 평상시 색으로 돌아가면
-   * 색이 전달하던 오류 신호가 사라진다.
-   *
-   * 색은 `aria-invalid` 를 대신하지 않는다 — 고지는 별도로 확인한다.
+   * 상태가 겹쳤을 때 필드 전체가 한 가지 이야기를 하는지.
+   * 단위 테스트는 각 컴포넌트에 prop을 직접 줘서 우선순위를 고정한다.
+   * 여기서는 소비자가 실제로 만드는 상황 — `<FormControl error>` 안에서 입력에 포커스가 갔을 때 — 라벨과 헬퍼가 함께 오류를 유지하는지 본다.
+   * 오류 필드에 커서를 놓는 순간 라벨만 평상시 색으로 돌아가면 색이 전달하던 오류 신호가 사라진다.
+   * 색은 `aria-invalid`를 대신하지 않는다 — 고지는 별도로 확인한다.
    */
   describe('필드 전체의 동시 상태', () => {
     beforeAll(() => {
@@ -304,7 +299,7 @@ describe('FormControl 필드 통합', () => {
       expect(colorsOf(label(), LABEL_STATES)).toEqual(['var(--ds-text-error)']);
       expect(colorsOf(helper(), HELPER_STATES)).toEqual(['var(--ds-text-error)']);
 
-      // 색은 고지가 아니다 — aria-invalid 가 따로 있어야 한다.
+      // 색은 고지가 아니다 — aria-invalid가 따로 있어야 한다.
       expect(input()).toHaveAttribute('aria-invalid', 'true');
     });
 

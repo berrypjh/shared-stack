@@ -85,9 +85,9 @@ describe('<ThemeProvider />', () => {
   });
 
   /**
-   * web은 Context가 아니라 `data-theme` DOM 스코프로 테마를 내려보낸다. 그래서 중첩의 계약은
-   * "안쪽이 자기 scope를 새로 연다"는 **구조**다 — 실제 값 선택은 CSS 캐스케이드가 하고,
-   * 그것은 브라우저 몫이라 jsdom에서 검증하지 않는다. RN은 같은 시맨틱을 Context로 구현한다.
+   * web은 Context가 아니라 `data-theme` DOM 스코프로 테마를 내려보낸다.
+   * 그래서 중첩의 계약은 "안쪽이 자기 scope를 새로 연다"는 구조다 — 실제 값 선택은 CSS 캐스케이드가 하고, 그것은 브라우저 몫이라 jsdom에서 검증하지 않는다.
+   * RN은 같은 시맨틱을 Context로 구현한다.
    */
   describe('중첩', () => {
     it('중첩하면 안쪽이 자기 data-theme scope를 연다', () => {
@@ -111,23 +111,20 @@ describe('<ThemeProvider />', () => {
   });
 
   /**
-   * 레지스트리 `selector` ↔ Provider 가 내보내는 `data-theme` 의 대응.
-   *
-   * 테마는 두 곳에서 만난다. design-tokens 는 `themes[].selector` 아래에 CSS 변수를 생성하고,
-   * ThemeProvider 는 `data-theme={mode}` 를 단다. **둘을 잇는 것은 이름 규약뿐이다** —
-   * selector 가 바뀌거나 Provider 가 다른 속성을 달면 CSS 가 더 이상 매칭되지 않는데
-   * 타입도 DOM 도 기존 테스트도 아무 말을 하지 않는다. 테마가 조용히 적용되지 않을 뿐이고,
-   * 그 증상은 Storybook 토글이 이름만 바뀌고 화면은 그대로인 모습으로 나타난다.
-   *
-   * 그래서 "Provider 가 만든 루트가 그 테마의 selector 에 실제로 매칭되는가" 를 본다.
+   * 레지스트리 `selector` ↔ Provider가 내보내는 `data-theme`의 대응.
+   * 테마는 두 곳에서 만난다.
+   * design-tokens는 `themes[].selector` 아래에 CSS 변수를 생성하고, ThemeProvider는 `data-theme={mode}`를 단다.
+   * 둘을 잇는 것은 이름 규약뿐이다 — selector가 바뀌거나 Provider가 다른 속성을 달면 CSS가 더 이상 매칭되지 않는데 타입도 DOM도 기존 테스트도 아무 말을 하지 않는다.
+   * 테마가 조용히 적용되지 않을 뿐이고, 그 증상은 Storybook 토글이 이름만 바뀌고 화면은 그대로인 모습으로 나타난다.
+   * 그래서 "Provider가 만든 루트가 그 테마의 selector에 실제로 매칭되는가"를 본다.
    * 목록은 레지스트리에서 읽는다 — 하드코딩하면 테마가 늘어도 조용히 통과한다.
    */
   describe('레지스트리 selector 대응', () => {
-    /** `light` 는 base 라 `:root` 에 실린다 — 요소 selector 가 아니라 따로 본다. */
+    /** `light`는 base라 `:root`에 실린다 — 요소 selector가 아니라 따로 본다 */
     const scoped = themes.filter((theme) => theme.selector !== ':root');
 
     it('검사할 테마를 찾는다', () => {
-      // 수집이 조용히 비면 아래 each 가 0건으로 통과한다.
+      // 수집이 조용히 비면 아래 each가 0건으로 통과한다.
       expect(themes.length).toBeGreaterThan(0);
       expect(scoped.length).toBeGreaterThan(0);
     });

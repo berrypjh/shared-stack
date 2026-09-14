@@ -1,11 +1,9 @@
 /**
  * Avatar — 정적 identity visual.
- *
- * 크기는 로컬 `--ui-avatar-size` 하나로 모은다. 상자·이미지·이니셜이 같은 값을 세 번 읽어야
- * 해서, size 클래스가 변수만 갈아끼우면 셋이 함께 움직인다.
- *
- * 상호작용 규칙이 없다 — `:hover`·`:active`·`:focus-visible` 을 두지 않는다. 누를 수 있는
- * identity 컨트롤은 소비자가 `ButtonBase`/`IconButton` 으로 감싸고, 그 포커스 링은 그쪽이 그린다.
+ * 크기는 로컬 `--ui-avatar-size` 하나로 모은다.
+ * 상자·이미지·이니셜이 같은 값을 세 번 읽어야 해서, size 클래스가 변수만 갈아끼우면 셋이 함께 움직인다.
+ * 상호작용 규칙이 없다 — `:hover`·`:active`·`:focus-visible`을 두지 않는다.
+ * 누를 수 있는 identity 컨트롤은 소비자가 `ButtonBase`/`IconButton`으로 감싸고, 그 포커스 링은 그쪽이 그린다.
  */
 .ui-avatar {
   --ui-avatar-size: var(--ds-spacing-2xl);
@@ -29,7 +27,7 @@
   background-color: var(--ds-background-grey);
   color: var(--ds-text-default);
 
-  /* 긴 이니셜이 원을 밀어내지 않는다 — 상자는 고정이고 넘치는 글자만 잘린다. */
+  /* 긴 이니셜이 원을 밀어내지 않는다 — 상자는 고정이고 넘치는 글자만 잘린다 */
   overflow: hidden;
 
   font-family: var(--ui-avatar-font-family);
@@ -41,7 +39,7 @@
   user-select: none;
 }
 
-/* 이미지는 상자를 꽉 채우고 비율을 유지한 채 잘린다. crop 은 CSS 가 한다. */
+/* 이미지는 상자를 꽉 채우고 비율을 유지한 채 잘린다. crop은 CSS가 한다. */
 .ui-avatar__image {
   inline-size: 100%;
   block-size: 100%;
@@ -99,15 +97,13 @@
 
 /**
  * forced-colors(Windows 고대비) 대응.
- *
- * 이니셜 Avatar 는 **배경색만으로** 자기 경계를 만든다. 그 모드에서 저자 색은 시스템 색으로
- * 갈아끼워져 배경(`Canvas`)과 같아질 수 있고, 그러면 원이 사라져 이니셜이 허공에 뜬 글자가 된다.
- * 그 모드에서만 테두리를 켜서 경계를 만든다 — `.ui-button--variant-contained` 와 같은 전략이다.
- *
- * `<img>` 는 다루지 않는다. forced-colors 는 이미지 내용을 갈아끼우지 않으므로 사진 Avatar 는
- * 그대로 보인다.
- *
- * `ButtonBorder` 는 CSS 시스템 색 키워드지 하드코딩이 아니다. 길이는 강제되지 않아 토큰을 쓴다.
+ * 이니셜 Avatar는 배경색만으로 자기 경계를 만든다.
+ * 그 모드에서 저자 색은 시스템 색으로 갈아끼워져 배경(`Canvas`)과 같아질 수 있고, 그러면 원이 사라져 이니셜이 허공에 뜬 글자가 된다.
+ * 그 모드에서만 테두리를 켜서 경계를 만든다 — `.ui-button--variant-contained`와 같은 전략이다.
+ * `<img>`는 다루지 않는다.
+ * forced-colors는 이미지 내용을 갈아끼우지 않으므로 사진 Avatar는 그대로 보인다.
+ * `ButtonBorder`는 CSS 시스템 색 키워드지 하드코딩이 아니다.
+ * 길이는 강제되지 않아 토큰을 쓴다.
  */
 @media (forced-colors: active) {
   .ui-avatar {

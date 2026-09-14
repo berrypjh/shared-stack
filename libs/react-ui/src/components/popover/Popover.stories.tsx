@@ -35,7 +35,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /**
- * 위치는 컨슈머 소유다 — Popover 는 positioning 을 하지 않는다.
+ * 위치는 컨슈머 소유다 — Popover는 positioning을 하지 않는다.
  * 스토리는 relative 래퍼 + absolute 패널이라는 가장 단순한 배치를 쓴다.
  */
 const wrapperStyle = {
@@ -51,7 +51,7 @@ const panelStyle = {
   minInlineSize: '240px',
 };
 
-/** 기본 시맨틱. 패널에 role 이 없고 트리거는 `aria-expanded` 만 갖는다. */
+/** 기본 시맨틱. 패널에 role이 없고 트리거는 `aria-expanded`만 갖는다. */
 export const Default: Story = {
   render: () => (
     <div style={wrapperStyle}>
@@ -86,29 +86,21 @@ export const Playground: Story = {
 };
 
 /**
- * `semantics="dialog"` 는 트리거의 `aria-haspopup` 과 패널의 `role` 을 함께 올리고
- * 열릴 때 포커스를 패널 안으로 옮긴다. **접근 가능한 이름이 필수다.**
+ * `semantics="dialog"`는 트리거의 `aria-haspopup`과 패널의 `role`을 함께 올리고 열릴 때 포커스를 패널 안으로 옮긴다.
+ * 접근 가능한 이름이 필수다.
  */
 export const DialogSemantics: Story = {
   parameters: {
     /*
-     * `aria-valid-attr-value` 를 이 스토리에서만 끈다.
-     *
-     * axe 는 `aria-haspopup` 이 있으면 `aria-controls` 가 가리키는 id 를 **아예 검사하지
-     * 않고** incomplete("수동 확인 필요")로 넘긴다 — 팝업이 나중에 DOM 에 붙는 구현이 흔해서
-     * 참조가 유효한지 판단할 수 없다는 이유다. 조건은 두 속성이 함께 있는 것뿐이고 id 가
-     * 실제로 존재하는지는 보지 않으므로, 마크업을 고쳐서 없앨 수 있는 결과가 아니다.
-     * (axe-core 4.11 `ariaValidAttrValueEvaluate` 의 `aria-controls` preCheck.)
-     *
-     * 그 참조가 실제로 맞는지는 여기 말고 결정적인 검사가 이미 본다:
-     * - `aria-controls` → panel id 일치: `Popover.test.tsx` 의 'aria-controls 가 같은
-     *   인스턴스의 panel id 를 가리켜야 한다'
-     * - `aria-labelledby` → 존재하는 id: `components/stories.aria.test.ts` 가 스토리 소스를
-     *   정적으로 훑는다
-     * - `aria-haspopup` 값: `Popover.test.tsx` 의 semantics 검사
-     *
-     * CI 게이트에는 영향이 없었다 — `checkA11y` 는 violations 만 보고 incomplete 는 읽지
-     * 않는다. 이 설정은 Storybook a11y 패널의 잡음을 줄이는 것이 목적이다.
+     * `aria-valid-attr-value`를 이 스토리에서만 끈다.
+     * axe는 `aria-haspopup`이 있으면 `aria-controls`가 가리키는 id를 아예 검사하지 않고 incomplete("수동 확인 필요")로 넘긴다 — 팝업이 나중에 DOM에 붙는 구현이 흔해서 참조가 유효한지 판단할 수 없다는 이유다.
+     * 조건은 두 속성이 함께 있는 것뿐이고 id가 실제로 존재하는지는 보지 않으므로, 마크업을 고쳐서 없앨 수 있는 결과가 아니다 (axe-core 4.11 `ariaValidAttrValueEvaluate`의 `aria-controls` preCheck).
+     * 그 참조가 실제로 맞는지는 여기 말고 결정적인 검사가 이미 본다.
+     * - `aria-controls` → panel id 일치: `Popover.test.tsx`의 'aria-controls 가 같은 인스턴스의 panel id 를 가리켜야 한다'
+     * - `aria-labelledby` → 존재하는 id: `components/stories.aria.test.ts`가 스토리 소스를 정적으로 훑는다
+     * - `aria-haspopup` 값: `Popover.test.tsx`의 semantics 검사
+     * CI 게이트에는 영향이 없었다 — `checkA11y`는 violations만 보고 incomplete는 읽지 않는다.
+     * 이 설정은 Storybook a11y 패널의 잡음을 줄이는 것이 목적이다.
      */
     a11y: { options: { rules: { 'aria-valid-attr-value': { enabled: false } } } },
   },
@@ -136,8 +128,8 @@ export const DialogSemantics: Story = {
 
     await userEvent.click(trigger);
 
-    // dialog 는 패널 안 첫 포커스 가능 요소로 진입한다. 진입은 passive effect 에서 일어나고
-    // 실제 브라우저는 그것을 paint 뒤로 미룬다 — jsdom 은 동기 flush 라 이 차이가 안 보인다.
+    // dialog는 패널 안 첫 포커스 가능 요소로 진입한다.
+    // 진입은 passive effect에서 일어나고 실제 브라우저는 그것을 paint 뒤로 미룬다 — jsdom은 동기 flush라 이 차이가 안 보인다.
     await waitFor(() => expect(canvas.getByLabelText('Display name')).toHaveFocus());
     await expect(canvas.getByRole('dialog', { name: 'Edit name' })).toBeInTheDocument();
   },
@@ -164,7 +156,7 @@ export const Controlled: Story = {
   },
 };
 
-/** 패널 안의 상호작용은 닫지 않는다. Tab 은 자연스러운 DOM 순서로 흐른다. */
+/** 패널 안의 상호작용은 닫지 않는다. Tab은 자연스러운 DOM 순서로 흐른다. */
 export const InteractiveContent: Story = {
   render: () => (
     <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
@@ -195,7 +187,7 @@ export const InteractiveContent: Story = {
   },
 };
 
-/** Escape 로 닫으면 포커스가 트리거로 돌아온다. */
+/** Escape로 닫으면 포커스가 트리거로 돌아온다 */
 export const EscapeRestoresFocus: Story = {
   render: () => (
     <div style={wrapperStyle}>
@@ -223,7 +215,7 @@ export const EscapeRestoresFocus: Story = {
   },
 };
 
-/** 바깥 컨트롤을 클릭해 닫으면 포커스를 빼앗지 않는다 — 사용자가 고른 곳에 남는다. */
+/** 바깥 컨트롤을 클릭해 닫으면 포커스를 빼앗지 않는다 — 사용자가 고른 곳에 남는다 */
 export const OutsideDismissKeepsFocus: Story = {
   render: () => (
     <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
@@ -265,9 +257,7 @@ export const LongContent: Story = {
   ),
 };
 
-/**
- * 중첩. 한 번의 Escape 는 **안쪽만** 닫는다 — 바깥은 그대로 남는다.
- */
+/** 중첩. 한 번의 Escape는 안쪽만 닫는다 — 바깥은 그대로 남는다. */
 export const Nested: Story = {
   render: () => (
     <div style={wrapperStyle}>
@@ -294,20 +284,20 @@ export const Nested: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
-    // 포커스를 명시적으로 세운다. 주변 포커스 상태에 기대면 브라우저와 jsdom 에서 결과가
-    // 갈린다. 중첩에서 가장 흔한 위치는 방금 누른 안쪽 트리거다.
+    // 포커스를 명시적으로 세운다. 주변 포커스 상태에 기대면 브라우저와 jsdom에서 결과가 갈린다.
+    // 중첩에서 가장 흔한 위치는 방금 누른 안쪽 트리거다.
     const inner = canvas.getByRole('button', { name: 'Inner' });
     inner.focus();
     await expect(inner).toHaveFocus();
 
     /**
-     * Escape 가 실제로 어디로 갔는지 기록한다.
-     *
-     * 이 스토리는 jsdom 에서는 통과하면서 Chromium 에서만 실패한 이력이 있다. 그때 실패
-     * 메시지는 "패널이 남아 있다" 뿐이라 원인을 좁힐 수 없었다. capture/bubble 양쪽을 찍어
-     * 두면 **어느 단계에서 끊겼는지**가 메시지에 그대로 나온다:
-     * capture 만 있으면 우리 핸들러가 전파를 끊은 것이고(정상), 둘 다 있으면 핸들러가 아예
-     * 불리지 않은 것이며, 둘 다 없으면 키 이벤트가 이 문서로 오지도 않은 것이다.
+     * Escape가 실제로 어디로 갔는지 기록한다.
+     * 이 스토리는 jsdom에서는 통과하면서 Chromium에서만 실패한 이력이 있다.
+     * 그때 실패 메시지는 "패널이 남아 있다"뿐이라 원인을 좁힐 수 없었다.
+     * capture/bubble 양쪽을 찍어 두면 어느 단계에서 끊겼는지가 메시지에 그대로 나온다.
+     * - capture만 있으면 우리 핸들러가 전파를 끊은 것이다 (정상)
+     * - 둘 다 있으면 핸들러가 아예 불리지 않은 것이다
+     * - 둘 다 없으면 키 이벤트가 이 문서로 오지도 않은 것이다
      */
     const path: string[] = [];
     const probe = (event: Event) => {

@@ -31,8 +31,8 @@ const meta = {
     layout: 'centered',
   },
   args: {
-    // circular Fab 은 아이콘과 접근 가능한 이름을 타입에서 요구한다. meta 에 두면 모든
-    // 스토리가 물려받고 Playground 의 인자로도 쓰인다.
+    // circular Fab은 아이콘과 접근 가능한 이름을 타입에서 요구한다.
+    // meta에 두면 모든 스토리가 물려받고 Playground의 인자로도 쓰인다.
     icon: <PlusIcon />,
     'aria-label': 'Action',
     color: 'primary',
@@ -66,9 +66,9 @@ const meta = {
 export default meta;
 
 /**
- * `StoryObj<typeof meta>` 가 아니라 컴포넌트 기준이다. Fab prop 은 shape 판별 union 이라
- * extended 분기의 필수 `children` 을 meta.args 로는 채울 수 없고, 그러면 모든 스토리가
- * 쓰지도 않는 `args` 를 요구받는다. 런타임 meta.args 기본값은 그대로 적용된다.
+ * `StoryObj<typeof meta>`가 아니라 컴포넌트 기준이다.
+ * Fab prop은 shape 판별 union이라 extended 분기의 필수 `children`을 meta.args로는 채울 수 없고, 그러면 모든 스토리가 쓰지도 않는 `args`를 요구받는다.
+ * 런타임 meta.args 기본값은 그대로 적용된다.
  */
 type Story = StoryObj<typeof Fab>;
 
@@ -180,7 +180,7 @@ export const A11y: Story = {
         Opens the current document in edit mode.
       </p>
       <div style={rowStyle}>
-        {/* 네이티브 button 은 `disabled` 만으로 충분하다 — aria-disabled 는 링크 host 전용이다. */}
+        {/* 네이티브 button은 `disabled`만으로 충분하다 — aria-disabled는 링크 host 전용이다 */}
         <Fab disabled icon={<PlusIcon />} aria-label="Add (unavailable)" />
       </div>
     </div>
@@ -188,10 +188,9 @@ export const A11y: Story = {
 };
 
 /**
- * 등록된 모든 테마 × shape·상태. 테마 목록은 레지스트리에서 순회한다.
- *
- * Fab 은 elevation 이 시각 언어라 배경이 밝은 테마와 어두운 테마에서 그림자가 다르게 읽힌다 —
- * 테마별로 나란히 두는 것이 이 컴포넌트에서 특히 값이 있다.
+ * 등록된 모든 테마 × shape·상태.
+ * 테마 목록은 레지스트리에서 순회한다.
+ * Fab은 elevation이 시각 언어라 배경이 밝은 테마와 어두운 테마에서 그림자가 다르게 읽힌다 — 테마별로 나란히 두는 것이 이 컴포넌트에서 특히 값이 있다.
  */
 export const ThemeMatrix: Story = {
   parameters: themeGalleryParameters,
@@ -215,7 +214,7 @@ export const ThemeMatrix: Story = {
   ),
 };
 
-/** 키보드로 도달한다. circular Fab 은 이름이 `aria-label` 에만 있으므로 이름으로 단언한다. */
+/** 키보드로 도달한다. circular Fab은 이름이 `aria-label`에만 있으므로 이름으로 단언한다. */
 export const KeyboardFocus: Story = {
   render: () => (
     <div style={rowStyle}>

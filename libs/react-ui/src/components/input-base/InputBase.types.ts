@@ -50,9 +50,8 @@ export type InputBaseOwnProps = Omit<InputFieldProps, 'variant'> & {
   inputProps?: NativeInputProps;
   textareaProps?: NativeTextareaProps;
   /**
-   * native input/textarea 로 가는 ref.
-   *
-   * 루트 `<div>` 를 받는 `ref` 와 별개다 — 값 읽기·포커스·선택은 native 요소에서만 된다.
+   * native input/textarea로 가는 ref.
+   * 루트 `<div>`를 받는 `ref`와 별개다 — 값 읽기·포커스·선택은 native 요소에서만 된다.
    */
   inputRef?: Ref<InputLikeElement>;
   name?: string;

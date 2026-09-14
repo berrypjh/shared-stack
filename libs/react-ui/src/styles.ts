@@ -1,5 +1,8 @@
-// 공유 base(selector·CSS 변수 정의)는 이를 덮는 컴포넌트보다 먼저 로드되어야 cascade가 의도대로 동작.
-// 알파벳 정렬 시 base가 뒤로 가서 소비자 컴포넌트를 덮어버리는 회귀가 발생하므로 수동 정렬을 유지함.
+/**
+ * 모든 컴포넌트 SCSS aggregator.
+ * 공유 base(selector·CSS 변수 정의)는 이를 덮는 컴포넌트보다 먼저 로드되어야 cascade가 의도대로 동작한다.
+ * 알파벳 정렬 시 base가 뒤로 가서 소비자 컴포넌트를 덮어버리는 회귀가 생기므로 수동 정렬을 유지한다.
+ */
 /* eslint-disable simple-import-sort/imports */
 
 // 1. 공유 base

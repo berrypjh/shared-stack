@@ -1,13 +1,10 @@
 /**
  * Avatar 계약.
- *
- * Avatar 는 **정적 identity visual** 이다. 이미지가 있으면 `<img>` 로 그리고, 없거나 실패하면
- * fallback 을 그린다. 상호작용은 없다 — 누를 수 있는 identity 컨트롤이 필요하면 소비자가
- * `ButtonBase`/`IconButton` 으로 감싼다.
- *
- * 접근성의 핵심은 **같은 정보를 두 번 읽히지 않는 것**이다. 그래서 이미지와 fallback 은
- * 동시에 렌더되지 않고(둘 중 하나만), `alt` 를 준 fallback 은 루트가 `role="img"` +
- * `aria-label` 로 이름을 갖고 시각 글자는 트리에서 감춘다.
+ * Avatar는 정적 identity visual이다.
+ * 이미지가 있으면 `<img>`로 그리고, 없거나 실패하면 fallback을 그린다.
+ * 상호작용은 없다 — 누를 수 있는 identity 컨트롤이 필요하면 소비자가 `ButtonBase`/`IconButton`으로 감싼다.
+ * 접근성의 핵심은 같은 정보를 두 번 읽히지 않는 것이다.
+ * 그래서 이미지와 fallback은 동시에 렌더되지 않고(둘 중 하나만), `alt`를 준 fallback은 루트가 `role="img"` + `aria-label`로 이름을 갖고 시각 글자는 트리에서 감춘다.
  */
 import { createRef } from 'react';
 
@@ -27,9 +24,8 @@ describe('<Avatar />', () => {
   const { render } = createRenderer();
 
   /**
-   * `polymorphicProp` 은 제외한다 — Avatar 는 `component` prop 을 열지 않는다. 루트 element 를
-   * 바꾸면 `<img>`/`role="img"` 로 세운 시맨틱을 소비자가 조용히 무너뜨릴 수 있고, `Box` 도
-   * 같은 이유로 polymorphic 이 아니다 (polymorphic 은 ButtonBase 계열 관례다).
+   * `polymorphicProp`은 제외한다 — Avatar는 `component` prop을 열지 않는다.
+   * 루트 element를 바꾸면 `<img>`/`role="img"`로 세운 시맨틱을 소비자가 조용히 무너뜨릴 수 있고, `Box`도 같은 이유로 polymorphic이 아니다 (polymorphic은 ButtonBase 계열 관례다).
    */
   describeConformance(<Avatar>길동</Avatar>, () => ({
     render,
@@ -119,8 +115,8 @@ describe('<Avatar />', () => {
     });
 
     it('alt 를 주지 않으면 빈 alt 로 렌더해 트리에서 빠진다', () => {
-      // 이름 없는 `<img>` 는 스크린리더가 파일명을 읽는다. 기본 문자열을 지어내는 대신
-      // 장식으로 둔다 — 이름이 필요하면 소비자가 `alt` 를 준다.
+      // 이름 없는 `<img>`는 스크린리더가 파일명을 읽는다.
+      // 기본 문자열을 지어내는 대신 장식으로 둔다 — 이름이 필요하면 소비자가 `alt`를 준다.
       const { container } = render(<Avatar src={SRC} />);
       const img = container.querySelector('img');
 
@@ -166,7 +162,7 @@ describe('<Avatar />', () => {
     it('이름을 가진 fallback 의 시각 글자는 트리에서 감춘다 — 중복 낭독 방지', () => {
       render(<Avatar alt="홍길동">길동</Avatar>);
 
-      // 루트가 "홍길동" 으로 읽히므로 "길동" 가 따라 읽히면 같은 사람을 두 번 말하게 된다.
+      // 루트가 "홍길동"으로 읽히므로 "길동"이 따라 읽히면 같은 사람을 두 번 말하게 된다.
       expect(screen.getByText('길동')).toHaveAttribute('aria-hidden', 'true');
       expect(screen.getByRole('img', { name: '홍길동' })).toBeInTheDocument();
     });
@@ -244,7 +240,7 @@ describe('<Avatar />', () => {
       const next = 'https://example.test/next.png';
       setProps({ src: next } as Partial<AvatarProps>);
 
-      // 실패한 URL 에 상태를 매어 두므로 새 URL 은 깨끗하게 다시 시도된다.
+      // 실패한 URL에 상태를 매어 두므로 새 URL은 깨끗하게 다시 시도된다.
       expect(container.querySelector('img')).toHaveAttribute('src', next);
     });
   });

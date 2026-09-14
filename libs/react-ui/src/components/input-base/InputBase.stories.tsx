@@ -299,12 +299,10 @@ export const A11y: Story = {
 };
 
 /**
- * 포커스 chrome 은 CSS `:focus` 가 아니라 `InputBase` 가 관리하는 상태 클래스가 그린다.
- * 그래서 `play` 에서 실제로 포커스를 옮겨야 보인다 — 클래스를 손으로 붙이면 상태 기계를
- * 건너뛰고 시각만 흉내 내는 것이 된다.
- *
- * 평상시 필드를 옆에 둬서 대비를 함께 본다. Chromatic 은 `play` 이후를 찍으므로
- * 포커스 표시 자체가 시각 회귀 대상이 된다.
+ * 포커스 chrome은 CSS `:focus`가 아니라 `InputBase`가 관리하는 상태 클래스가 그린다.
+ * 그래서 `play`에서 실제로 포커스를 옮겨야 보인다 — 클래스를 손으로 붙이면 상태 기계를 건너뛰고 시각만 흉내 내는 것이 된다.
+ * 평상시 필드를 옆에 둬서 대비를 함께 본다.
+ * Chromatic은 `play` 이후를 찍으므로 포커스 표시 자체가 시각 회귀 대상이 된다.
  */
 export const Focused: Story = {
   render: () => (
@@ -321,9 +319,8 @@ export const Focused: Story = {
 
 /**
  * 값의 주인이 누구인지 보여준다.
- *
- * `InputBase` 는 값을 내부에 복제하지 않는다 — `value` 를 주면 소비자가 유일한 권한이고,
- * `defaultValue` 만 주면 native input 이 소유한다. 두 모델을 나란히 두면 계약이 눈에 보인다.
+ * `InputBase`는 값을 내부에 복제하지 않는다 — `value`를 주면 소비자가 유일한 권한이고, `defaultValue`만 주면 native input이 소유한다.
+ * 두 모델을 나란히 두면 계약이 눈에 보인다.
  */
 export const ControlledVsUncontrolled: Story = {
   render: function Render() {
@@ -347,14 +344,12 @@ export const ControlledVsUncontrolled: Story = {
 
 /**
  * 등록된 모든 테마 × 세 variant × 대표 상태를 한 화면에 담는다.
- *
- * 갤러리를 variant 마다 따로 두지 않고 하나로 묶은 이유는, 회귀에서 보고 싶은 것이 "이 테마에서
- * plain·filled·boxed 가 **서로** 어떻게 다른가" 이기 때문이다. 따로 찍으면 그 비교가 사라진다.
- *
- * `focused` 는 `FormControl` 의 controlled prop 으로 켠다 — 상태를 흉내 내려고 클래스를 손으로
- * 붙이지 않는다. 그것이 실제 합성 계층이고, 스크린샷도 진짜 경로를 지나야 의미가 있다.
- *
- * 전체 곱을 만들지 않는다. 토큰이 갈라지는 자리(테두리·표면·halo·비활성)를 대표하는 상태만 둔다.
+ * 갤러리를 variant마다 따로 두지 않고 하나로 묶은 이유는, 회귀에서 보고 싶은 것이 "이 테마에서 plain·filled·boxed가 서로 어떻게 다른가"이기 때문이다.
+ * 따로 찍으면 그 비교가 사라진다.
+ * `focused`는 `FormControl`의 controlled prop으로 켠다 — 상태를 흉내 내려고 클래스를 손으로 붙이지 않는다.
+ * 그것이 실제 합성 계층이고, 스크린샷도 진짜 경로를 지나야 의미가 있다.
+ * 전체 곱을 만들지 않는다.
+ * 토큰이 갈라지는 자리(테두리·표면·halo·비활성)를 대표하는 상태만 둔다.
  */
 export const ThemeMatrix: Story = {
   parameters: themeGalleryParameters,

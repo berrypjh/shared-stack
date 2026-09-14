@@ -1,8 +1,8 @@
 /**
  * RadioGroup.
- *
- * native `<fieldset>` 의 기본 테두리·여백만 걷어낸다. 그룹 시맨틱과 `disabled` 전파는
- * 브라우저 것 그대로다. 선택지 경계의 오류 색은 `radio.scss` 가 input 의 `data-invalid` 로 정한다.
+ * native `<fieldset>`의 기본 테두리·여백만 걷어낸다.
+ * 그룹 시맨틱과 `disabled` 전파는 브라우저 것 그대로다.
+ * 선택지 경계의 오류 색은 `radio.scss`가 input의 `data-invalid`로 정한다.
  */
 .ui-radio-group {
   display: flex;
