@@ -80,6 +80,10 @@ export class BundleError extends Error {
   }
 }
 
+/**
+ * entry 는 저장소 밖에 둔다. 저장소 안이면 root tsconfig `paths` 가 패키지를 `src` 로 돌려
+ * dist 가 아닌 소스를 재게 된다.
+ */
 const writeEntry = async (content: string): Promise<string> => {
   const dir = await fs.mkdtemp(path.join(os.tmpdir(), 'treeshake-'));
   const file = path.join(dir, 'entry.mjs');
@@ -101,7 +105,12 @@ const bundleSize = (target: Target, entry: string): { raw: number; gzip: number 
       '--platform=neutral',
       ...target.external.map((e) => `--external:${e}`),
     ],
-    { encoding: 'utf8', cwd: process.cwd() },
+    // 저장소 밖 entry 는 pnpm shim 의 `.pnpm/node_modules` 로만 해석되는데 거기엔 design-tokens 가 없다.
+    {
+      encoding: 'utf8',
+      cwd: process.cwd(),
+      env: { ...process.env, NODE_PATH: path.join(process.cwd(), 'node_modules') },
+    },
   );
   if (out.status !== 0) {
     throw new BundleError(out.stderr);
