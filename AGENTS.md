@@ -24,11 +24,28 @@ Agents must optimize for:
 
 - `apps/demo-mobile`: Expo / React Native demo app
 - `apps/demo-web`: React + Vite demo app
-- `apps/demo-web-e2e`: Playwright E2E tests for the web demo
+- `apps/quality-lab`: private Vite app that displays exported quality-collection results after validating them against `observability-contracts`
+- `apps/quality-lab-e2e`: Playwright E2E tests for `quality-lab`
 - `libs/design-tokens`: design token sources, transforms, and generated outputs
 - `libs/ui-core`: platform-agnostic contracts, shared logic, and foundational utilities
 - `libs/react-ui`: React web UI component library
 - `libs/react-native-ui`: React Native UI component library
+- `libs/observability-contracts`: private zod schemas shared by the quality-lab collectors and app; not released
+- `libs/{eslint,prettier,tsconfig,commitlint}-config`: shared configuration packages consumed by downstream repositories
+- `docs/quality-lab`: quality-lab architecture, metrics, collectors, verification, and limitations
+- `plugins/berry-commit`: Claude Code plugin (`commit-scope` skill + `commit-mcp` MCP server), distributed through `.claude-plugin/marketplace.json`
+- `tools/lib`: helpers shared across tools (for example token counting)
+- `tools/scripts`: build and measurement scripts — token measurement, tree-shaking check, release, the generated consumer catalog, and the quality-lab observability collectors (`tools/scripts/observability`)
+- `tools/consumer-retrieval`: deterministic resolvers that narrow retrieval from platform to package to symbol to token (`pnpm ui:lookup`)
+- `tools/evals/consumer`: the consumer evaluation harness — dataset, variants, graders, verification, and reports
+
+Quality observability is a separate flow: `observability-contracts -> tools/scripts/observability (collect, export) -> apps/quality-lab`.
+
+Most apps and libs have their own `AGENTS.md` with local rules. Read the nearest one before editing inside that project.
+
+`tools/` is not an Nx project, so `nx affected` does not reach it. Its typecheck and tests run through `pnpm tools:check`, which the `consumer-eval` job in `pr-check.yml` executes on every PR.
+
+When editing the plugin, load it with `claude --plugin-dir ./plugins/berry-commit` — a local plugin directory takes precedence over the installed copy. `plugins/*/dist` is a committed build artifact: rebuild with `pnpm build:mcp:commit` and commit it alongside any `src/` change.
 
 ---
 

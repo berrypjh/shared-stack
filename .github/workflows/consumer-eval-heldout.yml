@@ -1,0 +1,98 @@
+name: Consumer Eval (held-out)
+
+# 수동 실행만 한다.
+# 아직 programmatic LLM executor가 없어서 정기 실행은 CI 시간만 쓰고 실제 metric을
+# 만들지 못한다. executor가 붙고 baseline/분산이 쌓인 뒤에 schedule을 검토한다.
+on:
+  workflow_dispatch:
+    inputs:
+      split:
+        description: "평가 split (held-out은 test)"
+        type: choice
+        default: test
+        options: [test, dev]
+      trials:
+        description: "task당 시행 횟수"
+        type: string
+        default: "1"
+      variants:
+        description: "쉼표로 구분한 variant id (비우면 전체 matrix)"
+        type: string
+        default: ""
+      replay_traces:
+        description: "수집된 traces.jsonl 경로 (repo 기준). 없으면 harness가 실패한다 — 가짜 결과를 만들지 않는다."
+        type: string
+        default: ""
+      write_baseline:
+        description: "이 실행 결과를 baseline 스냅샷으로 저장 (아티팩트로만 나온다)"
+        type: boolean
+        default: false
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  held-out:
+    name: Held-out evaluation
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          filter: tree:0
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: ${{ vars.PNPM_VERSION }}
+
+      - name: Setup Node.js (pnpm cache)
+        uses: actions/setup-node@v6
+        with:
+          node-version: ${{ vars.NODE_VERSION }}
+          cache: "pnpm"
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --prefer-offline
+
+      - name: Build libs (declarations + generated catalog)
+        run: pnpm run build:libs
+
+      - name: Report executor availability
+        run: |
+          if [ -z "${{ inputs.replay_traces }}" ]; then
+            echo "::warning::No replay traces supplied and no live executor is configured."
+            echo "The harness will refuse to run rather than fabricate metrics."
+          else
+            echo "Replaying traces from ${{ inputs.replay_traces }}"
+          fi
+
+      # live executor가 붙으면 여기에 secret이 필요해진다. 그때는 fork PR 컨텍스트에서
+      # 실행되지 않도록 trigger와 environment를 함께 제한해야 한다. 지금은 secret을 쓰지 않는다.
+      - name: Run held-out evaluation
+        run: |
+          pnpm exec tsx tools/evals/consumer/runner/run.ts \
+            --split=${{ inputs.split }} \
+            --trials=${{ inputs.trials }} \
+            --run-id=heldout-${{ github.run_id }} \
+            --compare-baseline \
+            ${{ inputs.variants != '' && format('--variants={0}', inputs.variants) || '' }} \
+            ${{ inputs.replay_traces != '' && format('--replay={0}', inputs.replay_traces) || '' }} \
+            ${{ inputs.write_baseline && '--write-baseline' || '' }}
+
+      - name: Upload evaluation artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: consumer-eval-heldout-${{ github.run_id }}
+          path: |
+            tmp/llm-evals/heldout-${{ github.run_id }}/
+            tools/evals/consumer/baseline/
+          retention-days: 30
+          if-no-files-found: warn

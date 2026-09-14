@@ -1,0 +1,104 @@
+{
+  "primary": {
+    "pr100": {
+      "$value": "#CFFAFE",
+      "$type": "color"
+    },
+    "pr200": {
+      "$value": "#A5F3FC",
+      "$type": "color"
+    },
+    "pr300": {
+      "$value": "#67E8F9",
+      "$type": "color"
+    },
+    "pr400": {
+      "$value": "#22D3EE",
+      "$type": "color"
+    },
+    "pr500": {
+      "$value": "#06B6D4",
+      "$type": "color"
+    },
+    "pr600": {
+      "$value": "#0891B2",
+      "$type": "color"
+    },
+    "pr700": {
+      "$value": "#0E7490",
+      "$type": "color"
+    },
+    "pr800": {
+      "$value": "#155E75",
+      "$type": "color"
+    },
+    "pr900": {
+      "$value": "#164E63",
+      "$type": "color"
+    }
+  },
+  "neutral": {
+    "ne100": {
+      "$value": "#EEF2F6",
+      "$type": "color"
+    },
+    "ne200": {
+      "$value": "#E2E8F0",
+      "$type": "color"
+    },
+    "ne300": {
+      "$value": "#CBD5E1",
+      "$type": "color"
+    },
+    "ne400": {
+      "$value": "#94A3B8",
+      "$type": "color"
+    },
+    "ne500": {
+      "$value": "#64748B",
+      "$type": "color"
+    },
+    "ne600": {
+      "$value": "#475569",
+      "$type": "color"
+    },
+    "ne700": {
+      "$value": "#334155",
+      "$type": "color"
+    },
+    "ne800": {
+      "$value": "#1E293B",
+      "$type": "color"
+    },
+    "ne900": {
+      "$value": "#0F172A",
+      "$type": "color"
+    }
+  },
+  "background": {
+    "surface": {
+      "$value": "#F8FAFC",
+      "$type": "color"
+    }
+  },
+  "text": {
+    "disable": {
+      "$value": "#58687E",
+      "$type": "color"
+    },
+    "placeholder": {
+      "$value": "#58687E",
+      "$type": "color"
+    }
+  },
+  "stroke": {
+    "primary": {
+      "$value": "{primary.pr700}",
+      "$type": "color"
+    },
+    "secondary": {
+      "$value": "{secondary.se600}",
+      "$type": "color"
+    }
+  }
+}

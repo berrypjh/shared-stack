@@ -2,22 +2,25 @@
 
 import { useId } from 'react';
 
-import { cx } from '@berrypjh/ui-core';
-
+import type { InputLikeChangeEventHandler } from '../../types';
+import { cx } from '../../utils';
 import { FormControl } from '../form-control';
 import { FormHelperText } from '../form-helper-text';
 import { InputLabel } from '../input-label';
 import { Select } from '../select';
+import type { SelectProps } from '../select/Select.types';
 
 import { textFieldClasses } from './TextField.constants';
 import type { TextFieldProps } from './TextField.types';
 import {
+  composeDescribedBy,
   getTextFieldHelperTextId,
   getTextFieldInputComponent,
   hasTextFieldContent,
 } from './TextField.utils';
 
 export const TextField = ({
+  'aria-describedby': ariaDescribedby,
   autoComplete,
   autoFocus = false,
   children,
@@ -39,6 +42,7 @@ export const TextField = ({
   onChange,
   onFocus,
   placeholder,
+  readOnly = false,
   required = false,
   rows,
   select = false,
@@ -51,6 +55,7 @@ export const TextField = ({
 }: TextFieldProps) => {
   const generatedId = useId();
   const id = idProp ?? generatedId;
+  const labelId = `${id}-label`;
 
   const hasLabel = hasTextFieldContent(label);
   const hasHelperText = hasTextFieldContent(helperText);
@@ -59,6 +64,12 @@ export const TextField = ({
     hasHelperText,
     id,
   });
+
+  /**
+   * 설명은 소비자 값과 helper text를 합쳐서 진짜 입력에 건다.
+   * `...rest`로 흘려보내면 `aria-describedby`가 FormControl 래퍼 `div`에 얹혀 아무것도 설명하지 못한 채 사라진다 — 입력은 helper만 알게 된다.
+   */
+  const describedBy = composeDescribedBy(ariaDescribedby, helperTextId);
 
   const InputComponent = getTextFieldInputComponent(variant);
 
@@ -77,11 +88,16 @@ export const TextField = ({
       size={size}
       variant={variant}
     >
-      {hasLabel ? <InputLabel htmlFor={id}>{label}</InputLabel> : null}
+      {hasLabel ? (
+        <InputLabel htmlFor={id} id={labelId}>
+          {label}
+        </InputLabel>
+      ) : null}
 
+      {/* 타입이 `select`로 모드를 가르므로 각 분기의 `onChange`는 그 모드의 계약이다 */}
       {select ? (
         <Select
-          aria-describedby={helperTextId}
+          aria-describedby={describedBy}
           autoFocus={autoFocus}
           color={color}
           defaultValue={defaultValue}
@@ -89,8 +105,10 @@ export const TextField = ({
           error={error}
           fullWidth={fullWidth}
           id={id}
+          labelId={hasLabel ? labelId : undefined}
           name={name}
           onBlur={onBlur}
+          onChange={onChange as SelectProps['onChange']}
           onFocus={onFocus}
           placeholder={placeholder}
           required={required}
@@ -102,7 +120,7 @@ export const TextField = ({
         </Select>
       ) : (
         <InputComponent
-          aria-describedby={helperTextId}
+          aria-describedby={describedBy}
           autoComplete={autoComplete}
           autoFocus={autoFocus}
           color={color}
@@ -115,9 +133,10 @@ export const TextField = ({
           multiline={multiline}
           name={name}
           onBlur={onBlur}
-          onChange={onChange}
+          onChange={onChange as InputLikeChangeEventHandler}
           onFocus={onFocus}
           placeholder={placeholder}
+          readOnly={readOnly}
           required={required}
           rows={rows}
           size={size}

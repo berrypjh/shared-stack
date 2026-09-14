@@ -44,7 +44,7 @@
   align-items: center;
   justify-content: center;
   line-height: 0;
-  transition: opacity 140ms ease;
+  transition: opacity var(--ds-motion-duration-normal) var(--ds-motion-easing-standard);
 }
 
 .ui-icon-button__loading-wrapper {
@@ -76,7 +76,8 @@
   border: var(--ds-primitive-border-xs) solid currentColor;
   border-right-color: transparent;
   border-radius: var(--ds-radius-rounded);
-  animation: ui-icon-button-spin 0.65s linear infinite;
+  animation: ui-icon-button-spin var(--ds-motion-duration-slow) var(--ds-motion-easing-linear)
+    infinite;
 }
 
 .ui-icon-button--loading > *:not(.ui-icon-button__loading-wrapper) {
@@ -116,14 +117,12 @@
 
 .ui-icon-button--color-primary {
   --ui-btn-fg: var(--ds-text-primary);
-  --ui-btn-bg-hover: var(--ds-primary-pr100);
-  --ui-btn-focus-color: var(--ds-primary-btn-focus-ripple);
+  --ui-btn-bg-hover: var(--ds-primary-btn-outlined-hover);
 }
 
 .ui-icon-button--color-secondary {
   --ui-btn-fg: var(--ds-text-secondary);
-  --ui-btn-bg-hover: var(--ds-secondary-se100);
-  --ui-btn-focus-color: var(--ds-stroke-secondary);
+  --ui-btn-bg-hover: var(--ds-secondary-btn-outlined-hover);
 }
 
 .ui-icon-button--disabled,
@@ -138,7 +137,7 @@
   }
 
   .ui-icon-button__spinner {
-    animation-duration: 1.2s;
+    animation-duration: var(--ds-motion-duration-slower);
   }
 }
 

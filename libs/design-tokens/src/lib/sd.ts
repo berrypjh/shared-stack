@@ -8,9 +8,10 @@ import {
 import StyleDictionary from 'style-dictionary';
 import type { Dictionary, Transform, TransformedToken } from 'style-dictionary/types';
 
-import type { ThemeDef } from '../themes';
+import type { ThemeDef } from '../themes.js';
 
-import { getTokenType, getTokenValue } from './tokens';
+import { toRnNumeric, toWebDuration, toWebFontStack, toWebRem } from './platformValue.js';
+import { getTokenType, getTokenValue } from './tokens.js';
 
 export type ThemeBuild = {
   theme: string;
@@ -25,39 +26,16 @@ const RN_NUMERIC_TYPES = new Set([
   'lineHeight',
   'letterSpacing',
   'fontWeight',
+  'duration',
 ]);
 
 /**
- * Web rem 변환 대상 토큰 타입.
- * tokens-studio align-types preprocessor가 spacing/borderRadius/borderWidth를 `dimension`으로 정규화하므로
- * `dimension`을 포함시켜야 spacing/radius/border-width가 px → rem 변환된다.
+ * Web px → rem 변환 대상 타입.
+ * spacing/radius/borderWidth는 전처리에서 `dimension`으로 합쳐지므로 `dimension`에 포함된다.
  */
 const WEB_REM_TYPES = new Set(['dimension', 'fontSize', 'lineHeight']);
 
-/** rem 변환 base. CSS 표준 16px. */
-const REM_BASE_PX = 16;
-
-/** 배열·객체가 아닌 평범한 record 객체인지 검사. */
-const isPlainObj = (v: unknown): v is Record<string, unknown> =>
-  !!v && typeof v === 'object' && !Array.isArray(v);
-
-/** 숫자/숫자 문자열을 number로 강제 변환. 객체·배열은 재귀 적용. 그 외는 원본. */
-const coerceNum = (v: unknown): unknown => {
-  if (typeof v === 'number') return v;
-  if (typeof v === 'string') {
-    const s = v.trim();
-    return /^-?\d+(\.\d+)?$/.test(s) ? Number(s) : v;
-  }
-  if (Array.isArray(v)) return v.map(coerceNum);
-  if (isPlainObj(v)) {
-    const o: Record<string, unknown> = {};
-    for (const [k, x] of Object.entries(v)) o[k] = coerceNum(x);
-    return o;
-  }
-  return v;
-};
-
-/** RN용 숫자형 토큰(spacing/radius/fontSize 등) 값을 number로 변환하는 SD transform. */
+/** RN: 숫자 문자열 → number (`'16'` → `16`) */
 const rnNumberTransform: Transform = {
   name: 'ds/rn/number',
   type: 'value',
@@ -66,13 +44,10 @@ const rnNumberTransform: Transform = {
     const type = getTokenType(t);
     return typeof type === 'string' && RN_NUMERIC_TYPES.has(type);
   },
-  transform: (t: TransformedToken) => coerceNum(getTokenValue(t)),
+  transform: (t: TransformedToken) => toRnNumeric(getTokenValue(t)),
 };
 
-/**
- * Web용 rem 변환 transform. spacing/fontSize/lineHeight 값을 px → rem으로 변환.
- * html font-size override에 반응하도록 unitless/px 값을 rem 기반으로 노출.
- */
+/** Web: px → rem (`16` → `1rem`) */
 const webRemTransform: Transform = {
   name: 'ds/web/rem',
   type: 'value',
@@ -81,42 +56,41 @@ const webRemTransform: Transform = {
     const type = getTokenType(t);
     return typeof type === 'string' && WEB_REM_TYPES.has(type);
   },
-  transform: (t: TransformedToken) => {
-    const v = getTokenValue(t);
-    const n = toNumeric(v);
-    if (n === null) return v;
-    return `${stripTrailingZeros(n / REM_BASE_PX)}rem`;
-  },
+  transform: (t: TransformedToken) => toWebRem(getTokenValue(t)),
 };
 
-/** 숫자 또는 숫자 문자열을 number로 변환. 단위가 붙어 있으면 null. */
-const toNumeric = (v: unknown): number | null => {
-  if (typeof v === 'number') return Number.isFinite(v) ? v : null;
-  if (typeof v !== 'string') return null;
-  const s = v.trim();
-  if (!/^-?\d+(\.\d+)?$/.test(s)) return null;
-  const n = Number(s);
-  return Number.isFinite(n) ? n : null;
+/** Web: 숫자 → ms (`140` → `140ms`) */
+const webDurationTransform: Transform = {
+  name: 'ds/web/duration',
+  type: 'value',
+  transitive: true,
+  filter: (t) => getTokenType(t) === 'duration',
+  transform: (t: TransformedToken) => toWebDuration(getTokenValue(t)),
 };
 
-/** 부동소수점 표기에서 불필요한 trailing 0 제거. `0.1250000` → `0.125`. */
-const stripTrailingZeros = (n: number): string => {
-  const s = n.toFixed(6);
-  return s.replace(/\.?0+$/, '');
+/** Web: 서체 이름 → fallback 스택 (`Pretendard` → `Pretendard, 'Apple SD Gothic Neo', ...`) */
+const webFontFamilyTransform: Transform = {
+  name: 'ds/web/fontFamily',
+  type: 'value',
+  transitive: true,
+  filter: (t) => getTokenType(t) === 'fontFamily',
+  transform: (t: TransformedToken) => toWebFontStack(getTokenValue(t)),
 };
 
 let registered = false;
 
-/** Tokens Studio + 자체 transform을 SD에 1회만 등록. 중복 호출 안전. */
+/** SD에 transform 등록 (최초 1회만) */
 const registerOnce = () => {
   if (registered) return;
   registered = true;
   registerTokensStudio(StyleDictionary);
   StyleDictionary.registerTransform(rnNumberTransform);
   StyleDictionary.registerTransform(webRemTransform);
+  StyleDictionary.registerTransform(webDurationTransform);
+  StyleDictionary.registerTransform(webFontFamilyTransform);
 };
 
-/** `arr`에서 `rm`에 포함된 항목을 제거한 새 배열을 반환. */
+/** 배열에서 특정 항목 제외 */
 const without = (arr: string[], rm: string[]) => {
   const set = new Set(rm);
   return arr.filter((x) => !set.has(x));
@@ -129,6 +103,8 @@ const baseTransforms = getTransforms({ platform: 'css' })
 const WEB_TRANSFORMS = [
   ...without(baseTransforms, ['ts/color/css/hexrgba', 'ts/size/px']),
   'ds/web/rem',
+  'ds/web/duration',
+  'ds/web/fontFamily',
   'name/kebab',
 ];
 
@@ -138,10 +114,7 @@ const RN_TRANSFORMS = [
   'name/kebab',
 ];
 
-/**
- * 테마별로 web/rn 두 사전을 in-memory로 빌드한다.
- * SD 파일 출력은 사용하지 않고 후속 generator가 사전을 직접 소비한다.
- */
+/** 테마별 web/rn 토큰 사전 빌드 (in-memory) */
 export const buildThemeDictionaries = async (
   themes: readonly ThemeDef[],
   tokensDirAbs: string,

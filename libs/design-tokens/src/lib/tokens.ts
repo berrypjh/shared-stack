@@ -1,13 +1,16 @@
 import type { TransformedToken } from 'style-dictionary/types';
 
-/** DTCG 토큰의 `$type` 추출. 자식 토큰이 부모의 `$type`을 상속받는 경우 SD가 leaf에 propagate. */
+/**
+ * DTCG 토큰의 `$type` 추출.
+ * 부모의 `$type`을 상속받는 자식 토큰은 SD가 leaf까지 전파한다.
+ */
 export const getTokenType = (t: TransformedToken): string | undefined =>
   t.$type ?? t.original.$type;
 
-/** DTCG 토큰의 `$value` 추출. */
+/** DTCG 토큰의 `$value` 추출 */
 export const getTokenValue = (t: TransformedToken): unknown => t.$value;
 
-/** camelCase / snake_case / 공백 혼합을 단일 kebab-case로 변환. */
+/** camelCase·snake_case·공백 → kebab-case (`fontSize_lg` → `font-size-lg`) */
 const toKebab = (s: string): string =>
   s
     .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
@@ -15,13 +18,13 @@ const toKebab = (s: string): string =>
     .replace(/-+/g, '-')
     .toLowerCase();
 
-/** 토큰 path를 CSS 변수명으로 변환. `prefix` 미지정 시 prefix 없이 생성. */
+/** 토큰 path → CSS 변수명, prefix는 선택 (`ds`, `['color', 'primary']` → `--ds-color-primary`) */
 export const cssVarName = (prefix: string | undefined, path: readonly string[]): string => {
   const k = toKebab(path.join('-'));
   return prefix ? `--${prefix}-${k}` : `--${k}`;
 };
 
-/** HEX 또는 `rgb(...)` 색상 문자열을 "R G B" 채널 문자열로 변환. 그 외는 null. */
+/** HEX·`rgb()` 색상 → 채널 문자열, 그 외는 null (`#ff8000` → `'255 128 0'`) */
 export const colorToRgbChannels = (value: unknown): string | null => {
   if (typeof value !== 'string') return null;
   const v = value.trim();
@@ -30,11 +33,11 @@ export const colorToRgbChannels = (value: unknown): string | null => {
   return null;
 };
 
-/** RGB 튜플을 "R G B" 문자열로 직렬화. null 입력은 null 반환. */
+/** RGB 튜플 → 채널 문자열, null은 그대로 (`[255, 128, 0]` → `'255 128 0'`) */
 const rgbStr = (rgb: [number, number, number] | null) =>
   rgb ? `${rgb[0]} ${rgb[1]} ${rgb[2]}` : null;
 
-/** `#RGB`, `#RRGGBB`, `#RRGGBBAA` 를 [r, g, b] 정수 튜플로 파싱. 알파는 무시. */
+/** `#RGB`·`#RRGGBB`·`#RRGGBBAA` → RGB 튜플, 알파는 무시 (`#f80` → `[255, 136, 0]`) */
 const parseHex = (hex: string): [number, number, number] | null => {
   const h = hex.replace('#', '');
   if (![3, 6, 8].includes(h.length)) return null;
@@ -51,7 +54,7 @@ const parseHex = (hex: string): [number, number, number] | null => {
   return [r, g, b].some(Number.isNaN) ? null : [r, g, b];
 };
 
-/** `rgb(...)` / `rgba(...)` 함수 표기를 [r, g, b] 정수 튜플로 파싱. 0~255로 클램프. */
+/** `rgb()`·`rgba()` → RGB 튜플, 0~255로 클램프 (`rgb(300 0 0)` → `[255, 0, 0]`) */
 const parseRgbFn = (fn: string): [number, number, number] | null => {
   const m = fn.match(/^rgba?\((.+)\)$/i);
   if (!m) return null;
@@ -66,6 +69,7 @@ const parseRgbFn = (fn: string): [number, number, number] | null => {
   return [clamp(nums[0]), clamp(nums[1]), clamp(nums[2])];
 };
 
+/** 토큰 head → 카테고리 접두 path (`primary` → `['color', 'primary']`) */
 const HEAD_REWRITE: Record<string, readonly string[]> = {
   primary: ['color', 'primary'],
   secondary: ['color', 'secondary'],
@@ -74,6 +78,10 @@ const HEAD_REWRITE: Record<string, readonly string[]> = {
   warning: ['color', 'warning'],
   error: ['color', 'error'],
   primaryBtn: ['color', 'primaryBtn'],
+  secondaryBtn: ['color', 'secondaryBtn'],
+  errorBtn: ['color', 'errorBtn'],
+  field: ['color', 'field'],
+  selectionControl: ['color', 'selectionControl'],
   text: ['color', 'text'],
   background: ['color', 'background'],
   icon: ['color', 'icon'],
@@ -99,11 +107,12 @@ const HEAD_REWRITE: Record<string, readonly string[]> = {
   elevation: ['elevation'],
   border: ['border'],
   component: ['component'],
+  motion: ['motion'],
 };
 
 /**
- * 토큰 path[0]을 9개 카테고리(color/spacing/...) 중 하나의 접두 path로 치환한다.
- * 미등록 head는 throw — 새 토큰 추가 시 빌드에서 즉시 감지된다.
+ * 토큰 path의 head를 카테고리 접두 path로 치환 (`['primary', '500']` → `['color', 'primary', '500']`).
+ * 미등록 head는 throw해서 새 토큰의 누락을 빌드에서 즉시 감지한다.
  */
 export const classifyTokenPath = (path: readonly string[]): string[] => {
   const head = path[0];
@@ -117,6 +126,7 @@ export const classifyTokenPath = (path: readonly string[]): string[] => {
   return [...rewrite, ...path.slice(1)];
 };
 
+/** 토큰 카테고리 목록 (`classifyTokenPath` 결과의 첫 segment) */
 export const TOKEN_CATEGORIES = [
   'color',
   'spacing',
@@ -127,4 +137,5 @@ export const TOKEN_CATEGORIES = [
   'shadow',
   'elevation',
   'component',
+  'motion',
 ] as const;

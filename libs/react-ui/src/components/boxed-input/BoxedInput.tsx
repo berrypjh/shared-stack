@@ -1,7 +1,6 @@
 'use client';
 
-import { cx } from '@berrypjh/ui-core';
-
+import { cx } from '../../utils';
 import { InputBase } from '../input-base';
 
 import { boxedInputClasses } from './BoxedInput.constants';

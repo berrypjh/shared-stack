@@ -65,6 +65,16 @@ describe('<InputBase />', () => {
       expect(screen.getByTestId('root')).toHaveClass(inputBaseClasses.sizeSm);
     });
 
+    /** 시맨틱 prop을 명시적으로 `undefined`로 주는 것은 생략과 같아야 한다 */
+    it('색·크기를 undefined로 줘도 기본값으로 렌더링해야 한다', () => {
+      render(<InputBase data-testid="root" color={undefined} size={undefined} />);
+
+      const root = screen.getByTestId('root');
+
+      expect(root).toHaveClass(inputBaseClasses.colorPrimary);
+      expect(root).toHaveClass(inputBaseClasses.sizeMd);
+    });
+
     it('children을 root 내부에 렌더링해야 한다', () => {
       render(
         <InputBase>
@@ -155,6 +165,105 @@ describe('<InputBase />', () => {
 
       expect(root).toHaveClass(inputBaseClasses.readOnly);
       expect(input).toHaveProperty('readOnly', true);
+    });
+  });
+
+  /**
+   * 제어/비제어 소유권.
+   * `value`·`defaultValue`는 native 요소로 그대로 내려가고 Base는 자기 값 상태를 두지 않는다.
+   * 그 사실은 속성으로는 보이지 않는다 — 실제로 타이핑해 봐야 드러난다.
+   */
+  describe('controlled / uncontrolled', () => {
+    it('비제어 입력은 소비자 개입 없이 타이핑을 반영한다', async () => {
+      const { user } = render(<InputBase defaultValue="ab" />);
+
+      const input = screen.getByRole('textbox') as HTMLInputElement;
+      await user.type(input, 'c');
+
+      // Base가 value를 붙잡으면 "ab"에서 멈춘다.
+      expect(input.value).toBe('abc');
+    });
+
+    it('defaultValue 는 controlled 로 승격되지 않는다', async () => {
+      const { user } = render(<InputBase defaultValue="ab" />);
+
+      const input = screen.getByRole('textbox') as HTMLInputElement;
+      await user.type(input, 'c');
+
+      // 비제어의 지문 — DOM 속성은 기본값에 머물고 프로퍼티만 움직인다.
+      // 제어로 승격되면 둘이 함께 움직이거나 프로퍼티가 기본값에 묶인다.
+      expect(input.getAttribute('value')).toBe('ab');
+      expect(input.value).toBe('abc');
+    });
+
+    it('제어 value 는 소비자만 바꾼다', async () => {
+      const onChange = spy();
+      const { user } = render(<InputBase value="fixed" onChange={onChange} />);
+
+      const input = screen.getByRole('textbox') as HTMLInputElement;
+      await user.type(input, 'x');
+
+      expect(onChange.callCount).toBe(1);
+      expect(input.value).toBe('fixed');
+    });
+  });
+
+  /**
+   * `disabled`와 `readOnly`는 둘 다 편집을 막지만 같은 상태가 아니다.
+   * 속성만 보면 구분되지 않아서, 포커스를 받는지까지 본다 — readOnly는 읽을 수 있어야 하므로 탐색 가능한 채로 남고, disabled는 상호작용 대상에서 빠진다.
+   */
+  describe('편집 가능성', () => {
+    it('disabled 는 타이핑을 막는다', async () => {
+      const onChange = spy();
+      const { user } = render(<InputBase disabled defaultValue="ab" onChange={onChange} />);
+
+      const input = screen.getByRole('textbox') as HTMLInputElement;
+      await user.type(input, 'c');
+
+      expect(onChange.callCount).toBe(0);
+      expect(input.value).toBe('ab');
+    });
+
+    it('readOnly 는 타이핑을 막지만 포커스는 받는다', async () => {
+      const onChange = spy();
+      const { user } = render(<InputBase readOnly defaultValue="ab" onChange={onChange} />);
+
+      const input = screen.getByRole('textbox') as HTMLInputElement;
+      await user.type(input, 'c');
+
+      expect(onChange.callCount).toBe(0);
+      expect(input.value).toBe('ab');
+      expect(input).toHaveFocus();
+    });
+
+    it('disabled 는 포커스를 받지 않는다 — readOnly 와 갈리는 지점', async () => {
+      const { user } = render(<InputBase disabled defaultValue="ab" />);
+
+      const input = screen.getByRole('textbox');
+      await user.click(input);
+
+      expect(input).not.toHaveFocus();
+    });
+
+    /**
+     * disabled를 풀어도 focus가 되살아나면 안 된다.
+     * disabled 동안 실제 포커스는 이미 떠났다 (`InputBase`가 활성 요소를 blur시킨다).
+     * 로컬 focus 상태가 남아 있으면 다시 켜는 순간 아무것도 포커스를 갖지 않았는데 루트가 `--focused`를 주장한다 — 시맨틱과 시각이 어긋난다.
+     * 이 경로는 FormControl 밖이라 InputBase가 focus의 소유자다.
+     * 안쪽에서는 FormControl이 같은 이유로 자기 상태를 버린다.
+     * RN `InputBase`도 같은 계약이다.
+     */
+    it('disabled 를 풀어도 focus 시각 상태가 되살아나지 않는다', async () => {
+      const { user, setProps } = render(<InputBase data-testid="root" />);
+
+      await user.click(screen.getByRole('textbox'));
+      expect(screen.getByTestId('root')).toHaveClass(inputBaseClasses.focused);
+
+      setProps({ disabled: true });
+      expect(screen.getByTestId('root')).not.toHaveClass(inputBaseClasses.focused);
+
+      setProps({ disabled: false });
+      expect(screen.getByTestId('root')).not.toHaveClass(inputBaseClasses.focused);
     });
   });
 
@@ -428,6 +537,53 @@ describe('<InputBase />', () => {
       expect(screen.getByTestId('label')).toHaveTextContent('filled: false');
     });
 
+    /**
+     * 첫 렌더의 정적 스캔(`deriveStateFromChildren`)이 런타임 상태를 영구히 덮으면 안 된다.
+     * `defaultValue`가 있으면 스캔은 계속 참을 말하므로, 사용자가 지워도 filled가 안 내려갔다.
+     */
+    it('defaultValue를 지우면 filled가 false가 되어야 한다', () => {
+      render(
+        <FormControl>
+          <FilledStateLabel data-testid="label" />
+          <InputBase defaultValue="berry" />
+        </FormControl>,
+      );
+
+      expect(screen.getByTestId('label')).toHaveTextContent('filled: true');
+
+      fireEvent.change(screen.getByRole('textbox'), { target: { value: '' } });
+
+      expect(screen.getByTestId('label')).toHaveTextContent('filled: false');
+    });
+
+    it('defaultValue를 지웠다가 다시 채우면 filled가 따라온다', () => {
+      render(
+        <FormControl>
+          <FilledStateLabel data-testid="label" />
+          <InputBase defaultValue="berry" />
+        </FormControl>,
+      );
+
+      const textbox = screen.getByRole('textbox');
+
+      fireEvent.change(textbox, { target: { value: '' } });
+      expect(screen.getByTestId('label')).toHaveTextContent('filled: false');
+
+      fireEvent.change(textbox, { target: { value: 'x' } });
+      expect(screen.getByTestId('label')).toHaveTextContent('filled: true');
+    });
+
+    it('첫 렌더부터 defaultValue를 filled로 본다', () => {
+      render(
+        <FormControl>
+          <FilledStateLabel data-testid="label" />
+          <InputBase defaultValue="berry" />
+        </FormControl>,
+      );
+
+      expect(screen.getByTestId('label')).toHaveTextContent('filled: true');
+    });
+
     it('controlled 상태에서 filled를 FormControl에 전파해야 한다', () => {
       const ControlledInputBase = (props: React.ComponentProps<typeof InputBase>) => (
         <FormControl>
@@ -564,6 +720,216 @@ describe('<InputBase />', () => {
       const { container } = render(<InputBase multiline inputRef={inputRef} />);
 
       expect(inputRef.current).toBe(container.querySelector('textarea'));
+    });
+  });
+
+  describe('root click', () => {
+    /**
+     * 루트 여백을 눌렀을 때 입력으로 포커스를 넘기는 것은 필드의 기본 편의다.
+     * 아래 두 테스트가 그 동작을 고정한다.
+     */
+    it('루트 여백 클릭은 native input에 포커스를 준다', () => {
+      render(<InputBase data-testid="root" />);
+
+      fireEvent.click(screen.getByTestId('root'));
+
+      expect(document.activeElement).toBe(screen.getByRole('textbox'));
+    });
+
+    it('native input 클릭은 포커스를 합성하지 않는다', () => {
+      const handleFocus = spy();
+      render(<InputBase onFocus={handleFocus} />);
+
+      fireEvent.click(screen.getByRole('textbox'));
+
+      expect(handleFocus.callCount).toBe(0);
+    });
+
+    /**
+     * 장식이 스스로 포커스를 가지는 요소면 루트가 뺏어오면 안 된다.
+     * 지우기 버튼을 눌렀는데 포커스가 입력으로 튀면 버튼의 상태 변화를 스크린리더가 놓치고 키보드 위치도 잃는다.
+     */
+    it('상호작용 장식 클릭은 루트가 포커스를 뺏지 않는다', () => {
+      const handleClear = spy();
+
+      render(
+        <InputBase
+          endAdornment={
+            <button type="button" data-testid="clear" onClick={handleClear}>
+              clear
+            </button>
+          }
+        />,
+      );
+
+      fireEvent.click(screen.getByTestId('clear'));
+
+      expect(handleClear.callCount).toBe(1);
+      expect(document.activeElement).not.toBe(screen.getByRole('textbox'));
+    });
+
+    it('장식이 장식일 뿐이면 루트 클릭과 똑같이 입력에 포커스를 준다', () => {
+      render(<InputBase endAdornment={<span data-testid="icon">₩</span>} />);
+
+      fireEvent.click(screen.getByTestId('icon'));
+
+      expect(document.activeElement).toBe(screen.getByRole('textbox'));
+    });
+
+    it('disabled면 루트 클릭이 포커스를 옮기지 않는다', () => {
+      render(<InputBase data-testid="root" disabled />);
+
+      fireEvent.click(screen.getByTestId('root'));
+
+      expect(document.activeElement).not.toBe(screen.getByRole('textbox'));
+    });
+  });
+
+  describe('native 라우팅', () => {
+    it('error는 native input의 aria-invalid가 된다', () => {
+      render(<InputBase error />);
+
+      expect(screen.getByRole('textbox')).toHaveAttribute('aria-invalid', 'true');
+    });
+
+    it('FormControl error도 aria-invalid로 반영된다', () => {
+      render(
+        <FormControl error>
+          <InputBase />
+        </FormControl>,
+      );
+
+      expect(screen.getByRole('textbox')).toHaveAttribute('aria-invalid', 'true');
+    });
+
+    it('명시 aria-invalid가 error보다 우선한다', () => {
+      render(<InputBase error aria-invalid={false} />);
+
+      expect(screen.getByRole('textbox')).toHaveAttribute('aria-invalid', 'false');
+    });
+
+    it('error가 아니면 aria-invalid를 붙이지 않는다', () => {
+      render(<InputBase />);
+
+      expect(screen.getByRole('textbox')).not.toHaveAttribute('aria-invalid');
+    });
+
+    /**
+     * `inputProps`는 native 요소로 가는 유일한 통로다.
+     * 최상위에서 같은 prop을 주지 않았는데도 값이 사라지면 통로가 아니라 함정이 된다.
+     */
+    it.each([
+      ['aria-label', '이름'],
+      ['aria-describedby', 'hint'],
+      ['placeholder', '홍길동'],
+      ['autoComplete', 'name'],
+      ['name', 'fullName'],
+    ] as const)('최상위에서 주지 않은 inputProps.%s는 살아남는다', (key, value) => {
+      render(<InputBase inputProps={{ [key]: value }} />);
+
+      const attribute = key === 'autoComplete' ? 'autocomplete' : key;
+
+      expect(screen.getByRole('textbox')).toHaveAttribute(attribute, value);
+    });
+
+    it('최상위 prop은 여전히 inputProps를 이긴다', () => {
+      render(<InputBase aria-label="최상위" inputProps={{ 'aria-label': '내부' }} />);
+
+      expect(screen.getByRole('textbox')).toHaveAttribute('aria-label', '최상위');
+    });
+
+    /**
+     * `inputMode`·`enterKeyHint`는 상속되지 않는 편집 전용 속성이다 — 래퍼 div에 놓이면 가상 키보드에 아무것도 전달되지 않는다.
+     * `spellCheck`·`autoCapitalize`는 자손 편집 요소로 상속되므로 래퍼에 남겨도 동작한다.
+     */
+    it('inputMode는 native input으로 간다', () => {
+      render(<InputBase data-testid="root" inputMode="numeric" />);
+
+      expect(screen.getByRole('textbox')).toHaveAttribute('inputmode', 'numeric');
+      expect(screen.getByTestId('root')).not.toHaveAttribute('inputmode');
+    });
+
+    it('enterKeyHint는 native input으로 간다', () => {
+      render(<InputBase data-testid="root" enterKeyHint="search" />);
+
+      expect(screen.getByRole('textbox')).toHaveAttribute('enterkeyhint', 'search');
+      expect(screen.getByTestId('root')).not.toHaveAttribute('enterkeyhint');
+    });
+
+    it('multiline이어도 textarea로 간다', () => {
+      render(<InputBase multiline inputMode="numeric" enterKeyHint="done" />);
+
+      const textarea = screen.getByRole('textbox');
+
+      expect(textarea).toHaveAttribute('inputmode', 'numeric');
+      expect(textarea).toHaveAttribute('enterkeyhint', 'done');
+    });
+  });
+
+  /**
+   * 타입 수준 계약.
+   * vitest는 타입을 지우므로 이 블록은 `tsc -p tsconfig.spec.json`이 검증한다.
+   * `inputRef`는 native input/textarea로 가는 ref다.
+   * `unknown`이면 아무 값이나 받아 놓고 런타임에 조용히 무시하므로, 잘못 연결한 ref를 컴파일에서 잡지 못한다.
+   */
+  describe('타입: inputRef', () => {
+    it('올바른 ref 형태를 받는다', () => {
+      const objectRef = React.createRef<HTMLInputElement>();
+      const textareaRef = React.createRef<HTMLTextAreaElement>();
+      const callbackRef = (instance: HTMLInputElement | null) => {
+        void instance;
+      };
+
+      render(
+        <>
+          <InputBase inputRef={objectRef} />
+          <InputBase multiline inputRef={textareaRef} />
+          <InputBase inputRef={callbackRef} />
+          <InputBase inputRef={null} />
+        </>,
+      );
+
+      expect(objectRef.current).not.toBeNull();
+    });
+
+    it('ref 가 아닌 값은 타입에서 막힌다', () => {
+      const reject = () => (
+        <>
+          {/* @ts-expect-error 문자열은 ref가 아니다 */}
+          <InputBase inputRef="input" />
+          {/* @ts-expect-error 엉뚱한 요소의 ref는 연결되지 않는다 */}
+          <InputBase inputRef={React.createRef<HTMLDivElement>()} />
+        </>
+      );
+
+      expect(typeof reject).toBe('function');
+    });
+  });
+
+  describe('prop: role', () => {
+    it('기본값은 presentation이다', () => {
+      render(<InputBase data-testid="root" />);
+
+      expect(screen.getByTestId('root')).toHaveAttribute('role', 'presentation');
+    });
+
+    /** 받아 놓고 무시하면 소비자는 왜 안 되는지 알 수 없다 */
+    it('소비자가 준 role이 이긴다', () => {
+      render(<InputBase data-testid="root" role="group" />);
+
+      expect(screen.getByTestId('root')).toHaveAttribute('role', 'group');
+    });
+
+    /**
+     * 위젯 role은 래퍼의 것이 아니다.
+     * 이름 prop(`aria-label` 등)은 native 요소로 가므로, 래퍼에 `searchbox`·`textbox` 같은 위젯 role을 얹으면 이름 없는 위젯이 만들어지고 진짜 입력을 자식으로 품는다 (axe `aria-input-field-name`).
+     * 검색 필드는 native `type`으로 만든다.
+     */
+    it('검색 필드는 native type이 만든다 — 래퍼 role이 아니라', () => {
+      render(<InputBase data-testid="root" type="search" aria-label="검색" />);
+
+      expect(screen.getByRole('searchbox', { name: '검색' })).toBe(screen.getByLabelText('검색'));
+      expect(screen.getByTestId('root')).toHaveAttribute('role', 'presentation');
     });
   });
 });

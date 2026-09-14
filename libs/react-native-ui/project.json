@@ -15,7 +15,9 @@
           "nx run @berrypjh/react-native-ui:build-types",
           "cp libs/ui-core/dist/tokens.json libs/react-native-ui/dist/tokens.json",
           "cp libs/react-native-ui/AGENTS.consumer.md libs/react-native-ui/dist/AGENTS.md",
-          "node -e \"const fs=require('fs'); const p='libs/react-native-ui/dist/package.json'; const j=JSON.parse(fs.readFileSync(p,'utf8')); delete j.exports; delete j.devDependencies; fs.writeFileSync(p, JSON.stringify(j,null,2));\""
+          "node -e \"const fs=require('fs'); const p='libs/react-native-ui/dist/package.json'; const j=JSON.parse(fs.readFileSync(p,'utf8')); delete j.exports; delete j.devDependencies; fs.writeFileSync(p, JSON.stringify(j,null,2));\"",
+          "tsx tools/scripts/generate-consumer-catalog/index.ts --target=react-native-ui",
+          "esbuild tools/consumer-retrieval/package-cli.ts --bundle --platform=node --format=esm --target=node20 --outfile=libs/react-native-ui/dist/cli.mjs --banner:js='#!/usr/bin/env node'"
         ]
       }
     },
@@ -32,6 +34,17 @@
       "outputs": ["{projectRoot}/dist/index.d.ts"],
       "options": {
         "command": "dts-bundle-generator --project libs/react-native-ui/tsconfig.rollup.json --no-banner --no-check --external-imports=react --external-imports=react-native --external-imports=react/jsx-runtime -o libs/react-native-ui/dist/index.d.ts libs/react-native-ui/src/index.ts"
+      }
+    },
+    "test": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "jest -c libs/react-native-ui/jest.config.cjs"
+      },
+      "configurations": {
+        "ci": {
+          "args": ["--ci"]
+        }
       }
     },
     "nx-release-publish": {

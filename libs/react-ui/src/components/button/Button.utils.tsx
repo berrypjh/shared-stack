@@ -1,6 +1,6 @@
-import { cx } from '@berrypjh/ui-core';
-
 import type { ReactNode } from 'react';
+
+import { cx } from '../../utils';
 
 import { buttonClasses } from './Button.constants';
 import type {
@@ -10,24 +10,14 @@ import type {
 } from './Button.types';
 
 /**
- * Button 컴포넌트에서 auto-anchor props인지 판별합니다.
- *
- * auto-anchor는 `component`를 명시하지 않았고, `href`가 존재하는 경우를 의미합니다.
- * 이 경우 `ButtonBase`는 기본적으로 anchor 렌더링 경로를 탑니다.
- *
- * @param props 판별할 Button props
- * @returns auto-anchor props 여부
+ * Button의 auto-anchor props 판별.
+ * auto-anchor는 `component`를 명시하지 않고 `href`가 있는 경우이며, 이때 `ButtonBase`는 anchor 렌더링 경로를 탄다.
  */
 export const isAutoAnchorProps = (props: ButtonRenderableProps): props is ButtonAutoAnchorProps => {
   return props.component == null && 'href' in props && props.href != null;
 };
 
-/**
- * Button root className 문자열을 생성합니다.
- *
- * @param params Button 시각적 상태와 추가 className
- * @returns 조합된 className 문자열
- */
+/** Button loading 상태와 추가 className → root className */
 export const getButtonClassNames = ({
   className,
   loading,
@@ -42,12 +32,7 @@ export const getButtonClassNames = ({
     className,
   );
 
-/**
- * Button start icon을 생성합니다.
- *
- * @param params Button start icon과 loading 상태
- * @returns start icon
- */
+/** start icon과 loading 상태 → start icon 슬롯 */
 export const getStartIcon = ({
   startIcon,
   loading,
@@ -68,12 +53,7 @@ export const getStartIcon = ({
   );
 };
 
-/**
- * Button end icon을 생성합니다.
- *
- * @param params Button end icon과 loading 상태
- * @returns end icon
- */
+/** end icon과 loading 상태 → end icon 슬롯 */
 export const getEndIcon = ({
   endIcon,
   loading,
@@ -94,12 +74,7 @@ export const getEndIcon = ({
   );
 };
 
-/**
- * Button loading indicator를 생성합니다.
- *
- * @param params Button loading indicator와 label id
- * @returns loading indicator
- */
+/** loading indicator와 label id → loading indicator */
 export const getLoadingIndicator = ({
   children,
   labelId,
@@ -120,12 +95,7 @@ export const getLoadingIndicator = ({
   );
 };
 
-/**
- * Button loader를 생성합니다.
- *
- * @param params Button loading 상태와 label id
- * @returns loader
- */
+/** loading 상태와 label id → loader */
 export const getLoader = ({
   loading,
   children,
@@ -152,12 +122,7 @@ export const getLoader = ({
   );
 };
 
-/**
- * Button content를 생성합니다.
- *
- * @param params Button content와 label id
- * @returns content
- */
+/** content와 label id → 라벨 content */
 export const getContent = ({ children, labelId }: { children?: ReactNode; labelId: string }) => {
   if (children == null) {
     return null;

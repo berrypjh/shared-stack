@@ -13,10 +13,13 @@
       "!{projectRoot}/**/*.stories.@(js|jsx|ts|tsx|mdx)",
       "!{projectRoot}/.storybook/**/*",
       "!{projectRoot}/tsconfig.storybook.json",
-      "!{projectRoot}/**/*.spec.[jt]s?(x)",
-      "!{projectRoot}/playwright.config.[jt]s"
+      "!{projectRoot}/**/*.spec.[jt]s?(x)"
     ],
     "sharedGlobals": [
+      "{workspaceRoot}/tsconfig.base.json",
+      "{workspaceRoot}/package.json",
+      "{workspaceRoot}/eslint.config.mjs",
+      "{workspaceRoot}/babel.config.json",
       "{workspaceRoot}/.github/workflows/pr-check.yml",
       "{workspaceRoot}/.github/workflows/release.yml",
       "{workspaceRoot}/.github/workflows/chromatic.yml"
@@ -56,7 +59,7 @@
       "options": {
         "testTargetName": "test",
         "ciTargetName": "test-ci",
-        "testMode": "watch"
+        "testMode": "run"
       }
     },
     {
@@ -168,7 +171,12 @@
     },
     "build-storybook": {
       "cache": true,
-      "dependsOn": ["^build"]
+      "dependsOn": ["^build"],
+      "inputs": [
+        "default",
+        "^production",
+        { "externalDependencies": ["storybook", "@storybook/test-runner"] }
+      ]
     },
     "test": {
       "cache": true,
@@ -176,11 +184,6 @@
       "inputs": ["default", "^default"]
     },
     "lint": {
-      "cache": true,
-      "dependsOn": ["^build"],
-      "inputs": ["default", "^default"]
-    },
-    "e2e": {
       "cache": true,
       "inputs": ["default", "^default"]
     }

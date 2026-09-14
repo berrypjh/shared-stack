@@ -1,4 +1,4 @@
-import { encoding_for_model, type TiktokenModel } from 'tiktoken';
+import { countOpenAITokens, openAIModelFromEnv } from '../../lib/token-count';
 
 import { printTable, readFiles, type Row, scenarios } from './shared';
 
@@ -13,22 +13,13 @@ import { printTable, readFiles, type Row, scenarios } from './shared';
  *   MEASURE_OPENAI_MODEL  (선택, 기본 'gpt-4o' — tiktoken 인코딩 매핑 대상)
  */
 
-const MODEL = (process.env.MEASURE_OPENAI_MODEL ?? 'gpt-4o') as TiktokenModel;
-
-const countTokens = (content: string): number => {
-  const enc = encoding_for_model(MODEL);
-  try {
-    return enc.encode(content).length;
-  } finally {
-    enc.free();
-  }
-};
+const MODEL = openAIModelFromEnv();
 
 const main = async () => {
   const rows: Row[] = [];
   for (const [name, files] of Object.entries(scenarios)) {
     const { content, chars } = await readFiles(files);
-    const tokens = countTokens(content);
+    const tokens = countOpenAITokens(content, MODEL);
     rows.push({ name, files: files.length, chars, tokens });
   }
   printTable(`OpenAI ${MODEL} (tiktoken local)`, rows);

@@ -1,0 +1,14 @@
+{
+  "motion": {
+    "duration": {
+      "fast": { "$value": "60", "$type": "duration" },
+      "normal": { "$value": "140", "$type": "duration" },
+      "slow": { "$value": "650", "$type": "duration" },
+      "slower": { "$value": "1200", "$type": "duration" }
+    },
+    "easing": {
+      "standard": { "$value": "ease", "$type": "cubicBezier" },
+      "linear": { "$value": "linear", "$type": "cubicBezier" }
+    }
+  }
+}

@@ -22,7 +22,7 @@ pnpm treeshake <target>
 ### 잘 동작하는 케이스 (ui-core)
 
 ```bash
-$ pnpm treeshake ui-core cx
+$ pnpm treeshake ui-core createTheme
 ```
 
 ```
@@ -31,13 +31,14 @@ external: (none)
 
 scenario                       raw      gzip    vs all
 ------------------------------------------------------
-single: cx                     479       276    −99.1%
-all-exports (baseline)      52,496     3,724         —
+single: createTheme            685       242    −99.5%
+all-exports (baseline)     148,910     8,423         —
 
-tree-shaking 효과: 단일 심볼(cx)은 전체 대비 raw 99.1% 작음
+tree-shaking 효과: 단일 심볼(createTheme)은 전체 대비 raw 99.5% 작음
 ```
 
-ui-core는 utility 모듈이라 side-effect 없음 → 단일 심볼이 거의 빈 번들 수준.
+ui-core는 side-effect 없는 타입·토큰 계층이라 단일 심볼이 거의 빈 번들 수준이다.
+baseline이 큰 것은 전체 export가 테마별 토큰 트리를 전부 끌고 오기 때문.
 
 ### 한계가 보이는 케이스 (react-ui)
 

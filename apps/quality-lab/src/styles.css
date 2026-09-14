@@ -1,0 +1,6 @@
+@import 'tailwindcss';
+@config '../tailwind.config.js';
+
+body {
+  font-family: var(--ds-body-medium-font-family);
+}

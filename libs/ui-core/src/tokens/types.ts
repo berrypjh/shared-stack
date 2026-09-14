@@ -4,8 +4,7 @@ import type { LeafDotPath } from './path';
 
 /**
  * 토큰 트리 leaf의 literal 타입을 base primitive로 widen한다.
- * 토큰 namespace는 `as const`로 좁혀져 테마별 literal이 모두 다르므로
- * "임의 테마 tokens" 변수에 대입하려면 widen이 필요하다.
+ * 토큰 namespace는 `as const`로 좁혀져 테마별 literal이 모두 다르므로 "임의 테마 tokens" 변수에 대입하려면 widen이 필요하다.
  */
 type WidenLiterals<T> = T extends string
   ? string
@@ -19,7 +18,7 @@ type WidenLiterals<T> = T extends string
           ? { [K in keyof T]: WidenLiterals<T[K]> }
           : T;
 
-/** 모든 테마(light/dark/sepia 등)의 tokens가 대입 가능한 구조적 RN 토큰 타입. */
+/** 모든 테마(light/dark/sepia 등)의 tokens가 대입 가능한 구조적 RN 토큰 타입 */
 export type RNTokens = WidenLiterals<Native.Light.Tokens>;
 export type ThemeName = DefaultTheme;
 

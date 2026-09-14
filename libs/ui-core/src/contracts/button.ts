@@ -3,7 +3,7 @@ export type ButtonSize = 'sm' | 'md' | 'lg';
 export type ButtonColor = 'primary' | 'secondary';
 export type ButtonLoadingPosition = 'start' | 'center' | 'end';
 
-export interface ButtonProps {
+export interface ButtonSemanticProps {
   variant?: ButtonVariant;
   size?: ButtonSize;
   color?: ButtonColor;

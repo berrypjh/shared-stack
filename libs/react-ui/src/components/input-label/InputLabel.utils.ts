@@ -1,16 +1,10 @@
-import { cx } from '@berrypjh/ui-core';
-
+import { cx } from '../../utils';
 import { FormControlContextValue } from '../form-control';
 
 import { inputLabelClasses } from './InputLabel.constants';
 import type { InputLabelOwnProps } from './InputLabel.types';
 
-/**
- * InputLabel root className 문자열을 생성합니다.
- *
- * @param params InputLabel 시각적 상태와 추가 className
- * @returns 조합된 className 문자열
- */
+/** InputLabel root className 생성 */
 export const getInputLabelClassNames = ({
   className,
   color,

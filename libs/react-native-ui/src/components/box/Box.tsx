@@ -3,7 +3,8 @@ import { View } from 'react-native';
 import type { BoxProps, BoxRadiusValue, BoxSpacingValue, RNTokens } from '@berrypjh/ui-core';
 import { getColor } from '@berrypjh/ui-core';
 
-import type { StyleProp, ViewProps, ViewStyle } from 'react-native';
+import type { Ref } from 'react';
+import type { StyleProp, View as RNView, ViewProps, ViewStyle } from 'react-native';
 
 import { useTheme } from '../../theme';
 
@@ -27,6 +28,12 @@ const radiusToNumber = (
 
 export type NativeBoxProps = BoxProps &
   Omit<ViewProps, keyof BoxProps> & {
+    /**
+     * 호스트 `View`. `ViewProps` 에는 `ref` 필드가 없어서 공개 컴포넌트마다 직접 선언합니다
+     * (Button·Select·TextField 등과 같은 규약).
+     */
+    ref?: Ref<RNView>;
+
     style?: StyleProp<ViewStyle>;
   };
 

@@ -8,7 +8,12 @@
       "outputs": ["{projectRoot}/dist"],
       "options": {
         "parallel": false,
-        "commands": ["nx run @berrypjh/react-ui:build-js", "nx run @berrypjh/react-ui:build-types"]
+        "commands": [
+          "nx run @berrypjh/react-ui:build-js",
+          "nx run @berrypjh/react-ui:build-types",
+          "nx run @berrypjh/react-ui:generate-catalog",
+          "nx run @berrypjh/react-ui:build-cli"
+        ]
       }
     },
     "build-js": {
@@ -59,11 +64,30 @@
         "command": "mkdir -p libs/react-ui/dist/types && dts-bundle-generator --project libs/react-ui/tsconfig.lib.json --no-banner --no-check --external-imports=react --external-imports=react-dom --external-imports=react/jsx-runtime -o libs/react-ui/dist/types/index.d.ts libs/react-ui/src/index.ts"
       }
     },
+    "generate-catalog": {
+      "executor": "nx:run-commands",
+      "outputs": ["{projectRoot}/dist/llm-catalog.json"],
+      "options": {
+        "command": "tsx tools/scripts/generate-consumer-catalog/index.ts --target=react-ui"
+      }
+    },
+    "build-cli": {
+      "executor": "nx:run-commands",
+      "outputs": ["{projectRoot}/dist/cli.mjs"],
+      "options": {
+        "command": "esbuild tools/consumer-retrieval/package-cli.ts --bundle --platform=node --format=esm --target=node20 --outfile=libs/react-ui/dist/cli.mjs --banner:js='#!/usr/bin/env node'"
+      }
+    },
     "typecheck": {
       "executor": "nx:run-commands",
       "outputs": ["{projectRoot}/out-tsc"],
       "options": {
-        "command": "tsc -p libs/react-ui/tsconfig.lib.json"
+        "commands": [
+          "tsc -p libs/react-ui/tsconfig.lib.json",
+          "tsc -p libs/react-ui/tsconfig.storybook.json --noEmit",
+          "tsc -p libs/react-ui/tsconfig.spec.json --noEmit"
+        ],
+        "parallel": false
       }
     },
     "test": {

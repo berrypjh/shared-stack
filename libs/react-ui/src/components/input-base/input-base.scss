@@ -5,15 +5,15 @@
   --ui-input-bg: transparent;
   --ui-input-fg: var(--ds-text-default);
   --ui-input-placeholder: var(--ds-text-placeholder);
-  --ui-input-border-color: var(--ds-neutral-ne300);
-  --ui-input-border-hover: var(--ds-neutral-ne500);
+  --ui-input-border-color: var(--ds-field-border);
+  --ui-input-border-hover: var(--ds-field-border-hover);
   --ui-input-active-color: var(--ds-border-primary-color);
-  --ui-input-focus-halo: var(--ds-primary-btn-focus-ripple);
-  --ui-input-disabled-bg: var(--ds-neutral-ne100);
+  --ui-input-focus-halo: var(--ds-field-focus-ring-primary);
+  --ui-input-disabled-bg: var(--ds-field-surface-subtle);
   --ui-input-disabled-fg: var(--ds-text-disable);
   --ui-input-disabled-border: var(--ds-border-disabled-color);
   --ui-input-error-color: var(--ds-stroke-error);
-  --ui-input-min-height: 52px;
+  --ui-input-min-height: var(--ds-component-field-height-md);
   --ui-input-gap: var(--ds-spacing-sm);
 
   display: inline-flex;
@@ -27,10 +27,10 @@
   color: var(--ui-input-fg);
   background-color: var(--ui-input-bg);
   transition:
-    border-color 140ms ease,
-    box-shadow 140ms ease,
-    background-color 140ms ease,
-    color 140ms ease;
+    border-color var(--ds-motion-duration-normal) var(--ds-motion-easing-standard),
+    box-shadow var(--ds-motion-duration-normal) ease,
+    background-color var(--ds-motion-duration-normal) ease,
+    color var(--ds-motion-duration-normal) ease;
 }
 
 .ui-input-base--form-control {
@@ -44,18 +44,18 @@
 .ui-input-base--size-sm {
   --ui-input-padding-inline: var(--ds-spacing-md);
   --ui-input-padding-block: var(--ds-spacing-sm);
-  --ui-input-min-height: 40px;
+  --ui-input-min-height: var(--ds-component-field-height-sm);
 }
 
 .ui-input-base--size-md {
   --ui-input-padding-inline: var(--ds-spacing-lg);
   --ui-input-padding-block: var(--ds-spacing-md);
-  --ui-input-min-height: 52px;
+  --ui-input-min-height: var(--ds-component-field-height-md);
 }
 
 .ui-input-base--color-secondary {
   --ui-input-active-color: var(--ds-stroke-secondary);
-  --ui-input-focus-halo: var(--ds-secondary-se100);
+  --ui-input-focus-halo: var(--ds-field-focus-ring);
 }
 
 .ui-input-base__input {
@@ -139,4 +139,14 @@
 
 .ui-input-base--read-only .ui-input-base__input {
   cursor: default;
+}
+
+/**
+ * 루트가 테두리·halo·표면·글자색을 transition한다.
+ * 상태 변화 자체는 색이 담당하므로 전환을 꺼도 정보가 사라지지 않는다 — 움직임에 민감한 사용자에게는 끄는 편이 낫다.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .ui-input-base {
+    transition: none;
+  }
 }

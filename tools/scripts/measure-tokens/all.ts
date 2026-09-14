@@ -1,4 +1,9 @@
-import { encoding_for_model, type TiktokenModel } from 'tiktoken';
+import {
+  anthropicModelFromEnv,
+  countAnthropicTokens,
+  countOpenAITokens,
+  openAIModelFromEnv,
+} from '../../lib/token-count';
 
 import { delta, fmt, readFiles, scenarios } from './shared';
 
@@ -18,38 +23,10 @@ import { delta, fmt, readFiles, scenarios } from './shared';
  *   MEASURE_OPENAI_MODEL     (선택, 기본 'gpt-4o')
  */
 
-const ANTHROPIC_MODEL = process.env.MEASURE_ANTHROPIC_MODEL ?? 'claude-sonnet-4-6';
-const OPENAI_MODEL = (process.env.MEASURE_OPENAI_MODEL ?? 'gpt-4o') as TiktokenModel;
-const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages/count_tokens';
+const ANTHROPIC_MODEL = anthropicModelFromEnv();
+const OPENAI_MODEL = openAIModelFromEnv();
 
 const apiKey = process.env.ANTHROPIC_API_KEY;
-
-const countAnthropic = async (content: string): Promise<number> => {
-  const r = await fetch(ANTHROPIC_API_URL, {
-    method: 'POST',
-    headers: {
-      'x-api-key': apiKey as string,
-      'anthropic-version': '2023-06-01',
-      'content-type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: ANTHROPIC_MODEL,
-      messages: [{ role: 'user', content }],
-    }),
-  });
-  if (!r.ok) throw new Error(`anthropic count_tokens ${r.status}: ${await r.text()}`);
-  const data = (await r.json()) as { input_tokens: number };
-  return data.input_tokens;
-};
-
-const countOpenAI = (content: string): number => {
-  const enc = encoding_for_model(OPENAI_MODEL);
-  try {
-    return enc.encode(content).length;
-  } finally {
-    enc.free();
-  }
-};
 
 type Row = {
   name: string;
@@ -66,8 +43,8 @@ const main = async () => {
   const rows: Row[] = [];
   for (const [name, files] of Object.entries(scenarios)) {
     const { content, chars } = await readFiles(files);
-    const openai = countOpenAI(content);
-    const anthropic = apiKey ? await countAnthropic(content) : null;
+    const openai = countOpenAITokens(content, OPENAI_MODEL);
+    const anthropic = apiKey ? await countAnthropicTokens(content, apiKey, ANTHROPIC_MODEL) : null;
     rows.push({ name, files: files.length, chars, anthropic, openai });
   }
 

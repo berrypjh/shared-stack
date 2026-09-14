@@ -1,0 +1,11 @@
+{
+  "name": "berry-commit",
+  "description": "staged 변경을 scope별로 분석해 한국어 Conventional Commits 메시지를 제안하고 승인 후 커밋한다. commit-mcp MCP 서버를 함께 제공한다.",
+  "version": "0.1.0",
+  "author": {
+    "name": "berrypjh"
+  },
+  "homepage": "https://github.com/berrypjh/shared-stack",
+  "repository": "https://github.com/berrypjh/shared-stack",
+  "license": "MIT"
+}

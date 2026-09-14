@@ -1,11 +1,15 @@
-import type { Meta, StoryObj } from '@storybook/react-vite';
+import { themes } from '@berrypjh/ui-core';
 
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { expect, userEvent, within } from 'storybook/test';
+
+import { ThemeProvider } from '../../theme';
 import { MenuItem } from '../menu-item';
 
 import { TextField } from './TextField';
 
 const meta = {
-  title: 'Components/TextField',
+  title: 'Components/Inputs/TextField',
   component: TextField,
   tags: ['autodocs'],
   parameters: {
@@ -137,6 +141,31 @@ export const Disabled: Story = {
   ),
 };
 
+/**
+ * `readOnly`와 `disabled`를 나란히 둔다 — 둘은 다른 상태다.
+ * readOnly는 편집만 막고 포커스·탐색·값 제출은 살린다.
+ * disabled는 셋 다 막고 비활성으로 고지된다.
+ * 시각이 거의 같아서 회귀가 눈에 띄지 않으므로 한 화면에서 비교한다.
+ */
+export const ReadOnly: Story = {
+  render: () => (
+    <div style={columnStyle}>
+      <TextField
+        label="Account ID"
+        value="ACC-1024"
+        readOnly
+        helperText="Read-only: focusable, submitted with the form."
+      />
+      <TextField
+        label="Account ID"
+        value="ACC-1024"
+        disabled
+        helperText="Disabled: not focusable, not submitted."
+      />
+    </div>
+  ),
+};
+
 export const Error: Story = {
   render: () => (
     <div style={columnStyle}>
@@ -226,6 +255,17 @@ export const WithSelect: Story = {
       </TextField>
     </div>
   ),
+  // select 모드의 목록도 라벨로 이름을 갖고, Escape는 포커스를 trigger에 둔다.
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const trigger = canvas.getByRole('combobox', { name: 'Notification frequency' });
+
+    await userEvent.click(trigger);
+    await expect(canvas.getByRole('listbox')).toHaveAccessibleName('Notification frequency');
+
+    await userEvent.keyboard('{Escape}');
+    await expect(trigger).toHaveFocus();
+  },
 };
 
 export const WithHelperText: Story = {
@@ -326,6 +366,62 @@ export const A11y: Story = {
         <MenuItem value="editor">Editor</MenuItem>
         <MenuItem value="viewer">Viewer</MenuItem>
       </TextField>
+    </div>
+  ),
+};
+
+/** `deepSea` 같은 합성어도 읽히도록 띄어 쓴다. preview 툴바와 같은 규칙. */
+const themeLabel = (name: string) =>
+  name.replace(/([a-z0-9])([A-Z])/g, '$1 $2').replace(/^./, (character) => character.toUpperCase());
+
+/**
+ * 등록된 모든 테마를 한 화면에 나란히 세운다.
+ * 테마마다 스토리를 복사하면 design-tokens에 테마가 늘어도 Storybook만 조용히 낡는다 — 툴바가 이미 겪은 문제다.
+ * 여기서는 `themes` 레지스트리를 순회하므로 새 테마가 자동으로 들어온다.
+ * 툴바 데코레이터를 끄는 것은 정확성 때문이다.
+ * light는 CSS 선택자가 `:root` 하나뿐이라 `data-theme="light"`에 대응하는 규칙이 없다 — 바깥이 dark로 감싸여 있으면 light 칸이 dark를 물려받아 매트릭스가 거짓말을 한다.
+ * 데코레이터를 끄면 `:root`가 light를 맡고 나머지 여섯은 각자의 `data-theme`로 스코프된다.
+ */
+export const ThemeMatrix: Story = {
+  parameters: {
+    layout: 'fullscreen',
+    disableThemeDecorator: true,
+  },
+  render: () => (
+    <div style={{ display: 'grid', gap: '20px', padding: '24px' }}>
+      {themes.map(({ name }) => (
+        <ThemeProvider key={name} mode={name}>
+          <div
+            style={{
+              display: 'grid',
+              gap: '12px',
+              padding: '16px',
+              borderRadius: 'var(--ds-radius-md)',
+              background: 'var(--ds-background-default)',
+              color: 'var(--ds-text-default)',
+              border: '1px solid var(--ds-field-border)',
+            }}
+          >
+            <strong style={{ font: 'var(--ds-body-small-font-size) / 1 inherit' }}>
+              {themeLabel(name)}
+            </strong>
+
+            <div style={rowStyle}>
+              <TextField variant="plain" label="Plain" placeholder="Enter value" />
+              <TextField variant="filled" label="Filled" defaultValue="Filled value" />
+              <TextField
+                variant="boxed"
+                label="Boxed"
+                error
+                defaultValue="bad@"
+                helperText="Enter a valid email address."
+              />
+              <TextField variant="boxed" label="Disabled" disabled defaultValue="Not editable" />
+              <TextField variant="boxed" label="Required" required placeholder="Enter value" />
+            </div>
+          </div>
+        </ThemeProvider>
+      ))}
     </div>
   ),
 };

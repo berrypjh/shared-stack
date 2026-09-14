@@ -29,7 +29,9 @@
     "./tailwind": {
       "types": "./dist/tailwind.d.ts",
       "default": "./dist/tailwind.js"
-    }
+    },
+    "./tokens": "./dist/tokens.json",
+    "./package.json": "./package.json"
   },
   "devDependencies": {
     "@tokens-studio/sd-transforms": "^2.0.3",

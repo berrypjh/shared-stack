@@ -1,6 +1,6 @@
 'use client';
 
-import { cx } from '@berrypjh/ui-core';
+import { cx } from '../../utils';
 
 import { segmentControlClasses } from './SegmentControl.constants';
 import type { SegmentControlProps } from './SegmentControl.types';

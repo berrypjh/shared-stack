@@ -1,5 +1,28 @@
 {
   "component": {
-    "button": { "$value": "{spacing.sm} {spacing.lg}", "$type": "spacing" }
+    "button": {
+      "$value": "{spacing.sm} {spacing.lg}",
+      "$type": "spacing"
+    },
+    "pressedOffset": {
+      "$value": "1",
+      "$type": "spacing"
+    },
+    "field": {
+      "height": {
+        "sm": {
+          "$value": "40",
+          "$type": "spacing"
+        },
+        "md": {
+          "$value": "52",
+          "$type": "spacing"
+        }
+      },
+      "focusRingWidth": {
+        "$value": "{primitiveBorder.sm}",
+        "$type": "borderWidth"
+      }
+    }
   }
 }

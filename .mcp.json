@@ -1,8 +1,8 @@
 {
   "mcpServers": {
-    "ai-commit": {
+    "commit-mcp": {
       "command": "node",
-      "args": ["./tools/mcp/commit/dist/index.js"]
+      "args": ["./plugins/berry-commit/dist/index.js"]
     }
   }
 }

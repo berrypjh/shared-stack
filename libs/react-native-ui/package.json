@@ -21,7 +21,13 @@
         "types": "./dist/index.d.ts",
         "default": "./dist/index.esm.js"
       }
-    }
+    },
+    "./catalog": "./dist/llm-catalog.json",
+    "./tokens": "./dist/tokens.json",
+    "./agents": "./dist/AGENTS.md"
+  },
+  "bin": {
+    "berry-react-native-ui": "./dist/cli.mjs"
   },
   "files": [
     "dist"

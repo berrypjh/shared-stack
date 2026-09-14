@@ -22,8 +22,25 @@
       "dependsOn": ["build:tokens", "build:ts"]
     },
     "typecheck": {
-      "executor": "nx:noop",
-      "dependsOn": ["build:ts"]
+      "executor": "nx:run-commands",
+      "dependsOn": ["build:ts"],
+      "options": {
+        "command": "tsc -p libs/design-tokens/tsconfig.spec.json"
+      }
+    },
+    "test": {
+      "executor": "@nx/vitest:test",
+      "dependsOn": ["build"],
+      "options": {
+        "configFile": "libs/design-tokens/vitest.config.mts",
+        "watch": false,
+        "reportsDirectory": "libs/design-tokens/test-output/vitest/coverage"
+      },
+      "configurations": {
+        "ci": {
+          "runMode": "run"
+        }
+      }
     }
   },
   "tags": ["scope:internal"]

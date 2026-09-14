@@ -3,10 +3,11 @@
 ## 절대 원칙
 
 - **웹 전용**: DOM API · CSS · React DOM이 전제. RN API 금지. 양 플랫폼이 쓸 코드는 ui-core로 올린다.
-- **ui-core 캡슐화**: react-ui 소비자는 `@berrypjh/ui-core`·`@berrypjh/design-tokens`를 모른다. 컴포넌트 prop은 ui-core contracts를 wrap해 노출 (`BoxProps` 등이 ui-core에서 와도 react-ui 자체 props로 한 번 감싼다).
+- **ui-core 캡슐화**: react-ui 소비자는 `@berrypjh/ui-core`·`@berrypjh/design-tokens`를 모른다. 컴포넌트 prop은 시맨틱 계약을 wrap해 노출한다.
+- **시맨틱 계약의 소유자**: 양 렌더러가 같은 불변식을 실제로 구현하는 계약만 ui-core에 있다 (`avatar`·`badge`·`box`·`button`·`chip`·`divider`·`fab`·`icon-button`·`field`·`stack`). RN 구현이 없는 `menu-item`, 그리고 같은 계약 안에서도 한쪽에만 있는 키(`FieldProps`의 `required`·`margin`·`hiddenLabel`, `IconButtonProps`의 `edge`·`loading`)는 `src/types/`가 소유한다. RN 구현이 생기기 전에 ui-core로 올리지 않는다.
 - **accessibility는 필수**: keyboard/focus/aria 동작은 변경 시 보존. `describeConformance` 기반 conformance 테스트는 회귀 방지용.
 - **토큰만 사용**: 색·spacing·radius 하드코딩 금지. SCSS는 CSS 변수, JSX는 `getColor`/Tailwind class 활용.
-- **단일 사용처면 react-ui가 아님**: 양 플랫폼이 쓸 로직은 ui-core, 한 컴포넌트 안에서만 쓰면 그 컴포넌트 폴더로.
+- **단일 사용처면 `src/utils`가 아님**: 한 컴포넌트만 쓰면 그 컴포넌트 폴더로 (`Select.navigation.ts`·`Select.selection.ts`·`SearchField.utils.ts`가 그 예). 양 플랫폼이 **실제로** 같은 의미로 쓸 때만 ui-core.
 
 ## 파일 (요약)
 
@@ -21,16 +22,24 @@ src/
     <name>/<Name>.utils.ts cx/이벤트 헬퍼 (있을 때만)
     <name>/<name>.scss     스타일
     <name>/index.ts        feature export
-    index.ts               전체 aggregator (17개 컴포넌트)
+    index.ts               전체 aggregator (정확한 목록은 dist/llm-catalog.json)
   theme/
-    ThemeProvider.tsx      <html data-theme=...> 적용
+    ThemeProvider.tsx      <div data-theme=...> 스코프 (Context 아님 — 중첩하면 안쪽이 자기 scope를 연다)
     ThemeProvider.types.ts
     index.ts
-  types/
-    field.ts               Field* 재export, InputLikeElement 등 DOM 한정 alias
+  types/                   ui-core 계약의 web wrap + web 전용 계약 (소유 경계는 위 '절대 원칙' 참조)
+    button.ts              ButtonProps, ButtonVariant/Size/Color, ButtonLoadingPosition
+    fab.ts                 FabProps, FabShape
+    field.ts               FieldProps, FormControlProps, InputFieldProps, TextFieldProps + FieldMargin, InputLike* alias
+                           (FieldVariant/Size/Color와 시맨틱 키는 ui-core 계약을 re-export/확장. web 전용은 required·margin·hiddenLabel)
+    icon-button.ts         IconButtonProps, IconButtonEdge
+    menu-item.ts           MenuItemProps
     polymorphic.ts         PropsOf, PolymorphicComponentProps* (component prop 패턴)
     index.ts
-  utils/                   internal 전용 (form/input/react). src/index.ts에 노출 안 됨
+  utils/                   여러 컴포넌트가 함께 쓰는 web 헬퍼
+    cx.ts                  className 결합 (react-ui가 소유. src/index.ts로 공개)
+    form-value.ts          hasFormValue — InputBase·FormControl의 filled 판정
+    react/                 nodes, refs (internal)
 ```
 
 `*.test.tsx`는 같은 폴더, `*.stories.tsx`는 storybook용.
@@ -40,7 +49,7 @@ src/
 | 작업               | 수정 파일                                                                                          |
 | ------------------ | -------------------------------------------------------------------------------------------------- |
 | 새 컴포넌트        | `components/<name>/{<Name>.tsx, .types.ts, .scss, index.ts}` + `components/index.ts` + `styles.ts` |
-| 컴포넌트 prop 변경 | 해당 `<Name>.types.ts` (ui-core contracts 변경 필요 시 거기 먼저)                                  |
+| 컴포넌트 prop 변경 | 해당 `<Name>.types.ts` (시맨틱 계약 변경이면 `src/types/<name>.ts` 먼저)                           |
 | 새 SCSS 파일       | 해당 컴포넌트 폴더 + `src/styles.ts` import 추가                                                   |
 | 토큰 사용          | `getColor` (JSX) / Tailwind class / SCSS의 `var(--color-...)`                                      |
 | 테마 동작 변경     | `theme/ThemeProvider.tsx` (`data-theme` 적용 정책)                                                 |
@@ -49,13 +58,13 @@ src/
 ## 빌드 / 테스트
 
 ```bash
-pnpm nx build @berrypjh/react-ui          # rollup(JS) + dts-bundle-generator(d.ts) + cp(tailwind/css)
-pnpm nx test @berrypjh/react-ui           # vitest (424 tests, jsdom)
+pnpm nx build @berrypjh/react-ui          # rollup(JS) + dts-bundle-generator(d.ts) + cp(tailwind/css) + llm-catalog
+pnpm nx test @berrypjh/react-ui           # vitest (jsdom)
 pnpm nx storybook @berrypjh/react-ui      # storybook
 pnpm build-storybook @berrypjh/react-ui   # static storybook
 ```
 
-빌드 산출물: `dist/{index.esm.js, index.css, types/index.d.ts, tailwind.{js,d.ts}, AGENTS.md, tokens.json, README.md}`. d.ts는 `dts-bundle-generator`로 단일 파일, ui-core/design-tokens 타입을 inline.
+빌드 산출물: `dist/{index.esm.js, index.css, types/index.d.ts, tailwind.{js,d.ts}, AGENTS.md, tokens.json, llm-catalog.json, README.md}`. d.ts는 `dts-bundle-generator`로 단일 파일, ui-core/design-tokens 타입을 inline. `llm-catalog.json`은 declaration 생성 뒤 `generate-catalog` target이 만든다 (`tools/scripts/generate-consumer-catalog`).
 
 ## Gotcha
 
@@ -64,6 +73,8 @@ pnpm build-storybook @berrypjh/react-ui   # static storybook
 - **ui-core 직접 import 금지**: 외부에서 `@berrypjh/ui-core`를 import하라고 안내 X. react-ui가 캡슐화 — ui-core export는 react-ui index를 통해 패스스루.
 - **`components/index.ts`·`styles.ts` 동기화**: 새 컴포넌트는 두 곳에 등록해야 SCSS도 dist/index.css에 들어감.
 - **conformance 테스트**: `test-utils/describeConformance`가 root class·prop spread·ref forwarding·polymorphic·className merge를 확인. props 패턴 바꾸면 같이 갱신.
+- **스토리와 `.storybook/`도 typecheck 대상이다**: 둘은 `tsconfig.lib.json`·`tsconfig.spec.json` 어디에도 없어서, `tsconfig.storybook.json`을 돌리지 않으면 타입 오류가 CI 어디에서도 걸리지 않는다 (Storybook 빌더는 vite/esbuild라 타입을 지우고 지나간다 — 빌드 성공이 타입 검사를 대신하지 못한다). 테스트 파일도 같다 — vitest 는 타입을 지우고 돌아서 `@ts-expect-error` 로 적은 타입 수준 계약이 `tsconfig.spec.json` 없이는 아무 데서도 검사되지 않는다. `typecheck` 타깃이 lib → storybook → spec 세 tsc를 순서대로 도는 이유다 (ui-core 와 같은 관례).
+- **forced-colors에서 `box-shadow`는 렌더되지 않는다**: Windows 고대비 모드는 저자 색을 시스템 색으로 갈아끼우고 `box-shadow`를 지운다(CSS Color Adjust 1). 그래서 halo·링·밑줄을 box-shadow로만 그리면 그 모드에서 사라지고, 테두리 색 변화도 평상시와 같은 색으로 평탄화된다. **포커스를 box-shadow로 그리는 새 규칙에는 `@media (forced-colors: active)` outline 대응을 함께 둔다** — `outline`은 그 모드에서도 남는다. `src/components/forcedColors.test.ts`가 규칙 자체를 검사하므로 variant를 더하면 목록 수정 없이 걸린다. 그 블록 안의 `Highlight`·`ButtonBorder`는 CSS 시스템 색 키워드지 하드코딩이 아니다 — 그 모드의 팔레트는 OS가 소유해서 토큰을 써도 무시된다. 길이는 강제되지 않으므로 토큰을 그대로 쓴다.
 
 ## 다운스트림 영향
 

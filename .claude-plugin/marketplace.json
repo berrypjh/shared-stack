@@ -1,0 +1,17 @@
+{
+  "name": "berrypjh",
+  "description": "@berrypjh 공유 스택의 개발 도구 플러그인. 여러 저장소에서 같은 규칙으로 동작하는 skill과 MCP 서버를 배포한다.",
+  "owner": {
+    "name": "berrypjh",
+    "url": "https://github.com/berrypjh"
+  },
+  "plugins": [
+    {
+      "name": "berry-commit",
+      "source": "./plugins/berry-commit",
+      "description": "staged 변경을 scope별로 분석해 한국어 Conventional Commits 메시지를 제안하고 승인 후 커밋한다. commit-mcp MCP 서버를 함께 제공한다.",
+      "category": "workflow",
+      "keywords": ["commit", "conventional-commits", "mcp", "korean"]
+    }
+  ]
+}

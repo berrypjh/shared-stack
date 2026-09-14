@@ -1,5 +1,20 @@
 packages:
-  - 'libs/*'
-  - 'apps/*'
-  - 'tools/*'
+  - "libs/*"
+  - "apps/*"
+  - "tools/*"
+
+allowBuilds:
+  "@parcel/watcher": true # nx 파일 감시
+  "@swc/core": true # @swc/cli · swc-node/register
+  esbuild: true # vite · plugins/berry-commit 번들
+  nx: true
+  unrs-resolver: true # eslint import 해석 네이티브 바인딩
+  core-js: false # postinstall이 후원 안내만 출력한다
+  cypress: false # 이 저장소는 Playwright를 쓴다
+  detox: false # RN E2E를 쓰지 않는다
+  dtrace-provider: false # detox 경유 optional 네이티브
+
+overrides:
+  "@swc/core": ^1.15.0
+
 autoInstallPeers: true

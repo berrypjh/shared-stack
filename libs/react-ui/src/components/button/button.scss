@@ -3,8 +3,8 @@
   --ui-button-spinner-size: 1em;
   --ui-button-spinner-border-width: var(--ds-primitive-border-xs);
   --ui-button-loader-offset-inline: calc(var(--ui-btn-px) + (var(--ui-button-icon-size) / 2));
-  --ui-button-loading-transition-duration: 140ms;
-  --ui-button-loading-transition-timing: ease;
+  --ui-button-loading-transition-duration: var(--ds-motion-duration-normal);
+  --ui-button-loading-transition-timing: var(--ds-motion-easing-standard);
 
   position: relative;
   text-decoration: none;
@@ -74,7 +74,7 @@
   border: var(--ui-button-spinner-border-width) solid currentColor;
   border-right-color: transparent;
   border-radius: var(--ds-radius-rounded);
-  animation: ui-button-spin 0.65s linear infinite;
+  animation: ui-button-spin var(--ds-motion-duration-slow) var(--ds-motion-easing-linear) infinite;
 }
 
 .ui-button--loading-position-start .ui-button__loading-wrapper {
@@ -111,7 +111,7 @@
   }
 
   .ui-button__spinner {
-    animation-duration: 1.2s;
+    animation-duration: var(--ds-motion-duration-slower);
   }
 }
 

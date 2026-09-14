@@ -1,0 +1,10 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "types": ["node"],
+    "jsx": "react-jsx"
+  },
+  "include": ["lib/**/*.ts", "evals/**/*.ts", "scripts/**/*.ts"],
+  "exclude": ["evals/consumer/fixtures/**"]
+}

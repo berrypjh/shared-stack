@@ -1,0 +1,41 @@
+{
+  "name": "commit-mcp",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "plugins/berry-commit/src",
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "inputs": [
+        "{projectRoot}/src/**/*",
+        "{projectRoot}/tsconfig.json",
+        "{projectRoot}/package.json",
+        "sharedGlobals"
+      ],
+      "outputs": ["{projectRoot}/dist"],
+      "options": {
+        "cwd": "plugins/berry-commit",
+        "parallel": false,
+        "commands": [
+          "tsc -p tsconfig.json",
+          "esbuild src/index.ts --bundle --platform=node --format=esm --target=node20 --outfile=dist/index.js"
+        ]
+      }
+    },
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "cache": true,
+      "inputs": [
+        "{projectRoot}/src/**/*",
+        "{projectRoot}/tsconfig.json",
+        "{projectRoot}/package.json",
+        "sharedGlobals"
+      ],
+      "options": {
+        "cwd": "plugins/berry-commit",
+        "command": "tsc -p tsconfig.json"
+      }
+    }
+  }
+}

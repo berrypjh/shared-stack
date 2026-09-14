@@ -1,0 +1,9 @@
+{
+  "name": "eval-fixture-react-native-basic",
+  "private": true,
+  "dependencies": {
+    "@berrypjh/react-native-ui": "^1.0.1",
+    "react": "^19.1.0",
+    "react-native": "0.81.5"
+  }
+}

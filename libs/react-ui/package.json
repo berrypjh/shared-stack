@@ -17,7 +17,13 @@
     "./tailwind": {
       "types": "./dist/tailwind.d.ts",
       "import": "./dist/tailwind.js"
-    }
+    },
+    "./catalog": "./dist/llm-catalog.json",
+    "./tokens": "./dist/tokens.json",
+    "./agents": "./dist/AGENTS.md"
+  },
+  "bin": {
+    "berry-react-ui": "./dist/cli.mjs"
   },
   "main": "./dist/index.esm.js",
   "types": "./dist/types/index.d.ts",

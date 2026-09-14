@@ -1,6 +1,6 @@
-import { cx } from '@berrypjh/ui-core';
-
 import type { CSSProperties } from 'react';
+
+import { cx } from '../../utils';
 
 import { boxClasses } from './Box.constants';
 import type { ReactBoxProps } from './Box.types';
@@ -26,6 +26,7 @@ export const Box = ({
   bg,
   radius,
   children,
+  ref,
   ...rest
 }: ReactBoxProps) => {
   const computedStyle = getBoxComputedStyle({
@@ -53,7 +54,7 @@ export const Box = ({
   };
 
   return (
-    <div {...rest} className={cx(boxClasses.root, className)} style={mergedStyle}>
+    <div {...rest} ref={ref} className={cx(boxClasses.root, className)} style={mergedStyle}>
       {children}
     </div>
   );

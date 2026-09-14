@@ -12,6 +12,15 @@
         "command": "tsc --noEmit -p tsconfig.app.json",
         "cwd": "apps/demo-web"
       }
+    },
+    "build": {
+      "dependsOn": ["^build"]
+    },
+    "serve": {
+      "dependsOn": ["^build"]
+    },
+    "test": {
+      "dependsOn": ["^build"]
     }
   }
 }

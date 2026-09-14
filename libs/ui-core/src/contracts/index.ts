@@ -1,21 +1,31 @@
+/**
+ * 두 렌더러가 실제로 같은 불변식을 구현하는 계약만 둔다.
+ */
+export type { AvatarSemanticProps, AvatarShape, AvatarSize } from './avatar';
+export type {
+  BadgeIntent,
+  BadgePlacement,
+  BadgeSemanticProps,
+  BadgeSize,
+  BadgeVariant,
+} from './badge';
 export type { BoxProps, BoxRadiusValue, BoxSpacingValue } from './box';
 export type {
   ButtonColor,
   ButtonLoadingPosition,
-  ButtonProps,
+  ButtonSemanticProps,
   ButtonSize,
   ButtonVariant,
 } from './button';
-export type { FabProps, FabShape } from './fab';
+export type { ChipSemanticProps, ChipSize, ChipVariant } from './chip';
+export type { DividerOrientation, DividerSemanticProps } from './divider';
+export type { FabSemanticProps, FabShape } from './fab';
 export type {
   FieldColor,
-  FieldMargin,
-  FieldProps,
+  FieldSemanticProps,
   FieldSize,
   FieldVariant,
-  FormControlProps,
-  InputFieldProps,
-  TextFieldProps,
+  InputFieldSemanticProps,
 } from './field';
-export type { IconButtonEdge, IconButtonProps } from './icon-button';
-export type { MenuItemProps } from './menu-item';
+export type { IconButtonSemanticProps } from './icon-button';
+export type { StackAlign, StackDirection, StackJustify, StackSemanticProps } from './stack';

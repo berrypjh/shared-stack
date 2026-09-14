@@ -1,11 +1,8 @@
 import type { ButtonColor, ButtonSize } from './button';
 
-export type IconButtonEdge = 'start' | 'end' | false;
-
-export interface IconButtonProps {
+export interface IconButtonSemanticProps {
   color?: ButtonColor;
   size?: ButtonSize;
-  edge?: IconButtonEdge;
 
   disabled?: boolean;
 }

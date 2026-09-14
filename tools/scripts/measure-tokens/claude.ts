@@ -1,3 +1,5 @@
+import { anthropicModelFromEnv, countAnthropicTokens } from '../../lib/token-count';
+
 import { printTable, readFiles, type Row, scenarios } from './shared';
 
 /**
@@ -12,8 +14,7 @@ import { printTable, readFiles, type Row, scenarios } from './shared';
  *   MEASURE_ANTHROPIC_MODEL  (선택, 기본 'claude-sonnet-4-6')
  */
 
-const MODEL = process.env.MEASURE_ANTHROPIC_MODEL ?? 'claude-sonnet-4-6';
-const API_URL = 'https://api.anthropic.com/v1/messages/count_tokens';
+const MODEL = anthropicModelFromEnv();
 
 const apiKey = process.env.ANTHROPIC_API_KEY;
 if (!apiKey) {
@@ -22,29 +23,11 @@ if (!apiKey) {
   process.exit(1);
 }
 
-const countTokens = async (content: string): Promise<number> => {
-  const r = await fetch(API_URL, {
-    method: 'POST',
-    headers: {
-      'x-api-key': apiKey,
-      'anthropic-version': '2023-06-01',
-      'content-type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: MODEL,
-      messages: [{ role: 'user', content }],
-    }),
-  });
-  if (!r.ok) throw new Error(`count_tokens ${r.status}: ${await r.text()}`);
-  const data = (await r.json()) as { input_tokens: number };
-  return data.input_tokens;
-};
-
 const main = async () => {
   const rows: Row[] = [];
   for (const [name, files] of Object.entries(scenarios)) {
     const { content, chars } = await readFiles(files);
-    const tokens = await countTokens(content);
+    const tokens = await countAnthropicTokens(content, apiKey, MODEL);
     rows.push({ name, files: files.length, chars, tokens });
   }
   printTable(`Anthropic ${MODEL}`, rows);

@@ -1,15 +1,21 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { expect, userEvent, within } from 'storybook/test';
+
+import { ThemeGallery, themeGalleryParameters } from '../../../.storybook/ThemeGallery';
 
 import { IconButton } from './IconButton';
 
 const meta = {
-  title: 'Components/IconButton',
+  title: 'Components/Buttons/IconButton',
   component: IconButton,
   tags: ['autodocs'],
   parameters: {
     layout: 'centered',
   },
   args: {
+    // 아이콘 전용 컨트롤은 접근 가능한 이름이 타입 요구사항이다.
+    // meta에 두면 모든 스토리가 물려받고 Playground의 control로도 노출된다.
+    'aria-label': 'Search',
     size: 'md',
     color: 'primary',
     edge: false,
@@ -92,7 +98,7 @@ const ShareIcon = () => (
 
 export const Playground: Story = {
   render: (args) => (
-    <IconButton {...args} aria-label="Search">
+    <IconButton {...args}>
       <SearchIcon />
     </IconButton>
   ),
@@ -152,19 +158,25 @@ export const Loading: Story = {
   render: () => (
     <div style={columnStyle}>
       <div style={rowStyle}>
-        <span style={{ fontSize: '12px', color: '#666', minWidth: '120px' }}>loading: null</span>
+        <span style={{ fontSize: '12px', color: 'var(--ds-text-light)', minWidth: '120px' }}>
+          loading: null
+        </span>
         <IconButton loading={null} aria-label="Search">
           <SearchIcon />
         </IconButton>
       </div>
       <div style={rowStyle}>
-        <span style={{ fontSize: '12px', color: '#666', minWidth: '120px' }}>loading: false</span>
+        <span style={{ fontSize: '12px', color: 'var(--ds-text-light)', minWidth: '120px' }}>
+          loading: false
+        </span>
         <IconButton loading={false} aria-label="Search">
           <SearchIcon />
         </IconButton>
       </div>
       <div style={rowStyle}>
-        <span style={{ fontSize: '12px', color: '#666', minWidth: '120px' }}>loading: true</span>
+        <span style={{ fontSize: '12px', color: 'var(--ds-text-light)', minWidth: '120px' }}>
+          loading: true
+        </span>
         <IconButton loading={true} aria-label="Saving...">
           <BookmarkIcon />
         </IconButton>
@@ -182,7 +194,7 @@ export const WithEdge: Story = {
           justifyContent: 'space-between',
           alignItems: 'center',
           padding: '8px 16px',
-          border: '1px dashed #ccc',
+          border: '1px dashed var(--ds-stroke-default)',
           borderRadius: '4px',
           minWidth: '320px',
         }}
@@ -240,19 +252,77 @@ export const A11y: Story = {
       </div>
       {/* 비활성화 상태 */}
       <div style={rowStyle}>
-        <IconButton disabled aria-label="Share (unavailable)" aria-disabled="true">
+        <IconButton disabled aria-label="Share (unavailable)">
           <ShareIcon />
         </IconButton>
       </div>
-      {/* 로딩 상태 — aria-busy 명시 */}
+      {/* 로딩 상태 — 고지는 컴포넌트가 그리는 progressbar가 맡는다. aria-busy를 덧붙이면 같은 상태를 두 번 읽는다. */}
       <div style={rowStyle}>
-        <IconButton loading={true} aria-label="Saving bookmark" aria-busy="true">
+        <IconButton loading={true} aria-label="Saving bookmark">
           <BookmarkIcon />
         </IconButton>
       </div>
     </div>
   ),
-  parameters: {
-    a11y: { disable: false },
+};
+
+/**
+ * 등록된 모든 테마 × 대표 상태.
+ * 테마 목록은 레지스트리에서 순회한다 — 손으로 적으면 design-tokens에 테마가 늘어도 여기만 조용히 낡는다.
+ * 아이콘 전용 컨트롤이라 모든 예시가 `aria-label`을 갖는다 — 갤러리라고 이름을 빼면 axe가 잡을 뿐 아니라 스크린샷도 실제 사용례가 아니게 된다.
+ */
+export const ThemeMatrix: Story = {
+  parameters: themeGalleryParameters,
+  render: () => (
+    <ThemeGallery>
+      {() => (
+        <div style={rowStyle}>
+          <IconButton aria-label="Close">
+            <CloseIcon />
+          </IconButton>
+          <IconButton aria-label="Search" color="secondary">
+            <SearchIcon />
+          </IconButton>
+          <IconButton aria-label="More options" size="sm">
+            <MoreVertIcon />
+          </IconButton>
+          <IconButton aria-label="Close (large)" size="lg">
+            <CloseIcon />
+          </IconButton>
+          <IconButton aria-label="Close (disabled)" disabled>
+            <CloseIcon />
+          </IconButton>
+          <IconButton aria-label="Search (loading)" loading>
+            <SearchIcon />
+          </IconButton>
+        </div>
+      )}
+    </ThemeGallery>
+  ),
+};
+
+/**
+ * 키보드로 도달하고 활성화된다.
+ * 아이콘만 있는 컨트롤이라 "무엇에 포커스가 갔는지"를 눈으로 확인할 수 없다 — 이름으로 단언해야 의미가 있다.
+ * `.focus()`가 아니라 Tab을 쓰는 이유는 `:focus-visible`이 키보드 경로에서만 켜지기 때문이다.
+ */
+export const KeyboardFocus: Story = {
+  render: () => (
+    <div style={rowStyle}>
+      <IconButton aria-label="Search">
+        <SearchIcon />
+      </IconButton>
+      <IconButton aria-label="Close (unavailable)" disabled>
+        <CloseIcon />
+      </IconButton>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+
+    await userEvent.tab();
+
+    await expect(canvas.getByRole('button', { name: 'Search' })).toHaveFocus();
+    await expect(canvas.getByRole('button', { name: 'Close (unavailable)' })).toBeDisabled();
   },
 };

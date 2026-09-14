@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { fireEvent, screen } from '@testing-library/react';
 import { spy } from 'sinon';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import { createRenderer, describeConformance } from '../../../test';
 import { filledInputClasses } from '../filled-input';
@@ -129,6 +129,68 @@ describe('<TextField />', () => {
         'my-field-helper-text',
       );
     });
+
+    /**
+     * 소비자가 준 `aria-describedby`는 helper text와 합성되어 input에 닿아야 한다.
+     * 설명은 여러 요소를 가리킬 수 있는 공백 구분 id 목록이다.
+     * 둘 중 하나를 버리면 스크린리더가 설명 하나를 통째로 잃는데, 타입도 런타임도 아무 말을 하지 않는다.
+     * TextField가 이 합성의 소유자다 — helper의 id를 만드는 유일한 층이기 때문이다.
+     */
+    it('소비자 aria-describedby 를 helper text id 와 합성해 input 에 건다', () => {
+      render(
+        <>
+          <span id="extra">추가 설명</span>
+          <TextField id="f" label="이메일" helperText="회사 메일" aria-describedby="extra" />
+        </>,
+      );
+
+      const input = screen.getByRole('textbox');
+
+      expect(input).toHaveAttribute('aria-describedby', 'extra f-helper-text');
+      expect(input).toHaveAccessibleDescription('추가 설명 회사 메일');
+    });
+
+    it('helperText 가 없으면 소비자 aria-describedby 만 input 에 닿는다', () => {
+      render(
+        <>
+          <span id="extra">추가 설명</span>
+          <TextField id="f" label="이메일" aria-describedby="extra" />
+        </>,
+      );
+
+      expect(screen.getByRole('textbox')).toHaveAttribute('aria-describedby', 'extra');
+    });
+  });
+
+  /**
+   * `readOnly`는 ui-core `InputFieldSemanticProps`가 소유한 공유 시맨틱이고 TextField에 타입으로 선언되어 있다.
+   * 진짜 입력에 닿지 않으면 타입은 통과하는데 필드는 그대로 편집 가능한 채 남는다 — 조용한 계약 위반이다.
+   * `disabled`와 갈리는 지점이기도 하다 — readOnly는 편집만 막고 포커스와 값 제출은 살린다.
+   */
+  describe('prop: readOnly', () => {
+    it('readOnly 가 실제 input 에 닿는다 — disabled 로 바뀌지 않는다', () => {
+      render(<TextField label="A" readOnly defaultValue="x" />);
+
+      const input = screen.getByRole('textbox');
+
+      expect(input).toHaveAttribute('readonly');
+      expect(input).not.toBeDisabled();
+    });
+
+    it('readOnly 를 FormControl 래퍼 div 로 흘리지 않는다', () => {
+      render(<TextField label="A" readOnly />);
+
+      expect(document.querySelector('.ui-form-control')).not.toHaveAttribute('readonly');
+    });
+
+    it('readOnly 는 포커스를 막지 않는다', async () => {
+      const { user } = render(<TextField label="A" readOnly defaultValue="x" />);
+
+      const input = screen.getByRole('textbox');
+      await user.click(input);
+
+      expect(input).toHaveFocus();
+    });
   });
 
   describe('events', () => {
@@ -243,6 +305,90 @@ describe('<TextField />', () => {
       );
 
       expect(screen.getByRole('combobox')).toHaveAccessibleDescription('Choose one');
+    });
+
+    it('옵션을 고르면 onChange가 Select 의 change 계약({ target: { name, value } })으로 호출되어야 한다', async () => {
+      const onChange = vi.fn();
+      const { user } = render(
+        <TextField select label="Currency" name="currency" defaultValue="usd" onChange={onChange}>
+          <option value="usd">USD</option>
+          <option value="krw">KRW</option>
+        </TextField>,
+      );
+
+      await user.click(screen.getByRole('combobox'));
+      await user.click(screen.getByRole('option', { name: 'KRW' }));
+
+      expect(onChange).toHaveBeenCalledTimes(1);
+      expect(onChange.mock.calls[0][0].target).toEqual({ name: 'currency', value: 'krw' });
+    });
+
+    it('controlled select는 onChange로 값을 갱신할 수 있어야 한다', async () => {
+      const Controlled = () => {
+        const [value, setValue] = React.useState<unknown>('usd');
+        return (
+          <TextField
+            select
+            label="Currency"
+            value={value}
+            onChange={(event) => setValue(event.target.value)}
+          >
+            <option value="usd">USD</option>
+            <option value="krw">KRW</option>
+          </TextField>
+        );
+      };
+
+      const { user } = render(<Controlled />);
+
+      await user.click(screen.getByRole('combobox'));
+      await user.click(screen.getByRole('option', { name: 'KRW' }));
+
+      expect(screen.getByRole('combobox')).toHaveTextContent('KRW');
+    });
+
+    it('열린 listbox 도 label 로 이름을 가져야 한다', async () => {
+      const { user } = render(
+        <TextField select label="Currency" value="usd">
+          <option value="usd">USD</option>
+          <option value="krw">KRW</option>
+        </TextField>,
+      );
+
+      await user.click(screen.getByRole('combobox'));
+
+      expect(screen.getByRole('listbox')).toHaveAccessibleName('Currency');
+    });
+
+    it('select 모드는 Select 에 뜻이 없는 입력 전용 prop 을 타입에서 거부한다', () => {
+      const elements = [
+        // @ts-expect-error select의 포커스 대상은 native input이 아니다
+        <TextField key="ref" select label="L" inputRef={() => undefined} />,
+        // @ts-expect-error Select에는 readOnly가 없다
+        <TextField key="readOnly" select label="L" readOnly />,
+        // @ts-expect-error Select에는 multiline이 없다
+        <TextField key="multiline" select label="L" multiline />,
+        // @ts-expect-error Select에는 rows가 없다
+        <TextField key="rows" select label="L" rows={3} />,
+        // @ts-expect-error Select에는 input type이 없다
+        <TextField key="type" select label="L" type="email" />,
+      ];
+
+      expect(elements).toHaveLength(5);
+    });
+
+    it('disabled·required·error 를 combobox 에 알려야 한다', () => {
+      render(
+        <TextField select label="Currency" value="usd" disabled required error>
+          <option value="usd">USD</option>
+        </TextField>,
+      );
+
+      const combobox = screen.getByRole('combobox');
+
+      expect(combobox).toBeDisabled();
+      expect(combobox).toHaveAttribute('aria-required', 'true');
+      expect(combobox).toHaveAttribute('aria-invalid', 'true');
     });
   });
 });

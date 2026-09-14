@@ -1,2 +1,40 @@
 @import 'tailwindcss';
 @config '../tailwind.config.js';
+
+:root {
+  --demo-canvas: var(--ds-neutral-ne200);
+}
+
+[data-theme='dark'] {
+  --demo-canvas: #0a0f1a;
+}
+
+[data-theme='sepia'] {
+  --demo-canvas: var(--ds-neutral-ne300);
+}
+
+body {
+  font-family: var(--ds-body-medium-font-family);
+}
+
+@keyframes ds-token-motion {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(84px);
+  }
+}
+
+.token-motion {
+  animation-name: ds-token-motion;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+  animation-timing-function: ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .token-motion {
+    animation: none;
+  }
+}

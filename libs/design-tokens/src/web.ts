@@ -1,1 +1,1 @@
-export * from './.generated/web/index';
+export * from './.generated/web/index.js';

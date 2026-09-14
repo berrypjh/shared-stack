@@ -42,12 +42,12 @@
     "extraBold": { "$value": "Extra Bold", "$type": "fontWeights" }
   },
   "fontFamilies": {
-    "inter": { "$value": "Inter", "$type": "fontFamilies" }
+    "pretendard": { "$value": "Pretendard", "$type": "fontFamilies" }
   },
   "display": {
     "huge": {
       "$value": {
-        "fontFamily": "{fontFamilies.inter}",
+        "fontFamily": "{fontFamilies.pretendard}",
         "fontWeight": "{fontWeight.extraBold}",
         "fontSize": "{fontSize.7xl}",
         "lineHeight": "{lineHeight.7xl}",
@@ -57,7 +57,7 @@
     },
     "large": {
       "$value": {
-        "fontFamily": "{fontFamilies.inter}",
+        "fontFamily": "{fontFamilies.pretendard}",
         "fontWeight": "{fontWeight.extraBold}",
         "fontSize": "{fontSize.6xl}",
         "lineHeight": "{lineHeight.6xl}",
@@ -67,7 +67,7 @@
     },
     "medium": {
       "$value": {
-        "fontFamily": "{fontFamilies.inter}",
+        "fontFamily": "{fontFamilies.pretendard}",
         "fontWeight": "{fontWeight.extraBold}",
         "fontSize": "{fontSize.5xl}",
         "lineHeight": "{lineHeight.5xl}",
@@ -79,7 +79,7 @@
   "heading": {
     "h1": {
       "$value": {
-        "fontFamily": "{fontFamilies.inter}",
+        "fontFamily": "{fontFamilies.pretendard}",
         "fontWeight": "{fontWeight.bold}",
         "fontSize": "{fontSize.4xl}",
         "lineHeight": "{lineHeight.4xl}",
@@ -89,7 +89,7 @@
     },
     "h2": {
       "$value": {
-        "fontFamily": "{fontFamilies.inter}",
+        "fontFamily": "{fontFamilies.pretendard}",
         "fontWeight": "{fontWeight.bold}",
         "fontSize": "{fontSize.3xl}",
         "lineHeight": "{lineHeight.3xl}",
@@ -99,7 +99,7 @@
     },
     "h3": {
       "$value": {
-        "fontFamily": "{fontFamilies.inter}",
+        "fontFamily": "{fontFamilies.pretendard}",
         "fontWeight": "{fontWeight.bold}",
         "fontSize": "{fontSize.xxl}",
         "lineHeight": "{lineHeight.xxl}",
@@ -109,7 +109,7 @@
     },
     "h4": {
       "$value": {
-        "fontFamily": "{fontFamilies.inter}",
+        "fontFamily": "{fontFamilies.pretendard}",
         "fontWeight": "{fontWeight.bold}",
         "fontSize": "{fontSize.xl}",
         "lineHeight": "{lineHeight.xl}",
@@ -119,7 +119,7 @@
     },
     "h5": {
       "$value": {
-        "fontFamily": "{fontFamilies.inter}",
+        "fontFamily": "{fontFamilies.pretendard}",
         "fontWeight": "{fontWeight.bold}",
         "fontSize": "{fontSize.lg}",
         "lineHeight": "{lineHeight.lg}",
@@ -129,7 +129,7 @@
     },
     "h6": {
       "$value": {
-        "fontFamily": "{fontFamilies.inter}",
+        "fontFamily": "{fontFamilies.pretendard}",
         "fontWeight": "{fontWeight.bold}",
         "fontSize": "{fontSize.md}",
         "lineHeight": "{lineHeight.md}",
@@ -141,7 +141,7 @@
   "body": {
     "largeStrong": {
       "$value": {
-        "fontFamily": "{fontFamilies.inter}",
+        "fontFamily": "{fontFamilies.pretendard}",
         "fontWeight": "{fontWeight.semiBold}",
         "fontSize": "{fontSize.lg}",
         "lineHeight": "{lineHeight.lg}",
@@ -151,7 +151,7 @@
     },
     "large": {
       "$value": {
-        "fontFamily": "{fontFamilies.inter}",
+        "fontFamily": "{fontFamilies.pretendard}",
         "fontWeight": "{fontWeight.regular}",
         "fontSize": "{fontSize.lg}",
         "lineHeight": "{lineHeight.lg}",
@@ -161,7 +161,7 @@
     },
     "mediumStrong": {
       "$value": {
-        "fontFamily": "{fontFamilies.inter}",
+        "fontFamily": "{fontFamilies.pretendard}",
         "fontWeight": "{fontWeight.semiBold}",
         "fontSize": "{fontSize.sm}",
         "lineHeight": "{lineHeight.xsm}",
@@ -171,7 +171,7 @@
     },
     "medium": {
       "$value": {
-        "fontFamily": "{fontFamilies.inter}",
+        "fontFamily": "{fontFamilies.pretendard}",
         "fontWeight": "{fontWeight.regular}",
         "fontSize": "{fontSize.sm}",
         "lineHeight": "{lineHeight.xsm}",
@@ -181,7 +181,7 @@
     },
     "smallStrong": {
       "$value": {
-        "fontFamily": "{fontFamilies.inter}",
+        "fontFamily": "{fontFamilies.pretendard}",
         "fontWeight": "{fontWeight.semiBold}",
         "fontSize": "{fontSize.xsm}",
         "lineHeight": "{lineHeight.xxsm}",
@@ -191,7 +191,7 @@
     },
     "small": {
       "$value": {
-        "fontFamily": "{fontFamilies.inter}",
+        "fontFamily": "{fontFamilies.pretendard}",
         "fontWeight": "{fontWeight.regular}",
         "fontSize": "{fontSize.xsm}",
         "lineHeight": "{lineHeight.xxsm}",
@@ -201,7 +201,7 @@
     },
     "tinyStrong": {
       "$value": {
-        "fontFamily": "{fontFamilies.inter}",
+        "fontFamily": "{fontFamilies.pretendard}",
         "fontWeight": "{fontWeight.semiBold}",
         "fontSize": "{fontSize.xxsm}",
         "lineHeight": "{lineHeight.xxxsm}",
@@ -211,7 +211,7 @@
     },
     "tiny": {
       "$value": {
-        "fontFamily": "{fontFamilies.inter}",
+        "fontFamily": "{fontFamilies.pretendard}",
         "fontWeight": "{fontWeight.regular}",
         "fontSize": "{fontSize.xxsm}",
         "lineHeight": "{lineHeight.xxxsm}",
@@ -223,7 +223,7 @@
   "paragraph": {
     "large": {
       "$value": {
-        "fontFamily": "{fontFamilies.inter}",
+        "fontFamily": "{fontFamilies.pretendard}",
         "fontWeight": "{fontWeight.regular}",
         "fontSize": "{fontSize.lg}",
         "lineHeight": "{lineHeight.lg}",
@@ -233,7 +233,7 @@
     },
     "default": {
       "$value": {
-        "fontFamily": "{fontFamilies.inter}",
+        "fontFamily": "{fontFamilies.pretendard}",
         "fontWeight": "{fontWeight.regular}",
         "fontSize": "{fontSize.sm}",
         "lineHeight": "{lineHeight.sm}",
@@ -243,7 +243,7 @@
     },
     "small": {
       "$value": {
-        "fontFamily": "{fontFamilies.inter}",
+        "fontFamily": "{fontFamilies.pretendard}",
         "fontWeight": "{fontWeight.regular}",
         "fontSize": "{fontSize.xsm}",
         "lineHeight": "{lineHeight.xxsm}",
@@ -253,7 +253,7 @@
     },
     "tiny": {
       "$value": {
-        "fontFamily": "{fontFamilies.inter}",
+        "fontFamily": "{fontFamilies.pretendard}",
         "fontWeight": "{fontWeight.regular}",
         "fontSize": "{fontSize.xxsm}",
         "lineHeight": "{lineHeight.xxxsm}",
@@ -265,7 +265,7 @@
   "caption": {
     "default": {
       "$value": {
-        "fontFamily": "{fontFamilies.inter}",
+        "fontFamily": "{fontFamilies.pretendard}",
         "fontWeight": "{fontWeight.regular}",
         "fontSize": "{fontSize.xsm}",
         "lineHeight": "{lineHeight.xxsm}",
@@ -275,7 +275,7 @@
     },
     "small": {
       "$value": {
-        "fontFamily": "{fontFamilies.inter}",
+        "fontFamily": "{fontFamilies.pretendard}",
         "fontWeight": "{fontWeight.regular}",
         "fontSize": "{fontSize.xxsm}",
         "lineHeight": "{lineHeight.xxxsm}",
@@ -285,7 +285,7 @@
     },
     "tiny": {
       "$value": {
-        "fontFamily": "{fontFamilies.inter}",
+        "fontFamily": "{fontFamilies.pretendard}",
         "fontWeight": "{fontWeight.regular}",
         "fontSize": "{fontSize.xxsm}",
         "lineHeight": "{lineHeight.xxxsm}",

@@ -1,5 +1,53 @@
 {
+  "permissions": {
+    "deny": [
+      "Read(.env)",
+      "Read(.env.local)",
+      "Read(.env.*.local)",
+      "Read(*.key)",
+      "Read(*.p8)",
+      "Read(*.p12)",
+      "Read(*.jks)",
+      "Read(*.mobileprovision)",
+      "Bash(*nx submit*)",
+      "Bash(*mobile:submit*)",
+      "Bash(*eas submit*)",
+      "Bash(git push --force*)",
+      "Bash(git push -f*)"
+    ],
+    "ask": [
+      "Bash(git commit*)",
+      "Bash(git push*)",
+      "Bash(git merge*)",
+      "Bash(git rebase*)",
+      "Bash(git reset --hard*)",
+      "Bash(git clean*)",
+      "Bash(git checkout -- *)",
+      "Bash(git restore*)",
+      "Bash(git stash*)",
+      "Bash(git branch -d*)",
+      "Bash(git branch -D*)",
+      "Bash(git tag*)",
+      "Bash(*nx build mobile*)",
+      "Bash(*eas build*)",
+      "Bash(pnpm add*)",
+      "Bash(pnpm install*)",
+      "Bash(pnpm remove*)",
+      "Bash(pnpm update*)",
+      "Bash(*nx add*)",
+      "Bash(*nx migrate*)"
+    ]
+  },
+  "extraKnownMarketplaces": {
+    "berrypjh": {
+      "source": {
+        "source": "github",
+        "repo": "berrypjh/shared-stack"
+      }
+    }
+  },
   "enabledPlugins": {
-    "code-review@claude-plugins-official": true
+    "code-review@claude-plugins-official": true,
+    "berry-commit@berrypjh": true
   }
 }

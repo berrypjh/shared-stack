@@ -139,16 +139,14 @@
   --ui-btn-bg-disabled: var(--ds-primary-btn-disabled);
   --ui-btn-fg: var(--ds-text-contrast-text);
   --ui-btn-fg-disabled: var(--ds-text-disable);
-  --ui-btn-focus-color: var(--ds-primary-btn-focus-ripple);
 }
 
 .ui-fab--color-secondary {
-  --ui-btn-bg: var(--ds-secondary-se700);
-  --ui-btn-bg-hover: var(--ds-secondary-se800);
-  --ui-btn-bg-disabled: var(--ds-neutral-ne300);
+  --ui-btn-bg: var(--ds-secondary-btn-default);
+  --ui-btn-bg-hover: var(--ds-secondary-btn-hover);
+  --ui-btn-bg-disabled: var(--ds-secondary-btn-disabled);
   --ui-btn-fg: var(--ds-text-contrast-text);
   --ui-btn-fg-disabled: var(--ds-text-disable);
-  --ui-btn-focus-color: var(--ds-stroke-secondary);
 }
 
 @media (prefers-reduced-motion: reduce) {

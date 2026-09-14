@@ -2,21 +2,21 @@
   --ui-select-radius: var(--ds-radius-md);
   --ui-select-padding-inline: var(--ds-spacing-lg);
   --ui-select-padding-block: var(--ds-spacing-sm);
-  --ui-select-min-height: 52px;
+  --ui-select-min-height: var(--ds-component-field-height-md);
   --ui-select-fg: var(--ds-text-default);
   --ui-select-placeholder: var(--ds-text-placeholder);
-  --ui-select-border: var(--ds-neutral-ne300);
-  --ui-select-border-hover: var(--ds-neutral-ne500);
+  --ui-select-border: var(--ds-field-border);
+  --ui-select-border-hover: var(--ds-field-border-hover);
   --ui-select-active: var(--ds-border-primary-color);
-  --ui-select-focus-ring: var(--ds-primary-pr100);
-  --ui-select-disabled-bg: var(--ds-neutral-ne100);
+  --ui-select-focus-ring: var(--ds-field-focus-ring-primary);
+  --ui-select-disabled-bg: var(--ds-field-surface-subtle);
   --ui-select-disabled-fg: var(--ds-text-disable);
   --ui-select-disabled-border: var(--ds-border-disabled-color);
   --ui-select-error: var(--ds-stroke-error);
-  --ui-select-panel-bg: #fff;
-  --ui-select-panel-border: var(--ds-neutral-ne300);
-  --ui-select-option-hover: var(--ds-neutral-ne100);
-  --ui-select-option-selected: rgb(var(--ds-primary-pr500-rgb) / 0.08);
+  --ui-select-panel-bg: var(--ds-background-surface);
+  --ui-select-panel-border: var(--ds-field-border);
+  --ui-select-option-hover: var(--ds-field-surface-subtle);
+  --ui-select-option-selected: var(--ds-background-selected);
 
   position: relative;
   display: inline-flex;
@@ -32,18 +32,18 @@
 .ui-select--size-sm {
   --ui-select-padding-inline: var(--ds-spacing-md);
   --ui-select-padding-block: var(--ds-spacing-sm);
-  --ui-select-min-height: 40px;
+  --ui-select-min-height: var(--ds-component-field-height-sm);
 }
 
 .ui-select--size-md {
   --ui-select-padding-inline: var(--ds-spacing-lg);
   --ui-select-padding-block: var(--ds-spacing-sm);
-  --ui-select-min-height: 52px;
+  --ui-select-min-height: var(--ds-component-field-height-md);
 }
 
 .ui-select--color-secondary {
   --ui-select-active: var(--ds-stroke-secondary);
-  --ui-select-focus-ring: var(--ds-secondary-se100);
+  --ui-select-focus-ring: var(--ds-field-focus-ring);
 }
 
 .ui-select__native-input {
@@ -65,10 +65,10 @@
   cursor: pointer;
   text-align: left;
   transition:
-    border-color 140ms ease,
-    box-shadow 140ms ease,
-    background-color 140ms ease,
-    color 140ms ease;
+    border-color var(--ds-motion-duration-normal) var(--ds-motion-easing-standard),
+    box-shadow var(--ds-motion-duration-normal) ease,
+    background-color var(--ds-motion-duration-normal) ease,
+    color var(--ds-motion-duration-normal) ease;
 
   font-family: var(--ds-body-medium-font-family);
   font-size: var(--ds-body-medium-font-size);
@@ -122,20 +122,20 @@
   padding-inline: var(--ui-select-padding-inline) calc(var(--ui-select-padding-inline) + 24px);
   border: var(--ds-border-primary-width) solid var(--ui-select-border);
   border-radius: var(--ui-select-radius);
-  background-color: var(--ds-neutral-ne100);
+  background-color: var(--ds-field-surface-subtle);
   box-shadow: none;
 }
 
 .ui-select--variant-filled:not(.ui-select--disabled):not(.ui-select--focused):not(.ui-select--error)
   .ui-select__trigger:hover {
   border-color: var(--ui-select-border-hover);
-  background-color: var(--ds-neutral-ne200);
+  background-color: var(--ds-field-surface);
 }
 
 .ui-select--variant-filled.ui-select--focused .ui-select__trigger,
 .ui-select--variant-filled.ui-select--open .ui-select__trigger {
   border-color: var(--ui-select-active);
-  box-shadow: 0 0 0 2px var(--ui-select-focus-ring);
+  box-shadow: 0 0 0 var(--ds-component-field-focus-ring-width) var(--ui-select-focus-ring);
 }
 
 .ui-select--variant-filled.ui-select--error .ui-select__trigger {
@@ -144,7 +144,7 @@
 
 .ui-select--variant-filled.ui-select--error.ui-select--focused .ui-select__trigger,
 .ui-select--variant-filled.ui-select--error.ui-select--open .ui-select__trigger {
-  box-shadow: 0 0 0 2px var(--ds-error-er100);
+  box-shadow: 0 0 0 var(--ds-component-field-focus-ring-width) var(--ds-field-focus-ring-error);
 }
 
 /* boxed */
@@ -165,7 +165,7 @@
 .ui-select--variant-boxed.ui-select--focused .ui-select__trigger,
 .ui-select--variant-boxed.ui-select--open .ui-select__trigger {
   border-color: var(--ui-select-active);
-  box-shadow: 0 0 0 2px var(--ui-select-focus-ring);
+  box-shadow: 0 0 0 var(--ds-component-field-focus-ring-width) var(--ui-select-focus-ring);
 }
 
 .ui-select--variant-boxed.ui-select--error .ui-select__trigger {
@@ -174,7 +174,7 @@
 
 .ui-select--variant-boxed.ui-select--error.ui-select--focused .ui-select__trigger,
 .ui-select--variant-boxed.ui-select--error.ui-select--open .ui-select__trigger {
-  box-shadow: 0 0 0 2px var(--ds-error-er100);
+  box-shadow: 0 0 0 var(--ds-component-field-focus-ring-width) var(--ds-field-focus-ring-error);
 }
 
 .ui-select--disabled .ui-select__trigger {
@@ -211,8 +211,8 @@
   color: var(--ds-icon-light);
   pointer-events: none;
   transition:
-    transform 140ms ease,
-    color 140ms ease;
+    transform var(--ds-motion-duration-normal) var(--ds-motion-easing-standard),
+    color var(--ds-motion-duration-normal) ease;
 }
 
 .ui-select--variant-filled .ui-select__icon,
@@ -240,16 +240,14 @@
   border: var(--ds-border-primary-width) solid var(--ui-select-panel-border);
   border-radius: var(--ds-radius-md);
   background-color: var(--ui-select-panel-bg);
-  box-shadow:
-    0 8px 24px rgb(var(--ds-neutral-ne900-rgb) / 0.12),
-    0 2px 8px rgb(var(--ds-neutral-ne900-rgb) / 0.08);
+  box-shadow: var(--ds-shadow-lg);
 }
 
 .ui-select__option {
   display: flex;
   align-items: center;
   width: 100%;
-  min-height: 40px;
+  min-height: var(--ds-component-field-height-sm);
   padding-block: var(--ds-spacing-sm);
   padding-inline: var(--ds-spacing-lg);
   border: 0;
@@ -266,9 +264,19 @@
   line-height: var(--ds-body-small-line-height);
 }
 
-.ui-select__option:hover:not(:disabled),
-.ui-select__option--highlighted:not(:disabled) {
+.ui-select__option:hover:not([aria-disabled='true']),
+.ui-select__option--highlighted:not([aria-disabled='true']) {
   background-color: var(--ui-select-option-hover);
+}
+
+/**
+ * 활성 option (`aria-activedescendant` 대상).
+ * DOM 포커스가 trigger에 남아 UA 링이 없고, 배경 틴트는 패널과 1.1:1 안팎이라 위치를 보여 주지 못한다.
+ * 필드 포커스 테두리와 같은 토큰(3:1 보장)으로 안쪽 outline을 그린다 — outline은 forced-colors에서도 남는다.
+ */
+.ui-select__option--highlighted {
+  outline: var(--ds-component-field-focus-ring-width) solid var(--ui-select-active);
+  outline-offset: calc(var(--ds-component-field-focus-ring-width) * -1);
 }
 
 .ui-select__option--selected {
@@ -280,7 +288,32 @@
   line-height: var(--ds-body-small-strong-line-height);
 }
 
-.ui-select__option:disabled {
+.ui-select__option[aria-disabled='true'] {
   color: var(--ds-text-disable);
   cursor: not-allowed;
+}
+
+/**
+ * forced-colors(Windows 고대비) 대응.
+ * trigger의 포커스·열림은 `border-color` 변화와 `box-shadow`로만 그려진다.
+ * 그 모드에서 그림자는 지워지고 테두리 색은 평상시와 같은 시스템 색으로 평탄화돼 포커스 표시가 사라진다 (WCAG 2.4.7).
+ * 남는 것은 outline이라 여기서만 켠다 — 입력 variant와 같은 전략이다.
+ * `Highlight`는 CSS 시스템 색 키워드지 하드코딩한 값이 아니다.
+ */
+@media (forced-colors: active) {
+  .ui-select--variant-plain.ui-select--focused .ui-select__trigger,
+  .ui-select--variant-plain.ui-select--open .ui-select__trigger,
+  .ui-select--variant-plain.ui-select--error.ui-select--focused .ui-select__trigger,
+  .ui-select--variant-plain.ui-select--error.ui-select--open .ui-select__trigger,
+  .ui-select--variant-filled.ui-select--focused .ui-select__trigger,
+  .ui-select--variant-filled.ui-select--open .ui-select__trigger,
+  .ui-select--variant-filled.ui-select--error.ui-select--focused .ui-select__trigger,
+  .ui-select--variant-filled.ui-select--error.ui-select--open .ui-select__trigger,
+  .ui-select--variant-boxed.ui-select--focused .ui-select__trigger,
+  .ui-select--variant-boxed.ui-select--open .ui-select__trigger,
+  .ui-select--variant-boxed.ui-select--error.ui-select--focused .ui-select__trigger,
+  .ui-select--variant-boxed.ui-select--error.ui-select--open .ui-select__trigger {
+    outline: var(--ds-border-primary-width) solid Highlight;
+    outline-offset: var(--ds-spacing-2xs);
+  }
 }

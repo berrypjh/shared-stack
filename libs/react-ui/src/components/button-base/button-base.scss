@@ -48,36 +48,36 @@ $colors: (
     outline-bg-hover: var(--ds-primary-btn-outlined-hover),
     outline-focus-halo: var(--ds-primary-btn-focus-ripple),
     text-fg: var(--ds-text-primary),
-    text-bg-hover: var(--ds-primary-pr100),
+    text-bg-hover: var(--ds-primary-btn-outlined-hover),
     text-focus-halo: var(--ds-primary-btn-focus-ripple),
   ),
   secondary: (
-    solid-bg: var(--ds-secondary-se700),
-    solid-bg-hover: var(--ds-secondary-se800),
-    solid-bg-disabled: var(--ds-neutral-ne300),
+    solid-bg: var(--ds-secondary-btn-default),
+    solid-bg-hover: var(--ds-secondary-btn-hover),
+    solid-bg-disabled: var(--ds-secondary-btn-disabled),
     solid-fg: var(--ds-text-contrast-text),
-    solid-focus-halo: var(--ds-secondary-se100),
+    solid-focus-halo: var(--ds-secondary-btn-focus-ripple),
     focus-ring: var(--ds-stroke-secondary),
     outline-border: var(--ds-stroke-secondary),
-    outline-bg-hover: var(--ds-secondary-se100),
-    outline-focus-halo: var(--ds-secondary-se100),
+    outline-bg-hover: var(--ds-secondary-btn-outlined-hover),
+    outline-focus-halo: var(--ds-secondary-btn-outlined-focus-ripple),
     text-fg: var(--ds-text-secondary),
-    text-bg-hover: var(--ds-secondary-se100),
-    text-focus-halo: var(--ds-secondary-se100),
+    text-bg-hover: var(--ds-secondary-btn-outlined-hover),
+    text-focus-halo: var(--ds-secondary-btn-outlined-focus-ripple),
   ),
   error: (
-    solid-bg: var(--ds-error-er700),
-    solid-bg-hover: var(--ds-error-er800),
-    solid-bg-disabled: var(--ds-neutral-ne300),
+    solid-bg: var(--ds-error-btn-default),
+    solid-bg-hover: var(--ds-error-btn-hover),
+    solid-bg-disabled: var(--ds-error-btn-disabled),
     solid-fg: var(--ds-text-contrast-text),
-    solid-focus-halo: var(--ds-error-er100),
+    solid-focus-halo: var(--ds-error-btn-focus-ripple),
     focus-ring: var(--ds-stroke-error),
     outline-border: var(--ds-stroke-error),
-    outline-bg-hover: var(--ds-error-er100),
-    outline-focus-halo: var(--ds-error-er100),
+    outline-bg-hover: var(--ds-error-btn-outlined-hover),
+    outline-focus-halo: var(--ds-error-btn-outlined-focus-ripple),
     text-fg: var(--ds-text-error),
-    text-bg-hover: var(--ds-error-er100),
-    text-focus-halo: var(--ds-error-er100),
+    text-bg-hover: var(--ds-error-btn-outlined-hover),
+    text-focus-halo: var(--ds-error-btn-outlined-focus-ripple),
   ),
 );
 
@@ -182,19 +182,19 @@ $colors: (
   text-decoration: none;
 
   transition:
-    background-color 140ms ease,
-    color 140ms ease,
-    border-color 140ms ease,
-    box-shadow 140ms ease,
-    outline-color 140ms ease,
-    transform 60ms ease;
+    background-color var(--ds-motion-duration-normal) var(--ds-motion-easing-standard),
+    color var(--ds-motion-duration-normal) ease,
+    border-color var(--ds-motion-duration-normal) ease,
+    box-shadow var(--ds-motion-duration-normal) ease,
+    outline-color var(--ds-motion-duration-normal) ease,
+    transform var(--ds-motion-duration-fast) ease;
 
   &:hover:not(:disabled):not([aria-disabled='true']) {
     background-color: var(--ui-btn-bg-hover);
   }
 
   &:active:not(:disabled):not([aria-disabled='true']) {
-    transform: translateY(1px);
+    transform: translateY(var(--ds-component-pressed-offset));
   }
 
   &:focus {
@@ -288,4 +288,36 @@ $colors: (
 
   --ui-btn-focus-ring-color: var(--ui-focus-ring-color);
   --ui-btn-focus-halo-color: var(--ui-text-focus-halo);
+}
+
+/* =========================
+   Reduced motion
+========================= */
+
+/**
+ * 루트 전환은 base가 끈다.
+ * Button·IconButton의 reduced-motion 블록은 자식(label·icon·spinner)만 다뤄서, 여기가 없으면 6개 속성을 전환하는 루트만 정책에서 빠진다.
+ * 끄는 것은 전환뿐이다.
+ * `:focus-visible`의 outline·halo 선언은 그대로 남아 포커스 표시가 사라지지 않는다.
+ * `:active`의 눌림 오프셋도 유지한다 — 전환 없이 즉시 적용되는 눌림 위치이지 애니메이션이 아니다.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .ui-button {
+    transition: none;
+  }
+}
+
+/**
+ * forced-colors(Windows 고대비) 대응.
+ * 채워진 버튼은 배경색만으로 자기를 식별시키는데, 그 모드에서 배경은 `ButtonFace`, 페이지는 `Canvas`가 되고 두 값이 같은 고대비 테마가 있다.
+ * 그러면 버튼이 페이지에 녹아 사라진다.
+ * outlined·text는 이미 테두리가 있거나 글자로 식별되므로 여기서 다루지 않는다.
+ * `:focus-visible`은 손대지 않는다 — outline을 이미 함께 선언해 halo가 지워져도 남는다.
+ * `ButtonBorder`는 CSS 시스템 색 키워드다.
+ * 두께는 색이 아니라 강제되지 않으므로 토큰을 쓴다.
+ */
+@media (forced-colors: active) {
+  .ui-button--variant-contained {
+    border: var(--ds-border-primary-width) solid ButtonBorder;
+  }
 }

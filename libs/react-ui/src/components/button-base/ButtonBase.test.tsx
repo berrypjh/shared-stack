@@ -65,6 +65,115 @@ describe('<ButtonBase />', () => {
     });
   });
 
+  /**
+   * 시각 어휘 클래스는 공개 스타일 계약이다 — `dist/index.css`가 이 이름으로 팔레트를 싣고 소비자가 같은 이름으로 덮어쓴다.
+   * 그래서 상수가 아니라 문자열 리터럴로 고정한다.
+   * `getButtonBaseClassNames`가 세 호스트 분기 모두에서 이 클래스를 만드는 유일한 지점인데 지금까지 어느 테스트도 결과를 검사하지 않았다.
+   */
+  describe('prop: variant', () => {
+    it('기본값은 contained다', () => {
+      render(<ButtonBase>Hello</ButtonBase>);
+
+      expect(screen.getByText('Hello')).toHaveClass('ui-button--variant-contained');
+    });
+
+    it.each(['contained', 'outlined', 'text'] as const)(
+      '%s variant class를 적용한다',
+      (variant) => {
+        render(<ButtonBase variant={variant}>Hello</ButtonBase>);
+
+        expect(screen.getByText('Hello')).toHaveClass(`ui-button--variant-${variant}`);
+      },
+    );
+  });
+
+  describe('prop: size', () => {
+    it('기본값은 md다', () => {
+      render(<ButtonBase>Hello</ButtonBase>);
+
+      expect(screen.getByText('Hello')).toHaveClass('ui-button--size-md');
+    });
+
+    it.each(['sm', 'md', 'lg'] as const)('%s size class를 적용한다', (size) => {
+      render(<ButtonBase size={size}>Hello</ButtonBase>);
+
+      expect(screen.getByText('Hello')).toHaveClass(`ui-button--size-${size}`);
+    });
+  });
+
+  describe('prop: color', () => {
+    it('기본값은 primary다', () => {
+      render(<ButtonBase>Hello</ButtonBase>);
+
+      expect(screen.getByText('Hello')).toHaveClass('ui-button--color-primary');
+    });
+
+    it.each(['primary', 'secondary'] as const)('%s color class를 적용한다', (color) => {
+      render(<ButtonBase color={color}>Hello</ButtonBase>);
+
+      expect(screen.getByText('Hello')).toHaveClass(`ui-button--color-${color}`);
+    });
+  });
+
+  describe('prop: fullWidth', () => {
+    it('기본적으로 fullWidth class를 붙이지 않는다', () => {
+      render(<ButtonBase>Hello</ButtonBase>);
+
+      expect(screen.getByText('Hello')).not.toHaveClass('ui-button--fullWidth');
+    });
+
+    it('fullWidth class를 적용한다', () => {
+      render(<ButtonBase fullWidth>Hello</ButtonBase>);
+
+      expect(screen.getByText('Hello')).toHaveClass('ui-button--fullWidth');
+    });
+  });
+
+  describe('시각 어휘와 호스트 분기', () => {
+    it('anchor host에도 같은 어휘 클래스를 적용한다', () => {
+      render(
+        <ButtonBase href="/docs" variant="outlined" size="lg" color="secondary" fullWidth>
+          Hello
+        </ButtonBase>,
+      );
+
+      const link = screen.getByRole('link');
+
+      expect(link).toHaveClass('ui-button--variant-outlined');
+      expect(link).toHaveClass('ui-button--size-lg');
+      expect(link).toHaveClass('ui-button--color-secondary');
+      expect(link).toHaveClass('ui-button--fullWidth');
+    });
+
+    it('custom host에도 같은 어휘 클래스를 적용한다', () => {
+      render(
+        <ButtonBase component="div" variant="text" size="sm" color="secondary">
+          Hello
+        </ButtonBase>,
+      );
+
+      const host = screen.getByRole('button');
+
+      expect(host).toHaveClass('ui-button--variant-text');
+      expect(host).toHaveClass('ui-button--size-sm');
+      expect(host).toHaveClass('ui-button--color-secondary');
+    });
+
+    it('시각 어휘 prop을 DOM 속성으로 흘리지 않는다', () => {
+      render(
+        <ButtonBase variant="outlined" size="lg" color="secondary" fullWidth>
+          Hello
+        </ButtonBase>,
+      );
+
+      const button = screen.getByRole('button');
+
+      for (const prop of ['variant', 'size', 'color', 'fullwidth']) {
+        expect(button).not.toHaveAttribute(prop);
+      }
+    });
+  });
+
   describe('prop: type', () => {
     it('기본값은 button이다', () => {
       render(<ButtonBase />);
@@ -196,7 +305,7 @@ describe('<ButtonBase />', () => {
 
       const button = screen.getByRole('button', { name: 'Hello' });
 
-      // touch 이벤트를 지원하는 환경에서만 실행
+      // touch 이벤트를 지원하는 환경에서만 실행한다.
       if (supportsTouch()) {
         fireEvent.touchStart(button, {
           touches: [{ identifier: 0, target: button, clientX: 0, clientY: 0 }],
@@ -209,7 +318,7 @@ describe('<ButtonBase />', () => {
         expect(onTouchEnd.callCount).toBe(1);
       }
 
-      // drag 이벤트를 생성할 수 있는 환경에서만 실행
+      // drag 이벤트를 생성할 수 있는 환경에서만 실행한다.
       if (canFireDragEvents) {
         fireEvent.dragEnd(button);
         expect(onDragEnd.callCount).toBe(1);
@@ -324,6 +433,133 @@ describe('<ButtonBase />', () => {
       expect(link).toHaveAttribute('role', 'button');
       expect(link).toHaveAttribute('aria-disabled', 'true');
       expect(link).toHaveAttribute('tabindex', '-1');
+    });
+  });
+
+  /**
+   * 키보드 활성화의 불변식.
+   * ButtonBase는 native가 이미 하는 일을 다시 구현하지 않는다 — emulation은 native 활성화가 없는 host에서만 켠다 (`activateWithKeyboard: !isLinkLike`, native button 분기는 아예 핸들러를 붙이지 않는다).
+   * 아래는 그 경계가 어긋나면 바로 깨지는 자리들이다.
+   */
+  describe('키보드 활성화 불변식', () => {
+    /**
+     * 여기도 click 횟수로는 검사할 수 없다.
+     * emulation을 잘못 붙이면 `preventDefault`가 native 활성화를 지우고 자기 click을 대신 넣어, 총합은 여전히 1로 보인다.
+     * 관찰 가능한 차이는 "native의 기본 동작을 가로챘는가" 하나뿐이다.
+     */
+    it.each([
+      ['Enter', 'Enter'],
+      ['Space', ' '],
+    ])('native button 의 %s 를 가로채지 않는다', (_label, key) => {
+      const onClick = spy();
+      render(<ButtonBase onClick={onClick}>Hello</ButtonBase>);
+
+      expect(fireEvent.keyDown(screen.getByRole('button'), { key })).toBe(true);
+      expect(fireEvent.keyUp(screen.getByRole('button'), { key })).toBe(true);
+    });
+
+    it('native button 은 Enter 로 정확히 한 번 활성화된다', async () => {
+      const onClick = spy();
+      const { user } = render(<ButtonBase onClick={onClick}>Hello</ButtonBase>);
+
+      await user.tab();
+      await user.keyboard('{Enter}');
+
+      expect(onClick.callCount).toBe(1);
+    });
+
+    it('non-native host 의 Enter 는 정확히 한 번만 활성화한다', async () => {
+      const onClick = spy();
+      const { user } = render(
+        <ButtonBase component="div" onClick={onClick}>
+          Hello
+        </ButtonBase>,
+      );
+
+      await user.tab();
+      await user.keyboard('{Enter}');
+
+      expect(onClick.callCount).toBe(1);
+    });
+
+    it('non-native host 의 Space 는 keydown 에서 스크롤을 막는다', () => {
+      render(<ButtonBase component="div">Hello</ButtonBase>);
+
+      const host = screen.getByRole('button');
+
+      // dispatchEvent는 preventDefault되면 false를 돌려준다.
+      expect(fireEvent.keyDown(host, { key: ' ' })).toBe(false);
+    });
+
+    /**
+     * click 횟수로는 이것을 검사할 수 없다 — jsdom은 anchor의 기본 활성화를 구현하지 않아 "native가 1 + emulation이 0"과 "native가 0 + emulation이 1"이 똑같이 1로 보인다.
+     * 대신 emulation의 관찰 가능한 부작용인 `preventDefault`를 본다 — anchor의 Enter를 가로채면 네이티브 이동이 죽는다.
+     */
+    it('href 를 가진 anchor 의 Enter 를 가로채지 않는다', () => {
+      render(<ButtonBase href="/next">Hello</ButtonBase>);
+
+      expect(fireEvent.keyDown(screen.getByRole('link'), { key: 'Enter' })).toBe(true);
+    });
+
+    it('emulation 이 필요한 host 의 Enter 는 가로챈다', () => {
+      render(<ButtonBase component="div">Hello</ButtonBase>);
+
+      // 위 anchor 검사가 "아무도 preventDefault하지 않는다"로 공허해지지 않게 짝을 둔다.
+      expect(fireEvent.keyDown(screen.getByRole('button'), { key: 'Enter' })).toBe(false);
+    });
+
+    it('중첩된 대화형 자식에서 올라온 키는 활성화하지 않는다', async () => {
+      const onClick = spy();
+      const { user } = render(
+        <ButtonBase component="div" onClick={onClick}>
+          <input aria-label="nested" />
+        </ButtonBase>,
+      );
+
+      await user.click(screen.getByLabelText('nested'));
+      onClick.resetHistory();
+      await user.keyboard('{Enter}');
+
+      // `event.target !== event.currentTarget` 가드가 이것을 막는다.
+      expect(onClick.callCount).toBe(0);
+    });
+
+    it('disabled 인 non-native host 는 키보드로 활성화되지 않는다', async () => {
+      const onClick = spy();
+      const { user } = render(
+        <ButtonBase component="div" disabled onClick={onClick}>
+          Hello
+        </ButtonBase>,
+      );
+
+      const host = screen.getByRole('button');
+      act(() => host.focus());
+
+      await user.keyboard('{Enter}');
+      await user.keyboard(' ');
+
+      expect(onClick.callCount).toBe(0);
+    });
+  });
+
+  describe('링크 시맨틱', () => {
+    it('href 를 가진 anchor 를 role="button" 으로 바꾸지 않는다', () => {
+      render(<ButtonBase href="/next">Hello</ButtonBase>);
+
+      const link = screen.getByRole('link');
+
+      expect(link).not.toHaveAttribute('role');
+      expect(link).toHaveAttribute('href', '/next');
+    });
+
+    it('custom host 라도 href 가 있으면 링크로 남는다', () => {
+      render(
+        <ButtonBase component="a" href="/next">
+          Hello
+        </ButtonBase>,
+      );
+
+      expect(screen.getByRole('link')).not.toHaveAttribute('role');
     });
   });
 });
