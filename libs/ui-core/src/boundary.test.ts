@@ -1,10 +1,6 @@
 /**
- * ui-core 는 렌더러를 몰라야 한다.
- *
- * 이 규칙은 지금 관례로만 지켜진다 — 워크스페이스의 `@nx/enforce-module-boundaries` 는
- * `depConstraints: [{ sourceTag: '*', onlyDependOnLibsWithTags: ['*'] }]` 라 아무것도 막지 않고,
- * 그 설정은 다운스트림이 쓰는 `@berrypjh/eslint-config` 소유라 여기서 바꿀 수 없다.
- * 그래서 소스를 직접 훑는 결정적 검사를 둔다.
+ * ui-core는 렌더러를 몰라야 한다.
+ * 이 규칙은 지금 관례로만 지켜진다.
  */
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -12,10 +8,10 @@ import { fileURLToPath } from 'node:url';
 
 const SRC = path.resolve(path.dirname(fileURLToPath(import.meta.url)));
 
-/** ui-core 가 import 해서는 안 되는 패키지. */
+/** ui-core가 import해서는 안 되는 패키지 */
 const FORBIDDEN_MODULES = [/^react(\/|$)/, /^react-dom(\/|$)/, /^react-native(\/|$)/];
 
-/** ui-core 에 등장해서는 안 되는 렌더러 타입·전역. */
+/** ui-core에 등장해서는 안 되는 렌더러 타입·전역 */
 const FORBIDDEN_IDENTIFIERS = [
   'HTMLElement',
   'HTMLAttributes',
@@ -32,7 +28,7 @@ const FORBIDDEN_IDENTIFIERS = [
   'Platform',
   'window',
   'document',
-  // 렌더러 이벤트·스타일·a11y prop — 계약이 아니라 각 렌더러가 가진다.
+  // 렌더러 이벤트·스타일·a11y prop — 계약이 아니라 각 렌더러가 갖는다.
   'MouseEvent',
   'KeyboardEvent',
   'FocusEvent',
@@ -41,7 +37,7 @@ const FORBIDDEN_IDENTIFIERS = [
   'hitSlop',
 ];
 
-/** 주석 안의 단어가 걸리지 않도록 먼저 걷어낸다. */
+/** 소스에서 주석 제거, 주석 안의 단어가 검사에 걸리지 않게 한다 */
 const stripComments = (source: string): string =>
   source.replaceAll(/\/\*[\s\S]*?\*\//g, ' ').replaceAll(/\/\/[^\n]*/g, ' ');
 

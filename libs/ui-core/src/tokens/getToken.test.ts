@@ -27,10 +27,6 @@ describe('getToken', () => {
   });
 });
 
-/**
- * 반환 타입이 값을 약속하므로 결손은 전부 던진다.
- * `undefined` 를 돌려주면 정적 타입이 거짓이 되고 실패가 렌더까지 지연된다.
- */
 describe('getToken 은 결손을 조용히 넘기지 않는다', () => {
   it('마지막 leaf 가 없으면 던진다', () => {
     expect(() => getToken(tokens as any, 'color.unknown' as any)).toThrow(
@@ -55,7 +51,6 @@ describe('getToken 은 결손을 조용히 넘기지 않는다', () => {
   });
 
   it('값이 명시적으로 undefined 여도 키가 있으면 읽는다', () => {
-    // 결손(키 없음)과 값이 `undefined` 인 것을 구분한다.
     expect(getToken({ a: undefined } as any, 'a' as any)).toBeUndefined();
   });
 });

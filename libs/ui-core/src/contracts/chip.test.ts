@@ -1,14 +1,3 @@
-/**
- * Chip 시맨틱 계약의 타입 수준 검증.
- *
- * 공유되는 것은 `size`·`variant`·`selected`·`disabled` 넷이다. 두 렌더러가 같은 값 집합을 같은
- * 토큰으로 풀고, `selected`·`disabled` 는 같은 불변식("선택됨을 알린다" / "활성화를 차단한다")을
- * 구현한다. **모드 제약(interactive 에만 존재)** 은 각 렌더러가 판별 유니온으로 조립한다 —
- * 그것은 어휘가 아니라 조립 규칙이다.
- *
- * `intent` 가 없는 것은 의도다. 선택 강조가 `selectionControl.checked`(= `{primary.pr700}`)라서
- * `intent='primary'` 와 `selected` 가 같은 색으로 겹친다 — 표현력이 아니라 모호함이 늘어난다.
- */
 import type { ChipSemanticProps } from './chip';
 
 const full: ChipSemanticProps = {
@@ -39,7 +28,7 @@ describe('Chip 계약이 받는 것', () => {
 describe('Chip 계약이 거부하는 것', () => {
   it('V1 에 없는 intent 를 거부한다', () => {
     const intent: ChipSemanticProps = {
-      // @ts-expect-error selected 강조(selectionControl.checked = primary.pr700)와 겹친다
+      // @ts-expect-error selected 강조(base selectionControl.checked = primary.pr700)와 겹친다
       intent: 'primary',
     };
 
@@ -48,11 +37,11 @@ describe('Chip 계약이 거부하는 것', () => {
 
   it('라벨·leading 슬롯을 거부한다', () => {
     const children: ChipSemanticProps = {
-      // @ts-expect-error 라벨은 ReactNode 라 렌더러 소유다
+      // @ts-expect-error 라벨은 ReactNode라 렌더러 소유다
       children: '필터',
     };
     const leading: ChipSemanticProps = {
-      // @ts-expect-error leading 슬롯도 ReactNode 다
+      // @ts-expect-error leading 슬롯도 ReactNode다
       leading: 'icon',
     };
 
@@ -74,7 +63,7 @@ describe('Chip 계약이 거부하는 것', () => {
 
   it('렌더러가 소유한 접근성 prop 을 거부한다', () => {
     const pressed: ChipSemanticProps = {
-      // @ts-expect-error aria-pressed 는 web 통로다. RN 에는 대응이 없다
+      // @ts-expect-error aria-pressed는 web 통로다. RN에는 대응이 없다
       'aria-pressed': true,
     };
     const label: ChipSemanticProps = {
@@ -91,7 +80,7 @@ describe('Chip 계약이 거부하는 것', () => {
 
   it('스타일 수단을 거부한다', () => {
     const className: ChipSemanticProps = {
-      // @ts-expect-error className 은 web 렌더링 개념이다
+      // @ts-expect-error className은 web 렌더링 개념이다
       className: 'x',
     };
     const style: ChipSemanticProps = {
@@ -102,10 +91,10 @@ describe('Chip 계약이 거부하는 것', () => {
     expect([className, style]).toHaveLength(2);
   });
 
-  /** remove/delete 는 DEFER 다. 계약에 자리를 미리 만들어 두지 않는다. */
+  /** remove/delete는 DEFER다. 계약에 자리를 미리 만들어 두지 않는다. */
   it('DEFER 한 remove 액션을 거부한다', () => {
     const onDelete: ChipSemanticProps = {
-      // @ts-expect-error dual-action 은 별도 접근성 구조가 필요해 DEFER 했다
+      // @ts-expect-error dual-action은 별도 접근성 구조가 필요해 DEFER했다
       onDelete: () => undefined,
     };
     const deletable: ChipSemanticProps = {
@@ -118,11 +107,11 @@ describe('Chip 계약이 거부하는 것', () => {
 
   it('V1 범위 밖 상태를 거부한다', () => {
     const loading: ChipSemanticProps = {
-      // @ts-expect-error V1 에 필요성이 없다
+      // @ts-expect-error V1에 필요성이 없다
       loading: true,
     };
     const error: ChipSemanticProps = {
-      // @ts-expect-error V1 에 필요성이 없다
+      // @ts-expect-error V1에 필요성이 없다
       error: true,
     };
 

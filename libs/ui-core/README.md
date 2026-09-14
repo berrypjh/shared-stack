@@ -1,113 +1,123 @@
 # @berrypjh/ui-core
 
-플랫폼 독립적인 공통 UI 코어. `react-ui` (web) · `react-native-ui` (RN)이 공유하는 prop 계약과 토큰 타입·헬퍼를 제공한다.
+Web과 React Native 렌더러가 같은 디자인 결정을 공유하게 하는 플랫폼 독립 코어 패키지.
 
-유틸리티는 두지 않는다 — 순수 함수라는 것은 공유 계층에 둘 근거가 아니다. `cx` 같은 className 헬퍼는 react-ui가 소유한다.
+두 렌더러가 함께 구현하는 **prop 계약**과, [design-tokens](../design-tokens/README.md) 산출물을 타입과 함께 통과시키는
+**토큰 facade**를 제공한다. 렌더러 코드와 유틸리티는 두지 않는다.
 
-## private 경계
+> 워크스페이스 내부 패키지다 (`private: true`). 소비자는 이 패키지를 설치하지 않고
+> `@berrypjh/react-ui` / `@berrypjh/react-native-ui`를 통해 필요한 심볼을 받는다.
 
-`private: true`다. **소비자는 이 패키지를 설치하지도 import하지도 않는다.**
+## 특징
+
+- **플랫폼 독립** — DOM·React·React Native API를 쓰지 않는다. `boundary.test.ts`가 소스를 훑어 막는다.
+- **구현된 계약만** — 두 렌더러가 같은 불변식을 실제로 구현할 때만 계약이 들어온다.
+- **design-tokens 캡슐화** — 토큰 트리·CSS 변수·Tailwind preset·`tokens.json`을 이 패키지가 통과시킨다. 다운스트림은 design-tokens를 직접 import하지 않는다.
+- **엄격한 토큰 조회** — 없는 경로를 조회하면 `undefined`를 돌려주지 않고 던진다.
+
+## 의존 방향
 
 ```
 design-tokens (private) → ui-core (private) → react-ui / react-native-ui (public) → 앱
 ```
 
-소비자가 `@berrypjh/ui-core`를 import하면 consumer eval의 public-import grader가
-`private-package-import`로 잡는다. 필요한 심볼은 렌더러 패키지가 플랫폼에 맞게 re-export한다 —
-web은 `Web`·`themes`·`cx`, RN은 `Native`·`getColor`·`createTheme`.
-
-`design-tokens`는 이 패키지에 캡슐화되어 다운스트림(`react-ui`/`react-native-ui`/apps)은 design-tokens를 직접 의존하지 않는다.
-
 ## 사용
 
+### 공유 계약
+
+렌더러는 계약 타입에 자기 플랫폼 prop을 합쳐 공개 props를 만든다.
+
 ```ts
-// 토큰 접근
-import { getColor, createTheme } from '@berrypjh/ui-core';
-import type { ColorToken, Theme, RNTokens } from '@berrypjh/ui-core';
-const theme: Theme<RNTokens> = createTheme({ mode: 'light', tokens });
-const c = getColor(theme, 'primary.pr500');
+import type { ButtonSemanticProps } from '@berrypjh/ui-core';
+import type { PressableProps } from 'react-native';
 
-// design-tokens 패스스루 (consumer는 design-tokens 인지 필요 없음)
-import { Web, Native, themes } from '@berrypjh/ui-core';
-import type { ThemeInfo } from '@berrypjh/ui-core';
-const lightColor = Web.Light.tokens.color.primary.pr500;
-
-// Tailwind preset
-import preset from '@berrypjh/ui-core/tailwind';
-
-// CSS 변수
-import '@berrypjh/ui-core/css';
+export type ButtonProps = ButtonSemanticProps & Omit<PressableProps, 'disabled' | 'style'>;
 ```
 
-## Export 경로
+### 토큰
 
-| 경로                         | 용도                                                    |
-| ---------------------------- | ------------------------------------------------------- |
-| `@berrypjh/ui-core`          | 토큰 헬퍼 · 컴포넌트 prop 계약 · design-tokens 패스스루 |
-| `@berrypjh/ui-core/tailwind` | Tailwind preset 패스스루 — **패키징 예외**(아래 참조)   |
-| `@berrypjh/ui-core/css`      | CSS 변수 (side-effect import, design-tokens에서 흡수)   |
+```ts
+import { createTheme, getColor, Native, Web } from '@berrypjh/ui-core';
+import type { RNTokens, Theme } from '@berrypjh/ui-core';
 
-## Public 표면
+const theme: Theme<RNTokens> = createTheme({ mode: 'light', tokens: Native.Light.tokens });
+getColor(theme, 'primary.pr500'); // '#10B981'
 
-**ui-core 자체 기여**
+Web.Light.tokens.spacing.md; // '0.75rem'
+```
 
-| 카테고리           | 심볼                                                                                                                                                                                       |
-| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 토큰 헬퍼          | `getColor`, `createTheme`                                                                                                                                                                  |
-| 토큰 타입          | `ColorToken`, `RadiusToken`, `SpacingToken`, `RNTokens`, `Theme<T>`, `ThemeName`, `ThemeInfo`                                                                                              |
-| 컴포넌트 prop 계약 | `BoxProps`, `BoxRadiusValue`, `BoxSpacingValue` — 양 렌더러가 같은 불변식을 구현하는 유일한 계약. web 전용 계약(button/field/fab/icon-button/menu-item)은 `react-ui/src/types`가 소유한다. |
+### CSS 변수 · Tailwind
 
-**design-tokens 산출물 façade**
+```ts
+import '@berrypjh/ui-core/css';
+import preset from '@berrypjh/ui-core/tailwind';
+```
 
-| 심볼            | 종류                                                                                          |
-| --------------- | --------------------------------------------------------------------------------------------- |
-| `Web`, `Native` | namespace 값 — 생성된 토큰 트리를 그대로 통과시킨다                                           |
-| `themes`        | `readonly ThemeInfo[]` — 값은 design-tokens 레지스트리, 타입은 `{ name, selector }` 로 좁힌다 |
-| `ThemeDef`      | type — **deprecated**. 빌드 합성 메타데이터(`sourceDirs`)까지 드러낸다. `ThemeInfo` 를 쓸 것  |
+둘 다 design-tokens 산출물을 그대로 통과시킨다. 사용법은 [design-tokens README](../design-tokens/README.md)와 같다.
 
-### tailwind 브릿지는 패키징 예외다
+## 공유 계약
 
-`@berrypjh/ui-core/tailwind`는 플랫폼 중립 런타임 코어가 아니다. design-tokens가 private이라
-소비자가 직접 import할 수 없고, 렌더러 패키지는 빌드에서 `libs/ui-core/dist/tailwind.js`를 복사해
-간다. ui-core는 그 경로 하나만 제공한다 — preset 생성은 design-tokens의 `genTailwind` 소관이다.
+| 계약          | 타입                                                                                         |
+| ------------- | -------------------------------------------------------------------------------------------- |
+| `avatar`      | `AvatarSemanticProps`, `AvatarSize`, `AvatarShape`                                           |
+| `badge`       | `BadgeSemanticProps`, `BadgeVariant`, `BadgeSize`, `BadgeIntent`, `BadgePlacement`           |
+| `box`         | `BoxProps`, `BoxSpacingValue`, `BoxRadiusValue`                                              |
+| `button`      | `ButtonSemanticProps`, `ButtonVariant`, `ButtonSize`, `ButtonColor`, `ButtonLoadingPosition` |
+| `chip`        | `ChipSemanticProps`, `ChipSize`, `ChipVariant`                                               |
+| `divider`     | `DividerSemanticProps`, `DividerOrientation`                                                 |
+| `fab`         | `FabSemanticProps`, `FabShape`                                                               |
+| `field`       | `FieldSemanticProps`, `InputFieldSemanticProps`, `FieldVariant`, `FieldSize`, `FieldColor`   |
+| `icon-button` | `IconButtonSemanticProps`                                                                    |
+| `stack`       | `StackSemanticProps`, `StackDirection`, `StackAlign`, `StackJustify`                         |
 
-`/css`와 `tokens.json`도 같은 성격이다. ui-core는 design-tokens 산출물을 **복사**할 뿐
-다시 만들지 않는다 (`packageSurface.test.ts`가 바이트로 확인한다).
+계약은 렌더러와 무관한 어휘(size·variant·상태)만 가진다. 슬롯·스타일·접근성 prop은 각 렌더러가 소유한다.
+`menu-item`처럼 한쪽 렌더러만 구현한 계약은 그 렌더러 패키지에 있다.
 
-## 디렉토리
+## 토큰 API
+
+| 심볼                                          | 내용                                                     |
+| --------------------------------------------- | -------------------------------------------------------- |
+| `getColor(theme, path)`                       | RN 토큰 트리에서 색을 조회한다. 경로가 없으면 던진다     |
+| `createTheme({ mode, tokens })`               | `Theme<T>` 봉투를 만든다                                 |
+| `themes`                                      | `readonly ThemeInfo[]` — 등록된 테마의 `name`·`selector` |
+| `Web`, `Native`                               | design-tokens가 생성한 토큰 namespace 패스스루           |
+| `ColorToken` `SpacingToken` `RadiusToken`     | 토큰 경로 문자열 유니온 (`'primary.pr500'`)              |
+| `RNTokens` `Theme<T>` `ThemeName` `ThemeInfo` | 테마 타입                                                |
+
+## 산출물
+
+| 경로                         | 내용                                                              |
+| ---------------------------- | ----------------------------------------------------------------- |
+| `@berrypjh/ui-core`          | 계약 타입, 토큰 API, `Web`·`Native`·`themes` 패스스루             |
+| `@berrypjh/ui-core/css`      | 모든 테마의 CSS 변수 (side-effect import, design-tokens에서 복사) |
+| `@berrypjh/ui-core/tailwind` | Tailwind preset (default export, design-tokens 패스스루)          |
+
+`dist/tokens.json`도 design-tokens에서 복사되지만 exports에 없다. 렌더러 빌드가 파일로 가져간다.
+d.ts는 design-tokens 타입까지 inline한 단일 파일로 번들된다.
+
+## 구조
 
 ```
 src/
-├── index.ts                    public re-export
-├── tailwind.ts                 design-tokens/tailwind 패스스루
-├── boundary.test.ts            렌더러 타입·패키지 유입 검사
-├── packageSurface.test.ts      exports map ↔ dist 산출물 검사
-├── contracts/                  양 렌더러가 공유하는 prop 계약
-│   ├── box.ts, box.test.ts, index.ts
-└── tokens/                     토큰 타입·접근 헬퍼
-    ├── types.ts                ColorToken, SpacingToken, RadiusToken, RNTokens, Theme, ThemeName
-    ├── path.ts                 LeafDotPath, PathValue (internal generic)
-    ├── getToken.ts             internal path-walk (결손이면 던진다)
-    ├── getters.ts              getColor (1개)
-    ├── theme.ts                createTheme
-    ├── registry.ts             themes(ThemeInfo[]), ThemeInfo, deprecated ThemeDef
-    ├── parity.test.ts          Web/RN 경로 어휘 + 테마 레지스트리 검사
-    └── index.ts
+  index.ts      공개 re-export
+  tailwind.ts   design-tokens/tailwind 패스스루
+  contracts/    양 렌더러가 공유하는 prop 계약
+  tokens/       토큰 타입, 조회 헬퍼, 테마 레지스트리, design-tokens 패스스루
 ```
 
-`utils/`는 없다. web 전용 유틸은 react-ui가 소유한다.
+## 개발
 
-## 빌드 / 테스트
+워크스페이스 루트에서 실행한다.
 
-```bash
-pnpm nx build @berrypjh/ui-core      # vite + d.ts 번들링 + css 복사
-pnpm nx test @berrypjh/ui-core       # vitest
-pnpm nx typecheck @berrypjh/ui-core
-pnpm nx lint @berrypjh/ui-core
-```
+| 명령                                      | 설명                                                |
+| ----------------------------------------- | --------------------------------------------------- |
+| `pnpm nx run @berrypjh/ui-core:build`     | JS·d.ts 번들 + design-tokens CSS·`tokens.json` 복사 |
+| `pnpm nx run @berrypjh/ui-core:typecheck` | 선언 emit 후 타입 계약 테스트 검사                  |
+| `pnpm nx run @berrypjh/ui-core:test`      | build 후 테스트 (계약 타입·토큰 조회·패키지 경계)   |
+| `pnpm nx run @berrypjh/ui-core:lint`      | 린트                                                |
 
-## Publish
+토큰 JSON을 바꿨다면 `pnpm tokens:build`를 먼저 돌린다. ui-core는 design-tokens의 `dist`를 본다.
 
-`private: true` 워크스페이스 패키지. 직접 publish 안 함 — `react-ui`/`react-native-ui` 빌드 시 d.ts·CSS·Tailwind preset 모두 번들되어 다운스트림에 전달된다 (vite-plugin-dts의 `bundledPackages: ['@berrypjh/design-tokens']`로 design-tokens 타입까지 inline).
+## 라이선스
 
-`package.json`의 `sideEffects: ["./dist/css/index.css"]`가 CSS-only import의 tree-shake를 막는다.
+[MIT](../../LICENSE)

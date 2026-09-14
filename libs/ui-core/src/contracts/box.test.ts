@@ -1,13 +1,5 @@
-/**
- * Box 계약의 **타입 수준** 검증.
- *
- * 런타임 동작이 아니라 "무엇을 받고 무엇을 거부하는가"가 계약이므로 검사도 타입 수준이다.
- * `@ts-expect-error` 는 `tsc -p tsconfig.spec.json` 이 확인한다 — 에러가 사라지면
- * "unused directive" 로 실패하므로 계약이 느슨해지면 빌드가 깨진다.
- */
 import type { BoxProps, BoxRadiusValue, BoxSpacingValue } from './box';
 
-/** 토큰 이름과 원시 숫자를 모두 받는다. 축약 우선순위는 렌더러가 구현한다. */
 const semantic: BoxProps = {
   p: 'md',
   px: 4,
@@ -21,11 +13,6 @@ const semantic: BoxProps = {
 const numericRadius: BoxRadiusValue = 8;
 const tokenSpacing: BoxSpacingValue = 'xl';
 
-/**
- * `bg` 는 semantic-only 가 **아니다**. `ColorToken` 은 `color` 트리 전체에서 유도되므로
- * 원시 램프 경로도 leaf 면 받는다. demo-mobile 의 `BoxSection` 이 정확히 이 경로들을 쓴다 —
- * 시맨틱 역할만 남기도록 좁히면 그 소비자가 깨진다. 좁힘을 컴파일에서 잡으려고 여기 둔다.
- */
 const rampBg: BoxProps = { bg: 'primary.pr500' };
 const neutralRampBg: BoxProps = { bg: 'neutral.ne200' };
 const componentBg: BoxProps = { bg: 'primaryBtn.hover' };
@@ -55,7 +42,7 @@ describe('Box 계약이 받는 것', () => {
 describe('Box 계약이 거부하는 것', () => {
   it('색 카테고리 밖의 토큰 경로와 원시 색 문자열을 거부한다', () => {
     const wrongCategory: BoxProps = {
-      // @ts-expect-error spacing 토큰은 ColorToken 이 아니다
+      // @ts-expect-error spacing 토큰은 ColorToken이 아니다
       bg: 'md',
     };
     const rawColor: BoxProps = {
@@ -82,28 +69,24 @@ describe('Box 계약이 거부하는 것', () => {
   });
 });
 
-/**
- * 초과 프로퍼티 에러는 객체 리터럴당 **첫 번째 것만** 보고된다.
- * 그래서 금지 prop 은 리터럴 하나에 하나씩 둔다 — 묶으면 뒤쪽 directive 가 침묵한다.
- */
 describe('렌더러 prop 은 계약에 없다', () => {
   it('web 전용 prop 을 받지 않는다', () => {
-    // @ts-expect-error className 은 react-ui 가 덧붙인다
+    // @ts-expect-error className은 react-ui가 덧붙인다
     const className: BoxProps = { className: 'root' };
-    // @ts-expect-error style 은 react-ui 가 덧붙인다
+    // @ts-expect-error style은 react-ui가 덧붙인다
     const style: BoxProps = { style: {} };
-    // @ts-expect-error DOM 이벤트는 react-ui 가 덧붙인다
+    // @ts-expect-error DOM 이벤트는 react-ui가 덧붙인다
     const onClick: BoxProps = { onClick: () => undefined };
 
     expect([className, style, onClick]).toHaveLength(3);
   });
 
   it('RN 전용 prop 을 받지 않는다', () => {
-    // @ts-expect-error testID 는 react-native-ui 가 덧붙인다
+    // @ts-expect-error testID는 react-native-ui가 덧붙인다
     const testID: BoxProps = { testID: 'box' };
-    // @ts-expect-error onLayout 은 react-native-ui 가 덧붙인다
+    // @ts-expect-error onLayout은 react-native-ui가 덧붙인다
     const onLayout: BoxProps = { onLayout: () => undefined };
-    // @ts-expect-error accessibilityRole 은 react-native-ui 가 덧붙인다
+    // @ts-expect-error accessibilityRole은 react-native-ui가 덧붙인다
     const accessibilityRole: BoxProps = { accessibilityRole: 'none' };
 
     expect([testID, onLayout, accessibilityRole]).toHaveLength(3);

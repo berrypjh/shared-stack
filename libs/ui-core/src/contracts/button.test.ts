@@ -1,14 +1,3 @@
-/**
- * Button 시맨틱 계약의 **타입 수준** 검증.
- *
- * 이 계약이 ui-core 에 있는 근거는 "이름이 같다" 가 아니라 **두 렌더러가 같은 불변식을 실제로
- * 구현한다** 는 것이다 — variant/size/color 는 web SCSS(`$sizes`·`$colors`)와 RN
- * `Button.styles.ts` 가 같은 세 값을 각각 토큰으로 풀고, `disabled`·`loading` 은 양쪽 모두
- * "활성화 불가 + 상태 고지" 로 구현한다.
- *
- * 렌더러 개념(DOM·RN prop·슬롯)은 여기 들어오면 안 된다. `@ts-expect-error` 가 사라지면
- * "unused directive" 로 실패하므로, 계약이 느슨해지는 순간 빌드가 깨진다.
- */
 import type {
   ButtonColor,
   ButtonLoadingPosition,
@@ -51,19 +40,19 @@ describe('Button 계약이 거부하는 것', () => {
   it('어휘 밖의 값을 거부한다', () => {
     // 초과 프로퍼티 에러는 리터럴당 첫 번째만 보고되므로 하나씩 나눈다.
     const badVariant: ButtonSemanticProps = {
-      // @ts-expect-error 세 가지 variant 뿐이다
+      // @ts-expect-error 세 가지 variant뿐이다
       variant: 'ghost',
     };
     const badSize: ButtonSemanticProps = {
-      // @ts-expect-error 세 가지 size 뿐이다
+      // @ts-expect-error 세 가지 size뿐이다
       size: 'xl',
     };
     const badColor: ButtonSemanticProps = {
-      // @ts-expect-error web SCSS 에는 error 팔레트가 있지만 계약에는 없다
+      // @ts-expect-error web SCSS에는 error 팔레트가 있지만 계약에는 없다
       color: 'error',
     };
     const badPosition: ButtonSemanticProps = {
-      // @ts-expect-error start/center/end 뿐이다
+      // @ts-expect-error start/center/end뿐이다
       loadingPosition: 'middle',
     };
 
@@ -80,7 +69,7 @@ describe('Button 계약이 거부하는 것', () => {
       component: 'a',
     };
     const className: ButtonSemanticProps = {
-      // @ts-expect-error className 은 DOM 이다
+      // @ts-expect-error className은 DOM이다
       className: 'x',
     };
     const onClick: ButtonSemanticProps = {
@@ -97,7 +86,7 @@ describe('Button 계약이 거부하는 것', () => {
       onPress: () => undefined,
     };
     const role: ButtonSemanticProps = {
-      // @ts-expect-error 접근성 prop 은 렌더러 소유다
+      // @ts-expect-error 접근성 prop은 렌더러 소유다
       accessibilityRole: 'button',
     };
     const label: ButtonSemanticProps = {
@@ -118,7 +107,7 @@ describe('Button 계약이 거부하는 것', () => {
 
   it('ReactNode 슬롯을 거부한다', () => {
     const children: ButtonSemanticProps = {
-      // @ts-expect-error 슬롯은 렌더러 타입(ReactNode)이라 ui-core 에 들어올 수 없다
+      // @ts-expect-error 슬롯은 렌더러 타입(ReactNode)이라 ui-core에 들어올 수 없다
       children: 'Save',
     };
     const startIcon: ButtonSemanticProps = {

@@ -1,23 +1,3 @@
-/**
- * Field 계열 시맨틱 계약의 타입 수준 검증.
- *
- * 두 렌더러가 실제로 같은 불변식을 구현한다는 근거가 있는 것만 공유한다:
- * `variant`·`size`·`color`는 양쪽이 같은 값 집합을 각각 토큰으로 풀고, `disabled`는 양쪽 모두
- * "편집 불가 + 상태 고지", `readOnly`는 양쪽 모두 "편집 불가지만 disabled는 아님",
- * `error`는 양쪽 모두 시각 상태, `multiline`은 양쪽 모두 여러 줄 입력,
- * `autoFocus`는 양쪽 모두 마운트 시 포커스, `fullWidth`는 뜻이 같고 수단만 다르다
- * (web `width: 100%`, RN `alignSelf: 'stretch'`).
- *
- * 승격하지 않은 것:
- * - `required`: RN에도 prop이 생겼지만(FormControl·InputLabel·TextField) 불변식이 다르다.
- *   web은 `<input required>`로 제약 검증과 암묵 `aria-required`를 얻고 라벨의 `*`를
- *   `aria-hidden`으로 감춘다. RN은 폼 검증이 없고 `AccessibilityState`에 `required`가 없어
- *   TextInput에 닿는 것이 하나도 없으며, `*`가 라벨 텍스트의 일부로 읽힌다.
- *   이름이 같다고 계약이 같지 않다.
- * - `margin`·`hiddenLabel`: web 폼 밀도/레이블 규약이라 RN에 대응 개념이 없다.
- * - `value`·`defaultValue`: 도메인이 다르다. web은 `string | number | readonly string[]`까지
- *   받고 RN TextInput은 문자열 편집기다.
- */
 import type { FieldSemanticProps, InputFieldSemanticProps } from './field';
 
 const field: FieldSemanticProps = {
@@ -77,15 +57,15 @@ describe('Field 계약이 받는 것', () => {
 describe('Field 계약이 거부하는 것', () => {
   it('어휘에 없는 스칼라 값을 거부한다', () => {
     const variant: FieldSemanticProps = {
-      // @ts-expect-error variant는 plain|filled|boxed 뿐이다
+      // @ts-expect-error variant는 plain|filled|boxed뿐이다
       variant: 'outlined',
     };
     const size: FieldSemanticProps = {
-      // @ts-expect-error field size는 sm|md 뿐이다 — lg는 Button 어휘다
+      // @ts-expect-error field size는 sm|md뿐이다 — lg는 Button 어휘다
       size: 'lg',
     };
     const color: FieldSemanticProps = {
-      // @ts-expect-error color는 primary|secondary 뿐이다
+      // @ts-expect-error color는 primary|secondary뿐이다
       color: 'error',
     };
 
@@ -219,17 +199,6 @@ describe('Field 계약이 거부하는 것', () => {
     expect([onFilled, onEmpty, filled, adornedStart]).toHaveLength(4);
   });
 
-  /**
-   * 가장 그럴듯한 승격 후보라서 명시적으로 막는다.
-   *
-   * 두 렌더러의 `focused`는 이름도 우선순위(`disabled`가 이긴다)도 같지만, **입력의 시맨틱이
-   * 아니라 FormControl 컨테이너의 상태**다. 양쪽 `InputBase` 어느 쪽도 `focused`를 prop으로
-   * 받지 않는다 — web은 context나 자기 DOM 이벤트에서, RN은 context나 TextInput 콜백에서
-   * 얻는다. 수집 수단도 다르다: web은 루트에서 focus를 버블링받아 `relatedTarget`으로 거르고,
-   * RN View는 포커스를 버블링하지 않아 입력이 직접 알린다.
-   *
-   * 컨테이너 계약을 ui-core가 갖기 시작하면 context·hook까지 따라 올라온다. 그 선을 넘지 않는다.
-   */
   it('포커스 상태와 포커스 알림을 거부한다', () => {
     const focused: FieldSemanticProps = {
       // @ts-expect-error FormControl 컨테이너의 상태다 — 입력 시맨틱이 아니다

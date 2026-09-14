@@ -1,12 +1,10 @@
 /**
- * 공개 경계는 `package.json` 의 exports map 이 정한다.
- *
- * dist 에 internal 모듈이 있어도 subpath 로는 들어올 수 없어야 하고, exports 에 적힌 대상은
- * 실제로 빌드 산출물에 있어야 한다. design-tokens 의 `packageSurface.test.ts` 와 같은 취지지만
- * 해석 방법이 다르다 — ui-core 는 `import` 조건만 두는 ESM 이라 `require.resolve` 로는
- * 열리지 않는다. 그래서 `import.meta.resolve` 를 쓴다.
- *
- * dist 가 없으면 통과가 아니라 실패다.
+ * 공개 경계는 `package.json`의 exports map이 정한다.
+ * dist에 internal 모듈이 있어도 subpath로는 들어올 수 없어야 하고, exports에 적힌 대상은 실제로 빌드 산출물에 있어야 한다.
+ * design-tokens의 `packageSurface.test.ts`와 같은 취지지만 해석 방법이 다르다 —
+ * ui-core는 `import` 조건만 두는 ESM이라 `require.resolve`로는 열리지 않는다.
+ * 그래서 `import.meta.resolve`를 쓴다.
+ * dist가 없으면 통과가 아니라 실패다.
  */
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -26,7 +24,7 @@ type PackageJson = {
 
 const pkg: PackageJson = JSON.parse(await fs.readFile(path.join(PKG_ROOT, 'package.json'), 'utf8'));
 
-/** subpath 가 열리면 패키지 기준 상대 경로를, 막히면 에러 코드를 돌려준다. */
+/** subpath → 패키지 기준 상대 경로, 막히면 에러 코드 (`@berrypjh/ui-core` → `dist/index.js`) */
 const resolve = (specifier: string): string => {
   try {
     return path.relative(PKG_ROOT, fileURLToPath(import.meta.resolve(specifier)));
@@ -41,7 +39,7 @@ const exists = async (relative: string): Promise<boolean> =>
     .then(() => true)
     .catch(() => false);
 
-/** exports map 의 모든 조건부 대상(`types`/`import`/문자열)을 평평하게 편다. */
+/** exports map의 모든 조건부 대상(`types`/`import`/문자열)을 평평하게 편 목록 */
 const exportTargets = (): [subpath: string, condition: string, target: string][] =>
   Object.entries(pkg.exports).flatMap(([subpath, value]) =>
     typeof value === 'string'
@@ -53,7 +51,7 @@ const exportTargets = (): [subpath: string, condition: string, target: string][]
 
 describe('패키지는 private 로 남는다', () => {
   it('ui-core 는 publish 되지 않는다', () => {
-    // 소비자는 react-ui/react-native-ui 만 설치한다.
+    // 소비자는 react-ui/react-native-ui만 설치한다.
     expect(pkg.private).toBe(true);
     expect(pkg.name).toBe('@berrypjh/ui-core');
   });
@@ -137,8 +135,8 @@ describe('build 산출물', () => {
       'tailwind.js',
       'tokens.json',
     ];
-    // `@nx/vite:build` 가 출력 디렉터리에 package.json 을 하나 더 쓴다. 쓰는 곳은 없지만
-    // executor 산출물이라 허용한다 — raw `vite build` 로는 나오지 않아 존재 여부를 강제하지 않는다.
+    // `@nx/vite:build`가 출력 디렉터리에 package.json을 하나 더 쓴다.
+    // 쓰는 곳은 없지만 executor 산출물이라 허용한다 — raw `vite build`로는 나오지 않아 존재 여부를 강제하지 않는다.
     const allowedExtra = ['package.json'];
     const produced = await walk(DIST);
 
@@ -161,9 +159,9 @@ describe('build 산출물', () => {
   });
 
   it('tailwind 브릿지가 실제로 로드되고 preset 을 돌려준다', async () => {
-    // 파일 존재만으로는 부족하다 — design-tokens 까지 이어지는 체인이 살아 있는지 본다.
-    // specifier 를 변수로 두는 것은 의도다: 검사 대상이 컴파일 타임 import 가 아니라
-    // exports map 을 거치는 **런타임 해석**이다. 리터럴로 쓰면 tsc/lint 가 먼저 가로챈다.
+    // 파일 존재만으로는 부족하다 — design-tokens까지 이어지는 체인이 살아 있는지 본다.
+    // specifier를 변수로 두는 것은 의도다: 검사 대상이 컴파일 타임 import가 아니라 exports map을 거치는 런타임 해석이다.
+    // 리터럴로 쓰면 tsc/lint가 먼저 가로챈다.
     const entry = '@berrypjh/ui-core/tailwind';
     const preset = (await import(entry)) as { default?: unknown };
 
@@ -177,7 +175,7 @@ describe('build 산출물', () => {
       fs.readFile(path.join(PKG_ROOT, '../design-tokens/dist/tokens.json'), 'utf8'),
     ]);
 
-    // ui-core 가 다시 만들지 않는다는 사실을 바이트로 확인한다.
+    // ui-core가 다시 만들지 않는다는 사실을 바이트로 확인한다.
     expect(copied).toBe(canonical);
   });
 });
