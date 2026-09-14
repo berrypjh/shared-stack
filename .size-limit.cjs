@@ -103,5 +103,9 @@ module.exports = [
   reactNativeUi('Native tokens (Light)', '{ Native }', '3.7 KB'),
   reactNativeUi('PlainInput only', '{ PlainInput }', '6.2 KB'),
   reactNativeUi('TextField only', '{ TextField }', '7.5 KB'),
-  reactNativeUi('* (full)', '*', '15.1 KB'),
+  // 15.1 KB -> 16.7 KB: 한도는 2026-09-09 에 정했고, 그 뒤 RN 에 Checkbox·Radio·RadioGroup·Switch,
+  // Avatar·Badge·Chip, Stack, Divider 가 들어왔지만 한도는 그대로였다. 실측 15.86 KB 로 757 B
+  // 넘긴다(커밋별로 나눠 재지는 않았다). 단일 심볼 케이스는 모두 한도 안이다 — 늘어난 것은 전체
+  // re-export 에 실리는 컴포넌트 코드다. 16.7 KB 는 현재값 위 약 5% 여유로 이 파일의 기존 정책과 같다.
+  reactNativeUi('* (full)', '*', '16.7 KB'),
 ];
