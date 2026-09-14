@@ -50,6 +50,7 @@ export default defineConfig(() => ({
     globals: true,
     environment: 'jsdom',
     include: ['src/**/*.spec.{ts,tsx}'],
+    setupFiles: ['src/test/setup.ts'],
     reporters: ['default'],
     coverage: {
       reportsDirectory: '../../coverage/apps/quality-lab',

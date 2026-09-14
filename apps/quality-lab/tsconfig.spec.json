@@ -14,5 +14,11 @@
       "@nx/react/typings/image.d.ts"
     ]
   },
-  "include": ["vite.config.*", "src/**/*.test.*", "src/**/*.spec.*", "src/**/*.d.ts"]
+  "include": [
+    "vite.config.*",
+    "src/test/setup.ts",
+    "src/**/*.test.*",
+    "src/**/*.spec.*",
+    "src/**/*.d.ts"
+  ]
 }
