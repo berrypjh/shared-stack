@@ -46,7 +46,7 @@
     "tokens:gen": "nx run @berrypjh/design-tokens:build:tokens",
     "tokens:measure": "tsx --env-file-if-exists=.env tools/scripts/measure-tokens/all.ts",
     "tokens:watch": "nx watch --projects=@berrypjh/design-tokens -- nx run @berrypjh/design-tokens:build:tokens",
-    "tools:check": "tsc -p tools/tsconfig.json && vitest run --config tools/vitest.tools.config.mts",
+    "tools:check": "nx run @berrypjh/observability-contracts:build && tsc -p tools/tsconfig.json && vitest run --config tools/vitest.tools.config.mts",
     "treeshake": "tsx tools/scripts/treeshake/check.ts",
     "typecheck": "nx run-many -t typecheck",
     "ui-core:measure": "MEASURE_TARGET=ui-core tsx --env-file-if-exists=.env tools/scripts/measure-tokens/all.ts",
