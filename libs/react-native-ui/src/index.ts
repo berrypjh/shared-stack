@@ -3,7 +3,7 @@
 export * from './components';
 export * from './theme';
 
-// RN 소비자용 토큰 façade. web 전용 심볼은 `./deprecated`로 분리했다.
+// RN 소비자용 토큰 facade. web 전용 심볼은 `./deprecated`로 분리했다.
 export * from './deprecated';
 export { cx } from './utils';
 export type {
