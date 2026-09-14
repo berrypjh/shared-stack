@@ -10,7 +10,7 @@ import { VariantMatrix } from './VariantMatrix';
 /**
  * Canvas region — scenario 선택 · Canvas · 비교.
  *
- * Developer View 와 **같은 scenario source** 를 읽고, Canvas · Variant Matrix · State Matrix 가
+ * presentation definition 의 scenario 를 읽고, Canvas · Variant Matrix · State Matrix 가
  * 모두 같은 `renderScenario` adapter 를 쓴다. docs chrome 은 가져오지 않는다 — adapter 는
  * example 만 돌려주고 면은 여기가 소유한다.
  *
@@ -36,7 +36,7 @@ export const DesignerCanvas = ({
 
   return (
     <div className="flex flex-col gap-2xl min-w-0">
-      <Section title="Scenario" note="Developer View 와 같은 presentation definition 을 읽는다">
+      <Section title="Scenario">
         <div role="group" aria-label="Scenario" className="flex flex-wrap gap-xs">
           {data.scenarios.map((scenario) => (
             <Chip

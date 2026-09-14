@@ -1,7 +1,7 @@
 /**
  * Shared presentation model.
  *
- * Developer View 와 앞으로의 Designer View 가 **같은 scenario 목록**을 읽게 하는 중립 계약이다.
+ * 컴포넌트 페이지의 docs section 과 Designer 영역이 **같은 scenario 목록**을 읽게 하는 중립 계약이다.
  * 두 화면이 각자 example 을 들고 있으면 한쪽만 고쳐진 채 갈라지므로, example 의 identity 는
  * 여기 한 곳에만 둔다.
  *

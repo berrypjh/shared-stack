@@ -5,8 +5,6 @@ import {
   List,
   ListItem,
   SearchField,
-  SegmentControl,
-  type SegmentOption,
   SkipLink,
   ThemeName,
   ThemeProvider,
@@ -14,8 +12,6 @@ import {
 } from '@berrypjh/react-ui';
 
 import { NavLink, useLocation } from 'react-router-dom';
-
-import { useViewMode, type ViewMode } from '../presentation/viewMode';
 
 import { SelectControl } from './controls';
 import { filterNav, hasComponentMatches, titleFor } from './nav';
@@ -52,21 +48,14 @@ const MenuIcon = () => (
 /**
  * 사이드바 — 이 앱의 **유일한** 내비게이션.
  *
- * Designer 에도 따로 컴포넌트 목록을 두지 않는다. 같은 registry 에서 같은 항목·같은 링크를
- * 그리는 목록이 둘이면 landmark 와 `aria-current` 가 두 벌이 되고, 데스크톱에서는 Canvas 왼쪽에
- * 링크 열이 두 개 붙는다. 컴포넌트 검색은 그 목록이 있는 여기 위에 둔다.
- *
- * `to` 에 현재 `search` 를 그대로 실어 보낸다. Designer 에서 항목을 눌렀을 때 `view=designer`
- * 가 조용히 사라지면 이동만으로 mode 가 바뀌어 버린다. 지우는 것이 아니라 옮기는 것이므로
- * view 이외의 parameter 도 손대지 않는다 — Developer 에서는 search 가 비어 있어 `view` 가
- * 새로 붙지도 않는다.
- *
- * `isActive` 는 pathname 으로만 계산되므로 query 를 실어도 현재 위치 표시는 그대로다.
+ * 컴포넌트 페이지의 Designer 영역에도 따로 컴포넌트 목록을 두지 않는다. 같은 registry 에서
+ * 같은 항목·같은 링크를 그리는 목록이 둘이면 landmark 와 `aria-current` 가 두 벌이 된다.
+ * 컴포넌트 검색은 그 목록이 있는 여기 위에 둔다.
  *
  * 검색어는 이 컴포넌트의 일시적 UI 상태다. 데스크톱 사이드바와 모바일 드로어는 같은 폭에서
  * 동시에 보이지 않으므로 각자 들고 있어도 갈리지 않는다.
  */
-const Sidebar = ({ search }: { search: string }) => {
+const Sidebar = () => {
   const [query, setQuery] = useState('');
   const groups = filterNav(query);
   const noMatches = query.trim() !== '' && !hasComponentMatches(groups);
@@ -122,7 +111,7 @@ const Sidebar = ({ search }: { search: string }) => {
               {group.items.map((item) => (
                 <ListItem key={item.path}>
                   <NavLink
-                    to={{ pathname: item.path, search }}
+                    to={item.path}
                     end={item.end}
                     className={({ isActive }) =>
                       [
@@ -154,37 +143,16 @@ const Sidebar = ({ search }: { search: string }) => {
   );
 };
 
-/**
- * 좁은 topbar 에서는 라벨을 줄인다. 보이는 글자를 없애지 않고 짧은 쪽으로 바꾸기만 하고,
- * `ariaLabel` 로 접근 가능한 이름을 두 폭에서 같게 고정한다. 짧은 라벨이 긴 이름에 포함되므로
- * Label in Name (WCAG 2.5.3) 도 지켜진다.
- */
-const viewLabel = (short: string, full: string) => (
-  <>
-    <span className="sm:hidden">{short}</span>
-    <span className="hidden sm:inline">{full}</span>
-  </>
-);
-
-const VIEW_OPTIONS: readonly SegmentOption<ViewMode>[] = [
-  { value: 'developer', label: viewLabel('Dev', 'Developer'), ariaLabel: 'Developer' },
-  { value: 'designer', label: viewLabel('Design', 'Designer'), ariaLabel: 'Designer' },
-];
-
 const Topbar = ({
   title,
   theme,
   onThemeChange,
-  viewMode,
-  onViewModeChange,
   onOpenMenu,
   menuOpen,
 }: {
   title: string;
   theme: ThemeName;
   onThemeChange: (t: ThemeName) => void;
-  viewMode: ViewMode;
-  onViewModeChange: (v: ViewMode) => void;
   onOpenMenu: () => void;
   menuOpen: boolean;
 }) => (
@@ -206,29 +174,13 @@ const Topbar = ({
         {title}
       </span>
     </div>
-    <div className="flex items-center gap-md sm:gap-xl">
-      {/*
-        App 수준 switch 다 — 컴포넌트별 toolbar 안에 넣지 않는다.
-        `SegmentControl` 은 `inline-size: 100%` 로 트랙을 채우므로 폭을 여기서 묶는다.
-        그러지 않으면 topbar 에서 제목·테마·메뉴 자리를 밀어낸다.
-      */}
-      <div className="shrink-0 w-[120px] sm:w-[176px]">
-        <SegmentControl
-          aria-label="View"
-          value={viewMode}
-          options={VIEW_OPTIONS}
-          onChange={onViewModeChange}
-          data-testid="view-switch"
-        />
-      </div>
-      <SelectControl
-        label="Theme"
-        value={theme}
-        options={THEME_OPTIONS}
-        onChange={onThemeChange}
-        testId="theme-select"
-      />
-    </div>
+    <SelectControl
+      label="Theme"
+      value={theme}
+      options={THEME_OPTIONS}
+      onChange={onThemeChange}
+      testId="theme-select"
+    />
   </header>
 );
 
@@ -241,8 +193,7 @@ export const AppShell = ({
   onThemeChange: (t: ThemeName) => void;
   children: ReactNode;
 }) => {
-  const { pathname, search } = useLocation();
-  const [viewMode, setViewMode] = useViewMode();
+  const { pathname } = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
 
   // 페이지를 옮기면 드로어는 할 일이 끝났다. 열린 채로 두면 이동한 화면을 가린다.
@@ -266,7 +217,7 @@ export const AppShell = ({
       <div className="flex min-h-screen w-full max-w-[1440px] mx-auto bg-background-default">
         {/* 데스크톱에서만 자리를 차지한다. 좁은 화면에서는 220px 이 본문을 먹는다. */}
         <div className="hidden lg:block w-[220px] shrink-0">
-          <Sidebar search={search} />
+          <Sidebar />
         </div>
 
         {menuOpen && (
@@ -279,7 +230,7 @@ export const AppShell = ({
               className="absolute inset-0 bg-[rgb(var(--ds-background-dark-rgb)/0.6)] border-0 cursor-pointer"
             />
             <div className="relative w-[260px] max-w-[80vw] h-full shadow-lg">
-              <Sidebar search={search} />
+              <Sidebar />
             </div>
           </div>
         )}
@@ -289,8 +240,6 @@ export const AppShell = ({
             title={titleFor(pathname)}
             theme={theme}
             onThemeChange={onThemeChange}
-            viewMode={viewMode}
-            onViewModeChange={setViewMode}
             onOpenMenu={() => setMenuOpen(true)}
             menuOpen={menuOpen}
           />

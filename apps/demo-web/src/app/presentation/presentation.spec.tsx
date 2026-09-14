@@ -12,7 +12,7 @@ const definitions = allPresentations();
 const eachDefinition = definitions.map((p) => [p.data.id, p] as const);
 
 /**
- * scenario 목록은 Developer View 와 앞으로의 Designer View 가 공유하는 유일한 source 다.
+ * scenario 목록은 docs section 과 Designer 영역이 공유하는 유일한 source 다.
  * identity 가 흔들리거나 section 이 없는 scenario 를 가리키면 한쪽 화면만 조용히 비므로,
  * 규칙 자체를 검증한다 — 특정 id 목록을 여기 다시 적지 않는다.
  */
@@ -49,7 +49,7 @@ describe('presentation registry', () => {
 /**
  * registry 가 현재 demo 의 컴포넌트 route 전부를 덮는지 본다. route 목록을 여기 다시 적지 않고
  * `app.tsx` 의 route table 에서 읽는다 — 새 컴포넌트 page 를 등록하고 definition 을 빠뜨리면
- * Designer 에서만 조용히 unsupported 가 되므로, 그것을 테스트가 막는다.
+ * 그 page 가 docs 와 Designer 영역을 그릴 수 없으므로, 그것을 테스트가 막는다.
  */
 describe('component route 커버리지', () => {
   it('모든 컴포넌트 route 에 definition 이 있다', () => {
@@ -136,12 +136,8 @@ describe('Button definition', () => {
   });
 });
 
-/**
- * Developer View 가 기존 정보 구조를 그대로 그리는지 본다. scenario abstraction 을 넣은 뒤에도
- * 제목 계층·section 순서·example 순서가 그대로여야 하고, 각 example 은 접근 가능한 이름을
- * 잃지 않아야 한다 (WCAG 4.1.2).
- */
-describe('Developer Button 화면', () => {
+/** 컴포넌트 페이지는 제목과 Designer 영역만 그린다. docs section 을 따로 그리지 않는다. */
+describe('Button 컴포넌트 페이지', () => {
   const at = () => render(<DeveloperComponentPage presentation={buttonPresentation} />);
   const { data } = buttonPresentation;
 
@@ -151,44 +147,12 @@ describe('Developer Button 화면', () => {
     expect(screen.getByText(data.lead)).toBeTruthy();
   });
 
-  it('기존 section 을 같은 순서로 그린다', () => {
+  it('Designer 영역만 그리고 docs section 은 없다', () => {
     at();
-    expect(screen.getAllByRole('heading', { level: 2 }).map((el) => el.textContent)).toEqual([
-      'Variants',
-      'Sizes',
-      'Colors',
-      'Loading State',
-      'Disabled',
-      'Full Width',
-    ]);
-  });
-
-  it('section note 를 그린다', () => {
-    at();
-    for (const note of data.sections.map((s) => s.note).filter(Boolean)) {
-      expect(screen.getByText(note as string)).toBeTruthy();
-    }
-  });
-
-  it('example 을 section 순서대로, 이름을 가진 채 그린다', () => {
-    at();
-    const expected = data.sections
-      .flatMap((s) => s.scenarioIds)
-      .map((id) => data.scenarios.find((s) => s.id === id)?.label);
-
-    expect(screen.getAllByRole('button').map((el) => el.textContent)).toEqual(expected);
-    expect(screen.getAllByRole('button', { name: /\S/ })).toHaveLength(expected.length);
-  });
-
-  it('disabled scenario 는 실제로 disabled 다', () => {
-    at();
-    const disabledIds = new Set(data.sections.find((s) => s.id === 'disabled')?.scenarioIds ?? []);
-    const disabledLabels = data.scenarios.filter((s) => disabledIds.has(s.id)).map((s) => s.label);
-
-    expect(disabledLabels.length).toBeGreaterThan(0);
-    for (const label of disabledLabels) {
-      const matches = screen.getAllByRole('button', { name: label });
-      expect(matches.some((el) => (el as HTMLButtonElement).disabled)).toBe(true);
+    expect(screen.getByTestId('designer-workspace')).toBeTruthy();
+    expect(screen.queryByTestId('component-docs')).toBeNull();
+    for (const section of data.sections) {
+      expect(screen.queryByRole('heading', { level: 2, name: section.label })).toBeNull();
     }
   });
 });

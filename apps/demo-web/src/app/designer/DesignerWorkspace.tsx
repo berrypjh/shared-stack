@@ -4,8 +4,8 @@ import type { ThemeName } from '@berrypjh/react-ui';
 
 import type { DesignerPropertyValue, PropertyOverrides } from '../presentation/model';
 import type { WebPresentation } from '../presentation/registry';
-import { Page } from '../shell/ui';
 import { useMediaQuery } from '../shell/useMediaQuery';
+import { useCurrentTheme } from '../verification/useCurrentTheme';
 
 import { DesignerCanvas } from './DesignerCanvas';
 import { DesignerInspector } from './DesignerInspector';
@@ -22,15 +22,14 @@ import { DesignerSheet } from './DesignerSheet';
 const WIDE = '(min-width: 1280px)';
 
 /**
- * Designer Workspace session.
+ * Designer session.
  *
  * scenario 선택과 property override 를 여기서 들고 있다. Canvas 와 Inspector 가 같은 값을 봐야
- * 하기 때문이고, 두 region 이 각자 복제하면 화면이 갈린다. **선택된 컴포넌트 · ViewMode ·
- * theme 은 여기 복제하지 않는다** — 각각 URL 과 App state 가 canonical source 다.
+ * 하기 때문이고, 두 region 이 각자 복제하면 화면이 갈린다. **선택된 컴포넌트 · theme 은 여기
+ * 복제하지 않는다** — 각각 URL 과 App state 가 canonical source 다.
  *
  * 컴포넌트 목록은 여기 없다 — AppShell 사이드바가 이 앱의 유일한 내비게이션이고, 컴포넌트
- * 검색도 그 위에 있다. Designer 가 같은 목록을 한 번 더 그리면 landmark 와 `aria-current` 가
- * 두 벌이 되고 Canvas 왼쪽에 링크 열이 두 개 붙는다.
+ * 검색도 그 위에 있다.
  *
  * 폭에 따라 Inspector 를 **한 벌만** mount 한다. CSS 로 두 벌을 그리면 같은 landmark 와 접근
  * 가능한 이름이 DOM 에 둘씩 생겨 보조 기술이 어느 쪽인지 알 수 없다.
@@ -129,8 +128,7 @@ const DesignerSession = ({
 
   /*
     좁은 화면: Canvas 가 전폭을 쓰고 Inspector 는 trigger 로 연다. 데스크톱 열을 비율만 줄여
-    밀어 넣지 않는다. 컴포넌트 이동은 전역 메뉴(AppShell 드로어)가 맡는다 — Designer 전용
-    목록을 하나 더 만들지 않는다.
+    밀어 넣지 않는다. 컴포넌트 이동은 전역 메뉴(AppShell 드로어)가 맡는다.
   */
   return (
     <div className="flex flex-col gap-xl" data-testid="designer-compact">
@@ -150,27 +148,21 @@ const DesignerSession = ({
 };
 
 /**
- * Designer Workspace.
+ * Designer 영역. 컴포넌트 페이지의 본문 전체다.
  *
  * 시각 테마는 `AppShell` 의 `ThemeProvider` 가 준다 — canvas 는 같은 `data-theme` 아래에 있다.
- * `theme` 이름을 따로 받는 것은 Token Inspector 가 그 theme 의 **값**을 catalog 에서 읽어야
- * 하기 때문이고, App 의 single state 를 그대로 전달받는다 — Designer 전용 theme state 가 아니다.
+ * Token Inspector 는 그 theme 의 **값**을 catalog 에서 읽어야 해서 이름이 필요하고, 페이지가
+ * Route children 이라 prop 대신 `useCurrentTheme` 으로 DOM 에서 읽는다.
  *
  * `key` 로 컴포넌트가 바뀔 때 session 을 다시 mount 한다 — 이전 컴포넌트의 scenario id 나
  * override 가 남아 있을 수 없게 하는 가장 단순한 방법이다.
  */
-export const DesignerWorkspace = ({
-  presentation,
-  theme,
-}: {
-  presentation: WebPresentation;
-  theme: ThemeName;
-}) => (
-  <Page
-    title={`${presentation.data.label} · Designer`}
-    lead={presentation.data.lead}
-    testId="designer-workspace"
-  >
-    <DesignerSession key={presentation.data.id} presentation={presentation} theme={theme} />
-  </Page>
-);
+export const DesignerWorkspace = ({ presentation }: { presentation: WebPresentation }) => {
+  const theme = useCurrentTheme();
+
+  return (
+    <div data-testid="designer-workspace">
+      <DesignerSession key={presentation.data.id} presentation={presentation} theme={theme} />
+    </div>
+  );
+};

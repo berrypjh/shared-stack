@@ -217,9 +217,12 @@ describe('Runtime 화면', () => {
  * 그 통합이라, 라우트 스모크만으로는 부족하고 열림·닫힘까지 본다.
  */
 describe('Popover 페이지', () => {
+  /** Matrix 에도 같은 트리거가 그려지므로 Canvas 로 좁힌다. */
+  const canvas = () => within(screen.getByTestId('designer-canvas'));
+
   it('트리거로 열고 Escape 로 닫는다', async () => {
     at('/components/popover');
-    const trigger = screen.getByRole('button', { name: '도움말 열기' });
+    const trigger = canvas().getByRole('button', { name: '도움말 열기' });
     expect(trigger.getAttribute('aria-expanded')).toBe('false');
 
     await userEvent.click(trigger);
@@ -231,8 +234,10 @@ describe('Popover 페이지', () => {
 
   it('dialog 패널은 이름을 갖는다', async () => {
     at('/components/popover');
-    await userEvent.click(screen.getByRole('button', { name: '계정 메뉴' }));
-    expect(screen.getByRole('dialog', { name: '계정 메뉴' })).toBeTruthy();
+    const scenarios = within(screen.getByRole('group', { name: 'Scenario' }));
+    await userEvent.click(scenarios.getByRole('button', { name: '계정 메뉴' }));
+    await userEvent.click(canvas().getByRole('button', { name: '계정 메뉴' }));
+    expect(canvas().getByRole('dialog', { name: '계정 메뉴' })).toBeTruthy();
   });
 });
 

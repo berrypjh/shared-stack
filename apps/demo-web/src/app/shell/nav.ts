@@ -9,7 +9,7 @@
  * 을 확인하기 위한 대표 세트다.
  *
  * **컴포넌트 항목은 presentation registry 에서 파생한다.** 라벨·경로를 여기 다시 적으면
- * Designer Library Browser 와 사이드바가 서로 다른 이름을 부를 수 있다. Foundation·검증은
+ * 페이지 h1 과 사이드바가 서로 다른 이름을 부를 수 있다. Foundation·검증은
  * presentation definition 이 아니므로 계속 이 파일이 소유한다.
  *
  * 방향은 nav → registry 한 쪽이다. registry 와 definition 은 nav 를 import 하지 않으므로
