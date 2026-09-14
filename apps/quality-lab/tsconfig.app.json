@@ -9,5 +9,13 @@
     "types": ["node", "@nx/react/typings/cssmodule.d.ts", "@nx/react/typings/image.d.ts"]
   },
   "exclude": ["**/*.spec.*", "**/*.test.*", "src/test/**", "vite.config.*", "vitest.config.*"],
-  "include": ["src/**/*.ts", "src/**/*.tsx"]
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "references": [
+    {
+      "path": "../../libs/react-ui/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/observability-contracts/tsconfig.lib.json"
+    }
+  ]
 }

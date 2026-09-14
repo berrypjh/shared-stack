@@ -140,10 +140,8 @@ describe('테스트 — 끝나지 않은 실행', () => {
       outcome: null,
       outcomeReason: '실행이 timeout 으로 끝나 결과가 없다',
     };
-    renderApp(
-      '/quality/tests?run=run-timeout',
-      publicFiles([{ ...qualityArtifact('run-timeout'), tests: [timedOut] }]),
-    );
+    const timedOutRun = { ...qualityArtifact('run-timeout'), tests: [timedOut] };
+    renderApp('/quality/tests?run=run-timeout', publicFiles([timedOutRun]));
 
     const table = await screen.findByRole('table', { name: 'test source 요약' });
     const headers = within(table)
