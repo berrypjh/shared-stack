@@ -26,6 +26,10 @@ module.exports = {
   rootDir: __dirname,
   testMatch: ['<rootDir>/src/**/*.test.tsx', '<rootDir>/src/**/*.test.ts'],
 
+  // 파일의 첫 render 가 react-native 모듈 로딩·트랜스폼을 떠안습니다. transform 캐시가 없는
+  // CI 에서 다른 task 와 병렬로 돌면 기본 5초를 넘깁니다 (로컬 cold 1.1초, warm 0.1초).
+  testTimeout: 15000,
+
   transform: {
     // preset의 `babel-jest` 문자열을 대체합니다. babelrc 탐색을 끄고 preset을 직접 지정해야
     // `.pnpm` 안의 react-native 소스까지 같은 설정으로 트랜스폼됩니다.
