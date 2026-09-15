@@ -5,6 +5,7 @@
     "declaration": false,
     "declarationMap": false,
     "emitDeclarationOnly": false,
-    "tsBuildInfoFile": "dist/.tsbuildinfo.rollup"
+    "tsBuildInfoFile": "dist/.tsbuildinfo.rollup",
+    "rootDir": ".."
   }
 }
