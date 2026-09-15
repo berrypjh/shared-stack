@@ -1,6 +1,6 @@
 const { withNxMetro } = require('@nx/expo');
-const { getDefaultConfig } = require('@expo/metro-config');
-const { mergeConfig } = require('metro-config');
+const { getDefaultConfig } = require('expo/metro-config');
+const { mergeConfig } = require('@expo/metro/metro-config');
 
 const defaultConfig = getDefaultConfig(__dirname);
 const { assetExts, sourceExts } = defaultConfig.resolver;
@@ -9,7 +9,7 @@ const { assetExts, sourceExts } = defaultConfig.resolver;
  * Metro configuration
  * https://reactnative.dev/docs/metro
  *
- * @type {import('metro-config').MetroConfig}
+ * @type {import('@expo/metro/metro-config').MetroConfig}
  */
 const customConfig = {
   cacheVersion: '@berrypjh/demo-mobile',
