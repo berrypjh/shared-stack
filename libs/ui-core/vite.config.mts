@@ -33,7 +33,7 @@ export default defineConfig(() => ({
       name: '@berrypjh/ui-core',
       formats: ['es' as const],
     },
-    rollupOptions: {
+    rolldownOptions: {
       external: ['tailwindcss'],
       output: {
         entryFileNames: '[name].js',
