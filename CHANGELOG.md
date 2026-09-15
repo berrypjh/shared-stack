@@ -1,3 +1,9 @@
+## 1.1.1 (2026-09-15)
+
+### 🩹 Fixes
+
+- **react-ui:** RSC 서버에서 client 모듈이 평가되지 않도록 'use client' 디렉티브 보존 ([441ff28](https://github.com/berrypjh/shared-stack/commit/441ff28))
+
 ## 1.1.0 (2026-09-14)
 
 ### 🚀 Features
