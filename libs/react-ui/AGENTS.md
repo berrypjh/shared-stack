@@ -15,7 +15,7 @@
 src/
   index.ts                 public re-export (components/theme + ui-core 패스스루)
   styles.ts                스타일 side-effect 진입점 (`styles.scss` import만)
-  styles.scss              모든 컴포넌트 SCSS aggregator — 로드 순서 + `@layer components` (rollup-plugin-postcss가 dist/index.css로 추출)
+  styles.scss              모든 컴포넌트 SCSS aggregator — 로드 순서 + `@layer components` (`tools/scripts/build-react-ui-css.mjs`가 sass·autoprefixer로 dist/index.css를 만든다)
   global.d.ts              SCSS 모듈 declaration
   components/
     <name>/<Name>.tsx      구현

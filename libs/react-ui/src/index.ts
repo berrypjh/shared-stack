@@ -1,4 +1,4 @@
-// SCSS 모음이다. rollup-plugin-postcss가 extract하므로 JS 번들에는 남지 않는다.
+// SCSS 모음이다. JS 번들에는 남지 않고, CSS는 `tools/scripts/build-react-ui-css.mjs`가 만든다.
 import './styles';
 
 // 시맨틱 prop 계약은 react-ui 자체 props가 wrap해서 내보낸다.
