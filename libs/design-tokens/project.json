@@ -35,11 +35,6 @@
         "configFile": "libs/design-tokens/vitest.config.mts",
         "watch": false,
         "reportsDirectory": "libs/design-tokens/test-output/vitest/coverage"
-      },
-      "configurations": {
-        "ci": {
-          "runMode": "run"
-        }
       }
     }
   },
