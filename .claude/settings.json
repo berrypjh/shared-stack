@@ -28,9 +28,13 @@
       "Bash(git branch -d*)",
       "Bash(git branch -D*)",
       "Bash(git tag*)",
-      "Bash(*nx build mobile*)",
       "Bash(*eas build*)",
+      "Bash(pnpm release:npm*)",
+      "Bash(*nx release*)",
+      "Bash(*npm publish*)",
       "Bash(pnpm add*)",
+      "Bash(pnpm i)",
+      "Bash(pnpm i *)",
       "Bash(pnpm install*)",
       "Bash(pnpm remove*)",
       "Bash(pnpm update*)",
@@ -49,5 +53,19 @@
   "enabledPlugins": {
     "code-review@claude-plugins-official": true,
     "berry-commit@berrypjh": true
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-bash.mjs\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
   }
 }
