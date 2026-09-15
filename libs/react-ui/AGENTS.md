@@ -64,11 +64,11 @@ pnpm nx storybook @berrypjh/react-ui      # storybook
 pnpm build-storybook @berrypjh/react-ui   # static storybook
 ```
 
-빌드 산출물: `dist/{index.esm.js, index.css, types/index.d.ts, tailwind.{js,d.ts}, AGENTS.md, tokens.json, llm-catalog.json, README.md}`. d.ts는 `dts-bundle-generator`로 단일 파일, ui-core/design-tokens 타입을 inline. `llm-catalog.json`은 declaration 생성 뒤 `generate-catalog` target이 만든다 (`tools/scripts/generate-consumer-catalog`).
+빌드 산출물: `dist/{index.esm.js, index.css, types/index.d.ts, tailwind.{js,d.ts}, AGENTS.md, tokens.json, llm-catalog.json, README.md}`. JS는 `preserveModules`라 모듈당 한 파일이다 — `index.esm.js`는 re-export만 하고, 구현은 `dist/{components,theme,utils}/**/*.esm.js`·`deprecated.esm.js`, ui-core는 `dist/ui-core/dist/index.esm.js`에 inline된다. d.ts는 `dts-bundle-generator`로 단일 파일, ui-core/design-tokens 타입을 inline. `llm-catalog.json`은 declaration 생성 뒤 `generate-catalog` target이 만든다 (`tools/scripts/generate-consumer-catalog`).
 
 ## Gotcha
 
-- **`use client` 디렉티브**: 서버 컴포넌트 호환을 위해 컴포넌트 최상단에 `'use client';` 유지. rollup 빌드 시 ignore 경고 떠도 무시.
+- **`use client` 디렉티브**: React client API(hook·`createContext`)를 쓰는 모듈은 최상단에 `'use client';`를 둔다 — Context 파일과 커스텀 hook 포함. rollup은 이 디렉티브를 지우고(`Module level directives ... ignored` 경고), `rollup.config.cjs`가 그 모듈의 청크 1행에 다시 붙인다. 빠뜨리면 RSC 서버에서 그 청크가 평가돼 `createContext only works in Client Components`로 깨진다. 디렉티브 없는 모듈(`cx`·`themes`·`Web`·`ThemeProvider`)은 서버 컴포넌트에서 그대로 실행된다.
 - **dts-bundle-generator는 surface 동결**: re-export하지 않은 타입은 `--export-referenced-types`가 아무리 떠도 dist에 포함 안 됨. 다운스트림에서 필요하면 `src/index.ts`에 명시.
 - **ui-core 직접 import 금지**: 외부에서 `@berrypjh/ui-core`를 import하라고 안내 X. react-ui가 캡슐화 — ui-core export는 react-ui index를 통해 패스스루.
 - **`components/index.ts`·`styles.ts` 동기화**: 새 컴포넌트는 두 곳에 등록해야 SCSS도 dist/index.css에 들어감.

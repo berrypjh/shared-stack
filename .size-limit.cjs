@@ -27,19 +27,17 @@ const reactNativeUi = (name, importStr, limit) => ({
 });
 
 module.exports = [
-  // react-ui: 단일 심볼 케이스는 대부분 같은 값이 나온다.
-  // 최상위 `Component.displayName = '...'` 할당은 번들러가 순수하다고 증명하지 못해서,
-  // 무엇을 import 하든 해당 컴포넌트가 전부 남는다. 이 할당을 없애거나 감싸는 것은
-  // 외부 소비자가 보는 속성을 바꾸는 breaking change 라 여기서는 값만 고정한다.
-  reactUi('cx only', '{ cx }', '11 KB'),
-  reactUi('Box only', '{ Box }', '11 KB'),
-  // Stack 은 displayName 이 없어 위 바닥값 위에 자기 코드만 얹힌다. 실제로 구분되는 케이스다.
-  reactUi('Stack only', '{ Stack }', '11 KB'),
-  reactUi('Button only', '{ Button }', '11 KB'),
-  reactUi('ThemeProvider only', '{ ThemeProvider }', '11 KB'),
-  reactUi('themes registry only', '{ themes }', '11 KB'),
-  reactUi('Web tokens (Light)', '{ Web }', '14 KB'),
-  reactUi('* (full)', '*', '17 KB'),
+  // react-ui: dist 는 모듈당 한 파일(preserveModules)이라 단일 심볼 케이스는 그 심볼이 끌어오는 모듈만 잰다.
+  // `* (full)` 은 단일 번들 때보다 약 570 B 크다. external 인 `react` import 를 esbuild 가
+  // 모듈마다 따로 남기기 때문이다 (import 문 2 → 60). react 를 번들하는 실제 앱에는 없는 비용이다.
+  reactUi('cx only', '{ cx }', '90 B'),
+  reactUi('Box only', '{ Box }', '565 B'),
+  reactUi('Stack only', '{ Stack }', '410 B'),
+  reactUi('Button only', '{ Button }', '1.52 KB'),
+  reactUi('ThemeProvider only', '{ ThemeProvider }', '210 B'),
+  reactUi('themes registry only', '{ themes }', '150 B'),
+  reactUi('Web tokens (Light)', '{ Web }', '3.37 KB'),
+  reactUi('* (full)', '*', '18.3 KB'),
 
   // react-native-ui: displayName 을 쓰지 않아 import 에 따라 값이 실제로 달라진다.
   // 그래서 공개 Button 계열(Button·IconButton·Fab)은 따로따로 검사한다. 내부용 ButtonBase 는 뺀다.
