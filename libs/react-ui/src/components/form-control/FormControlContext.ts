@@ -1,3 +1,5 @@
+'use client';
+
 import { createContext } from 'react';
 
 import type { FieldColor, FieldMargin, FieldSize, FieldVariant } from '../../types';

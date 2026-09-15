@@ -19,6 +19,8 @@ import { Button, TextField, ThemeProvider } from '@berrypjh/react-ui';
 </ThemeProvider>;
 ```
 
+서버 컴포넌트(Next.js App Router): `cx`·`themes`·`Web`·`ThemeProvider`는 서버에서 import·호출할 수 있다. 나머지 컴포넌트는 `'use client'` 모듈이라 서버에서는 client reference로 렌더된다 — 서버 파일에서 JSX로 쓰되 함수 prop(`onClick` 등)은 넘기지 않는다.
+
 ```js
 // 3. (선택) Tailwind preset 연결
 // tailwind.config.js
