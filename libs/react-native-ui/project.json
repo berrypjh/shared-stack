@@ -13,6 +13,7 @@
           "find libs/react-native-ui/dist -type f \\( -name '*.d.ts' -o -name '*.d.ts.map' \\) -delete",
           "rm -rf libs/react-native-ui/dist/src libs/react-native-ui/dist/.tsbuildinfo",
           "nx run @berrypjh/react-native-ui:build-types",
+          "tsc -p libs/react-native-ui/tsconfig.dist.json",
           "cp libs/ui-core/dist/tokens.json libs/react-native-ui/dist/tokens.json",
           "cp libs/react-native-ui/AGENTS.consumer.md libs/react-native-ui/dist/AGENTS.md",
           "node -e \"const fs=require('fs'); const p='libs/react-native-ui/dist/package.json'; const j=JSON.parse(fs.readFileSync(p,'utf8')); delete j.exports; delete j.devDependencies; fs.writeFileSync(p, JSON.stringify(j,null,2));\"",
