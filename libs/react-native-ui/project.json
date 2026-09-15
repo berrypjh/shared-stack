@@ -34,7 +34,7 @@
       "executor": "nx:run-commands",
       "outputs": ["{projectRoot}/dist/index.d.ts"],
       "options": {
-        "command": "dts-bundle-generator --project libs/react-native-ui/tsconfig.rollup.json --no-banner --no-check --external-imports=react --external-imports=react-native --external-imports=react/jsx-runtime -o libs/react-native-ui/dist/index.d.ts libs/react-native-ui/src/index.ts"
+        "command": "dts-bundle-generator --project libs/react-native-ui/tsconfig.dts.json --no-banner --no-check --external-imports=react --external-imports=react-native --external-imports=react/jsx-runtime -o libs/react-native-ui/dist/index.d.ts libs/react-native-ui/src/index.ts"
       }
     },
     "test": {
