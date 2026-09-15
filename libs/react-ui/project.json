@@ -97,11 +97,6 @@
         "configFile": "libs/react-ui/vitest.config.mts",
         "watch": false,
         "reportsDirectory": "libs/react-ui/test-output/vitest/coverage"
-      },
-      "configurations": {
-        "ci": {
-          "runMode": "run"
-        }
       }
     },
     "nx-release-publish": {
