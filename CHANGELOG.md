@@ -1,3 +1,9 @@
+## 1.1.2 (2026-09-15)
+
+### 🩹 Fixes
+
+- **react-ui:** 컴포넌트 스타일을 @layer components로 옮겨 Tailwind className 덮어쓰기 허용 ([5e0a3e0](https://github.com/berrypjh/shared-stack/commit/5e0a3e0))
+
 ## 1.1.1 (2026-09-15)
 
 ### 🩹 Fixes
