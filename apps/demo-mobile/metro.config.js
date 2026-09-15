@@ -40,9 +40,9 @@ const nxConfig = withNxMetro(mergeConfig(defaultConfig, customConfig), {
 // projectRoot 만 이 앱으로 되돌린다.
 nxConfig.projectRoot = __dirname;
 
-// 워크스페이스에 `react-native` 사본이 둘 있다 — 루트가 `0.81.5` 를 정확히 고정하고,
-// `libs/react-native-ui` 의 peer `~0.81.5` 를 pnpm 이 `autoInstallPeers` 로 채우면서
-// `0.81.6` 을 그 패키지 안에 따로 깐다. 둘 다 번들되면 네이티브 view config 가 한 사본에만
+// 워크스페이스에 `react-native` 사본이 둘 있다 — 버전은 같아도 pnpm 은 peer 조합(`@babel/core`
+// 등)이 다르면 사본을 따로 깐다. 루트와 이 앱·`libs/react-native-ui` 가 서로 다른 사본을
+// 가리킨다. 둘 다 번들되면 네이티브 view config 가 한 사본에만
 // 등록되어 `AndroidProgressBar`(ActivityIndicator) 같은 컴포넌트가
 // "View config getter callback ... must be a function" 으로 터진다.
 // RN 런타임은 반드시 하나여야 하므로 앱이 쓰는 사본으로 고정한다.
