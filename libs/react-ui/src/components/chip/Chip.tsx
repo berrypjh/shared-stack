@@ -49,6 +49,14 @@ type ChipRuntimeProps = {
  * menu item·listbox option·checkbox 역할로 자동 전환하지 않는다 — 그 셋은 다른 ARIA 계약과 키보드 모델을 요구하고 이미 `Select`·`Checkbox`가 소유한다.
  * remove/delete는 DEFER다.
  * chip 안에 두 번째 button을 넣으면 중첩 상호작용이 되고, 그것을 피하는 유일한 구조(별도 toolbar/grid 키보드 모델)는 실제 소비자 요구가 확인된 뒤에 설계한다.
+ * 색 prop은 없다 — `ChipSemanticProps`는 RN과 공유하는 계약이라 web 전용 색 어휘를 올리지 않는다.
+ * 톤은 루트의 CSS 변수로 바꾸고, 이것이 공식 확장점이다.
+ * 평상시는 `--ui-chip-surface`·`--ui-chip-border-color`·`--ui-chip-fg`, interactive 상태는 `--ui-chip-surface-hover`·`--ui-chip-border-hover`·`--ui-chip-surface-selected`·`--ui-chip-border-selected`.
+ * ```tsx
+ * <Chip className="[--ui-chip-fg:var(--ds-text-error)] [--ui-chip-border-color:var(--ds-stroke-error)]">긴급</Chip>
+ * ```
+ * 값은 토큰(`var(--ds-*)`)을 쓴다.
+ * disabled와 forced-colors 색은 변수를 읽지 않는다 — 비활성 표시와 고대비 모드는 소비자 톤이 덮지 못한다.
  * `displayName`을 두지 않는다 — 최상위 속성 할당은 tree-shaking을 막는다 (`.size-limit.cjs` 머리말, Avatar·Badge·Checkbox와 같은 관례).
  */
 export const Chip = (props: ChipProps) => {

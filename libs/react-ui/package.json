@@ -36,7 +36,7 @@
   },
   "devDependencies": {
     "@berrypjh/ui-core": "workspace:^",
-    "rollup-plugin-postcss": "^4.0.2",
+    "autoprefixer": "^10.6.0",
     "sass": "^1.97.3"
   }
 }

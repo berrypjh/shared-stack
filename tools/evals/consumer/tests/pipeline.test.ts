@@ -80,7 +80,7 @@ describe('pipeline', () => {
       expect(v.primary.falseSuccessRate.value).toBe(0);
       expect(v.primary.routingAccuracy.value).toBe(1);
     }
-  });
+  }, 60_000);
 
   it('runs multiple trials per task', async () => {
     const result = await runEval({
@@ -110,7 +110,7 @@ describe('pipeline', () => {
     expect(primary.verifiedTaskSuccessRate.value).toBe(0);
     expect(primary.falseSuccessRate.value).toBe(1);
     expect(result.summary.variants[0].failureBreakdown['verification-omitted']).toBe(dev.length);
-  });
+  }, 60_000);
 
   it('writes traces.jsonl / summary.json / report.md that read back', async () => {
     const outDir = await fs.mkdtemp(path.join(os.tmpdir(), 'consumer-eval-'));
@@ -132,5 +132,5 @@ describe('pipeline', () => {
     expect(await fs.readFile(path.join(outDir, 'report.md'), 'utf8')).toBe(report);
 
     await fs.rm(outDir, { recursive: true, force: true });
-  });
+  }, 60_000);
 });

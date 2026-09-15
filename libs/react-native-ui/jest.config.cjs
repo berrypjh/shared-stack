@@ -2,16 +2,11 @@
  * react-native-ui 컴포넌트 테스트 러너.
  *
  * 다른 패키지는 Vitest + jsdom을 쓰지만 여기만 Jest입니다. RN 컴포넌트는 DOM이 아니라 RN
- * 호스트 트리로 렌더되고 `react-native`는 Flow 소스를 그대로 배포하기 때문입니다. RN이
- * 제공하는 `jest-preset.js`가 둘 다 처리합니다 (환경은 jsdom이 아닌 node 파생).
+ * 호스트 트리로 렌더되고 `react-native`는 Flow 소스를 그대로 배포하기 때문입니다.
+ * `@react-native/jest-preset`이 둘 다 처리합니다 (환경은 jsdom이 아닌 node 파생). RN 0.85부터
+ * preset은 `react-native` 밖의 이 패키지로 옮겨졌습니다.
  */
-const { dirname, resolve } = require('node:path');
-
-// 워크스페이스에 react-native 사본이 둘 있습니다 (루트가 `0.81.5` 고정, 이 패키지의 peer
-// `~0.81.5`가 `autoInstallPeers`로 `0.81.6`을 끌어옴). preset의 setup.js는 한쪽 사본의
-// native module만 mock 하므로 섞이면 `__fbBatchedBridgeConfig is not set`으로 죽습니다.
-// 근본 해결은 워크스페이스 버전을 하나로 맞추는 것입니다.
-const reactNativeRoot = dirname(require.resolve('react-native/package.json'));
+const { resolve } = require('node:path');
 
 /** RN 소스는 Flow라 반드시 트랜스폼해야 합니다. preset은 이름만 주므로 경로로 고정합니다. */
 const babelPreset = require.resolve('@react-native/babel-preset');
@@ -22,7 +17,7 @@ const exportNamespaceFrom = require.resolve('@babel/plugin-transform-export-name
 
 module.exports = {
   displayName: '@berrypjh/react-native-ui',
-  preset: 'react-native',
+  preset: '@react-native/jest-preset',
   rootDir: __dirname,
   testMatch: ['<rootDir>/src/**/*.test.tsx', '<rootDir>/src/**/*.test.ts'],
 
@@ -38,7 +33,7 @@ module.exports = {
       { babelrc: false, configFile: false, presets: [babelPreset], plugins: [exportNamespaceFrom] },
     ],
     '^.+\\.(bmp|gif|jpg|jpeg|mp4|png|psd|svg|webp)$': require.resolve(
-      'react-native/jest/assetFileTransformer.js',
+      '@react-native/jest-preset/jest/assetFileTransformer.js',
     ),
   },
 
@@ -52,8 +47,10 @@ module.exports = {
   // dist/package.json이 소스 package.json과 haste 이름 충돌을 냅니다.
   modulePathIgnorePatterns: ['<rootDir>/dist/'],
 
+  // `react-native`는 매핑하지 않습니다. preset이 자기가 mock 하는 사본으로 `react-native`와
+  // 하위 경로를 함께 매핑합니다. 여기서 다른 사본을 가리키면 mock 되지 않은 사본이 로드되어
+  // `__fbBatchedBridgeConfig is not set`으로 죽습니다 (pnpm이 peer 조합별로 사본을 따로 깝니다).
   moduleNameMapper: {
-    '^react-native$': reactNativeRoot,
     // 상대 경로로 잡습니다. `require.resolve('@berrypjh/ui-core/…')`를 쓰면 Nx가 이 라이브러리를
     // lazy-loaded로 보고 패키지 안의 모든 정적 import를 module-boundary 위반으로 만듭니다.
     '^@berrypjh/ui-core$': resolve(__dirname, '../ui-core/src/index.ts'),

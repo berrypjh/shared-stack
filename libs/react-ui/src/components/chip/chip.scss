@@ -4,7 +4,7 @@
  * 상태 규칙은 `.ui-chip--interactive`로만 걸어서 passive chip에 hover·pressed·focus가 새지 않는다 — 누를 수 없는 것이 눌릴 것처럼 보이면 안 된다.
  * 상태 색은 서로 배타적이다.
  * `:not()`으로 배제해 어떤 조합에서도 매칭되는 규칙이 정확히 하나가 되게 한다 (Input·Label·Checkbox와 같은 순서: disabled > selected > hover > 평상시).
- * 선언 순서에 기대지 않는 이유는 `styles.ts` 정렬이 바뀌면 조용히 깨지기 때문이다.
+ * 선언 순서에 기대지 않는 이유는 `styles.scss` 정렬이 바뀌면 조용히 깨지기 때문이다.
  * pressed는 색이 아니라 위치다 — `component.pressedOffset`을 쓴다.
  * 이 저장소의 정본 표현이고 `contrast.test.ts`의 `pressed 상태 어휘`가 `color.*pressed*` 토큰 생성을 막는다.
  */

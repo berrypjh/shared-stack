@@ -1,4 +1,4 @@
-import { Native, ThemeName as DefaultTheme, Web } from '@berrypjh/design-tokens';
+import { Native, type ThemeName, Web } from '@berrypjh/design-tokens';
 
 import type { LeafDotPath } from './path';
 
@@ -20,7 +20,7 @@ type WidenLiterals<T> = T extends string
 
 /** 모든 테마(light/dark/sepia 등)의 tokens가 대입 가능한 구조적 RN 토큰 타입 */
 export type RNTokens = WidenLiterals<Native.Light.Tokens>;
-export type ThemeName = DefaultTheme;
+export type { ThemeName };
 
 export type Theme<TTokens> = {
   mode: ThemeName;

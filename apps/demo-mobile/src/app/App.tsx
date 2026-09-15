@@ -1,17 +1,10 @@
 import { useEffect, useState } from 'react';
-import {
-  BackHandler,
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { BackHandler, ScrollView, StatusBar, StyleSheet, Text, View } from 'react-native';
 
 import { ThemeName, ThemeProvider } from '@berrypjh/react-native-ui';
 
 import type { ReactNode } from 'react';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 import { AvatarSection } from './sections/AvatarSection';
 import { BadgeSection } from './sections/BadgeSection';
@@ -155,9 +148,11 @@ export const App = () => {
   const [mode, setMode] = useState<ThemeName>('light');
 
   return (
-    <ThemeProvider mode={mode}>
-      <Screen mode={mode} onChange={setMode} />
-    </ThemeProvider>
+    <SafeAreaProvider>
+      <ThemeProvider mode={mode}>
+        <Screen mode={mode} onChange={setMode} />
+      </ThemeProvider>
+    </SafeAreaProvider>
   );
 };
 

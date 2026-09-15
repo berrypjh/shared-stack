@@ -1,0 +1,43 @@
+// 모든 컴포넌트 SCSS aggregator.
+// 컴포넌트는 `components` 레이어에 둔다 — 레이어 밖 선언은 특정도와 무관하게 레이어 안 선언을 이겨서, 레이어가 없으면 소비자 `className`(Tailwind v4 `utilities`)이 조용히 무시된다.
+// 레이어 순서는 Tailwind v4와 같게 먼저 선언한다 — 소비자가 이 CSS를 Tailwind보다 먼저 불러도 preflight(`base`)가 컴포넌트를 덮지 않는다.
+// 공유 base(selector·CSS 변수 정의)는 이를 덮는 컴포넌트보다 먼저 로드되어야 cascade가 의도대로 동작한다.
+// 알파벳 정렬 시 base가 뒤로 가서 소비자 컴포넌트를 덮어버리는 회귀가 생기므로 수동 정렬을 유지한다.
+@use 'sass:meta';
+
+@layer theme, base, components, utilities;
+
+@layer components {
+  // 1. 공유 base
+  @include meta.load-css('components/button-base/button-base');
+  @include meta.load-css('components/input-base/input-base');
+
+  // 2. 나머지 컴포넌트 (알파벳 순)
+  @include meta.load-css('components/avatar/avatar');
+  @include meta.load-css('components/badge/badge');
+  @include meta.load-css('components/box/box');
+  @include meta.load-css('components/boxed-input/boxed-input');
+  @include meta.load-css('components/button/button');
+  @include meta.load-css('components/checkbox/checkbox');
+  @include meta.load-css('components/chip/chip');
+  @include meta.load-css('components/divider/divider');
+  @include meta.load-css('components/fab/fab');
+  @include meta.load-css('components/filled-input/filled-input');
+  @include meta.load-css('components/form-control/form-control');
+  @include meta.load-css('components/form-helper-text/form-helper-text');
+  @include meta.load-css('components/icon-button/icon-button');
+  @include meta.load-css('components/input-label/input-label');
+  @include meta.load-css('components/list/list');
+  @include meta.load-css('components/plain-input/plain-input');
+  @include meta.load-css('components/popover/popover');
+  @include meta.load-css('components/radio/radio');
+  @include meta.load-css('components/radio/radio-group');
+  @include meta.load-css('components/search-field/search-field');
+  @include meta.load-css('components/segment-control/segment-control');
+  @include meta.load-css('components/select/select');
+  @include meta.load-css('components/skip-link/skip-link');
+  @include meta.load-css('components/switch/switch');
+  @include meta.load-css('components/table/table');
+  @include meta.load-css('components/text-field/text-field');
+  @include meta.load-css('components/visually-hidden/visually-hidden');
+}

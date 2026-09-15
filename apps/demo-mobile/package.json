@@ -7,19 +7,16 @@
   },
   "dependencies": {
     "@berrypjh/react-native-ui": "workspace:*",
-    "@expo/metro-config": "*",
-    "@testing-library/react-native": "*",
-    "expo": "*",
-    "expo-splash-screen": "*",
-    "expo-status-bar": "*",
-    "expo-system-ui": "*",
-    "jest-expo": "*",
-    "metro-config": "*",
-    "metro-resolver": "*",
-    "react": "*",
-    "react-native": "*",
-    "react-native-svg": "*",
-    "react-native-svg-transformer": "*",
-    "react-native-web": "*"
+    "@expo/metro": "~56.0.0",
+    "expo": "~56.0.21",
+    "expo-splash-screen": "~56.0.15",
+    "expo-status-bar": "~56.0.4",
+    "expo-system-ui": "~56.0.5",
+    "react": "19.2.3",
+    "react-native": "0.85.3",
+    "react-native-safe-area-context": "~5.7.0",
+    "react-native-svg": "15.15.4",
+    "react-native-svg-transformer": "~1.5.3",
+    "react-native-web": "~0.21.2"
   }
 }

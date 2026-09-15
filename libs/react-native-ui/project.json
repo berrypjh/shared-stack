@@ -13,6 +13,7 @@
           "find libs/react-native-ui/dist -type f \\( -name '*.d.ts' -o -name '*.d.ts.map' \\) -delete",
           "rm -rf libs/react-native-ui/dist/src libs/react-native-ui/dist/.tsbuildinfo",
           "nx run @berrypjh/react-native-ui:build-types",
+          "tsc -p libs/react-native-ui/tsconfig.dist.json",
           "cp libs/ui-core/dist/tokens.json libs/react-native-ui/dist/tokens.json",
           "cp libs/react-native-ui/AGENTS.consumer.md libs/react-native-ui/dist/AGENTS.md",
           "node -e \"const fs=require('fs'); const p='libs/react-native-ui/dist/package.json'; const j=JSON.parse(fs.readFileSync(p,'utf8')); delete j.exports; delete j.devDependencies; fs.writeFileSync(p, JSON.stringify(j,null,2));\"",
@@ -33,7 +34,7 @@
       "executor": "nx:run-commands",
       "outputs": ["{projectRoot}/dist/index.d.ts"],
       "options": {
-        "command": "dts-bundle-generator --project libs/react-native-ui/tsconfig.rollup.json --no-banner --no-check --external-imports=react --external-imports=react-native --external-imports=react/jsx-runtime -o libs/react-native-ui/dist/index.d.ts libs/react-native-ui/src/index.ts"
+        "command": "dts-bundle-generator --project libs/react-native-ui/tsconfig.dts.json --no-banner --no-check --external-imports=react --external-imports=react-native --external-imports=react/jsx-runtime -o libs/react-native-ui/dist/index.d.ts libs/react-native-ui/src/index.ts"
       }
     },
     "test": {

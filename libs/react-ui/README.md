@@ -111,6 +111,8 @@ export default {
 };
 ```
 
+`styles.css`는 컴포넌트를 `@layer components`에 둡니다 (순서 `theme, base, components, utilities`). 그래서 import 순서와 상관없이 Tailwind 유틸리티 `className`이 컴포넌트 스타일을 덮습니다. 레이어 밖에 쓴 CSS도 컴포넌트를 이기므로 전역 리셋은 `@layer base`에 두세요.
+
 ## Export 경로
 
 | 경로                            | 용도                                     |

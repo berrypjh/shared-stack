@@ -131,7 +131,6 @@
       "@berrypjh/eslint-config"
     ],
     "projectsRelationship": "fixed",
-    "releaseTagPattern": "v{version}",
     "version": {
       "conventionalCommits": true,
       "fallbackCurrentVersionResolver": "disk",
@@ -156,6 +155,9 @@
         "commit": true,
         "tag": true
       }
+    },
+    "releaseTag": {
+      "pattern": "v{version}"
     }
   },
   "targetDefaults": {
@@ -205,5 +207,6 @@
         "style": "tailwind"
       }
     }
-  }
+  },
+  "analytics": false
 }

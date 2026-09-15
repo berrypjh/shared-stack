@@ -31,7 +31,7 @@
 
 ```bash
 pnpm add @berrypjh/react-ui         # peer: react ^19, react-dom ^19
-pnpm add @berrypjh/react-native-ui  # peer: react ^19, react-native ~0.81.5
+pnpm add @berrypjh/react-native-ui  # peer: react ^19, react-native ~0.85.3
 ```
 
 ## 공유 설정 패키지

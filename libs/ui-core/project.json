@@ -42,11 +42,6 @@
         "configFile": "libs/ui-core/vitest.config.mts",
         "watch": false,
         "reportsDirectory": "libs/ui-core/test-output/vitest/coverage"
-      },
-      "configurations": {
-        "ci": {
-          "runMode": "run"
-        }
       }
     }
   },
