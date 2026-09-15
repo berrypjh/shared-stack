@@ -24,7 +24,7 @@
           "nx run @berrypjh/react-ui:bundle-js",
           "find libs/react-ui/dist -type f \\( -name '*.d.ts' -o -name '*.d.ts.map' \\) -delete",
           "rm -rf libs/react-ui/dist/src",
-          "node -e \"const fs=require('fs'); const tokens=fs.readFileSync('libs/ui-core/dist/css/index.css','utf8'); const styles=fs.readFileSync('libs/react-ui/dist/index.css','utf8'); fs.writeFileSync('libs/react-ui/dist/index.css', tokens+'\\n'+styles);\"",
+          "node -e \"const fs=require('fs'); const tokens=fs.readFileSync('libs/ui-core/dist/css/index.css','utf8'); const styles=fs.readFileSync('libs/react-ui/dist/index.css','utf8').replace(/^@charset[^;]*;\\n/gm,''); fs.writeFileSync('libs/react-ui/dist/index.css', '@layer theme, base, components, utilities;\\n@layer theme {\\n'+tokens+'}\\n'+styles);\"",
           "cp libs/ui-core/dist/tailwind.js libs/react-ui/dist/tailwind.js",
           "cp libs/ui-core/dist/tailwind.d.ts libs/react-ui/dist/tailwind.d.ts",
           "cp libs/ui-core/dist/tokens.json libs/react-ui/dist/tokens.json",

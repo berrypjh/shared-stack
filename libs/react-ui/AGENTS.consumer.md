@@ -19,7 +19,7 @@ import { Button, TextField, ThemeProvider } from '@berrypjh/react-ui';
 </ThemeProvider>;
 ```
 
-서버 컴포넌트(Next.js App Router): `cx`·`themes`·`Web`·`ThemeProvider`는 서버에서 import·호출할 수 있다. 나머지 컴포넌트는 `'use client'` 모듈이라 서버에서는 client reference로 렌더된다 — 서버 파일에서 JSX로 쓰되 함수 prop(`onClick` 등)은 넘기지 않는다.
+서버 컴포넌트(Next.js App Router): `cx`·`themes`·`Web`·`ThemeProvider`·`VisuallyHidden`은 서버에서 import·호출할 수 있다. 나머지 컴포넌트는 `'use client'` 모듈이라 서버에서는 client reference로 렌더된다 — 서버 파일에서 JSX로 쓰되 함수 prop(`onClick` 등)은 넘기지 않는다.
 
 ```js
 // 3. (선택) Tailwind preset 연결
@@ -163,6 +163,36 @@ RN transform을 거친 숫자 트리다. web은 CSS 변수와 `Web` 네임스페
 ```
 
 `@config`는 v3 호환 directive — IDE의 "Unknown at rule" 경고는 무시 가능 (PostCSS 빌드는 정상).
+
+## 스타일 덮어쓰기 (cascade layer)
+
+`styles.css`는 Tailwind v4와 같은 레이어 순서를 먼저 선언하고, 토큰은 `theme`, 컴포넌트는 `components`에 둔다.
+
+```css
+@layer theme, base, components, utilities;
+```
+
+- Tailwind 유틸리티가 컴포넌트를 특정도와 무관하게 이긴다 — `<List className="pl-3">`, `<Divider className="border-dashed">`가 그대로 적용된다.
+- `styles.css`와 `@import 'tailwindcss'`의 import 순서는 결과를 바꾸지 않는다. preflight(`base`)는 컴포넌트를 덮지 않는다.
+- 레이어 밖에 쓴 소비자 CSS도 컴포넌트를 이긴다. 전역 `button { … }` 같은 리셋은 `@layer base` 안에 둔다.
+
+### Chip 색
+
+색 prop은 없다. 루트에 CSS 변수를 줘서 바꾼다 — 이것이 공식 확장점이다.
+
+| 변수                                                            | 적용                      |
+| --------------------------------------------------------------- | ------------------------- |
+| `--ui-chip-surface` · `--ui-chip-border-color` · `--ui-chip-fg` | 평상시 면 · 테두리 · 글자 |
+| `--ui-chip-surface-hover` · `--ui-chip-border-hover`            | interactive hover         |
+| `--ui-chip-surface-selected` · `--ui-chip-border-selected`      | interactive `selected`    |
+
+```tsx
+<Chip className="[--ui-chip-fg:var(--ds-text-error)] [--ui-chip-border-color:var(--ds-stroke-error)]">
+  긴급
+</Chip>
+```
+
+값은 토큰(`var(--ds-*)`)을 쓴다. disabled 색과 forced-colors(고대비) 색은 변수를 읽지 않아 덮이지 않는다.
 
 ## 카탈로그 (`dist/llm-catalog.json`, `dist/tokens.json`)
 

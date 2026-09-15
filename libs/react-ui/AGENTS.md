@@ -14,7 +14,8 @@
 ```
 src/
   index.ts                 public re-export (components/theme + ui-core 패스스루)
-  styles.ts                모든 컴포넌트 SCSS aggregator (rollup-plugin-postcss가 dist/index.css로 추출)
+  styles.ts                스타일 side-effect 진입점 (`styles.scss` import만)
+  styles.scss              모든 컴포넌트 SCSS aggregator — 로드 순서 + `@layer components` (rollup-plugin-postcss가 dist/index.css로 추출)
   global.d.ts              SCSS 모듈 declaration
   components/
     <name>/<Name>.tsx      구현
@@ -46,14 +47,14 @@ src/
 
 ## 작업 매트릭스
 
-| 작업               | 수정 파일                                                                                          |
-| ------------------ | -------------------------------------------------------------------------------------------------- |
-| 새 컴포넌트        | `components/<name>/{<Name>.tsx, .types.ts, .scss, index.ts}` + `components/index.ts` + `styles.ts` |
-| 컴포넌트 prop 변경 | 해당 `<Name>.types.ts` (시맨틱 계약 변경이면 `src/types/<name>.ts` 먼저)                           |
-| 새 SCSS 파일       | 해당 컴포넌트 폴더 + `src/styles.ts` import 추가                                                   |
-| 토큰 사용          | `getColor` (JSX) / Tailwind class / SCSS의 `var(--color-...)`                                      |
-| 테마 동작 변경     | `theme/ThemeProvider.tsx` (`data-theme` 적용 정책)                                                 |
-| Storybook 추가     | `<Name>.stories.tsx` (publish 안 됨)                                                               |
+| 작업               | 수정 파일                                                                                            |
+| ------------------ | ---------------------------------------------------------------------------------------------------- |
+| 새 컴포넌트        | `components/<name>/{<Name>.tsx, .types.ts, .scss, index.ts}` + `components/index.ts` + `styles.scss` |
+| 컴포넌트 prop 변경 | 해당 `<Name>.types.ts` (시맨틱 계약 변경이면 `src/types/<name>.ts` 먼저)                             |
+| 새 SCSS 파일       | 해당 컴포넌트 폴더 + `src/styles.scss`에 `meta.load-css` 추가                                        |
+| 토큰 사용          | `getColor` (JSX) / Tailwind class / SCSS의 `var(--color-...)`                                        |
+| 테마 동작 변경     | `theme/ThemeProvider.tsx` (`data-theme` 적용 정책)                                                   |
+| Storybook 추가     | `<Name>.stories.tsx` (publish 안 됨)                                                                 |
 
 ## 빌드 / 테스트
 
@@ -68,10 +69,11 @@ pnpm build-storybook @berrypjh/react-ui   # static storybook
 
 ## Gotcha
 
-- **`use client` 디렉티브**: React client API(hook·`createContext`)를 쓰는 모듈은 최상단에 `'use client';`를 둔다 — Context 파일과 커스텀 hook 포함. rollup은 이 디렉티브를 지우고(`Module level directives ... ignored` 경고), `rollup.config.cjs`가 그 모듈의 청크 1행에 다시 붙인다. 빠뜨리면 RSC 서버에서 그 청크가 평가돼 `createContext only works in Client Components`로 깨진다. 디렉티브 없는 모듈(`cx`·`themes`·`Web`·`ThemeProvider`)은 서버 컴포넌트에서 그대로 실행된다.
+- **`use client` 디렉티브**: React client API(hook·`createContext`)를 쓰는 모듈은 최상단에 `'use client';`를 둔다 — Context 파일과 커스텀 hook 포함. rollup은 이 디렉티브를 지우고(`Module level directives ... ignored` 경고), `rollup.config.cjs`가 그 모듈의 청크 1행에 다시 붙인다. 빠뜨리면 RSC 서버에서 그 청크가 평가돼 `createContext only works in Client Components`로 깨진다. 디렉티브 없는 모듈(`cx`·`themes`·`Web`·`ThemeProvider`·`VisuallyHidden`)은 서버 컴포넌트에서 그대로 실행된다.
 - **dts-bundle-generator는 surface 동결**: re-export하지 않은 타입은 `--export-referenced-types`가 아무리 떠도 dist에 포함 안 됨. 다운스트림에서 필요하면 `src/index.ts`에 명시.
 - **ui-core 직접 import 금지**: 외부에서 `@berrypjh/ui-core`를 import하라고 안내 X. react-ui가 캡슐화 — ui-core export는 react-ui index를 통해 패스스루.
-- **`components/index.ts`·`styles.ts` 동기화**: 새 컴포넌트는 두 곳에 등록해야 SCSS도 dist/index.css에 들어감.
+- **`components/index.ts`·`styles.scss` 동기화**: 새 컴포넌트는 두 곳에 등록해야 SCSS도 dist/index.css에 들어감. `styles.scss`에는 `@layer components` 블록 안에 `meta.load-css`로 넣는다.
+- **cascade 레이어**: `styles.scss`가 Tailwind v4 순서(`@layer theme, base, components, utilities;`)를 선언하고 컴포넌트를 `components`에 넣는다. `build-js`는 ui-core 토큰을 `@layer theme`으로 감싸 앞에 붙이고, 토큰 뒤로 밀려 무효가 된 `@charset`을 지운다. 레이어 밖 선언은 특정도와 무관하게 레이어 안 선언을 이기므로, 컴포넌트 규칙이 레이어를 벗어나면 소비자 Tailwind `className`이 조용히 무시된다.
 - **conformance 테스트**: `test-utils/describeConformance`가 root class·prop spread·ref forwarding·polymorphic·className merge를 확인. props 패턴 바꾸면 같이 갱신.
 - **스토리와 `.storybook/`도 typecheck 대상이다**: 둘은 `tsconfig.lib.json`·`tsconfig.spec.json` 어디에도 없어서, `tsconfig.storybook.json`을 돌리지 않으면 타입 오류가 CI 어디에서도 걸리지 않는다 (Storybook 빌더는 vite/esbuild라 타입을 지우고 지나간다 — 빌드 성공이 타입 검사를 대신하지 못한다). 테스트 파일도 같다 — vitest 는 타입을 지우고 돌아서 `@ts-expect-error` 로 적은 타입 수준 계약이 `tsconfig.spec.json` 없이는 아무 데서도 검사되지 않는다. `typecheck` 타깃이 lib → storybook → spec 세 tsc를 순서대로 도는 이유다 (ui-core 와 같은 관례).
 - **forced-colors에서 `box-shadow`는 렌더되지 않는다**: Windows 고대비 모드는 저자 색을 시스템 색으로 갈아끼우고 `box-shadow`를 지운다(CSS Color Adjust 1). 그래서 halo·링·밑줄을 box-shadow로만 그리면 그 모드에서 사라지고, 테두리 색 변화도 평상시와 같은 색으로 평탄화된다. **포커스를 box-shadow로 그리는 새 규칙에는 `@media (forced-colors: active)` outline 대응을 함께 둔다** — `outline`은 그 모드에서도 남는다. `src/components/forcedColors.test.ts`가 규칙 자체를 검사하므로 variant를 더하면 목록 수정 없이 걸린다. 그 블록 안의 `Highlight`·`ButtonBorder`는 CSS 시스템 색 키워드지 하드코딩이 아니다 — 그 모드의 팔레트는 OS가 소유해서 토큰을 써도 무시된다. 길이는 강제되지 않으므로 토큰을 그대로 쓴다.
@@ -89,4 +91,5 @@ pnpm build-storybook @berrypjh/react-ui   # static storybook
 - [ ] accessibility 회귀 없는가? (keyboard/focus/aria)
 - [ ] 토큰 사용 — 하드코딩 색/spacing/radius 없는가?
 - [ ] storybook stories·conformance test가 의도를 표현하는가?
-- [ ] `components/index.ts` + `styles.ts` 동기화했는가?
+- [ ] `components/index.ts` + `styles.scss` 동기화했는가?
+- [ ] 새 컴포넌트 규칙이 `@layer components` 안에 들어가는가? (소비자 `className` 덮어쓰기)

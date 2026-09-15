@@ -29,7 +29,7 @@ const JUSTIFY_CONTENT = {
  * 면·여백·모서리는 Box가 가지므로 여기서 복제하지 않는다.
  * 둘 다 필요하면 `<Box p="lg"><Stack gap="md">…</Stack></Box>`로 겹쳐 쓴다.
  * 스타일시트가 없다.
- * 레이아웃이 전부 계산된 inline style이라 SCSS 파일도 `styles.ts` 등록도 필요 없다 — 모듈 부작용을 늘리지 않는 쪽이 tree-shaking에 낫다.
+ * 레이아웃이 전부 계산된 inline style이라 SCSS 파일도 `styles.scss` 등록도 필요 없다 — 모듈 부작용을 늘리지 않는 쪽이 tree-shaking에 낫다.
  * `.ui-stack`은 소비자가 붙잡을 수 있는 이름일 뿐 규칙을 갖지 않는다.
  * `flex-direction`은 항상 내보낸다.
  * CSS 기본값은 `row`인데 계약 기본값은 `column`이라 (RN Yoga 기본값과 맞춘다) 브라우저 기본값에 기대면 두 렌더러가 갈린다.
