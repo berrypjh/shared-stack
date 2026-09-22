@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <title>Shared Stack DevHub</title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="data:," />
+
+    <!-- 저장된 테마, 없으면 OS 설정을 첫 paint 전에 적용한다 (src/app/theme/theme.ts 와 같은 키). -->
+    <script>
+      (function () {
+        var mode;
+        try {
+          mode = localStorage.getItem('devhub-theme');
+        } catch (e) {}
+        if (mode !== 'light' && mode !== 'dark') {
+          mode = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        document.documentElement.dataset.theme = mode;
+      })();
+    </script>
+
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

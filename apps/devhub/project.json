@@ -1,0 +1,44 @@
+{
+  "name": "@berrypjh/devhub",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "apps/devhub/src",
+  "projectType": "application",
+  "tags": [],
+  "targets": {
+    "typecheck": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["^build"],
+      "options": {
+        "commands": ["tsc --noEmit -p tsconfig.app.json", "tsc --noEmit -p tsconfig.spec.json"],
+        "parallel": false,
+        "cwd": "apps/devhub"
+      }
+    },
+    "build": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "production",
+        "^production",
+        "{workspaceRoot}/**/*",
+        {
+          "runtime": "git rev-parse HEAD"
+        },
+        {
+          "runtime": "git status --porcelain"
+        }
+      ],
+      "options": {
+        "env": {
+          "NODE_ENV": "production"
+        }
+      }
+    },
+    "serve": {
+      "dependsOn": ["^build"]
+    },
+    "test": {
+      "dependsOn": ["^build"],
+      "inputs": ["default", "^production", "{workspaceRoot}/**/*"]
+    }
+  }
+}

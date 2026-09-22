@@ -1,0 +1,13 @@
+{
+  "name": "@berrypjh/devhub",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "@berrypjh/devhub-ui": "workspace:*",
+    "@berrypjh/react-ui": "workspace:*",
+    "react": "*",
+    "react-dom": "19.2.3",
+    "react-router-dom": "6.29.0",
+    "tailwindcss": "^4.0.0"
+  }
+}
