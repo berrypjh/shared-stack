@@ -45,6 +45,12 @@ const PUBLISHED: Published[] = [
     ],
   },
   {
+    id: '@berrypjh/devhub-ui',
+    root: 'libs/devhub-ui',
+    subpaths: ['.', './styles.css'],
+    artifacts: ['dist/index.d.ts', 'dist/index.js', 'dist/styles.css'],
+  },
+  {
     id: '@berrypjh/react-native-ui',
     root: 'libs/react-native-ui',
     subpaths: ['./package.json', '.', './catalog', './tokens', './agents'],
@@ -270,6 +276,7 @@ describe('게시되는 선언은 private 패키지를 요구하지 않는다', (
   it.each([
     ['@berrypjh/react-native-ui', 'libs/react-native-ui/dist/index.d.ts'],
     ['@berrypjh/react-ui', 'libs/react-ui/dist/types/index.d.ts'],
+    ['@berrypjh/devhub-ui', 'libs/devhub-ui/dist/index.d.ts'],
   ])('%s 선언에 private import 가 없다', async (_id, relative) => {
     const text = await fs.readFile(path.join(REPO_ROOT, relative), 'utf8');
     const offenders = text
@@ -283,6 +290,7 @@ describe('게시되는 선언은 private 패키지를 요구하지 않는다', (
   it.each([
     ['@berrypjh/react-native-ui', 'libs/react-native-ui/dist/index.d.ts'],
     ['@berrypjh/react-ui', 'libs/react-ui/dist/types/index.d.ts'],
+    ['@berrypjh/devhub-ui', 'libs/devhub-ui/dist/index.d.ts'],
   ])('%s 선언에 로컬 절대 경로가 없다', async (_id, relative) => {
     const text = await fs.readFile(path.join(REPO_ROOT, relative), 'utf8');
 
