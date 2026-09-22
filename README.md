@@ -12,6 +12,7 @@
 | ----------------------------------------------------------------- | --------------------- |
 | [`@berrypjh/react-ui`](libs/react-ui/README.md)                   | React 웹 컴포넌트     |
 | [`@berrypjh/react-native-ui`](libs/react-native-ui/README.md)     | React Native 컴포넌트 |
+| [`@berrypjh/devhub-ui`](libs/devhub-ui/README.md)                 | DevHub 공용 화면      |
 | [`@berrypjh/eslint-config`](libs/eslint-config/README.md)         | 공유 ESLint 설정      |
 | [`@berrypjh/prettier-config`](libs/prettier-config/README.md)     | 공유 Prettier 설정    |
 | [`@berrypjh/tsconfig`](libs/tsconfig/README.md)                   | 공유 TypeScript 설정  |
@@ -97,6 +98,7 @@ libs/
 ├── design-tokens/        # 디자인 토큰 (CSS 변수, Tailwind, RN, 내부)
 ├── react-ui/             # React 컴포넌트 라이브러리 (Web)
 ├── react-native-ui/      # React Native 컴포넌트 라이브러리 (Mobile)
+├── devhub-ui/            # DevHub 앱 공용 화면 (셸·그림·markdown·검색, 공개)
 ├── eslint-config/        # 공유 ESLint 설정
 ├── prettier-config/      # 공유 Prettier 설정
 ├── tsconfig/             # 공유 TypeScript 설정
@@ -106,6 +108,8 @@ libs/
 apps/
 ├── demo-web/             # 웹 라이브러리 데모 (React + Vite)
 ├── demo-mobile/          # 모바일 라이브러리 데모 (Expo)
+├── devhub/               # 저장소 구조·근거 탐색기 (Vite)
+├── devhub-e2e/           # devhub E2E 테스트 (Playwright)
 ├── quality-lab/          # 품질 수집 결과 뷰어 (Vite)
 └── quality-lab-e2e/      # quality-lab E2E 테스트 (Playwright)
 
@@ -135,6 +139,7 @@ tools/
 | `pnpm ui:lookup`     | 플랫폼·심볼·토큰 조회 CLI                                                       |
 | `pnpm size`          | 라이브러리 번들 크기 검사 (size-limit, `build:libs` 선행 필요)                  |
 | `pnpm quality:lab`   | quality-lab 실행                                                                |
+| `pnpm devhub`        | devhub 실행                                                                     |
 
 ### 기술 스택
 

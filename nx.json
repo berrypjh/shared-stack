@@ -122,6 +122,7 @@
   "release": {
     "projects": [
       "@berrypjh/react-ui",
+      "@berrypjh/devhub-ui",
       "@berrypjh/ui-core",
       "@berrypjh/design-tokens",
       "@berrypjh/react-native-ui",
@@ -177,7 +178,9 @@
       "inputs": [
         "default",
         "^production",
-        { "externalDependencies": ["storybook", "@storybook/test-runner"] }
+        {
+          "externalDependencies": ["storybook", "@storybook/test-runner"]
+        }
       ]
     },
     "test": {

@@ -24,15 +24,19 @@ Agents must optimize for:
 
 - `apps/demo-mobile`: Expo / React Native demo app
 - `apps/demo-web`: React + Vite demo app
+- `apps/devhub`: private Vite app for exploring the repository's structure and evidence; separate from `quality-lab`
+- `apps/devhub-e2e`: Playwright E2E tests for `devhub`
 - `apps/quality-lab`: private Vite app that displays exported quality-collection results after validating them against `observability-contracts`
 - `apps/quality-lab-e2e`: Playwright E2E tests for `quality-lab`
 - `libs/design-tokens`: design token sources, transforms, and generated outputs
 - `libs/ui-core`: platform-agnostic contracts, shared logic, and foundational utilities
 - `libs/react-ui`: React web UI component library
 - `libs/react-native-ui`: React Native UI component library
+- `libs/devhub-ui`: published shell, canvas, markdown, search and theme components shared by the DevHub apps of this and other repositories; router-agnostic via `DevHubProvider`
 - `libs/observability-contracts`: private zod schemas shared by the quality-lab collectors and app; not released
 - `libs/{eslint,prettier,tsconfig,commitlint}-config`: shared configuration packages consumed by downstream repositories
 - `docs/quality-lab`: quality-lab architecture, metrics, collectors, verification, and limitations
+- `docs/records`: dated development records (decisions, fixes, implementations), one file each, registered in `devhub`'s catalog and shown in its "기록" view
 - `plugins/berry-commit`: Claude Code plugin (`commit-scope` skill + `commit-mcp` MCP server), distributed through `.claude-plugin/marketplace.json`
 - `tools/lib`: helpers shared across tools (for example token counting)
 - `tools/scripts`: build and measurement scripts — token measurement, tree-shaking check, release, the generated consumer catalog, and the quality-lab observability collectors (`tools/scripts/observability`)

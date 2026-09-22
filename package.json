@@ -10,6 +10,7 @@
     "build:libs:web": "nx run-many -t build --projects=@berrypjh/design-tokens,@berrypjh/ui-core,@berrypjh/react-ui",
     "build:mcp:commit": "nx run commit-mcp:build",
     "catalog:gen": "tsx tools/scripts/generate-consumer-catalog/index.ts",
+    "devhub": "nx serve @berrypjh/devhub",
     "eval:consumer:context": "tsx tools/evals/consumer/runner/run.ts --context-only",
     "eval:consumer:dev": "tsx tools/evals/consumer/runner/run.ts --split=dev",
     "eval:consumer:routing": "tsx tools/evals/consumer/runner/run.ts --routing-only",
