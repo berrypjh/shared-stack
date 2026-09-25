@@ -1,7 +1,6 @@
 # measure-tokens
 
-패키지를 AI 에이전트가 분석할 때 소비하는 input 토큰 수를 시나리오별로 측정한다.
-Anthropic·OpenAI 두 모델군을 같은 시나리오로 비교해 문서·카탈로그 변경의 효과를 수치로 검증.
+패키지를 AI 에이전트가 분석할 때 소비하는 input 토큰 수를 시나리오별로 측정한다. Anthropic · OpenAI 두 모델군을 같은 시나리오로 비교해 문서 · 카탈로그 변경의 효과를 수치로 검증.
 
 ## 측정 대상 (target)
 
@@ -25,18 +24,15 @@ Anthropic·OpenAI 두 모델군을 같은 시나리오로 비교해 문서·카�
 | `api-catalog-only` | `dist/llm-catalog.json` (생성된 public API 사실) |
 | `agents+*`         | 위 둘의 조합                                     |
 
-## ⚠️ 알려진 제약
+## 알려진 제약
 
-`design-tokens`와 `ui-core` target은 **현재 실패한다.** 두 시나리오 모두 `dist/AGENTS.md`를
-읽는데, 그 파일을 만드는 단계가 없기 때문이다 — `dist/AGENTS.md`는 `react-ui`/`react-native-ui`
-build가 각자의 `AGENTS.consumer.md`를 복사해 만들고, 두 private 패키지에는 소비자 문서 자체가 없다.
+`design-tokens`와 `ui-core` target은 **현재 실패한다.** 두 시나리오 모두 `dist/AGENTS.md`를 읽는데, 그 파일을 만드는 단계가 없기 때문이다 — `dist/AGENTS.md`는 `react-ui`/`react-native-ui` build가 각자의 `AGENTS.consumer.md`를 복사해 만들고, 두 private 패키지에는 소비자 문서 자체가 없다.
 
 ```
 Error: missing file dist/AGENTS.md — build the target package first.
 ```
 
-고치려면 둘 중 하나가 필요하다: 해당 패키지에 `AGENTS.consumer.md`를 두고 build에 복사 단계를
-추가하거나, `shared.ts`에서 그 시나리오를 빼는 것. 어느 쪽도 아직 하지 않았다.
+고치려면 둘 중 하나가 필요하다: 해당 패키지에 `AGENTS.consumer.md`를 두고 build에 복사 단계를 추가하거나, `shared.ts`에서 그 시나리오를 빼는 것. 어느 쪽도 아직 하지 않았다.
 
 `react-ui` / `react-native-ui` target은 정상 동작한다.
 
@@ -49,8 +45,7 @@ Error: missing file dist/AGENTS.md — build the target package first.
 | `pnpm react-ui:measure`        | Anthropic + OpenAI | react-ui        |
 | `pnpm react-native-ui:measure` | Anthropic + OpenAI | react-native-ui |
 
-네 스크립트 모두 `all.ts`(두 provider 동시)를 실행한다. Anthropic 칸은 `ANTHROPIC_API_KEY`가
-있을 때만 채워지고, 없으면 `—`로 표시된다.
+네 스크립트 모두 `all.ts`(두 provider 동시)를 실행한다. Anthropic 칸은 `ANTHROPIC_API_KEY`가 있을 때만 채워지고, 없으면 `—`로 표시된다.
 
 단일 provider 스크립트는 `package.json`에 등록되어 있지 않다. 필요하면 직접 호출한다:
 
@@ -129,14 +124,11 @@ measure-tokens/
   openai.ts       OpenAI tiktoken 로컬 인코딩
 ```
 
-토큰 카운팅 구현은 `tools/lib/token-count.ts` 하나를 공유한다. `tools/evals/consumer`도
-같은 모듈을 쓴다 — 중복 구현 없음.
+토큰 카운팅 구현은 `tools/lib/token-count.ts` 하나를 공유한다. `tools/evals/consumer`도 같은 모듈을 쓴다 — 중복 구현 없음.
 
 ## 정적 측정 vs task 단위 측정
 
-여기서 재는 것은 **파일을 통째로 읽었을 때의 정적 토큰 수**다.
-실제 task 하나가 소비하는 컨텍스트는 `pnpm eval:consumer:context`가 따로 잰다
-(`tools/evals/consumer` 참조). 두 숫자는 목적이 달라 직접 비교하지 않는다.
+여기서 재는 것은 **파일을 통째로 읽었을 때의 정적 토큰 수**다. 실제 task 하나가 소비하는 컨텍스트는 `pnpm eval:consumer:context`가 따로 잰다 (`tools/evals/consumer` 참조). 두 숫자는 목적이 달라 직접 비교하지 않는다.
 
 ## 새 패키지 추가
 
@@ -152,7 +144,6 @@ measure-tokens/
 },
 ```
 
-시나리오가 참조하는 파일은 **실제로 build가 만드는 것**이어야 한다. 없는 파일을 넣으면
-그 target 전체가 실패한다 (위 "알려진 제약" 참조).
+시나리오가 참조하는 파일은 **실제로 build가 만드는 것**이어야 한다. 없는 파일을 넣으면 그 target 전체가 실패한다 (위 "알려진 제약" 참조).
 
 `package.json` 스크립트도 추가 (또는 `MEASURE_TARGET=my-pkg`로 직접 호출).

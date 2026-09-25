@@ -37,8 +37,7 @@ all-exports (baseline)     148,910     8,423         —
 tree-shaking 효과: 단일 심볼(createTheme)은 전체 대비 raw 99.5% 작음
 ```
 
-ui-core는 side-effect 없는 타입·토큰 계층이라 단일 심볼이 거의 빈 번들 수준이다.
-baseline이 큰 것은 전체 export가 테마별 토큰 트리를 전부 끌고 오기 때문.
+ui-core는 side-effect 없는 타입 · 토큰 계층이라 단일 심볼이 거의 빈 번들 수준이다. baseline이 큰 것은 전체 export가 테마별 토큰 트리를 전부 끌고 오기 때문.
 
 ### 한계가 보이는 케이스 (react-ui)
 
@@ -61,7 +60,7 @@ all-exports (baseline)           86,916    14,508         —
 
 **관찰**:
 
-- 어떤 컴포넌트 하나만 import해도 **34KB 동일** — Box/Button/TextField 다 같은 사이즈
+- 어떤 컴포넌트 하나만 import해도 **34KB 동일** — Box/Button/TextField다 같은 사이즈
 - 세 개 동시 import해도 거의 안 늘어남 (34,187 bytes)
 
 **원인**: `libs/react-ui/package.json`의 `sideEffects: ["**/*.css", "**/*.scss"]`로 SCSS import는 side-effect로 보존됨. `src/index.ts`가 맨 위에서 `import './styles'`로 17개 SCSS 파일을 한 번에 import. 한 컴포넌트만 써도 styles 모듈이 evaluate되며 그 안의 transitive JS가 따라옴.
@@ -87,11 +86,11 @@ all-exports (baseline)           86,916    14,508         —
    --external:react --external:react-dom --external:react/jsx-runtime
    ```
 
-3. stdout으로 받은 코드를 `Buffer.byteLength` (raw) + `zlib.gzipSync` (gzip)로 측정.
+3. stdout으로 받은 코드를 `Buffer.byteLength` (raw) + `zlib.gzipSync` (gzip)로 측정
 
-4. "전체 export" 베이스라인은 `export * from 'pkg'`로 만들어 트리셰이킹을 최대한 무력화.
+4. "전체 export" 베이스라인은 `export * from 'pkg'`로 만들어 트리셰이킹을 최대한 무력화
 
-5. 비율 계산: `(1 - single / all) * 100`.
+5. 비율 계산: `(1 - single / all) * 100`
 
 ## 출력 컬럼
 
