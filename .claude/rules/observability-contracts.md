@@ -1,17 +1,20 @@
-# observability-contracts
+---
+paths:
+  - 'libs/observability-contracts/**'
+---
 
-## 왜 있나
+# observability-contracts (`libs/observability-contracts`)
 
-quality-lab 수집기(Node)와 화면(브라우저)이 **같은 schema 한 벌**로 artifact 를 검증하게 한다.
-private 이고 release 대상이 아니다.
+zod. quality-lab 수집기(Node)와 화면(브라우저)이 **같은 schema 한 벌**로 artifact를 검증하게 하는 계약 패키지다.
 
-## 절대 원칙
+**private이고 release 대상이 아니다.**
 
-- 의존은 `zod` 하나. React·Node·DOM·Style Dictionary·metric grader 를 import 하지 않는다
-  (`tsconfig.lib.json` 의 `lib: es2022`, `types: []` 가 막는다).
-- 타입은 schema 에서 도출한다. 손으로 쓴 중복 타입을 두지 않는다.
-- 값이 없으면 `null` + 이유다. 0·pass 로 바꾸는 기본값을 넣지 않는다.
-- 출처를 모르면 `null` 이 아니라 `'unknown'` 이다.
+## 원칙
+
+- **의존은 `zod` 하나다.** React · Node · DOM · Style Dictionary · metric grader를 import하지 않는다 (`tsconfig.lib.json`의 `lib: es2022`, `types: []`가 막는다)
+- **타입은 schema에서 도출한다.** 손으로 쓴 중복 타입을 두지 않는다
+- **값이 없으면 `null` + 이유다.** 0 · pass로 바꾸는 기본값을 넣지 않는다
+- **출처를 모르면 `null`이 아니라 `'unknown'`이다**
 
 ## 파일
 
@@ -33,8 +36,7 @@ src/
 tests/             test 전용 fixture 와 schema test
 ```
 
-- **비교는 보고 전용이다.** 통과·실패 threshold·통계 검정을 만들지 않는다. 모르는 조건(eval model 설정·
-  timeout·task 부분집합)은 unknown 이고, evaluator 의 원래 비교(`originalComparison`)는 대시보드 판정과 따로 둔다.
+- **비교는 보고 전용이다.** 통과 · 실패 threshold · 통계 검정을 만들지 않는다. 모르는 조건(eval model 설정 · timeout · task 부분집합)은 unknown이고, evaluator의 원래 비교(`originalComparison`)는 대시보드 판정과 따로 둔다
 
 ## 검증
 
@@ -46,6 +48,5 @@ pnpm nx build @berrypjh/observability-contracts   # tools·앱이 dist 를 읽�
 
 ## Gotcha
 
-- **exports 에 `default` 조건이 있다.** tools 는 `tsx` 에서 CommonJS 로 로드되어 `import` 조건만으로는
-  해석되지 않는다. dist 는 ESM 이고 Node 의 `require(esm)` 로 읽힌다.
-- schema 를 바꾸면 `dist` 를 다시 build 해야 tools·앱이 새 schema 를 본다.
+- **exports에 `default` 조건이 있다.** tools는 `tsx`에서 CommonJS로 로드되어 `import` 조건만으로는 해석되지 않는다. dist는 ESM이고 Node의 `require(esm)`로 읽힌다
+- schema를 바꾸면 `dist`를 다시 build해야 tools · 앱이 새 schema를 본다

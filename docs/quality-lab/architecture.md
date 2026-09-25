@@ -18,7 +18,7 @@ tools/scripts/observability     apps/quality-lab (Vite SPA)
 - `tmp/quality-lab`과 `apps/quality-lab/public/observability`는 gitignore 대상이다
 - E2E는 `apps/quality-lab-e2e`(implicit dependency → quality-lab)가 따로 한다. 앱 소스를 import하지 않는다
 
-같은 폴더의 문서: [metrics.md](./metrics.md) (metric · 단위 · 분모 · 호환) · [collectors.md](./collectors.md) (profile · 입력 · store) · [verification.md](./verification.md) (gate · 최근 결과) · [limitations.md](./limitations.md). 사용법은 [apps/quality-lab/README.md](../../apps/quality-lab/README.md).
+같은 폴더의 문서: [metrics.md](./metrics.md) (metric · 단위 · 분모 · 호환) · [collectors.md](./collectors.md) (profile · 입력 · store) · [verification.md](./verification.md) (gate · 최근 결과) · [limitations.md](./limitations.md). 사용법은 [usage.md](./usage.md).
 
 ## 실행 순서
 

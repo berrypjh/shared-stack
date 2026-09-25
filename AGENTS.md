@@ -1,6 +1,6 @@
 # shared-stack — 크로스 플랫폼 UI 시스템
 
-> `CLAUDE.md`가 `@AGENTS.md`로 이 파일을 불러온다. 에이전트 지침의 단일 출처는 이 파일이다. 하위 프로젝트의 `CLAUDE.md`도 같은 방식이며, 지침은 `CLAUDE.md`가 아니라 `AGENTS.md`에 쓴다.
+> `CLAUDE.md`가 `@AGENTS.md`로 이 파일을 불러온다. 에이전트 지침의 단일 출처는 이 파일이다. 지침은 `CLAUDE.md`가 아니라 `AGENTS.md`에 쓴다.
 
 디자인 토큰 하나로 웹과 모바일에서 같은 UI를 만드는 Nx monorepo.
 
@@ -36,11 +36,14 @@ Nx 프로젝트가 아닌 곳도 있다.
 | `tools/scripts`            | 토큰 측정 · tree-shaking 검사 · 릴리스 · 소비자 카탈로그 생성 · quality-lab 수집기(`tools/scripts/observability`)                                     |
 | `tools/consumer-retrieval` | 플랫폼 → 패키지 → 심볼 → 토큰으로 조회를 좁히는 결정적 resolver (`pnpm ui:lookup`)                                                                    |
 | `tools/evals/consumer`     | 소비자 평가 harness — dataset · variant · grader · 검증 · 보고                                                                                        |
-| `docs/`                    | quality-lab 설계(`docs/quality-lab`), harness 설계(`docs/claude-harness`), 개발 기록(`docs/records`)                                                  |
+| `docs/`                    | quality-lab 설계 · 사용법(`docs/quality-lab`), demo 앱(`docs/demo`), harness 설계(`docs/claude-harness`), 개발 기록(`docs/records`)                   |
 
 품질 관측은 별도 흐름이다 — `observability-contracts → tools/scripts/observability (collect · export) → apps/quality-lab`.
 
-**대부분의 앱과 lib에 자기 `AGENTS.md`가 있다.** 그 안을 고치기 전에 가장 가까운 것을 읽는다.
+**프로젝트별 지침은 `.claude/rules/<프로젝트>.md` path rule에 있다.** 그 프로젝트의 파일을 열면 자동으로 로드된다. 문서 자리는 이렇게 나눈다.
+
+- 저장소 밖으로 배포되는 문서는 원본 옆에 둔다 — lib `README.md`(npm · 토큰 측정 baseline), `AGENTS.consumer.md`(`dist/AGENTS.md`), `plugins/*`
+- 이 저장소 안에서만 쓰는 지침은 `.claude/rules/`, 설명은 `docs/`에 둔다. 앱에는 `README.md` · `AGENTS.md`를 두지 않는다
 
 **`tools/`는 Nx 프로젝트가 아니라 `nx affected`가 닿지 않는다.** 타입 검사와 테스트는 `pnpm tools:check`로 돌고, PR에서는 `pr-check.yml`의 consumer-eval job이 실행한다.
 
@@ -89,10 +92,10 @@ Nx 프로젝트가 아닌 곳도 있다.
 
 ## Memory
 
-| 어디에                                                                         | 무엇을                                                        |
-| ------------------------------------------------------------------------------ | ------------------------------------------------------------- |
-| **committed** — `AGENTS.md` · `.claude/` · `docs/` · 각 프로젝트의 `AGENTS.md` | architecture · 안정적인 convention · 명령 · 팀 정책           |
-| **auto memory**                                                                | 이 머신에서 반복되는 사실 (막히는 경로, 우회 방법, 개인 선호) |
+| 어디에                                             | 무엇을                                                        |
+| -------------------------------------------------- | ------------------------------------------------------------- |
+| **committed** — `AGENTS.md` · `.claude/` · `docs/` | architecture · 안정적인 convention · 명령 · 팀 정책           |
+| **auto memory**                                    | 이 머신에서 반복되는 사실 (막히는 경로, 우회 방법, 개인 선호) |
 
 architecture를 auto memory에만 두지 않는다. **secret과 credential은 어디에도 저장하지 않는다.**
 

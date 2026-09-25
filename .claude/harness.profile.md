@@ -7,7 +7,7 @@ berry-dev의 generic rule · 절차(`repo-verify` 등)가 가리키는 shared-st
 ### 영향 범위
 
 - Nx workspace다([nx.json](../nx.json)). 영향은 `nx show projects --affected --files=<파일>`로 묻는다
-- **affected는 거의 비지 않는다.** Nx 프로젝트 밖 파일(`tools/**` · `.claude/**` · `.claude-plugin/**` · `plugins/berry-dev/**` · `docs/**`)은 root 프로젝트 `@berrypjh/shared-stack`로 잡히고, devhub의 test · build가 저장소 전체를 입력으로 두어 `@berrypjh/devhub` · `@berrypjh/devhub-e2e`가 함께 나온다([apps/devhub/AGENTS.md](../apps/devhub/AGENTS.md) Gotcha)
+- **affected는 거의 비지 않는다.** Nx 프로젝트 밖 파일(`tools/**` · `.claude/**` · `.claude-plugin/**` · `plugins/berry-dev/**` · `docs/**`)은 root 프로젝트 `@berrypjh/shared-stack`로 잡히고, devhub의 test · build가 저장소 전체를 입력으로 두어 `@berrypjh/devhub` · `@berrypjh/devhub-e2e`가 함께 나온다([.claude/rules/devhub.md](rules/devhub.md) Gotcha)
 - root 프로젝트의 target은 `local-registry` 하나다(포트를 연다). 그래서 위 경로의 실제 검사는 아래 "프로젝트 밖 경로"다
 - `nx affected -t <target>`은 target이 없는 프로젝트를 건너뛴다. 예: `commit-mcp`에는 `test`가 없다
 
@@ -29,7 +29,7 @@ berry-dev의 generic rule · 절차(`repo-verify` 등)가 가리키는 shared-st
 
 - tools 테스트 일부(카탈로그 drift · 패키지 경계)는 빌드된 libs의 `dist`를 읽는다. 먼저 `pnpm build:libs` (CI 순서와 같다 — [pr-check.yml](../.github/workflows/pr-check.yml) consumer-eval job)
 - 앱 · devhub는 libs의 `dist`를 읽는다(`^build`). lib를 고쳤으면 그 lib를 build 한 뒤 앱을 검사한다
-- lib 별 검증 순서는 각 lib의 `AGENTS.md`가 적는다(예: [libs/ui-core/AGENTS.md](../libs/ui-core/AGENTS.md))
+- lib 별 검증 순서는 각 lib의 path rule(`.claude/rules/<lib>.md`)이 적는다(예: [.claude/rules/ui-core.md](rules/ui-core.md))
 
 ### eval
 
@@ -58,25 +58,25 @@ berry-dev의 generic rule · 절차(`repo-verify` 등)가 가리키는 shared-st
 
 ### 역할
 
-| 경로                                                                      | 역할       | 따를 문서                                                              |
-| ------------------------------------------------------------------------- | ---------- | ---------------------------------------------------------------------- |
-| `libs/react-ui` · `libs/react-native-ui` · `libs/devhub-ui`               | maintainer | 각 패키지 `AGENTS.md`                                                  |
-| `libs/ui-core`                                                            | UI 아님    | 플랫폼 중립 계약 — [libs/ui-core/AGENTS.md](../libs/ui-core/AGENTS.md) |
-| `apps/demo-web` · `apps/demo-mobile` · `apps/quality-lab` · `apps/devhub` | consumer   | 각 앱 `AGENTS.md`의 "소비자처럼 쓴다"                                  |
+| 경로                                                                      | 역할       | 따를 문서                                                       |
+| ------------------------------------------------------------------------- | ---------- | --------------------------------------------------------------- |
+| `libs/react-ui` · `libs/react-native-ui` · `libs/devhub-ui`               | maintainer | 각 패키지 `AGENTS.md`                                           |
+| `libs/ui-core`                                                            | UI 아님    | 플랫폼 중립 계약 — [.claude/rules/ui-core.md](rules/ui-core.md) |
+| `apps/demo-web` · `apps/demo-mobile` · `apps/quality-lab` · `apps/devhub` | consumer   | 각 앱 `AGENTS.md`의 "소비자처럼 쓴다"                           |
 
 - 한 작업이 lib와 앱을 함께 고치면 파일마다 역할을 따로 판정한다. lib 수정은 maintainer로, 앱 수정은 consumer로 본다
 
 ### consumer 조회
 
 - 각 앱에 설치된 bin이 연결돼 있다 — `@berrypjh/react-ui`를 쓰는 앱은 `berry-react-ui`, `@berrypjh/react-native-ui`를 쓰는 앱은 `berry-react-native-ui` (`pnpm --dir <앱> exec <bin> find <query>`). bin은 lib의 `dist/cli.mjs`다 — lib를 build하지 않았으면 먼저 build한다
-- `@berrypjh/devhub-ui`에는 bin이 없다. [libs/devhub-ui/AGENTS.md](../libs/devhub-ui/AGENTS.md)와 공개 export로 확인한다
+- `@berrypjh/devhub-ui`에는 bin이 없다. [.claude/rules/devhub-ui.md](rules/devhub-ui.md)와 공개 export로 확인한다
 - 사용 규칙 · 함정은 설치된 패키지의 `agents` export(`dist/AGENTS.md`)다
 
 ### locale 과 제품 정책
 
 - 화면 문구 locale 정책 문서가 없다. `ko-ui` rule을 채택하지 않았다([standards-sources.md](../docs/claude-harness/standards-sources.md)) — 어미 · 형식을 강제하지 않는다
 - 제품 셸 · 화면 폭 · 최소 터치 크기 · 완료 문구 정책이 없다. demo 앱은 패키지 통합을 확인하는 도구다. 기준이 필요하면 기준 없음으로 보고한다
-- 라이브러리 접근성 규칙은 패키지 문서가 정한다 — [libs/react-ui/AGENTS.md](../libs/react-ui/AGENTS.md)의 accessibility · forced-colors, [libs/react-native-ui/AGENTS.consumer.md](../libs/react-native-ui/AGENTS.consumer.md)의 접근 가능한 이름 · 한계
+- 라이브러리 접근성 규칙은 패키지 문서가 정한다 — [.claude/rules/react-ui.md](rules/react-ui.md)의 accessibility · forced-colors, [libs/react-native-ui/AGENTS.consumer.md](../libs/react-native-ui/AGENTS.consumer.md)의 접근 가능한 이름 · 한계
 
 ### 확인 수단
 
@@ -85,4 +85,4 @@ berry-dev의 generic rule · 절차(`repo-verify` 등)가 가리키는 shared-st
 | 자동      | `@berrypjh/react-ui` test(jsdom · conformance · forced-colors 규칙), `@berrypjh/react-native-ui` test(jest), devhub · quality-lab 앱 test | 실행 가능                           |
 | 자동(axe) | `pnpm storybook:a11y` — Storybook을 띄워 axe 검사. PR에서는 `pr-check.yml`의 a11y job                                                     | 포트 — unsupported, CI · 사용자에게 |
 | 실제 web  | `@berrypjh/devhub-e2e` · `@berrypjh/quality-lab-e2e` Playwright, Storybook                                                                | 포트 — unsupported, 사용자에게      |
-| 실제 RN   | `apps/demo-mobile`을 사람이 기기 · 시뮬레이터에서 본다([apps/demo-mobile/AGENTS.md](../apps/demo-mobile/AGENTS.md))                       | 수단 없음 — unsupported             |
+| 실제 RN   | `apps/demo-mobile`을 사람이 기기 · 시뮬레이터에서 본다([.claude/rules/demo-mobile.md](rules/demo-mobile.md))                              | 수단 없음 — unsupported             |
