@@ -1,6 +1,8 @@
 'use client';
 
-import { List, ListItem } from '@berrypjh/react-ui';
+import { useEffect, useState } from 'react';
+
+import { IconButton, List, ListItem } from '@berrypjh/react-ui';
 
 import { useDevHub } from '../provider/devhub-provider';
 import { Icon, type IconName } from '../ui/icon';
@@ -19,7 +21,12 @@ export type ExplorerItem = {
   code?: boolean;
 };
 
-export type ExplorerGroup = { title?: string; items: ExplorerItem[] };
+export type ExplorerGroup = {
+  title?: string;
+  items: ExplorerItem[];
+  /** 제목이 있는 묶음을 접힌 채로 시작한다. 현재 항목이 든 묶음은 늘 펼친다. */
+  collapsed?: boolean;
+};
 
 export type ExplorerSection = {
   id: string;
@@ -55,30 +62,113 @@ const Items = ({ items }: { items: ExplorerItem[] }) => {
   );
 };
 
+type TitledGroup = ExplorerGroup & { title: string };
+
+/** 제목이 있는 묶음. 제목을 눌러 접고 편다. 열림 상태는 섹션이 갖는다. */
+const Group = ({
+  group,
+  open,
+  onToggle,
+}: {
+  group: TitledGroup;
+  open: boolean;
+  onToggle: (open: boolean) => void;
+}) => (
+  <details
+    open={open}
+    onToggle={(event) => onToggle(event.currentTarget.open)}
+    className="group/explorer-group"
+  >
+    <summary className="flex min-h-8 cursor-pointer list-none items-center gap-2xs rounded-md px-sm typo-caption-small text-text-light hover:bg-background-default [&::-webkit-details-marker]:hidden">
+      <Icon
+        name="chevron-right"
+        className="transition-transform group-open/explorer-group:rotate-90 motion-reduce:transition-none"
+      />
+      <span className="min-w-0 flex-1">{group.title}</span>
+      <span>{group.items.length}</span>
+    </summary>
+    <div className="pt-xs">
+      <Items items={group.items} />
+    </div>
+  </details>
+);
+
+/**
+ * 섹션 안 묶음들의 열림 상태. `collapsed` 묶음은 접힌 채로 시작하고,
+ * 현재 항목이 든 묶음은 이동할 때마다 펼친다. 한 번 편 묶음은 이동해도 접지 않는다.
+ */
+const useGroupsOpen = (groups: TitledGroup[]) => {
+  const { pathname } = useDevHub().router.location;
+  const current = groups.find((group) => group.items.some((item) => item.href === pathname));
+  const [open, setOpen] = useState<Record<string, boolean>>(() =>
+    Object.fromEntries(groups.map((group) => [group.title, !group.collapsed || group === current])),
+  );
+  const currentTitle = current?.title;
+  useEffect(() => {
+    if (currentTitle) setOpen((state) => ({ ...state, [currentTitle]: true }));
+  }, [currentTitle]);
+  const set = (title: string, value: boolean) =>
+    setOpen((state) => (state[title] === value ? state : { ...state, [title]: value }));
+  const setAll = (value: boolean) =>
+    setOpen(Object.fromEntries(groups.map((group) => [group.title, value])));
+  return { open, set, setAll };
+};
+
+/**
+ * 섹션 묶음을 한꺼번에 여닫는 토글 하나. 모두 펼쳐져 있으면 모두 접고, 하나라도 접혀 있으면 모두 편다.
+ * 이름은 `aria-label`, 마우스에는 `title` 로 보인다.
+ */
+const GroupsToggle = ({
+  title,
+  allOpen,
+  onToggle,
+}: {
+  title: string;
+  allOpen: boolean;
+  onToggle: () => void;
+}) => {
+  const label = `${title} 묶음 모두 ${allOpen ? '닫기' : '열기'}`;
+  return (
+    <IconButton size="sm" color="secondary" aria-label={label} title={label} onClick={onToggle}>
+      <Icon name={allOpen ? 'fold' : 'unfold'} />
+    </IconButton>
+  );
+};
+
 const Section = ({ section }: { section: ExplorerSection }) => {
   const { Link } = useDevHub().router;
   const current = useCurrent();
   const headingId = `explorer-${section.id}`;
   const count = section.groups.reduce((n, group) => n + group.items.length, 0);
+  const titled = section.groups.filter((group): group is TitledGroup => Boolean(group.title));
+  const { open, set, setAll } = useGroupsOpen(titled);
+  const allOpen = titled.every((group) => open[group.title] ?? true);
   return (
     <section aria-labelledby={headingId} className="flex flex-col gap-xs py-lg">
-      <h2 id={headingId} className="flex items-center justify-between px-sm">
-        <Link
-          to={section.href}
-          aria-current={current(section.href)}
-          className="inline-flex items-center gap-sm typo-body-small-strong text-text-default hover:underline aria-[current=page]:underline"
-        >
-          <Icon name={section.icon} className="text-text-light" />
-          {section.title}
-        </Link>
-        <span className="typo-caption-small text-text-light">{count}</span>
-      </h2>
+      <div className="flex items-center gap-2xs px-sm">
+        <h2 id={headingId} className="flex flex-1 items-center justify-between">
+          <Link
+            to={section.href}
+            aria-current={current(section.href)}
+            className="inline-flex items-center gap-sm typo-body-small-strong text-text-default hover:underline aria-[current=page]:underline"
+          >
+            <Icon name={section.icon} className="text-text-light" />
+            {section.title}
+          </Link>
+          <span className="typo-caption-small text-text-light">{count}</span>
+        </h2>
+        {titled.length > 1 && (
+          <GroupsToggle title={section.title} allOpen={allOpen} onToggle={() => setAll(!allOpen)} />
+        )}
+      </div>
       {section.groups.map((group, index) =>
         group.title ? (
-          <div key={group.title} className="flex flex-col gap-xs">
-            <h3 className="px-sm typo-caption-small text-text-light">{group.title}</h3>
-            <Items items={group.items} />
-          </div>
+          <Group
+            key={group.title}
+            group={{ ...group, title: group.title }}
+            open={open[group.title] ?? true}
+            onToggle={(value) => set(group.title as string, value)}
+          />
         ) : (
           <Items key={index} items={group.items} />
         ),

@@ -71,6 +71,9 @@ const PATHS = {
   ],
   'chevron-left': ['M15 6l-6 6 6 6'],
   'chevron-right': ['M9 6l6 6-6 6'],
+  /** 모두 펼치기 · 모두 접기 */
+  unfold: ['M7 15l5 5 5-5', 'M7 9l5-5 5 5'],
+  fold: ['M7 20l5-5 5 5', 'M7 4l5 5 5-5'],
   minus: ['M5 12h14'],
   plus: ['M12 5v14', 'M5 12h14'],
   fit: ['M4 9V4h5', 'M20 9V4h-5', 'M4 15v5h5', 'M20 15v5h-5', 'M9 9h6v6H9z'],
