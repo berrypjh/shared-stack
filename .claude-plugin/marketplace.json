@@ -12,6 +12,13 @@
       "description": "staged 변경을 scope별로 분석해 한국어 Conventional Commits 메시지를 제안하고 승인 후 커밋한다. commit-mcp MCP 서버를 함께 제공한다.",
       "category": "workflow",
       "keywords": ["commit", "conventional-commits", "mcp", "korean"]
+    },
+    {
+      "name": "berry-dev",
+      "source": "./plugins/berry-dev",
+      "description": "여러 저장소가 같은 작업 규칙을 쓰도록 standards rule 원본과 sync · check CLI, 검증 · UI 검수 skill, secret guard hook을 제공한다.",
+      "category": "workflow",
+      "keywords": ["standards", "rules", "harness", "korean"]
     }
   ]
 }

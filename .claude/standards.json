@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "rules": {
+    "core": true,
+    "cross-runtime-pure": { "paths": ["libs/ui-core/src/**"] },
+    "berry-consumer": {
+      "paths": [
+        "apps/demo-web/src/**",
+        "apps/demo-mobile/src/**",
+        "apps/quality-lab/src/**",
+        "apps/devhub/src/**"
+      ]
+    },
+    "docs-ko": { "paths": ["docs/records/**/*.md"] }
+  }
+}
