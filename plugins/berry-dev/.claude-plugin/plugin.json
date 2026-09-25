@@ -1,0 +1,12 @@
+{
+  "name": "berry-dev",
+  "description": "여러 저장소가 같은 Claude Code 작업 규칙을 쓰도록 standards rule 원본과 sync · check 도구를 제공한다.",
+  "version": "0.1.0",
+  "author": {
+    "name": "berrypjh"
+  },
+  "homepage": "https://github.com/berrypjh/shared-stack",
+  "repository": "https://github.com/berrypjh/shared-stack",
+  "license": "MIT",
+  "keywords": ["standards", "rules", "harness", "korean"]
+}

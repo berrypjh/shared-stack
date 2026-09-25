@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "rules": {
+    "core": true,
+    "cross-runtime-pure": { "paths": ["libs/shared-contracts/src/**"] },
+    "berry-consumer": { "paths": ["apps/web/src/**", "apps/native/src/**"] },
+    "ko-ui": { "paths": ["apps/web/src/**/*.tsx", "apps/native/src/**/*.tsx"] },
+    "docs-ko": { "paths": ["docs/**/*.md"] }
+  }
+}
