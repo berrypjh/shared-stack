@@ -60,7 +60,6 @@ describe('package inspector', () => {
   it('shows the reason instead of an empty list', () => {
     renderAt('/packages/eslint-config');
     expect(section('테스트').getByText(/테스트 파일도 test target 도 없다/)).toBeTruthy();
-    expect(section('명령').getByText(/명령이 카탈로그에 없다/)).toBeTruthy();
     expect(section('위 · 아래').getAllByText(/카탈로그에 없다/)).toHaveLength(2);
   });
 
@@ -72,7 +71,7 @@ describe('package inspector', () => {
   });
 });
 
-describe('application and tool inspectors', () => {
+describe('application inspectors', () => {
   it('say there is no manifest rather than guessing visibility or entry points', () => {
     renderAt('/applications/quality-lab-e2e');
     expect(section('공개 여부').getByText(/package\.json 이 없어/)).toBeTruthy();
@@ -84,14 +83,6 @@ describe('application and tool inspectors', () => {
     renderAt('/applications/quality-lab');
     expect(inspector().getAllByText('Internal')).toHaveLength(2);
     expect(section('진입점').getByText(/exports · main 이 없다/)).toBeTruthy();
-  });
-
-  it('show a tool outside Nx and the artifacts it writes', () => {
-    renderAt('/engineering/consumer-retrieval');
-    expect(section('개요').getByText(/Nx 프로젝트가 아니다/)).toBeTruthy();
-    const artifacts = section('생성물');
-    expect(artifacts.getByRole('link', { name: 'react-ui' })).toBeTruthy();
-    expect(artifacts.getByText('libs/react-ui/dist/cli.mjs')).toBeTruthy();
   });
 });
 

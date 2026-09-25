@@ -4,6 +4,7 @@ import { act, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, useNavigate } from 'react-router-dom';
 
+import { catalog } from '@/data';
 import { SECTIONS, VIEWS } from '@/lib/catalog/entities';
 
 import App from './app';
@@ -41,8 +42,6 @@ describe('routes', () => {
     ['/applications/devhub', 'devhub'],
     ['/packages', '패키지'],
     ['/packages/react-ui', 'react-ui'],
-    ['/engineering', '엔지니어링'],
-    ['/engineering/berry-commit', 'berry-commit'],
     ['/documents', '문서'],
     ['/documents/root-readme', 'README.md'],
     ['/records', '기록'],
@@ -88,11 +87,10 @@ describe('navigation data', () => {
       '개요',
       '소비 흐름',
       '아키텍처',
-      '애플리케이션',
       '패키지',
+      '애플리케이션',
       '문서',
       '기록',
-      '엔지니어링',
     ]);
   });
 
@@ -101,7 +99,7 @@ describe('navigation data', () => {
     const headings = within(explorerNav())
       .getAllByRole('heading', { level: 2 })
       .map((heading) => heading.querySelector('a')?.textContent);
-    expect(headings).toEqual(['소비 흐름', '기록', '애플리케이션', '패키지', '문서', '엔지니어링']);
+    expect(headings).toEqual(['소비 흐름', '기록', '패키지', '애플리케이션', '문서']);
   });
 
   it('lists every catalog entry in the explorer, linked to its route', () => {
@@ -113,6 +111,59 @@ describe('navigation data', () => {
       expect(hrefs).toContain(section.path);
       for (const entity of section.entities) expect(hrefs).toContain(entity.href);
     }
+  });
+
+  it('files every document under a group, so none drops out of the explorer', () => {
+    const documents = SECTIONS.find((section) => section.id === 'documents')?.entities ?? [];
+    expect(documents.map((entity) => entity.id).sort()).toEqual(
+      catalog.documents.map((doc) => doc.id).sort(),
+    );
+  });
+
+  it('starts the document groups folded, except the one holding the current document', async () => {
+    const openGroups = () =>
+      Array.from(explorerNav().querySelectorAll('details'))
+        .filter((group) => group.open)
+        .map((group) => group.querySelector('summary span')?.textContent);
+    await act(async () => {
+      renderAt('/documents/react-ui-agents');
+    });
+    expect(openGroups()).toEqual(expect.arrayContaining(['UI 라이브러리', '프로젝트 지침']));
+    expect(openGroups()).not.toContain('패키지');
+
+    const user = userEvent.setup();
+    await user.click(within(explorerNav()).getByText('패키지', { selector: 'summary span' }));
+    expect(openGroups()).toContain('패키지');
+  });
+
+  it('offers one open-all or close-all toggle in every section with more than one group', () => {
+    renderAt('/');
+    const nav = within(explorerNav());
+    for (const title of ['소비 흐름', '기록', '패키지', '애플리케이션', '문서']) {
+      const toggle = new RegExp(`^${title} 묶음 모두 (열기|닫기)$`);
+      expect(nav.getAllByRole('button', { name: toggle })).toHaveLength(1);
+    }
+    expect(nav.getByRole('button', { name: '문서 묶음 모두 열기' })).toBeTruthy();
+    expect(nav.getByRole('button', { name: '패키지 묶음 모두 닫기' })).toBeTruthy();
+  });
+
+  it('opens and closes every group of a section at once', async () => {
+    const user = userEvent.setup();
+    renderAt('/');
+    const nav = within(explorerNav());
+    const documentGroups = () =>
+      Array.from(
+        explorerNav().querySelectorAll<HTMLDetailsElement>(
+          'section[aria-labelledby="explorer-documents"] details',
+        ),
+      ).map((group) => group.open);
+
+    await user.click(nav.getByRole('button', { name: '문서 묶음 모두 열기' }));
+    expect(documentGroups().every(Boolean)).toBe(true);
+    expect(nav.queryByRole('button', { name: '문서 묶음 모두 열기' })).toBeNull();
+    await user.click(nav.getByRole('button', { name: '문서 묶음 모두 닫기' }));
+    expect(documentGroups().some(Boolean)).toBe(false);
+    expect(documentGroups().length).toBeGreaterThan(1);
   });
 
   it('marks the selection from the URL in both navigations', () => {

@@ -79,7 +79,6 @@ type ProjectBase = {
   readonly nxManifest: SourceRef;
   readonly platform: Platform;
   readonly purpose: string;
-  readonly commands: readonly string[];
   readonly docs: readonly string[];
   /** 진입점 등 대표 소스. */
   readonly source: readonly SourceRef[];
@@ -120,7 +119,6 @@ export type Tool = {
   readonly packageName?: string;
   readonly packageManifest?: SourceRef;
   readonly visibility?: Visibility;
-  readonly commands: readonly string[];
   readonly docs: readonly string[];
   readonly source: readonly SourceRef[];
   readonly gaps?: readonly EvidenceGap[];
@@ -198,121 +196,11 @@ export type RecordRef = {
   readonly tests: readonly string[];
 };
 
-/**
- * 명령이 돌려면 갖춰야 하는 것, 또는 돌리면 생기는 비용 · 부작용. 근거가 있는 것만 적는다.
- * 비어 있다고 "어디서나 돈다"는 뜻은 아니다 — 알려진 조건이 없을 뿐이다. 성공 여부가 아니다.
- */
-export type CommandConstraint =
-  /** 포트를 열어 서버를 띄운다(끝나지 않는다) */
-  | 'port-binding'
-  /** 이미 떠 있는 서버가 있어야 한다 */
-  | 'running-server'
-  /** Playwright 브라우저가 설치돼 있어야 한다 */
-  | 'browser-binaries'
-  /** 먼저 빌드한 산출물(dist · storybook-static)을 읽는다 */
-  | 'build-output'
-  /** 로컬 registry 가 떠 있어야 한다 */
-  | 'local-registry'
-  /** registry 인증 토큰이 있어야 한다 */
-  | 'registry-credentials'
-  /** 저장소에 커밋 · 태그 · GitHub release 를 만든다 */
-  | 'repository-writes'
-  /** 모델을 부르는 외부 executor 가 있어야 한다. 없으면 실행을 거부한다 */
-  | 'external-executor'
-  /** API 키가 있으면 외부 API 를 부른다. 없으면 그 측정을 건너뛴다 */
-  | 'optional-api-key'
-  /** 여러 검사를 차례로 실행해 오래 걸린다 */
-  | 'long-running'
-  /** 감시 모드로 끝나지 않는다 */
-  | 'watch-mode'
-  /** 생성물 · 캐시를 지운다 */
-  | 'deletes-files';
-
-/** 조건 하나와 그것을 말하는 파일. */
-export type ConstraintRef = { readonly kind: CommandConstraint; readonly evidence: SourceRef };
-
-export type CommandSource =
-  | { readonly kind: 'package-script'; readonly script: string }
-  | { readonly kind: 'nx-target'; readonly project: string; readonly target: string };
-
-/** 엔지니어링 화면의 묶음. 명령은 정확히 한 묶음에 든다. */
-export type CommandGroupId =
-  | 'build'
-  | 'verify'
-  | 'tokens'
-  | 'storybook'
-  | 'bundle'
-  | 'consumer-catalog'
-  | 'consumer-retrieval'
-  | 'consumer-eval'
-  | 'measurement'
-  | 'observability'
-  | 'release'
-  | 'plugin'
-  | 'dev-server'
-  | 'workspace';
-
-export type CommandGroup = {
-  readonly id: CommandGroupId;
-  readonly title: string;
-  readonly summary: string;
-  /** 이 묶음을 설명하는 문서. 흐름 · 결과 화면으로 가는 링크는 화면이 카탈로그에서 찾는다. */
-  readonly docs: readonly string[];
-};
-
-export type CommandRef = {
-  readonly id: string;
-  readonly source: CommandSource;
-  readonly group: CommandGroupId;
-  readonly purpose: string;
-  readonly constraints: readonly ConstraintRef[];
-};
-
-/**
- * CI step 이 무엇을 부르는가.
- * - `command`: 카탈로그 명령을 그대로(`pnpm run x`)
- * - `target`: `nx affected -t <target>` — 바뀐 프로젝트의 그 target 만
- * - `direct`: 스크립트 없이 도구 진입점을 직접
- * - `action`: 저장소 밖 GitHub Action
- */
-export type CiInvocation =
-  | { readonly kind: 'command'; readonly command: string }
-  | { readonly kind: 'target'; readonly target: string; readonly exclude?: readonly string[] }
-  | { readonly kind: 'direct'; readonly tool: string }
-  | { readonly kind: 'action'; readonly action: string };
-
-export type CiStep = {
-  readonly name: string;
-  /** workflow 에 적힌 그대로의 한 줄(여러 줄이면 첫 줄). action 은 없다. */
-  readonly run?: string;
-  /** 이 step 이 도는 조건(`if:`). 없으면 job 이 돌 때마다 돈다. */
-  readonly when?: string;
-  readonly invokes: CiInvocation;
-};
-
-export type CiJob = {
-  readonly id: string;
-  readonly name: string;
-  readonly needs: readonly string[];
-  readonly steps: readonly CiStep[];
-};
-
-export type CiWorkflow = {
-  readonly id: string;
-  readonly path: string;
-  readonly name: string;
-  /** 언제 도는가. workflow `on:` 을 글로. */
-  readonly trigger: string;
-  readonly jobs: readonly CiJob[];
-  readonly notes?: readonly { readonly text: string; readonly evidence: SourceRef }[];
-};
-
-/** 테스트 묶음 하나: 러너 · 설정 파일 · 실행 명령 · 확인 대상. 개수 · 결과는 담지 않는다. */
+/** 테스트 묶음 하나: 러너 · 설정 파일 · 확인 대상. 개수 · 결과는 담지 않는다. */
 export type TestSuite = {
   readonly id: string;
   readonly runner: 'vitest' | 'jest' | 'playwright' | 'storybook-test-runner';
   readonly config: SourceRef;
-  readonly command: string;
   readonly subjects: readonly string[];
   /** 설정 전체가 아니라 특정 파일이 묶음일 때. */
   readonly files?: readonly SourceRef[];
@@ -345,7 +233,6 @@ export type JourneyStep = {
   readonly owner: string;
   readonly status: StepStatus;
   readonly source: readonly SourceRef[];
-  readonly commands: readonly string[];
   readonly tests: readonly string[];
   readonly docs: readonly string[];
   /** 이어질 수 있는 단계 ID. 끝이면 비어 있다. */
@@ -391,9 +278,6 @@ export type Catalog = {
   readonly relations: readonly Relation[];
   readonly documents: readonly DocumentRef[];
   readonly records: readonly RecordRef[];
-  readonly commands: readonly CommandRef[];
-  readonly commandGroups: readonly CommandGroup[];
-  readonly workflows: readonly CiWorkflow[];
   readonly tests: readonly TestSuite[];
   readonly contexts: readonly ExecutionContext[];
   readonly journeys: readonly ConsumerJourney[];

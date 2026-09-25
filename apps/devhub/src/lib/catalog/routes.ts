@@ -5,10 +5,11 @@
 
 export type EntityKind = 'application' | 'package' | 'tool';
 
+/** 도구는 자기 화면이 없어 아키텍처 그림의 그 노드로 간다. */
 const SECTION: Record<EntityKind, string> = {
   application: 'applications',
   package: 'packages',
-  tool: 'engineering',
+  tool: 'architecture',
 };
 
 export const entityHref = (kind: EntityKind, id: string) => `/${SECTION[kind]}/${id}`;
@@ -22,13 +23,7 @@ export const recordHref = (id: string) => `/records/${id}`;
 export const sourceHref = (path: string) =>
   `/sources/${path.split('/').map(encodeURIComponent).join('/')}`;
 
-export const commandAnchor = (id: string) => `command-${id}`;
-export const testAnchor = (id: string) => `test-${id}`;
-export const workflowAnchor = (id: string) => `workflow-${id}`;
 export const symbolAnchor = (symbol: string) => `symbol-${symbol}`;
 
-export const commandHref = (id: string) => `/engineering#${commandAnchor(id)}`;
-export const testHref = (id: string) => `/engineering#${testAnchor(id)}`;
-export const workflowHref = (id: string) => `/engineering#${workflowAnchor(id)}`;
 export const symbolHref = (path: string, symbol: string) =>
   `${sourceHref(path)}#${symbolAnchor(symbol)}`;

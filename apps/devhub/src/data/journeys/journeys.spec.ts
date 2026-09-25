@@ -11,7 +11,6 @@ const { journeys, contexts } = catalog;
 const entities = [...catalog.applications, ...catalog.packages, ...catalog.tools];
 const entityIds = new Set(entities.map((entity) => entity.id));
 const contextIds = new Set(contexts.map((context) => context.id));
-const commandIds = new Set(catalog.commands.map((command) => command.id));
 const testIds = new Set(catalog.tests.map((suite) => suite.id));
 const documentIds = new Set(catalog.documents.map((doc) => doc.id));
 const steps = journeys.flatMap((journey) => journey.steps.map((step) => ({ journey, step })));
@@ -72,13 +71,12 @@ describe('journey graph', () => {
 });
 
 describe('journey references', () => {
-  it('resolve owners, contexts, commands, tests, and documents', () => {
+  it('resolve owners, contexts, tests, and documents', () => {
     const broken = steps.flatMap(({ journey, step }) => {
       const at = where(journey.id, step.id);
       return [
         ...(entityIds.has(step.owner) ? [] : [`${at} owner ${step.owner}`]),
         ...(contextIds.has(step.context) ? [] : [`${at} context ${step.context}`]),
-        ...step.commands.filter((id) => !commandIds.has(id)).map((id) => `${at} command ${id}`),
         ...step.tests.filter((id) => !testIds.has(id)).map((id) => `${at} test ${id}`),
         ...step.docs.filter((id) => !documentIds.has(id)).map((id) => `${at} doc ${id}`),
       ];

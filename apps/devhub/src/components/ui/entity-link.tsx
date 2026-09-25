@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 
-import { entityById } from '@/lib/catalog/entities';
+import { linkOf } from '@/lib/catalog/entities';
 
 export const LINK = 'text-text-link underline-offset-2 hover:underline';
 
@@ -9,10 +9,10 @@ export const LINK = 'text-text-link underline-offset-2 hover:underline';
  * `hash` 를 주면 이동 뒤 그 자리(예: 상세 정보)에 머문다.
  */
 export const EntityLink = ({ id, hash }: { id: string; hash?: string }) => {
-  const entity = entityById(id);
-  return entity ? (
-    <Link to={hash ? `${entity.href}#${hash}` : entity.href} className={LINK}>
-      {entity.label}
+  const target = linkOf(id);
+  return target ? (
+    <Link to={hash ? `${target.href}#${hash}` : target.href} className={LINK}>
+      {target.label}
     </Link>
   ) : (
     <span>{id}</span>

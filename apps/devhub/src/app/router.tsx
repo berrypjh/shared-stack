@@ -15,13 +15,11 @@ import { PackagePage } from './package-page';
 import { RecordPage } from './record-page';
 import { SectionPage } from './section-page';
 import { SourcePage } from './source-page';
-import { ToolPage } from './tool-page';
 
-/** 섹션마다의 항목 화면. 앱 · 패키지 · 도구는 같은 문법(`EntityDetail`)을 쓴다. */
+/** 섹션마다의 항목 화면. 앱 · 패키지는 같은 문법(`EntityDetail`)을 쓴다. */
 const DETAIL: Record<Exclude<SectionId, 'journeys'>, () => React.JSX.Element> = {
   applications: ApplicationPage,
   packages: PackagePage,
-  engineering: ToolPage,
   documents: DocumentPage,
   records: RecordPage,
 };
@@ -42,7 +40,7 @@ const ShellLayout = () => (
  * /journeys/<id>[/steps/<stepId>]  흐름 그림 · 목록 — 단계 선택이 바뀌어도 화면은 남는다
  * /sources/<경로>[#symbol-이름]  저장소 경로 하나 — 인용하는 곳 · symbol
  * /architecture[/<id>]      구조 그림 · 목록 — 노드 선택이 바뀌어도 화면은 남는다
- * /<section>                섹션 항목 (applications · packages · documents · records · engineering)
+ * /<section>                섹션 항목 (applications · packages · documents · records)
  * /<section>/<id>           항목 하나 — 카탈로그에 없는 ID 는 "카탈로그에 없는 항목"
  * 그 밖                      "없는 화면"
  * ```

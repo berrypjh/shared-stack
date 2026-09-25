@@ -6,31 +6,51 @@ export const documents: DocumentRef[] = [
   { id: 'root-readme', path: 'README.md', title: '@berrypjh/shared-stack' },
   { id: 'changelog', path: 'CHANGELOG.md', title: 'CHANGELOG.md' },
 
-  { id: 'demo-web-agents', path: 'apps/demo-web/AGENTS.md', title: 'demo-web' },
-  { id: 'demo-web-readme', path: 'apps/demo-web/README.md', title: '@berrypjh/demo-web' },
-  { id: 'demo-mobile-agents', path: 'apps/demo-mobile/AGENTS.md', title: 'demo-mobile' },
-  { id: 'demo-mobile-readme', path: 'apps/demo-mobile/README.md', title: '@berrypjh/demo-mobile' },
-  { id: 'quality-lab-agents', path: 'apps/quality-lab/AGENTS.md', title: 'quality-lab' },
-  { id: 'quality-lab-readme', path: 'apps/quality-lab/README.md', title: '@berrypjh/quality-lab' },
+  { id: 'demo-web-agents', path: '.claude/rules/demo-web.md', title: 'demo-web (`apps/demo-web`)' },
+  { id: 'demo-web-readme', path: 'docs/demo/web.md', title: '@berrypjh/demo-web' },
+  {
+    id: 'demo-mobile-agents',
+    path: '.claude/rules/demo-mobile.md',
+    title: 'demo-mobile (`apps/demo-mobile`)',
+  },
+  { id: 'demo-mobile-readme', path: 'docs/demo/mobile.md', title: '@berrypjh/demo-mobile' },
+  {
+    id: 'quality-lab-agents',
+    path: '.claude/rules/quality-lab.md',
+    title: 'quality-lab (`apps/quality-lab`)',
+  },
+  { id: 'quality-lab-readme', path: 'docs/quality-lab/usage.md', title: 'Quality Lab 사용법' },
   {
     id: 'quality-lab-e2e-agents',
-    path: 'apps/quality-lab-e2e/AGENTS.md',
-    title: 'quality-lab-e2e',
+    path: '.claude/rules/quality-lab-e2e.md',
+    title: 'quality-lab-e2e (`apps/quality-lab-e2e`)',
   },
-  { id: 'devhub-agents', path: 'apps/devhub/AGENTS.md', title: 'devhub' },
-  { id: 'devhub-e2e-agents', path: 'apps/devhub-e2e/AGENTS.md', title: 'devhub-e2e' },
+  { id: 'devhub-agents', path: '.claude/rules/devhub.md', title: 'devhub (`apps/devhub`)' },
+  {
+    id: 'devhub-e2e-agents',
+    path: '.claude/rules/devhub-e2e.md',
+    title: 'devhub-e2e (`apps/devhub-e2e`)',
+  },
 
-  { id: 'design-tokens-agents', path: 'libs/design-tokens/AGENTS.md', title: 'design-tokens' },
+  {
+    id: 'design-tokens-agents',
+    path: '.claude/rules/design-tokens.md',
+    title: 'design-tokens (`libs/design-tokens`)',
+  },
   {
     id: 'design-tokens-readme',
     path: 'libs/design-tokens/README.md',
     title: '@berrypjh/design-tokens',
   },
-  { id: 'ui-core-agents', path: 'libs/ui-core/AGENTS.md', title: 'ui-core' },
-  { id: 'devhub-ui-agents', path: 'libs/devhub-ui/AGENTS.md', title: 'devhub-ui' },
+  { id: 'ui-core-agents', path: '.claude/rules/ui-core.md', title: 'ui-core (`libs/ui-core`)' },
+  {
+    id: 'devhub-ui-agents',
+    path: '.claude/rules/devhub-ui.md',
+    title: 'devhub-ui (`libs/devhub-ui`)',
+  },
   { id: 'devhub-ui-readme', path: 'libs/devhub-ui/README.md', title: '@berrypjh/devhub-ui' },
   { id: 'ui-core-readme', path: 'libs/ui-core/README.md', title: '@berrypjh/ui-core' },
-  { id: 'react-ui-agents', path: 'libs/react-ui/AGENTS.md', title: 'react-ui' },
+  { id: 'react-ui-agents', path: '.claude/rules/react-ui.md', title: 'react-ui (`libs/react-ui`)' },
   { id: 'react-ui-readme', path: 'libs/react-ui/README.md', title: '@berrypjh/react-ui' },
   {
     id: 'react-ui-consumer-agents',
@@ -39,8 +59,8 @@ export const documents: DocumentRef[] = [
   },
   {
     id: 'react-native-ui-agents',
-    path: 'libs/react-native-ui/AGENTS.md',
-    title: 'react-native-ui',
+    path: '.claude/rules/react-native-ui.md',
+    title: 'react-native-ui (`libs/react-native-ui`)',
   },
   {
     id: 'react-native-ui-readme',
@@ -54,8 +74,8 @@ export const documents: DocumentRef[] = [
   },
   {
     id: 'observability-contracts-agents',
-    path: 'libs/observability-contracts/AGENTS.md',
-    title: 'observability-contracts',
+    path: '.claude/rules/observability-contracts.md',
+    title: 'observability-contracts (`libs/observability-contracts`)',
   },
   {
     id: 'eslint-config-readme',

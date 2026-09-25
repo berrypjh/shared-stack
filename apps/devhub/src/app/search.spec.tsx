@@ -104,13 +104,12 @@ describe('navigation from a result', () => {
     expect((field() as HTMLInputElement).value).toBe('');
   });
 
-  it('lands on the chosen command card in the main area', async () => {
+  it('lands on the architecture node for a tool, which has no page of its own', async () => {
     const user = userEvent.setup();
     renderAt('/');
-    await choose(user, 'size');
-    expect(location).toBe('/engineering#command-script:size');
-    expect(document.activeElement?.id).toBe('command-script:size');
-    expect(screen.getByRole('main').contains(document.activeElement)).toBe(true);
+    await choose(user, '릴리스 스크립트');
+    expect(location).toBe('/architecture/release-scripts');
+    expect(screen.getByRole('heading', { level: 2, name: '릴리스 스크립트' })).toBeTruthy();
   });
 
   it('lands on the exports section of the inspector for a public export', async () => {

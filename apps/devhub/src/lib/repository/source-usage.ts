@@ -1,13 +1,5 @@
 import type { Catalog, SourceRef } from '../../domain/model';
-import {
-  commandHref,
-  entityHref,
-  type EntityKind,
-  recordHref,
-  stepHref,
-  testHref,
-  workflowHref,
-} from '../catalog/routes';
+import { entityHref, type EntityKind, recordHref, stepHref } from '../catalog/routes';
 
 /** 경로를 인용하는 자리. 종류는 글자로 보인다. */
 export type Citation = { kind: CitationKind; label: string; href: string };
@@ -19,10 +11,7 @@ export type CitationKind =
   | 'tool'
   | 'relation'
   | 'step'
-  | 'record'
-  | 'test'
-  | 'command'
-  | 'workflow';
+  | 'record';
 
 export type SourceUsage = {
   path: string;
@@ -106,26 +95,6 @@ const citedRefs = (catalog: Catalog): Cited[] => [
       ref,
       by: { kind: 'record' as const, label: record.title, href: recordHref(record.id) },
     })),
-  ),
-  ...catalog.tests.flatMap((suite) =>
-    [suite.config, ...(suite.files ?? [])].map((ref) => ({
-      ref,
-      by: { kind: 'test' as const, label: suite.id, href: testHref(suite.id) },
-    })),
-  ),
-  ...catalog.commands.flatMap((command) =>
-    command.constraints.map(({ evidence }) => ({
-      ref: evidence,
-      by: { kind: 'command' as const, label: command.id, href: commandHref(command.id) },
-    })),
-  ),
-  ...catalog.workflows.flatMap((workflow) =>
-    [{ path: workflow.path }, ...(workflow.notes ?? []).map((note) => note.evidence)].map(
-      (ref) => ({
-        ref,
-        by: { kind: 'workflow' as const, label: workflow.name, href: workflowHref(workflow.id) },
-      }),
-    ),
   ),
 ];
 

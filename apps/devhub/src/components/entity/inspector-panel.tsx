@@ -12,7 +12,7 @@ import { groupByOwner } from '@/lib/catalog/reference-groups';
 import { FileRow } from '../source/file-row';
 import { EntityLink } from '../ui/entity-link';
 
-import { CommandRows, DocumentRows, SourceGroups, TestRows } from './inspector-parts';
+import { DocumentRows, SourceGroups, TestRows } from './inspector-parts';
 
 const SECTIONS = [
   ['overview', '개요'],
@@ -20,7 +20,6 @@ const SECTIONS = [
   ['exports', '진입점'],
   ['relations', '위 · 아래'],
   ['artifacts', '생성물'],
-  ['commands', '명령'],
   ['source', '소스'],
   ['documents', '문서'],
   ['tests', '테스트'],
@@ -29,7 +28,7 @@ const SECTIONS = [
 
 type SectionKey = (typeof SECTIONS)[number][0];
 const TITLE = Object.fromEntries(SECTIONS) as Record<SectionKey, string>;
-const KIND = { application: '애플리케이션', package: '패키지', tool: '도구' } as const;
+const KIND = { application: '애플리케이션', package: '패키지' } as const;
 
 const Section = ({
   id,
@@ -238,9 +237,6 @@ export const InspectorPanel = ({
     </Section>
     <Section id="artifacts" count={inspection.artifacts.length}>
       <RelationRows items={inspection.artifacts} empty={inspection.empty.artifacts} />
-    </Section>
-    <Section id="commands" count={inspection.commands.length}>
-      <CommandRows items={inspection.commands} empty={inspection.empty.commands} />
     </Section>
     <SourceSection inspection={inspection} />
     <Section id="documents" count={inspection.documents.length}>

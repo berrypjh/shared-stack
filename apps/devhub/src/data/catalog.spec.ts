@@ -5,7 +5,6 @@ import { join } from 'node:path';
 import { downstreamIds, testsOf, upstreamIds } from '../domain/graph';
 import type { SourceRef } from '../domain/model';
 
-import { unlistedTargets } from './commands';
 import { catalog } from './index';
 
 /** 카탈로그가 설명하는 저장소. 이 테스트는 그 파일을 읽기만 한다. */
@@ -40,7 +39,7 @@ const filesUnder = (path: string): string[] => {
 const childrenOf = (path: string) =>
   readdirSync(join(ROOT, path), { withFileTypes: true }).filter((entry) => !SKIP.has(entry.name));
 
-const { applications, packages, tools, relations, documents, records, commands, tests } = catalog;
+const { applications, packages, tools, relations, documents, records, tests } = catalog;
 const projects = [...applications, ...packages];
 const entities = [...projects, ...tools];
 const entityIds = new Set(entities.map((entity) => entity.id));
@@ -108,13 +107,11 @@ describe('ids', () => {
     expect(duplicates(relations.map((relation) => relation.id))).toEqual([]);
     expect(duplicates(documents.map((doc) => doc.id))).toEqual([]);
     expect(duplicates(records.map((record) => record.id))).toEqual([]);
-    expect(duplicates(commands.map((command) => command.id))).toEqual([]);
     expect(duplicates(tests.map((suite) => suite.id))).toEqual([]);
   });
 });
 
 describe('references', () => {
-  const commandIds = new Set(commands.map((command) => command.id));
   const documentIds = new Set(documents.map((doc) => doc.id));
 
   it('resolve for every relation end', () => {
@@ -126,13 +123,10 @@ describe('references', () => {
     expect(broken).toEqual([]);
   });
 
-  it('resolve for every command and document an entity names', () => {
-    const broken = entities.flatMap((entity) => [
-      ...entity.commands
-        .filter((id) => !commandIds.has(id))
-        .map((id) => `${entity.id} command ${id}`),
-      ...entity.docs.filter((id) => !documentIds.has(id)).map((id) => `${entity.id} doc ${id}`),
-    ]);
+  it('resolve for every document an entity names', () => {
+    const broken = entities.flatMap((entity) =>
+      entity.docs.filter((id) => !documentIds.has(id)).map((id) => `${entity.id} doc ${id}`),
+    );
     expect(broken).toEqual([]);
   });
 
@@ -145,11 +139,10 @@ describe('references', () => {
     expect(broken).toEqual([]);
   });
 
-  it('resolve for every test suite command and subject', () => {
-    const broken = tests.flatMap((suite) => [
-      ...(commandIds.has(suite.command) ? [] : [`${suite.id} command ${suite.command}`]),
-      ...suite.subjects.filter((id) => !entityIds.has(id)).map((id) => `${suite.id} subject ${id}`),
-    ]);
+  it('resolve for every test suite subject', () => {
+    const broken = tests.flatMap((suite) =>
+      suite.subjects.filter((id) => !entityIds.has(id)).map((id) => `${suite.id} subject ${id}`),
+    );
     expect(broken).toEqual([]);
   });
 });
@@ -318,7 +311,12 @@ describe('completeness', () => {
     const onDisk = [
       ...['README.md', 'AGENTS.md', 'CHANGELOG.md'].filter(exists),
       ...['apps', 'libs', 'tools', 'plugins', 'docs'].flatMap(filesUnder),
-    ].filter((path) => path.endsWith('.md') && (path.startsWith('docs/') || guide.test(path)));
+      ...readdirSync(join(ROOT, '.claude/rules')).map((name) => `.claude/rules/${name}`),
+    ].filter(
+      (path) =>
+        path.endsWith('.md') &&
+        (path.startsWith('docs/') || path.startsWith('.claude/rules/') || guide.test(path)),
+    );
     const registered = new Set([...documents, ...records].map((doc) => doc.path));
     expect(onDisk.filter((path) => !registered.has(path))).toEqual([]);
   });
@@ -383,19 +381,8 @@ describe('relations', () => {
   });
 });
 
-describe('commands', () => {
+describe('tool documents', () => {
   const scripts = readJson<Manifest>('package.json').scripts ?? {};
-  const manifestOf = new Map(
-    [...projects, ...tools].flatMap((entity) =>
-      entity.nxProject ? [[entity.nxProject, `${entity.root}/project.json`] as const] : [],
-    ),
-  );
-  const targetsOf = (project: string) => {
-    const manifest = manifestOf.get(project);
-    return manifest && exists(manifest)
-      ? Object.keys(readJson<{ targets?: object }>(manifest).targets ?? {})
-      : [];
-  };
 
   it('record every pnpm script a tool tells people to run but the root does not define', () => {
     const toolText = filesUnder('tools')
@@ -415,134 +402,6 @@ describe('commands', () => {
         ),
     );
     expect([...new Set(missing)].sort()).toEqual(recorded.sort());
-  });
-
-  it('cover every root script, and nothing else', () => {
-    const cataloged = commands.flatMap((c) =>
-      c.source.kind === 'package-script' ? [c.source.script] : [],
-    );
-    expect(duplicates(cataloged)).toEqual([]);
-    expect([...cataloged].sort()).toEqual(Object.keys(scripts).sort());
-  });
-
-  it('cover every explicit Nx target, or say why it is left out', () => {
-    const cataloged = new Set(
-      commands.flatMap((c) =>
-        c.source.kind === 'nx-target' ? [`${c.source.project}:${c.source.target}`] : [],
-      ),
-    );
-    const unlisted = new Set(unlistedTargets.map((t) => `${t.project}:${t.target}`));
-    const explicit = [...manifestOf.keys()].flatMap((project) =>
-      targetsOf(project).map((target) => `${project}:${target}`),
-    );
-    expect(explicit.filter((id) => !cataloged.has(id) && !unlisted.has(id))).toEqual([]);
-    expect([...cataloged, ...unlisted].filter((id) => !explicit.includes(id))).toEqual([]);
-    expect([...cataloged].filter((id) => unlisted.has(id))).toEqual([]);
-  });
-
-  it('back every constraint with a file that says it', () => {
-    const problems = commands.flatMap((command) =>
-      command.constraints.flatMap(({ kind, evidence }) => {
-        if (!exists(evidence.path)) return [`${command.id} ${kind}: missing ${evidence.path}`];
-        return evidence.symbol && !read(evidence.path).includes(evidence.symbol)
-          ? [`${command.id} ${kind}: "${evidence.symbol}" not in ${evidence.path}`]
-          : [];
-      }),
-    );
-    expect(problems).toEqual([]);
-  });
-
-  it('fall each into one declared group, and leave no group empty', () => {
-    const groups = new Set(catalog.commandGroups.map((group) => group.id));
-    expect(commands.filter((c) => !groups.has(c.group)).map((c) => c.id)).toEqual([]);
-    expect([...groups].filter((id) => !commands.some((c) => c.group === id))).toEqual([]);
-    const documentIds = new Set(documents.map((doc) => doc.id));
-    expect(
-      catalog.commandGroups.flatMap((g) => g.docs.filter((id) => !documentIds.has(id))),
-    ).toEqual([]);
-  });
-
-  it('mark exactly the eval scripts that grade trials as needing an external executor', () => {
-    const external = commands
-      .filter((c) => c.constraints.some((k) => k.kind === 'external-executor'))
-      .map((c) => c.id);
-    expect(external).toEqual(['script:eval:consumer:dev', 'script:eval:consumer:test']);
-    for (const id of external) {
-      const { source } = commands.find((c) => c.id === id) ?? {};
-      const body = source?.kind === 'package-script' ? scripts[source.script] : '';
-      expect(body).not.toMatch(/--(smoke|routing-only|context-only|replay)/);
-    }
-  });
-});
-
-describe('workflows', () => {
-  const commandIds = new Set(commands.map((command) => command.id));
-  /** workflow 의 `run:` 줄 중 준비 step(install)을 뺀 것. 여러 줄이면 첫 줄. */
-  const runLines = (text: string) =>
-    [...text.matchAll(/^\s+run: (?:\|\n\s+)?(.+)$/gm)]
-      .map((m) => m[1].trim())
-      .filter(
-        (line) => line.startsWith('pnpm') && !/^pnpm (install|exec playwright install)/.test(line),
-      );
-  const jobIds = (text: string) =>
-    [...text.slice(text.indexOf('\njobs:')).matchAll(/^ {2}([\w-]+):$/gm)].map((m) => m[1]);
-
-  it.each(catalog.workflows.map((w) => [w.id, w] as const))(
-    '%s matches its file',
-    (_id, workflow) => {
-      const text = read(workflow.path);
-      expect(text).toContain(`name: ${workflow.name}`);
-      expect(workflow.jobs.map((job) => job.id)).toEqual(jobIds(text));
-      const steps = workflow.jobs.flatMap((job) => job.steps);
-      expect(steps.flatMap((step) => step.run ?? [])).toEqual(runLines(text));
-      for (const step of steps) {
-        expect(text).toContain(`name: ${step.name}`);
-        if (step.when) expect(text).toContain(`if: ${step.when}`);
-      }
-      for (const note of workflow.notes ?? []) {
-        expect(read(note.evidence.path)).toContain(note.evidence.symbol);
-      }
-    },
-  );
-
-  it('name real commands, targets, tools, and actions', () => {
-    const scripts = readJson<Manifest>('package.json').scripts ?? {};
-    const problems = catalog.workflows.flatMap((workflow) =>
-      workflow.jobs.flatMap((job) =>
-        job.steps.flatMap((step) => {
-          const at = `${workflow.id}/${job.id}/${step.name}`;
-          const { invokes } = step;
-          const run = step.run ?? '';
-          switch (invokes.kind) {
-            case 'command': {
-              const command = commands.find((c) => c.id === invokes.command);
-              if (!command || command.source.kind !== 'package-script') return [`${at}: unknown`];
-              const { script } = command.source;
-              const same =
-                run === `pnpm run ${script}` ||
-                run === `pnpm ${script}` ||
-                run.startsWith(`pnpm ${scripts[script]} `);
-              return same ? [] : [`${at}: does not run ${script}`];
-            }
-            case 'target':
-              return run.includes(`-t ${invokes.target} `) &&
-                (invokes.exclude ?? []).every((p) => run.includes(`--exclude=${p}`))
-                ? []
-                : [`${at}: target ${invokes.target}`];
-            case 'direct': {
-              const tool = tools.find((t) => t.id === invokes.tool);
-              return tool && run.includes(tool.root) ? [] : [`${at}: tool ${invokes.tool}`];
-            }
-            default: // action
-              return read(workflow.path).includes(`uses: ${invokes.action}`)
-                ? []
-                : [`${at}: action`];
-          }
-        }),
-      ),
-    );
-    expect(problems).toEqual([]);
-    expect(commandIds.size).toBe(commands.length);
   });
 });
 
@@ -575,7 +434,8 @@ describe('evidence gaps', () => {
 describe('documents', () => {
   it('carry their opening heading verbatim as the title, or the file name without one', () => {
     for (const doc of [...documents, ...records]) {
-      const heading = read(doc.path).match(/^# (.+)/)?.[1] ?? doc.path.split('/').pop();
+      const body = read(doc.path).replace(/^---\n[\s\S]*?\n---\n+/, '');
+      const heading = body.match(/^# (.+)/)?.[1] ?? doc.path.split('/').pop();
       expect({ id: doc.id, heading }).toEqual({ id: doc.id, heading: doc.title });
     }
   });

@@ -12,8 +12,6 @@ export const KIND_LABEL: Record<SearchKind, string> = {
   export: '공개 export',
   document: '문서',
   record: '기록',
-  command: '명령',
-  test: '테스트 묶음',
   source: '소스 파일',
   symbol: 'symbol',
 };

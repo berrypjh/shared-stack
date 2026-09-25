@@ -84,7 +84,7 @@ const PlatformSummary = () => (
                 <EntityLink key={id} id={id} />
               ))}
               {toolCount > 0 && (
-                <Link to="/engineering" className={LINK}>
+                <Link to="/architecture" className={LINK}>
                   도구 {toolCount}개
                 </Link>
               )}

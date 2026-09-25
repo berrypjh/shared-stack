@@ -23,8 +23,6 @@ const captionOf = (entity: Entity) => {
       return `${APP_ROLE[entity.record.role]} · ${PLATFORM[entity.record.platform]}`;
     case 'packages':
       return `${entity.record.packageName} · ${VISIBILITY[entity.record.visibility]} · ${PLATFORM[entity.record.platform]}`;
-    case 'engineering':
-      return entity.record.root;
     case 'documents':
       return entity.record.title;
     case 'records':

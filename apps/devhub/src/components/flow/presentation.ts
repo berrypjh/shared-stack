@@ -1,7 +1,7 @@
 import { type LegendItem } from '@berrypjh/devhub-ui';
 
 import type { StepStatus } from '@/domain/model';
-import { entityById } from '@/lib/catalog/entities';
+import { linkOf } from '@/lib/catalog/entities';
 import { STEP_STATUS } from '@/lib/catalog/labels';
 
 export const journeyHref = (journeyId: string) => `/journeys/${journeyId}`;
@@ -14,7 +14,7 @@ export const statusLine = (status: StepStatus) =>
   `${STEP_STATUS[status].glyph} ${STEP_STATUS[status].label}`;
 
 /** 담당 항목의 이름. 카탈로그 ID 가 앱 · 패키지 · 도구를 가리킨다. */
-export const ownerLabel = (id: string) => entityById(id)?.label ?? id;
+export const ownerLabel = (id: string) => linkOf(id)?.label ?? id;
 
 /** 저장소 밖 단계(문서에만 있음)는 점선 상자. 글자로도 같은 것을 말한다. */
 export const boxOf = (status: StepStatus) =>

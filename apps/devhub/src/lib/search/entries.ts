@@ -1,10 +1,8 @@
 import { basename, stem } from '@berrypjh/devhub-ui';
 
-import { commandLine } from '../../domain/commands';
 import type { Catalog } from '../../domain/model';
 import { RECORD_KIND } from '../catalog/labels';
 import {
-  commandHref,
   documentHref,
   entityHref,
   journeyHref,
@@ -12,7 +10,6 @@ import {
   sourceHref,
   stepHref,
   symbolHref,
-  testHref,
 } from '../catalog/routes';
 import { sourceUsage } from '../repository/source-usage';
 
@@ -26,8 +23,6 @@ export const SEARCH_KINDS = [
   'export',
   'document',
   'record',
-  'command',
-  'test',
   'source',
   'symbol',
 ] as const;
@@ -142,32 +137,6 @@ const recordEntries = (catalog: Catalog): Draft[] =>
     text: [record.summary],
   }));
 
-const engineeringEntries = (catalog: Catalog): Draft[] => [
-  ...catalog.commands.map((command) => ({
-    key: `command:${command.id}`,
-    kind: 'command' as const,
-    label: commandLine(command),
-    detail: command.purpose,
-    href: commandHref(command.id),
-    names: [
-      command.id,
-      commandLine(command),
-      command.source.kind === 'package-script' ? command.source.script : command.source.target,
-    ],
-    text: [command.purpose],
-  })),
-  ...catalog.tests.map((suite) => ({
-    key: `test:${suite.id}`,
-    kind: 'test' as const,
-    label: suite.id,
-    detail: `${suite.runner} · ${suite.config.path}`,
-    href: testHref(suite.id),
-    names: [suite.id],
-    text: [suite.runner, suite.config.path],
-    related: [...suite.subjects],
-  })),
-];
-
 const sourceEntries = (catalog: Catalog): Draft[] =>
   [...sourceUsage(catalog).values()].flatMap((usage) => {
     const citing = usage.citations.map((citation) => citation.label);
@@ -203,6 +172,5 @@ export const searchEntries = (catalog: Catalog): SearchEntry[] =>
     ...exportEntries(catalog),
     ...documentEntries(catalog),
     ...recordEntries(catalog),
-    ...engineeringEntries(catalog),
     ...sourceEntries(catalog),
   ].map((draft) => ({ related: [], ...draft }));

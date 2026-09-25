@@ -2,7 +2,6 @@ import { InspectorSection, Pager, RecordMeta } from '@berrypjh/devhub-ui';
 import { List } from '@berrypjh/react-ui';
 
 import { catalog } from '@/data';
-import { commandLine } from '@/domain/commands';
 import type { RecordRef } from '@/domain/model';
 import { RECORDS_NEWEST_FIRST } from '@/lib/catalog/entities';
 import { RECORD_KIND } from '@/lib/catalog/labels';
@@ -33,11 +32,7 @@ export const RecordInspector = ({ record }: { record: RecordRef }) => {
     href: recordHref(r.id),
   }));
   const documents = record.docs.flatMap((id) => catalog.documents.find((d) => d.id === id) ?? []);
-  const tests = record.tests.flatMap((id) => {
-    const suite = catalog.tests.find((s) => s.id === id);
-    const command = suite && catalog.commands.find((c) => c.id === suite.command);
-    return suite ? [{ suite, line: command ? commandLine(command) : null }] : [];
-  });
+  const tests = record.tests.flatMap((id) => catalog.tests.find((s) => s.id === id) ?? []);
   return (
     <div className="flex flex-col divide-y divide-stroke-light">
       <header className="flex flex-col gap-sm pb-lg">

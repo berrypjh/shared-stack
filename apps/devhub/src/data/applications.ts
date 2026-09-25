@@ -13,7 +13,6 @@ export const applications: Application[] = [
     platform: 'web',
     purpose:
       'react-ui 를 실제 앱에 통합했을 때 살아 있는 것 — 테마 전환 · CSS 캐스케이드 · Tailwind preset · 패키지 경계 — 을 확인한다',
-    commands: ['demo-web:typecheck', 'demo-web:build', 'demo-web:serve', 'demo-web:test'],
     docs: ['demo-web-agents', 'demo-web-readme'],
     source: [{ path: 'apps/demo-web/src/main.tsx' }],
   },
@@ -28,7 +27,6 @@ export const applications: Application[] = [
     nxManifest: { path: 'apps/demo-mobile/project.json' },
     platform: 'react-native',
     purpose: 'react-native-ui 를 Expo 앱에 통합해 컴포넌트 상태를 눈으로 확인하는 유일한 자리',
-    commands: ['demo-mobile:typecheck', 'demo-mobile:build', 'demo-mobile:start'],
     docs: ['demo-mobile-agents', 'demo-mobile-readme'],
     source: [{ path: 'apps/demo-mobile/index.js' }, { path: 'apps/demo-mobile/src/app/App.tsx' }],
     gaps: [
@@ -36,7 +34,7 @@ export const applications: Application[] = [
         kind: 'no-test',
         note: '테스트 파일도 test target 도 없다. 통합 결과는 기기에서 눈으로 확인한다',
         evidence: [
-          { path: 'apps/demo-mobile/AGENTS.md' },
+          { path: '.claude/rules/demo-mobile.md' },
           { path: 'apps/demo-mobile/project.json' },
         ],
       },
@@ -54,13 +52,6 @@ export const applications: Application[] = [
     platform: 'web',
     purpose:
       '수집 · export 된 품질 결과를 계약으로 검증한 뒤에만 보여 준다. 명령은 실행하지 않는다',
-    commands: [
-      'quality-lab:typecheck',
-      'quality-lab:build',
-      'quality-lab:serve',
-      'quality-lab:test',
-      'script:quality:lab',
-    ],
     docs: [
       'quality-lab-agents',
       'quality-lab-readme',
@@ -80,7 +71,6 @@ export const applications: Application[] = [
     platform: 'node',
     purpose:
       'quality-lab 을 실제 브라우저에서 확인한다. 앱 소스를 import 하지 않고 공개 계약으로만 fixture 를 만든다',
-    commands: ['quality-lab-e2e:typecheck', 'quality-lab-e2e:e2e'],
     docs: ['quality-lab-e2e-agents'],
     source: [{ path: 'apps/quality-lab-e2e/src/fixtures.ts' }],
   },
@@ -93,7 +83,6 @@ export const applications: Application[] = [
     platform: 'node',
     purpose:
       'devhub 를 실제 브라우저에서 확인한다 — 셸 키보드 · 반응형 · 검색 · 딥링크 · dialog 포커스. 앱 소스를 import 하지 않는다',
-    commands: ['devhub-e2e:typecheck', 'devhub-e2e:e2e'],
     docs: ['devhub-e2e-agents'],
     source: [{ path: 'apps/devhub-e2e/src/support/keyboard.ts', symbol: 'tabTo' }],
   },
@@ -108,7 +97,6 @@ export const applications: Application[] = [
     nxManifest: { path: 'apps/devhub/project.json' },
     platform: 'web',
     purpose: '저장소의 구조와 근거를 탐색한다. 품질 수집 결과는 quality-lab 이 보여 준다',
-    commands: ['devhub:typecheck', 'devhub:build', 'devhub:serve', 'devhub:test', 'script:devhub'],
     docs: ['devhub-agents'],
     source: [{ path: 'apps/devhub/src/main.tsx' }],
   },

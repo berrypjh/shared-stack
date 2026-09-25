@@ -6,6 +6,21 @@ import type { RecordRef } from '../domain/model';
  */
 export const records: RecordRef[] = [
   {
+    id: 'project-docs-to-rules',
+    path: 'docs/records/2026-09-26-project-docs-to-rules.md',
+    title: '하위 프로젝트 지침을 path rule 로, 앱 설명을 docs 로 이동',
+    kind: 'decision',
+    date: '2026-09-26',
+    summary:
+      '한 사실이 여러 문서에 있어 어긋나던 구조를 정리. 지침은 .claude/rules, 앱 설명은 docs, 배포되는 문서는 원본 옆',
+    sources: [
+      { path: 'apps/devhub/src/lib/markdown/sources.ts', symbol: 'loadRaw' },
+      { path: 'apps/devhub/src/data/documents.ts' },
+    ],
+    docs: ['root-agents', 'devhub-agents', 'quality-lab-readme', 'quality-lab-architecture'],
+    tests: ['devhub-vitest'],
+  },
+  {
     id: 'devhub-ui-package',
     path: 'docs/records/2026-09-22-devhub-ui-package.md',
     title: 'DevHub 공용 화면을 @berrypjh/devhub-ui 패키지로 분리',

@@ -40,7 +40,7 @@ const Links = ({ ids }: { ids: string[] }) =>
   );
 
 /**
- * 앱 · 패키지 · 도구 항목 화면의 공통 문법: 가운데는 이름 · 목적 · 사실 · 관계 요약,
+ * 앱 · 패키지 항목 화면의 공통 문법: 가운데는 이름 · 목적 · 사실 · 관계 요약,
  * 오른쪽은 근거(`InspectorPanel`). 없는 ID 는 "카탈로그에 없는 항목"이다.
  */
 export const EntityDetail = ({

@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import type { StepInspection } from '@/lib/catalog/inspect-step';
 import { GAP_KIND } from '@/lib/catalog/labels';
 
-import { CommandRows, DocumentRows, SourceGroups, TestRows } from '../entity/inspector-parts';
+import { DocumentRows, SourceGroups, TestRows } from '../entity/inspector-parts';
 import { EntityLink, LINK } from '../ui/entity-link';
 
 import { statusLine, stepHref } from './presentation';
@@ -15,7 +15,6 @@ const SECTIONS = [
   ['overview', '개요'],
   ['next', '다음 단계'],
   ['source', '소스'],
-  ['commands', '명령'],
   ['tests', '테스트'],
   ['documents', '문서'],
   ['gaps', '근거 공백'],
@@ -25,7 +24,7 @@ const TITLE = Object.fromEntries(SECTIONS) as Record<(typeof SECTIONS)[number][0
 const idOf = (key: string) => `step-${key}`;
 
 /**
- * 고른 단계의 근거: 동작 · 실행 위치 · 담당, 다음 단계, 소스 · 명령 · 테스트 · 문서 · 공백.
+ * 고른 단계의 근거: 동작 · 실행 위치 · 담당, 다음 단계, 소스 · 테스트 · 문서 · 공백.
  * 섹션은 늘 같은 순서로 보이고 비면 이유를 쓴다. 단계 링크는 `#devhub-inspector` 로 이 칸에 머문다.
  */
 export const StepInspector = ({ inspection }: { inspection: StepInspection }) => {
@@ -96,14 +95,6 @@ export const StepInspector = ({ inspection }: { inspection: StepInspection }) =>
 
       <InspectorSection id={idOf('source')} title={TITLE.source} count={step.source.length}>
         <SourceGroups refs={step.source} empty={empty.source} />
-      </InspectorSection>
-
-      <InspectorSection
-        id={idOf('commands')}
-        title={TITLE.commands}
-        count={inspection.commands.length}
-      >
-        <CommandRows items={inspection.commands} empty={empty.commands} />
       </InspectorSection>
 
       <InspectorSection id={idOf('tests')} title={TITLE.tests} count={inspection.tests.length}>

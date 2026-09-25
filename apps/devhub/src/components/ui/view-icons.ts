@@ -10,7 +10,6 @@ export const SECTION_ICON: Record<SectionId, IconName> = {
   journeys: 'flow',
   applications: 'application',
   packages: 'package',
-  engineering: 'engineering',
   documents: 'document',
   records: 'record',
 };

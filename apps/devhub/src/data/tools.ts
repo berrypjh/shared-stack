@@ -9,7 +9,6 @@ export const tools: Tool[] = [
     rootKind: 'directory',
     platform: 'node',
     purpose: '빌드된 선언에서 react-ui · react-native-ui 의 dist/llm-catalog.json 을 만든다',
-    commands: ['script:catalog:gen'],
     docs: [],
     source: [{ path: 'tools/scripts/generate-consumer-catalog/index.ts' }],
   },
@@ -21,7 +20,6 @@ export const tools: Tool[] = [
     platform: 'node',
     purpose:
       '플랫폼 → 패키지 → 심볼 → 토큰으로 좁히는 결정적 resolver. 배포 패키지의 dist/cli.mjs 로도 번들된다',
-    commands: ['script:ui:lookup'],
     docs: ['consumer-retrieval-readme'],
     source: [
       { path: 'tools/consumer-retrieval/cli.ts' },
@@ -36,13 +34,6 @@ export const tools: Tool[] = [
     platform: 'node',
     purpose:
       '같은 dataset · 같은 결정적 grader 로 "무엇을 읽혔을 때 소비자 작업이 맞는가"를 비교하는 평가 harness',
-    commands: [
-      'script:eval:consumer:context',
-      'script:eval:consumer:routing',
-      'script:eval:consumer:smoke',
-      'script:eval:consumer:dev',
-      'script:eval:consumer:test',
-    ],
     docs: [
       'consumer-eval-readme',
       'consumer-eval-baseline-readme',
@@ -64,7 +55,6 @@ export const tools: Tool[] = [
     rootKind: 'directory',
     platform: 'node',
     purpose: '품질 결과를 수집해 계약으로 검증한 JSON 을 quality-lab 의 public 경로로 export 한다',
-    commands: ['script:quality', 'script:quality:collect', 'script:quality:export'],
     docs: ['quality-lab-collectors', 'quality-lab-architecture'],
     source: [
       { path: 'tools/scripts/observability/cli.ts' },
@@ -79,7 +69,6 @@ export const tools: Tool[] = [
     platform: 'node',
     purpose:
       'nx release 로 공개 패키지의 버전 · changelog · 배포를 한다(로컬 registry 또는 GitHub Packages)',
-    commands: ['script:release:local', 'script:release:npm', 'script:release:npm:beta'],
     docs: ['changelog'],
     source: [
       { path: 'tools/scripts/release/release-npm.ts' },
@@ -93,12 +82,6 @@ export const tools: Tool[] = [
     rootKind: 'directory',
     platform: 'node',
     purpose: '에이전트가 패키지를 분석할 때 읽는 입력 토큰 수를 시나리오별로 잰다',
-    commands: [
-      'script:tokens:measure',
-      'script:ui-core:measure',
-      'script:react-ui:measure',
-      'script:react-native-ui:measure',
-    ],
     docs: ['measure-tokens-readme'],
     source: [{ path: 'tools/scripts/measure-tokens/all.ts' }],
     gaps: [
@@ -119,7 +102,6 @@ export const tools: Tool[] = [
     rootKind: 'directory',
     platform: 'node',
     purpose: '심볼 하나만 import 한 entry 를 번들해 트리셰이킹 효과를 byte 로 잰다',
-    commands: ['script:treeshake'],
     docs: ['treeshake-readme'],
     source: [{ path: 'tools/scripts/treeshake/check.ts' }],
   },
@@ -130,7 +112,6 @@ export const tools: Tool[] = [
     rootKind: 'file',
     platform: 'node',
     purpose: 'react-ui 의 SCSS 를 sass · autoprefixer 로 dist/index.css 로 만든다',
-    commands: [],
     docs: ['react-ui-agents'],
     source: [{ path: 'tools/scripts/build-react-ui-css.mjs' }],
   },
@@ -141,7 +122,6 @@ export const tools: Tool[] = [
     rootKind: 'file',
     platform: 'node',
     purpose: 'demo-mobile 의 EAS 빌드에서 설치 뒤에 도는 스크립트',
-    commands: [],
     docs: [],
     source: [
       { path: 'tools/scripts/eas-build-post-install.mjs' },
@@ -155,7 +135,6 @@ export const tools: Tool[] = [
     rootKind: 'directory',
     platform: 'node',
     purpose: '토큰 카운트 · exports map 해석처럼 여러 도구가 함께 쓰는 헬퍼',
-    commands: [],
     docs: [],
     source: [{ path: 'tools/lib/token-count.ts' }, { path: 'tools/lib/package-exports.ts' }],
   },
@@ -171,7 +150,6 @@ export const tools: Tool[] = [
     packageName: 'commit-mcp',
     packageManifest: { path: 'plugins/berry-commit/package.json' },
     visibility: 'internal',
-    commands: ['berry-commit:build', 'berry-commit:typecheck', 'script:build:mcp:commit'],
     docs: ['berry-commit-readme'],
     source: [
       { path: 'plugins/berry-commit/src/index.ts' },

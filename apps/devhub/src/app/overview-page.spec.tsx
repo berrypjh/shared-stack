@@ -58,9 +58,7 @@ describe('overview', () => {
     renderOverview();
     const sections = within(region('항목'));
     expect(sections.getByText(String(catalog.documents.length))).toBeTruthy();
-    expect(sections.getByRole('link', { name: '엔지니어링' }).getAttribute('href')).toBe(
-      '/engineering',
-    );
+    expect(sections.getByRole('link', { name: '기록' }).getAttribute('href')).toBe('/records');
   });
 });
 

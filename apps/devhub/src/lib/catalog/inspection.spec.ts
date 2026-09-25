@@ -13,8 +13,8 @@ const must = (id: string) => {
 };
 
 describe('inspect', () => {
-  it('covers every application, package, and tool, and nothing else', () => {
-    for (const entity of [...catalog.applications, ...catalog.packages, ...catalog.tools]) {
+  it('covers every application and package, and nothing else', () => {
+    for (const entity of [...catalog.applications, ...catalog.packages]) {
       expect(inspect(catalog, entity.id)?.id).toBe(entity.id);
     }
     expect(inspect(catalog, 'root-readme')).toBeUndefined();
@@ -29,7 +29,6 @@ describe('inspect', () => {
     });
     expect(must('devhub').visibility).toMatchObject({ value: 'internal' });
     expect(must('quality-lab-e2e').visibility).toMatchObject({ value: null });
-    expect(must('consumer-retrieval').visibility).toMatchObject({ value: null });
   });
 
   it('lists package entry points from the manifest, with the barrel and surface guard', () => {
@@ -62,19 +61,16 @@ describe('inspect', () => {
     const config = must('eslint-config');
     expect(config.tests).toEqual([]);
     expect(config.empty.tests).toContain('테스트 파일도 test target 도 없다');
-    expect(config.commands).toEqual([]);
     expect(config.upstream).toEqual([]);
   });
 
   it('always starts the source list with the root and the manifests', () => {
-    const source = must('berry-commit').source.map((ref) => ref.path);
-    expect(source.slice(0, 2)).toEqual([
-      'plugins/berry-commit',
-      'plugins/berry-commit/package.json',
+    const source = must('react-ui').source.map((ref) => ref.path);
+    expect(source.slice(0, 3)).toEqual([
+      'libs/react-ui',
+      'libs/react-ui/project.json',
+      'libs/react-ui/package.json',
     ]);
-    expect(must('react-ui-css-build').source[0]).toEqual({
-      path: 'tools/scripts/build-react-ui-css.mjs',
-    });
   });
 });
 

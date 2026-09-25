@@ -49,7 +49,7 @@ const JourneySummary = ({ journey }: { journey: ConsumerJourney }) => {
         <p className="typo-caption-small text-text-light">{ACTOR[journey.actor]}</p>
         <h2 className="typo-body-medium-strong">{journey.title}</h2>
         <p className="typo-body-small">
-          단계를 고르면 그 단계의 소스 · 명령 · 테스트 · 문서 · 근거 공백이 여기에 나옵니다.
+          단계를 고르면 그 단계의 소스 · 테스트 · 문서 · 근거 공백이 여기에 나옵니다.
         </p>
       </header>
       <section aria-labelledby="journey-owners" className="flex flex-col gap-sm">

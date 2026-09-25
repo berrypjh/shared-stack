@@ -2,43 +2,21 @@ import { Empty } from '@berrypjh/devhub-ui';
 import { List, ListItem } from '@berrypjh/react-ui';
 
 import { catalog } from '@/data';
-import type { DocumentRef, SourceRef } from '@/domain/model';
-import type { CommandItem, TestItem } from '@/lib/catalog/inspection';
-import { CONSTRAINT } from '@/lib/catalog/labels';
+import type { DocumentRef, SourceRef, TestSuite } from '@/domain/model';
 import { groupByOwner } from '@/lib/catalog/reference-groups';
 
 import { FileRow } from '../source/file-row';
 
 /** 상세 정보 칸의 조각. 항목 상세와 흐름 단계 상세가 같은 모양으로 근거를 보인다. */
 
-export const CommandRows = ({ items, empty }: { items: CommandItem[]; empty: string }) =>
-  items.length ? (
-    <List className="flex flex-col gap-sm">
-      {items.map((command) => (
-        <ListItem key={command.id} className="flex flex-col gap-2xs">
-          <code className="font-mono typo-body-small break-all">{command.line}</code>
-          <span className="typo-caption-small text-text-light">{command.purpose}</span>
-          {command.constraints.length > 0 && (
-            <span className="typo-caption-small text-text-warning">
-              실행 조건: {command.constraints.map((c) => CONSTRAINT[c.kind]).join(' · ')}
-            </span>
-          )}
-        </ListItem>
-      ))}
-    </List>
-  ) : (
-    <Empty reason={empty} />
-  );
-
-export const TestRows = ({ items, empty }: { items: TestItem[]; empty: string }) =>
+export const TestRows = ({ items, empty }: { items: TestSuite[]; empty: string }) =>
   items.length ? (
     <List className="flex flex-col gap-md">
-      {items.map(({ suite, line }) => (
+      {items.map((suite) => (
         <ListItem key={suite.id} className="flex flex-col gap-xs">
           <span className="typo-body-small-strong">
             {suite.id} <span className="typo-caption-small text-text-light">· {suite.runner}</span>
           </span>
-          {line && <code className="devhub-code">{line}</code>}
           <ul className="flex flex-col gap-sm">
             <FileRow source={suite.config} label="설정" />
             {suite.files?.map((file) => (

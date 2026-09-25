@@ -15,7 +15,6 @@ describe('catalog index', () => {
     expect(keys.filter((k, i) => keys.indexOf(k) !== i)).toEqual([]);
     expect(SEARCH_KINDS.filter((kind) => !entries.some((e) => e.kind === kind))).toEqual([]);
     expect(entries.filter((e) => e.kind === 'journey')).toHaveLength(catalog.journeys.length);
-    expect(entries.filter((e) => e.kind === 'command')).toHaveLength(catalog.commands.length);
     expect(entries.filter((e) => e.kind === 'document')).toHaveLength(catalog.documents.length);
     expect(entries.filter((e) => e.kind === 'record')).toHaveLength(catalog.records.length);
   });
@@ -31,12 +30,7 @@ describe('catalog index', () => {
 
   it.each([
     ['react-ui', 'package:react-ui', '/packages/react-ui'],
-    ['size', 'command:script:size', '/engineering#command-script:size'],
-    [
-      'eval smoke',
-      'command:script:eval:consumer:smoke',
-      '/engineering#command-script:eval:consumer:smoke',
-    ],
+    ['릴리스 스크립트', 'tool:release-scripts', '/architecture/release-scripts'],
     ['styles.css', 'export:@berrypjh/react-ui/styles.css', '/packages/react-ui#inspector-exports'],
     [
       'buildTokenOutputs',
@@ -44,7 +38,6 @@ describe('catalog index', () => {
       '/sources/libs/design-tokens/src/lib/pipeline.ts#symbol-buildTokenOutputs',
     ],
     ['token-pipeline', 'journey:token-pipeline', '/journeys/token-pipeline'],
-    ['react-ui-vitest', 'test:react-ui-vitest', '/engineering#test-react-ui-vitest'],
     ['CHANGELOG', 'document:changelog', '/documents/changelog'],
     ['bash-guard-hook', 'record:bash-guard-hook', '/records/bash-guard-hook'],
   ])('ranks "%s" first as %s', (query, key, href) => {

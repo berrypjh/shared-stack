@@ -74,8 +74,7 @@ describe('inspectStep', () => {
     expect(inspection?.order).toBe(3);
     expect(inspection?.context?.id).toBe('workspace');
     expect(inspection?.next.map((n) => n.id)).toEqual(['web', 'rn']);
-    expect(inspection?.commands.map((c) => c.line)).toEqual(['pnpm nx build @berrypjh/ui-core']);
-    expect(inspection?.tests.map((t) => t.suite.id)).toEqual(['ui-core-vitest']);
+    expect(inspection?.tests.map((suite) => suite.id)).toEqual(['ui-core-vitest']);
   });
 
   it('explains a documented-only step that has no repository source', () => {

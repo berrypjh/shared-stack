@@ -13,7 +13,6 @@ const PAGES = [
   '/journeys/token-pipeline/steps/facade',
   '/architecture/react-ui',
   '/packages/react-ui',
-  '/engineering',
   '/documents/design-tokens-agents',
   '/records/react-ui-cascade-layers',
   '/sources/libs/design-tokens/src/lib/pipeline.ts',

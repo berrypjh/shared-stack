@@ -35,15 +35,20 @@ const EXPLORER_VIEWS = VIEWS.filter((view) => !view.section).map((view) => ({
   icon: VIEW_ICON[view.id],
 }));
 
-/** 묶음(`group`)이 있는 섹션은 묶음마다 작은 제목을 단다. 순서는 카탈로그에서 온 그대로다. */
+/**
+ * 묶음(`group`)이 있는 섹션은 묶음마다 접고 펴는 제목을 단다. 순서는 카탈로그에서 온 그대로다.
+ * 문서는 항목이 많아 접힌 채로 시작하고, 현재 문서가 든 묶음만 펼친다.
+ */
 const groupsOf = (section: Section): ExplorerGroup[] => {
   const code = section.id === 'documents';
+  const collapsed = section.id === 'documents';
   const items = (entities: Section['entities']) =>
     entities.map((entity) => ({ id: entity.id, label: entity.label, href: entity.href, code }));
   const groups = [...new Set(section.entities.map((entity) => entity.group))];
   if (groups.length === 1 && groups[0] === undefined) return [{ items: items(section.entities) }];
   return groups.map((title) => ({
     title,
+    collapsed,
     items: items(section.entities.filter((entity) => entity.group === title)),
   }));
 };

@@ -1,6 +1,5 @@
 import type {
   Application,
-  CommandConstraint,
   ConsumerJourney,
   EvidenceGap,
   PackageKind,
@@ -40,6 +39,14 @@ export const APP_ROLE: Record<Application['role'], string> = {
   e2e: 'E2E',
 };
 
+/** 탐색기의 앱 묶음. 역할 하나에 앱이 하나뿐이라 뷰어 · 탐색기는 "내부 도구"로 합친다. 순서가 화면 순서다. */
+export const APP_GROUP: Record<Application['role'], string> = {
+  demo: '데모',
+  viewer: '내부 도구',
+  explorer: '내부 도구',
+  e2e: 'E2E',
+};
+
 export const RELATION_KIND: Record<Relation['kind'], string> = {
   'build-dependency': '빌드 의존',
   'consumer-dependency': '소비 의존',
@@ -74,21 +81,16 @@ export const ACTOR: Record<ConsumerJourney['actor'], string> = {
   maintainer: '유지보수 흐름',
 };
 
-/** 실행 조건 · 비용. 성공 · 실패가 아니다 — 경고 색으로만 보이고 성공 색을 쓰지 않는다. */
-export const CONSTRAINT: Record<CommandConstraint, string> = {
-  'port-binding': '포트를 열어 서버를 띄운다',
-  'running-server': '떠 있는 서버가 필요하다',
-  'browser-binaries': 'Playwright 브라우저가 필요하다',
-  'build-output': '빌드 산출물이 먼저 있어야 한다',
-  'local-registry': '로컬 registry 가 떠 있어야 한다',
-  'registry-credentials': 'registry 인증 토큰이 필요하다',
-  'repository-writes': '커밋 · 태그 · GitHub release 를 만든다',
-  'external-executor': '외부 executor 필요 — 없으면 실행을 거부한다',
-  'optional-api-key': 'API 키가 있으면 외부 API 를 부른다',
-  'long-running': '여러 검사를 차례로 돌려 오래 걸린다',
-  'watch-mode': '감시 모드 — 끝나지 않는다',
-  'deletes-files': '파일을 지운다',
-};
+/** 문서 묶음 — 루트 문서는 "저장소", 나머지는 경로 접두사로 고른다. 표의 순서가 화면 순서다. */
+export const ROOT_DOCUMENT_GROUP = '저장소';
+
+export const DOCUMENT_GROUP: [prefix: string, title: string][] = [
+  ['.claude/rules/', '프로젝트 지침'],
+  ['libs/', '패키지'],
+  ['docs/', '설계 · 사용법'],
+  ['tools/', '도구 · 플러그인'],
+  ['plugins/', '도구 · 플러그인'],
+];
 
 /** 경로를 인용하는 자리의 종류. */
 export const CITATION_KIND: Record<CitationKind, string> = {
@@ -99,7 +101,4 @@ export const CITATION_KIND: Record<CitationKind, string> = {
   relation: '관계',
   step: '흐름 단계',
   record: '기록',
-  test: '테스트 묶음',
-  command: '명령 조건',
-  workflow: 'CI workflow',
 };

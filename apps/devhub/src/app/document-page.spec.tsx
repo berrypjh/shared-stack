@@ -119,7 +119,7 @@ describe('document inspector', () => {
     const panel = within(inspector());
     const entities = within(panel.getByRole('region', { name: /^이 문서를 드는 항목/ }));
     expect(entities.getByRole('link', { name: '릴리스 스크립트' }).getAttribute('href')).toBe(
-      `/engineering/release-scripts#${INSPECTOR_ID}`,
+      `/architecture/release-scripts#${INSPECTOR_ID}`,
     );
     const steps = within(panel.getByRole('region', { name: /^이 문서를 드는 흐름 단계/ }));
     expect(steps.getByRole('link', { name: '3. 변경 기록을 남긴다' }).getAttribute('href')).toBe(
