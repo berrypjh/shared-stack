@@ -11,7 +11,7 @@ export const repository: Repository = {
   webUrl: 'https://github.com/berrypjh/shared-stack',
   defaultBranch: 'main',
   purpose: {
-    text: '디자인 토큰 하나로 웹(React)과 모바일(React Native)에서 같은 UI를 만드는 컴포넌트 라이브러리입니다.',
+    text: '디자인 토큰 하나로 웹(React)과 모바일(React Native)에서 같은 UI를 만드는 컴포넌트 라이브러리.',
     source: { path: 'README.md' },
   },
   packageManager: 'pnpm',

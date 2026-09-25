@@ -2,7 +2,7 @@ import type { DocumentRef } from '../domain/model';
 
 /** 저장소 문서. `title` 은 첫 `#` 제목 그대로다(검증된다). */
 export const documents: DocumentRef[] = [
-  { id: 'root-agents', path: 'AGENTS.md', title: 'AGENTS.md' },
+  { id: 'root-agents', path: 'AGENTS.md', title: 'shared-stack — 크로스 플랫폼 UI 시스템' },
   { id: 'root-readme', path: 'README.md', title: '@berrypjh/shared-stack' },
   { id: 'changelog', path: 'CHANGELOG.md', title: 'CHANGELOG.md' },
 
@@ -99,6 +99,31 @@ export const documents: DocumentRef[] = [
     path: 'docs/quality-lab/verification.md',
     title: 'quality-lab 검증',
   },
+  {
+    id: 'claude-harness-architecture',
+    path: 'docs/claude-harness/architecture.md',
+    title: 'Claude Harness 아키텍처',
+  },
+  {
+    id: 'claude-harness-contracts',
+    path: 'docs/claude-harness/contracts.md',
+    title: 'Claude Harness 계약',
+  },
+  {
+    id: 'claude-harness-standards-sources',
+    path: 'docs/claude-harness/standards-sources.md',
+    title: 'Claude Harness standards 추출 근거',
+  },
+  {
+    id: 'claude-harness-setup',
+    path: 'docs/claude-harness/setup.md',
+    title: 'Claude Harness 도입',
+  },
+  {
+    id: 'claude-harness-verification',
+    path: 'docs/claude-harness/verification.md',
+    title: 'Claude Harness 검증',
+  },
 
   {
     id: 'consumer-retrieval-readme',
@@ -133,4 +158,5 @@ export const documents: DocumentRef[] = [
     ],
   },
   { id: 'berry-commit-readme', path: 'plugins/berry-commit/README.md', title: 'berry-commit' },
+  { id: 'berry-dev-readme', path: 'plugins/berry-dev/README.md', title: 'berry-dev' },
 ];
