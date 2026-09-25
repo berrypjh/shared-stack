@@ -47,13 +47,13 @@ test.describe('데스크톱 셸', () => {
     page,
   }) => {
     await page.goto('/');
-    const engineering = page
+    const records = page
       .getByRole('navigation', { name: '보기' })
-      .getByRole('link', { name: '엔지니어링', exact: true });
-    await tabTo(page, engineering);
+      .getByRole('link', { name: '기록', exact: true });
+    await tabTo(page, records);
     await page.keyboard.press('Enter');
-    await expect(page).toHaveURL('/engineering');
-    await expect(engineering).toHaveAttribute('aria-current', 'page');
+    await expect(page).toHaveURL('/records');
+    await expect(records).toHaveAttribute('aria-current', 'page');
     expect(await focusIsAtStart(page)).toBe(true);
 
     await page.keyboard.press('Tab');
@@ -98,11 +98,11 @@ test.describe('상세 정보 딥링크', () => {
     await expect(inspector).toBeFocused();
   });
 
-  test('명령 카드 해시는 본문의 그 카드로 간다', async ({ page }) => {
-    await page.goto('/engineering#command-script:size');
-    const card = page.locator('[id="command-script:size"]');
-    await expect(card).toBeFocused();
-    await expect(card).toBeInViewport();
+  test('symbol 해시는 본문의 그 symbol 로 간다', async ({ page }) => {
+    await page.goto('/sources/libs/design-tokens/src/lib/pipeline.ts#symbol-buildTokenOutputs');
+    const symbol = page.locator('[id="symbol-buildTokenOutputs"]');
+    await expect(symbol).toBeFocused();
+    await expect(symbol).toBeInViewport();
   });
 });
 
