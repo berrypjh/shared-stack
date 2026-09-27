@@ -1,9 +1,7 @@
 import { z } from 'zod';
 
-import { excerptSchema } from './evidence.js';
-import { VERIFICATION_KINDS, VERIFICATION_STATUSES } from './observation.js';
+import { excerptSchema, safeText } from './evidence.js';
 import { countSchema, gitShaSchema, isoTimeSchema, orUnknown, reasonSchema } from './primitives.js';
-import { safeText } from './test-summary.js';
 
 /**
  * consumer eval (`tools/evals/consumer`) 의 summary·trace 를 화면으로 옮기는 계약.
@@ -11,6 +9,18 @@ import { safeText } from './test-summary.js';
  */
 
 export const EVAL_AXES = ['correctness', 'routing', 'context', 'verification'] as const;
+
+/** eval harness(`tools/evals/consumer/runner/schema.ts`)와 같은 trace 검증 어휘. 원본 상태를 그대로 보존한다. */
+export const VERIFICATION_KINDS = ['public-import', 'typecheck', 'test', 'build', 'lint'] as const;
+export const VERIFICATION_STATUSES = [
+  'passed',
+  'failed',
+  'not-run',
+  'unsupported',
+  'timeout',
+] as const;
+
+export type VerificationStatus = (typeof VERIFICATION_STATUSES)[number];
 
 /**
  * 값이 없는 이유. `zero-denominator`·`no-samples` 는 원본 분모·n 에서 확인한 것이고,

@@ -19,13 +19,12 @@ import {
   scopeSchema,
   sha256Schema,
 } from './primitives.js';
-import { testSummarySchema } from './test-summary.js';
 
 export const RUN_STATES = ['running', 'complete', 'partial', 'failed', 'cancelled'] as const;
 /**
- * `static` 은 정의만 읽는다. `core` 는 test·check·bundle·context 를 수집한다.
+ * `static` 은 정의와 design system·package 표면 근거를 읽는다. `core` 는 bundle·context 를 수집한다.
  * `eval` 은 이미 만든 consumer eval 산출물을 다시 실행하지 않고 가져온다.
- * `a11y` 는 quality-lab localhost audit 과 이미 만든 접근성 test·Storybook 결과를 가져온다.
+ * `a11y` 는 DevHub 평가 화면 localhost audit 과 이미 만든 접근성 test·Storybook 결과를 가져온다.
  */
 export const PROFILES = ['static', 'core', 'eval', 'a11y'] as const;
 export const SOURCE_KINDS = ['local', 'ci'] as const;
@@ -110,8 +109,6 @@ export const runArtifactSchema = z
     metadata: runMetadataSchema,
     inventory: inventorySchema.nullable(),
     observations: z.array(observationSchema),
-    /** runner report 에서 온 test 결과. static profile 은 비어 있다. */
-    tests: z.array(testSummarySchema),
     /** size-limit budget·treeshake 진단. 주석의 과거 숫자는 여기 들어오지 않는다. */
     bundles: z.array(bundleMeasurementSchema),
     /** 시나리오·variant·agent 입력 token. */
@@ -170,7 +167,6 @@ export const publicRunArtifactSchema = runArtifactSchema.superRefine((artifact, 
     ...[...(artifact.inventory?.packages ?? []), ...(artifact.inventory?.workflows ?? [])].map(
       (entry) => entry.path,
     ),
-    ...artifact.tests.flatMap((summary) => summary.cases.map((testCase) => testCase.file)),
     ...artifact.contexts.flatMap((measurement) => measurement.files),
     ...artifact.accessibility.flatMap((summary) =>
       summary.checks.flatMap((check) => check.evidence.map((location) => location.path)),

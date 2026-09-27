@@ -8,21 +8,12 @@ import { countSchema, reasonSchema } from './primitives.js';
 import { type RunArtifact, runMetadataSchema } from './run.js';
 
 /**
- * 화면이 run 전체(test case·eval trace 포함)를 받기 전에 읽는 요약.
+ * 화면이 run 전체(eval trace 포함)를 받기 전에 읽는 요약.
  * 값을 다시 계산하지 않는다 — metadata·observation 은 그대로, 영역은 행 수만, 실패는 원본 판정이
  * fail 인 행만 옮긴다. not-run·unsupported 는 실패가 아니고 여기 오지 않는다.
  */
 
-export const FAILURE_DOMAINS = [
-  'test',
-  'verification',
-  'bundle',
-  'context',
-  'eval',
-  'a11y',
-  'browser',
-  'package-surface',
-] as const;
+export const FAILURE_DOMAINS = ['bundle', 'context', 'eval', 'a11y', 'package-surface'] as const;
 
 const failureSchema = z.strictObject({
   domain: z.enum(FAILURE_DOMAINS),
@@ -37,8 +28,6 @@ export const runSummarySchema = z
     observations: z.array(observationSchema),
     /** 영역마다 담긴 행 수. 비어 있으면 그 영역을 수집하지 않은 run 이다. */
     sections: z.strictObject({
-      tests: countSchema,
-      testCases: countSchema,
       bundles: countSchema,
       contexts: countSchema,
       evals: countSchema,
@@ -87,39 +76,22 @@ export type RunFailure = z.infer<typeof failureSchema>;
 
 const clip = (text: string) => (text.length <= 500 ? text : `${text.slice(0, 499)}…`);
 const integer = (value: number) => value.toLocaleString('en-US');
-const exitText = (exitCode: number | null) => (exitCode === null ? '' : ` (exit ${exitCode})`);
 
-const observationFailure = (observation: Observation): RunFailure | null => {
-  if (observation.outcome !== 'fail') return null;
-  const base = { id: observation.id, scope: observation.scope };
-  return observation.domain === 'verification'
+const observationFailure = (observation: Observation): RunFailure | null =>
+  observation.outcome === 'fail'
     ? {
-        ...base,
-        domain: 'verification',
-        reason: `${observation.kind} ${observation.status}${exitText(observation.exitCode)}`,
+        domain: observation.domain,
+        id: observation.id,
+        scope: observation.scope,
+        reason: `${observation.id} 의 원본 판정이 fail 이다`,
       }
-    : { ...base, domain: observation.domain, reason: `${observation.id} 의 원본 판정이 fail 이다` };
-};
+    : null;
 
 const failuresOf = (artifact: RunArtifact): RunFailure[] => {
   const failures: RunFailure[] = [];
   for (const observation of artifact.observations) {
     const failure = observationFailure(observation);
     if (failure) failures.push(failure);
-  }
-  for (const summary of artifact.tests) {
-    const { execution } = summary;
-    const base = { domain: 'test' as const, id: summary.sourceId, scope: summary.project };
-    if (execution.status === 'failed' || execution.status === 'timeout') {
-      failures.push({
-        ...base,
-        reason: clip(
-          `실행이 ${execution.status} 로 끝났다${exitText(execution.exitCode)} — ${summary.outcomeReason}`,
-        ),
-      });
-    } else if (summary.outcome === 'fail') {
-      failures.push({ ...base, reason: summary.outcomeReason });
-    }
   }
   for (const measurement of artifact.bundles) {
     const { budget } = measurement;
@@ -172,8 +144,6 @@ export const summarizeRun = (artifact: RunArtifact): RunSummary => ({
   metadata: artifact.metadata,
   observations: artifact.observations,
   sections: {
-    tests: artifact.tests.length,
-    testCases: artifact.tests.reduce((sum, summary) => sum + summary.cases.length, 0),
     bundles: artifact.bundles.length,
     contexts: artifact.contexts.length,
     evals: artifact.evals.length,

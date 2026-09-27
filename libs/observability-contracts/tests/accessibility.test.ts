@@ -46,9 +46,9 @@ const impacts = (overrides: Overrides = {}) => ({
 });
 
 const target = (overrides: Overrides = {}) => ({
-  id: 'quality-lab:/bundles:light:desktop',
-  label: '/bundles · light · desktop 1280×800',
-  route: '/bundles',
+  id: 'devhub:/evaluation/bundles:light:desktop',
+  label: '/evaluation/bundles · light · desktop 1280×800',
+  route: '/evaluation/bundles',
   storyId: null,
   theme: 'light',
   viewport: { name: 'desktop', width: 1280, height: 800 },
@@ -66,8 +66,8 @@ const target = (overrides: Overrides = {}) => ({
 const unscanned = { counts: null, impactNodes: null, scannedAt: null, violations: [] };
 
 const summary = (overrides: Overrides = {}) => ({
-  id: 'a11y:quality-lab',
-  sourceScope: 'quality-lab',
+  id: 'a11y:devhub',
+  sourceScope: 'devhub',
   source: 'axe-playwright',
   engine: { name: 'axe-core', version: '4.11.1' },
   tags: ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'],
@@ -185,7 +185,7 @@ describe('AccessibilitySummary — axe target', () => {
 
   it('completed 는 실패 target 이 없고, 실패가 섞이면 partial 이다', () => {
     const failed = target({
-      id: 'quality-lab:/ai:dark:mobile',
+      id: 'devhub:/evaluation/ai:dark:mobile',
       status: 'scan-failed',
       reason: 'x',
       ...unscanned,

@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
+import { safeText } from './evidence.js';
 import { MISSING_AVAILABILITIES } from './observation.js';
 import { countSchema, metricIdSchema, reasonSchema, relativePathSchema } from './primitives.js';
-import { safeText } from './test-summary.js';
 
 /**
  * - `package-scenario`: measure-tokens 의 패키지별 시나리오 (정적 파일 묶음)

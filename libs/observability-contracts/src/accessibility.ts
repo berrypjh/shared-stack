@@ -1,8 +1,7 @@
 import { z } from 'zod';
 
-import { excerptSchema } from './evidence.js';
+import { excerptSchema, safeText } from './evidence.js';
 import { countSchema, isoTimeSchema, reasonSchema, relativePathSchema } from './primitives.js';
-import { safeText } from './test-summary.js';
 
 /**
  * 접근성 검사 결과. 출처(sourceScope)마다 뜻이 달라 합치지 않는다 — axe 결과·token pair test·
@@ -11,7 +10,7 @@ import { safeText } from './test-summary.js';
 
 export const ACCESSIBILITY_SOURCE_SCOPES = [
   'storybook',
-  'quality-lab',
+  'devhub',
   'token-contrast',
   'static-css',
   'ui-test',
@@ -19,7 +18,7 @@ export const ACCESSIBILITY_SOURCE_SCOPES = [
 ] as const;
 
 /** axe 가 DOM 을 검사한 출처. 나머지는 test 결과나 사람의 기록이다. */
-export const AXE_SCOPES = ['storybook', 'quality-lab'] as const;
+export const AXE_SCOPES = ['storybook', 'devhub'] as const;
 
 export const ACCESSIBILITY_SOURCES = [
   'axe-playwright',

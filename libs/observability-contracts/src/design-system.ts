@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
+import { safeText } from './evidence.js';
 import { countSchema, reasonSchema, relativePathSchema } from './primitives.js';
-import { safeText } from './test-summary.js';
 
 /**
  * 토큰·테마·component state·catalog·package surface 를 source 와 검사 근거로 잇는 계약.
