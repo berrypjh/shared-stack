@@ -86,7 +86,7 @@ type ProjectBase = {
 };
 
 export type Application = ProjectBase & {
-  readonly role: 'demo' | 'viewer' | 'explorer' | 'e2e';
+  readonly role: 'demo' | 'explorer' | 'e2e';
   /** `package.json` 이 없는 앱(e2e)은 셋 다 비어 있다. 공개 여부는 그 매니페스트의 `private` 에서 온다. */
   readonly packageName?: string;
   readonly packageManifest?: SourceRef;

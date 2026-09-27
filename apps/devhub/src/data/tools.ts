@@ -50,12 +50,13 @@ export const tools: Tool[] = [
   },
   {
     id: 'observability-collectors',
-    name: 'quality-lab 수집기',
+    name: '품질 관측 수집기',
     root: 'tools/scripts/observability',
     rootKind: 'directory',
     platform: 'node',
-    purpose: '품질 결과를 수집해 계약으로 검증한 JSON 을 quality-lab 의 public 경로로 export 한다',
-    docs: ['quality-lab-collectors', 'quality-lab-architecture'],
+    purpose:
+      '품질 결과를 수집해 계약으로 검증한 JSON 을 DevHub 의 public 경로로 export 한다 — 평가 화면이 읽는다',
+    docs: ['observability-collectors-guide', 'observability-architecture'],
     source: [
       { path: 'tools/scripts/observability/cli.ts' },
       { path: 'tools/scripts/observability/export.ts', symbol: 'PUBLIC_ROOT' },

@@ -41,7 +41,7 @@ describe('inspect', () => {
     const reactUi = must('react-ui');
     expect(reactUi.upstream.map((item) => item.other)).toEqual(['ui-core']);
     expect(reactUi.downstream.map((item) => item.other).sort()).toEqual(
-      ['demo-web', 'devhub', 'devhub-ui', 'devhub-ui', 'quality-lab'].sort(),
+      ['demo-web', 'devhub', 'devhub-ui', 'devhub-ui'].sort(),
     );
     expect(reactUi.artifacts.map((item) => item.other).sort()).toEqual(
       ['consumer-catalog-generator', 'consumer-retrieval', 'react-ui-css-build', 'ui-core'].sort(),

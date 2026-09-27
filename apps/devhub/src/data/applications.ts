@@ -41,40 +41,6 @@ export const applications: Application[] = [
     ],
   },
   {
-    id: 'quality-lab',
-    role: 'viewer',
-    packageName: '@berrypjh/quality-lab',
-    root: 'apps/quality-lab',
-    packageManifest: { path: 'apps/quality-lab/package.json' },
-    visibility: 'internal',
-    nxProject: '@berrypjh/quality-lab',
-    nxManifest: { path: 'apps/quality-lab/project.json' },
-    platform: 'web',
-    purpose:
-      '수집 · export 된 품질 결과를 계약으로 검증한 뒤에만 보여 준다. 명령은 실행하지 않는다',
-    docs: [
-      'quality-lab-agents',
-      'quality-lab-readme',
-      'quality-lab-architecture',
-      'quality-lab-metrics',
-      'quality-lab-verification',
-      'quality-lab-limitations',
-    ],
-    source: [{ path: 'apps/quality-lab/src/main.tsx' }],
-  },
-  {
-    id: 'quality-lab-e2e',
-    role: 'e2e',
-    root: 'apps/quality-lab-e2e',
-    nxProject: '@berrypjh/quality-lab-e2e',
-    nxManifest: { path: 'apps/quality-lab-e2e/project.json' },
-    platform: 'node',
-    purpose:
-      'quality-lab 을 실제 브라우저에서 확인한다. 앱 소스를 import 하지 않고 공개 계약으로만 fixture 를 만든다',
-    docs: ['quality-lab-e2e-agents'],
-    source: [{ path: 'apps/quality-lab-e2e/src/fixtures.ts' }],
-  },
-  {
     id: 'devhub-e2e',
     role: 'e2e',
     root: 'apps/devhub-e2e',
@@ -82,9 +48,12 @@ export const applications: Application[] = [
     nxManifest: { path: 'apps/devhub-e2e/project.json' },
     platform: 'node',
     purpose:
-      'devhub 를 실제 브라우저에서 확인한다 — 셸 키보드 · 반응형 · 검색 · 딥링크 · dialog 포커스. 앱 소스를 import 하지 않는다',
+      'devhub 를 실제 브라우저에서 확인한다 — 셸 키보드 · 반응형 · 검색 · 딥링크 · dialog 포커스 · 평가 화면. 앱 소스를 import 하지 않고 평가 fixture 는 공개 계약으로만 만든다',
     docs: ['devhub-e2e-agents'],
-    source: [{ path: 'apps/devhub-e2e/src/support/keyboard.ts', symbol: 'tabTo' }],
+    source: [
+      { path: 'apps/devhub-e2e/src/support/keyboard.ts', symbol: 'tabTo' },
+      { path: 'apps/devhub-e2e/src/support/observability.ts', symbol: 'serveObservability' },
+    ],
   },
   {
     id: 'devhub',
@@ -96,8 +65,16 @@ export const applications: Application[] = [
     nxProject: '@berrypjh/devhub',
     nxManifest: { path: 'apps/devhub/project.json' },
     platform: 'web',
-    purpose: '저장소의 구조와 근거를 탐색한다. 품질 수집 결과는 quality-lab 이 보여 준다',
-    docs: ['devhub-agents'],
+    purpose:
+      '저장소의 구조와 근거를 탐색하고, 수집 · export 된 품질 결과를 계약으로 검증한 뒤에만 평가 화면에서 보여 준다',
+    docs: [
+      'devhub-agents',
+      'observability-usage',
+      'observability-architecture',
+      'observability-metrics',
+      'observability-verification',
+      'observability-limitations',
+    ],
     source: [{ path: 'apps/devhub/src/main.tsx' }],
   },
 ];

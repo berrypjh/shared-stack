@@ -33,14 +33,6 @@ export const relations: Relation[] = [
     declaredBy: 'devDependencies',
     evidence: { path: 'libs/react-native-ui/package.json' },
   },
-  {
-    kind: 'build-dependency',
-    id: 'quality-lab-e2e-builds-after-quality-lab',
-    from: 'quality-lab-e2e',
-    to: 'quality-lab',
-    declaredBy: 'implicitDependencies',
-    evidence: { path: 'apps/quality-lab-e2e/project.json' },
-  },
 
   {
     kind: 'build-dependency',
@@ -66,22 +58,6 @@ export const relations: Relation[] = [
     to: 'react-native-ui',
     declaredBy: 'dependencies',
     evidence: { path: 'apps/demo-mobile/package.json' },
-  },
-  {
-    kind: 'consumer-dependency',
-    id: 'quality-lab-uses-react-ui',
-    from: 'quality-lab',
-    to: 'react-ui',
-    declaredBy: 'dependencies',
-    evidence: { path: 'apps/quality-lab/package.json' },
-  },
-  {
-    kind: 'consumer-dependency',
-    id: 'quality-lab-uses-observability-contracts',
-    from: 'quality-lab',
-    to: 'observability-contracts',
-    declaredBy: 'dependencies',
-    evidence: { path: 'apps/quality-lab/package.json' },
   },
   {
     kind: 'consumer-dependency',
@@ -117,11 +93,19 @@ export const relations: Relation[] = [
   },
   {
     kind: 'consumer-dependency',
-    id: 'quality-lab-e2e-uses-observability-contracts',
-    from: 'quality-lab-e2e',
+    id: 'devhub-uses-observability-contracts',
+    from: 'devhub',
+    to: 'observability-contracts',
+    declaredBy: 'dependencies',
+    evidence: { path: 'apps/devhub/package.json' },
+  },
+  {
+    kind: 'consumer-dependency',
+    id: 'devhub-e2e-uses-observability-contracts',
+    from: 'devhub-e2e',
     to: 'observability-contracts',
     declaredBy: 'source-import',
-    evidence: { path: 'apps/quality-lab-e2e/src/fixtures.ts' },
+    evidence: { path: 'apps/devhub-e2e/src/support/observability.ts' },
   },
   {
     kind: 'consumer-dependency',
@@ -203,28 +187,20 @@ export const relations: Relation[] = [
   },
   {
     kind: 'generated-artifact',
-    id: 'collectors-export-to-quality-lab',
+    id: 'collectors-export-to-devhub',
     from: 'observability-collectors',
-    to: 'quality-lab',
-    artifacts: ['apps/quality-lab/public/observability'],
+    to: 'devhub',
+    artifacts: ['apps/devhub/public/observability'],
     evidence: { path: 'tools/scripts/observability/export.ts' },
   },
 
-  {
-    kind: 'verification',
-    id: 'quality-lab-e2e-verifies-quality-lab',
-    from: 'quality-lab-e2e',
-    to: 'quality-lab',
-    summary: 'quality-lab 개발 서버를 띄워 실제 브라우저로 이동 · 키보드 · 좁은 폭을 확인한다',
-    evidence: { path: 'apps/quality-lab-e2e/playwright.config.ts' },
-  },
   {
     kind: 'verification',
     id: 'devhub-e2e-verifies-devhub',
     from: 'devhub-e2e',
     to: 'devhub',
     summary:
-      'devhub 개발 서버를 띄워 실제 브라우저로 셸 키보드 · 반응형 · 검색 · 딥링크를 확인한다',
+      'devhub 개발 서버를 띄워 실제 브라우저로 셸 키보드 · 반응형 · 검색 · 딥링크 · 평가 화면을 확인한다',
     evidence: { path: 'apps/devhub-e2e/playwright.config.ts' },
   },
   {

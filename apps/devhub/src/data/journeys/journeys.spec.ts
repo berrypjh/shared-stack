@@ -138,7 +138,7 @@ describe('journey coverage', () => {
       'consumer-eval',
       'berry-commit',
       'observability-collectors',
-      'quality-lab',
+      'devhub',
       'release-scripts',
     ]) {
       expect(owners.has(id)).toBe(true);

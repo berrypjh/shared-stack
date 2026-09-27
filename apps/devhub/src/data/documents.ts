@@ -14,17 +14,7 @@ export const documents: DocumentRef[] = [
     title: 'demo-mobile (`apps/demo-mobile`)',
   },
   { id: 'demo-mobile-readme', path: 'docs/demo/mobile.md', title: '@berrypjh/demo-mobile' },
-  {
-    id: 'quality-lab-agents',
-    path: '.claude/rules/quality-lab.md',
-    title: 'quality-lab (`apps/quality-lab`)',
-  },
-  { id: 'quality-lab-readme', path: 'docs/quality-lab/usage.md', title: 'Quality Lab 사용법' },
-  {
-    id: 'quality-lab-e2e-agents',
-    path: '.claude/rules/quality-lab-e2e.md',
-    title: 'quality-lab-e2e (`apps/quality-lab-e2e`)',
-  },
+  { id: 'observability-usage', path: 'docs/observability/usage.md', title: '품질 관측 사용법' },
   { id: 'devhub-agents', path: '.claude/rules/devhub.md', title: 'devhub (`apps/devhub`)' },
   {
     id: 'devhub-e2e-agents',
@@ -95,29 +85,29 @@ export const documents: DocumentRef[] = [
   },
 
   {
-    id: 'quality-lab-architecture',
-    path: 'docs/quality-lab/architecture.md',
-    title: 'Quality Lab 아키텍처',
+    id: 'observability-architecture',
+    path: 'docs/observability/architecture.md',
+    title: '품질 관측 아키텍처',
   },
   {
-    id: 'quality-lab-collectors',
-    path: 'docs/quality-lab/collectors.md',
-    title: 'quality-lab 수집기',
+    id: 'observability-collectors-guide',
+    path: 'docs/observability/collectors.md',
+    title: '품질 관측 수집기',
   },
   {
-    id: 'quality-lab-limitations',
-    path: 'docs/quality-lab/limitations.md',
-    title: 'quality-lab 알려진 제약',
+    id: 'observability-limitations',
+    path: 'docs/observability/limitations.md',
+    title: '품질 관측 알려진 제약',
   },
   {
-    id: 'quality-lab-metrics',
-    path: 'docs/quality-lab/metrics.md',
-    title: 'quality-lab metric 카탈로그',
+    id: 'observability-metrics',
+    path: 'docs/observability/metrics.md',
+    title: '품질 관측 metric 카탈로그',
   },
   {
-    id: 'quality-lab-verification',
-    path: 'docs/quality-lab/verification.md',
-    title: 'quality-lab 검증',
+    id: 'observability-verification',
+    path: 'docs/observability/verification.md',
+    title: '품질 관측 검증',
   },
   {
     id: 'claude-harness-architecture',

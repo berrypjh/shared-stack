@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@berrypjh/devhub-ui": "workspace:*",
+    "@berrypjh/observability-contracts": "workspace:*",
     "@berrypjh/react-ui": "workspace:*",
     "react": "*",
     "react-dom": "19.2.3",

@@ -200,8 +200,7 @@ export const packages: Package[] = [
     nxProject: '@berrypjh/observability-contracts',
     nxManifest: { path: `${OC}/project.json` },
     platform: 'platform-neutral',
-    purpose:
-      'quality-lab 수집기(Node)와 화면(브라우저)이 같은 zod schema 로 산출물을 검증하게 한다',
+    purpose: '품질 관측 수집기(Node)와 화면(브라우저)이 같은 zod schema 로 산출물을 검증하게 한다',
     entries: [built(OC, '@berrypjh/observability-contracts', '.', 'index.js')],
     barrel: { path: `${OC}/src/index.ts` },
     docs: ['observability-contracts-agents'],

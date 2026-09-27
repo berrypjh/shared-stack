@@ -34,7 +34,6 @@ export const PACKAGE_KIND: Record<PackageKind, string> = {
 
 export const APP_ROLE: Record<Application['role'], string> = {
   demo: '데모',
-  viewer: '결과 뷰어',
   explorer: '저장소 탐색기',
   e2e: 'E2E',
 };

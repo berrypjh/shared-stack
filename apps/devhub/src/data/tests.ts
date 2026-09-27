@@ -1,6 +1,6 @@
 import type { TestSuite } from '../domain/model';
 
-/** 테스트 묶음. 개수 · 통과 여부는 담지 않는다 — 실행 결과는 quality-lab 의 몫이다. */
+/** 테스트 묶음. 개수 · 통과 여부는 담지 않는다 — 실행 결과는 수집기가 모으고 평가 화면이 보여 준다. */
 export const tests: TestSuite[] = [
   {
     id: 'design-tokens-vitest',
@@ -49,18 +49,6 @@ export const tests: TestSuite[] = [
     runner: 'vitest',
     config: { path: 'apps/demo-web/vite.config.mts' },
     subjects: ['demo-web'],
-  },
-  {
-    id: 'quality-lab-vitest',
-    runner: 'vitest',
-    config: { path: 'apps/quality-lab/vite.config.mts' },
-    subjects: ['quality-lab'],
-  },
-  {
-    id: 'quality-lab-e2e-playwright',
-    runner: 'playwright',
-    config: { path: 'apps/quality-lab-e2e/playwright.config.ts' },
-    subjects: ['quality-lab'],
   },
   {
     id: 'devhub-e2e-playwright',

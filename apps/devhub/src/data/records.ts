@@ -17,7 +17,7 @@ export const records: RecordRef[] = [
       { path: 'apps/devhub/src/lib/markdown/sources.ts', symbol: 'loadRaw' },
       { path: 'apps/devhub/src/data/documents.ts' },
     ],
-    docs: ['root-agents', 'devhub-agents', 'quality-lab-readme', 'quality-lab-architecture'],
+    docs: ['root-agents', 'devhub-agents', 'observability-usage', 'observability-architecture'],
     tests: ['devhub-vitest'],
   },
   {
@@ -260,5 +260,45 @@ export const records: RecordRef[] = [
     ],
     docs: [],
     tests: [],
+  },
+  {
+    id: 'quality-lab-into-devhub',
+    path: 'docs/records/2026-09-27-quality-lab-into-devhub.md',
+    title: 'quality-lab 화면을 DevHub 평가로 옮기고 앱을 삭제',
+    kind: 'decision',
+    date: '2026-09-27',
+    summary:
+      '품질 결과 화면 10개를 DevHub 평가 하위 화면으로 옮김. 수집기 · 계약은 그대로, export 와 audit 대상만 DevHub 로',
+    sources: [
+      { path: 'apps/devhub/src/lib/evaluation/screens.ts', symbol: 'EVALUATION_SCREENS' },
+      { path: 'apps/devhub/src/lib/evaluation/client.ts', symbol: 'createClient' },
+      { path: 'apps/devhub/src/components/shell/devhub-shell.tsx', symbol: 'useEvaluationSection' },
+      { path: 'tools/scripts/observability/export.ts', symbol: 'PUBLIC_ROOT' },
+      { path: 'tools/scripts/observability/audit.ts', symbol: 'AUDIT_ROUTES' },
+      { path: 'libs/observability-contracts/src/accessibility.ts', symbol: 'AXE_SCOPES' },
+    ],
+    docs: ['devhub-agents', 'observability-architecture', 'observability-contracts-agents'],
+    tests: [
+      'devhub-vitest',
+      'devhub-e2e-playwright',
+      'tools-vitest',
+      'observability-contracts-vitest',
+    ],
+  },
+  {
+    id: 'evaluation-custom-only',
+    path: 'docs/records/2026-09-27-evaluation-custom-only.md',
+    title: '평가에서 CI 가 주는 test · 검증 결과와 브라우저 세션을 제거',
+    kind: 'decision',
+    date: '2026-09-27',
+    summary:
+      '평가는 이 저장소가 따로 재는 번들 · AI 평가 · 접근성 · 디자인 시스템 · 패키지 표면과 실행 비교만. test · 검증 데이터는 수집기 · 계약까지 삭제',
+    sources: [
+      { path: 'apps/devhub/src/lib/evaluation/screens.ts', symbol: 'EVALUATION_SCREENS' },
+      { path: 'libs/observability-contracts/src/observation.ts', symbol: 'DOMAINS' },
+      { path: 'tools/scripts/observability/registry.ts', symbol: 'COMMANDS' },
+    ],
+    docs: ['devhub-agents', 'observability-architecture', 'observability-collectors-guide'],
+    tests: ['devhub-vitest', 'tools-vitest', 'observability-contracts-vitest'],
   },
 ];

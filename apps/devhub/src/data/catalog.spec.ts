@@ -520,7 +520,7 @@ describe('graph', () => {
       expect.arrayContaining(['ui-core', 'consumer-catalog-generator', 'consumer-retrieval']),
     );
     expect(downstreamIds(catalog, 'react-ui')).toEqual(
-      expect.arrayContaining(['demo-web', 'quality-lab', 'devhub']),
+      expect.arrayContaining(['demo-web', 'devhub']),
     );
     expect(upstreamIds(catalog, 'design-tokens')).toEqual([]);
   });
@@ -551,7 +551,7 @@ describe('presentation boundary', () => {
     expect(leaks.map(({ file }) => file)).toEqual([]);
   });
 
-  it('uses only the public entry points of react-ui and devhub-ui, like a consumer', () => {
+  it('uses only the public entry points of react-ui, devhub-ui, and the contracts, like a consumer', () => {
     const specifiers = ['app', 'components', 'data', 'domain', 'lib'].flatMap((dir) =>
       sourceFiles(dir).flatMap(({ file, text }) =>
         [...text.matchAll(/from '([^']+)'|import '([^']+)'/g)].map((match) => ({
@@ -566,7 +566,12 @@ describe('presentation boundary', () => {
         .map((s) => s.specifier),
     );
     expect(workspace).toEqual(
-      new Set(['@berrypjh/react-ui', '@berrypjh/react-ui/styles.css', '@berrypjh/devhub-ui']),
+      new Set([
+        '@berrypjh/react-ui',
+        '@berrypjh/react-ui/styles.css',
+        '@berrypjh/devhub-ui',
+        '@berrypjh/observability-contracts',
+      ]),
     );
     expect(specifiers.filter(({ specifier }) => /(^|\/)(dist|libs)\//.test(specifier))).toEqual([]);
   });

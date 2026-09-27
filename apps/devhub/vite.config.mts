@@ -20,6 +20,7 @@ export default defineConfig(({ command, mode }) => ({
     alias: { '@': join(__dirname, 'src') },
   },
   cacheDir: '../../node_modules/.vite/apps/devhub',
+  /** `public/`(기본값)의 `observability/` 가 평가 화면이 fetch 하는 export 산출물이다 — build 가 dist 로 복사한다. */
   /** 저장소 스냅샷은 여기서 한 번 읽는다. 브라우저는 git 을 부르지 않는다. */
   define: {
     __DEVHUB_SNAPSHOT__: JSON.stringify(readSnapshot(join(__dirname, '../..'))),

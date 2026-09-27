@@ -1,0 +1,72 @@
+/**
+ * 평가의 화면 한 벌. 탐색기 · 화면 머리 · 문서 제목이 모두 여기서 온다. 모든 화면이 수집기가
+ * export 한 실행을 읽는다. `group` 이 탐색기의 묶음이고, 개요는 묶음 없이 평가 섹션 제목이 가리킨다.
+ */
+export type EvaluationScreen = {
+  id: string;
+  path: string;
+  label: string;
+  lead: string;
+  group?: string;
+};
+
+export const EVALUATION_SCREENS = [
+  {
+    id: 'overview',
+    path: '/evaluation',
+    label: '개요',
+    lead: '실행 하나의 번들 budget · 컨텍스트 · 평가를 서로 합치지 않고 독립 카드로 보여 준다.',
+  },
+  {
+    id: 'packages',
+    path: '/evaluation/packages',
+    label: '패키지 표면',
+    lead: 'package.json 이 선언한 exports 와 실제 산출물, catalog 재생성 결과를 source 근거로 본다.',
+    group: '품질',
+  },
+  {
+    id: 'bundles',
+    path: '/evaluation/bundles',
+    label: '번들',
+    lead: 'size-limit budget 과 esbuild tree-shaking 진단을 method · 압축 · 조정 조건과 함께 본다. 조건이 모두 같을 때만 baseline delta 를 낸다.',
+    group: '품질',
+  },
+  {
+    id: 'ai',
+    path: '/evaluation/ai',
+    label: 'AI 평가',
+    lead: '평가 metric 을 원본 이름 · 분자 · 분모 · n 과 executor 출처와 함께 본다. 서로 다른 metric 을 합친 점수는 없다.',
+    group: 'AI',
+  },
+  {
+    id: 'design-system',
+    path: '/evaluation/design-system',
+    label: '디자인 시스템',
+    lead: '테마 · 산출물 · component state 근거를 source · test 위치와 잇는다. source 참조만으로 test 됨으로 보지 않는다.',
+    group: '디자인 · 접근성',
+  },
+  {
+    id: 'accessibility',
+    path: '/evaluation/accessibility',
+    label: '접근성',
+    lead: '접근성 근거를 출처별로 나눠 본다. axe 검사 · token 대비 test · CSS 텍스트 검사 · UI test · 수동 확인은 서로 다른 근거이고 합친 점수는 없다.',
+    group: '디자인 · 접근성',
+  },
+  {
+    id: 'runs',
+    path: '/evaluation/runs',
+    label: '실행 기록',
+    lead: '공개 index 의 실행 목록과 고른 실행의 상세다.',
+    group: '실행',
+  },
+] as const satisfies readonly EvaluationScreen[];
+
+export type ScreenId = (typeof EVALUATION_SCREENS)[number]['id'];
+
+export const screenOf = (id: ScreenId): EvaluationScreen => {
+  const screen = EVALUATION_SCREENS.find((candidate) => candidate.id === id);
+  if (!screen) throw new Error(`평가 화면에 ${id} 가 없다`);
+  return screen;
+};
+
+export const screenPath = (id: ScreenId) => screenOf(id).path;

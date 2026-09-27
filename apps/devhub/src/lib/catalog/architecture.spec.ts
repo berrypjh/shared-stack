@@ -61,12 +61,8 @@ describe('architecture model', () => {
   });
 
   it('shows the subsystems outside the UI spine', () => {
-    expect(edgesBetween('observability-collectors', 'quality-lab')[0]?.kind).toBe(
-      'generated-artifact',
-    );
-    expect(edgesBetween('quality-lab-e2e', 'quality-lab').map((e) => e.kind)).toEqual([
-      'verification',
-    ]);
+    expect(edgesBetween('observability-collectors', 'devhub')[0]?.kind).toBe('generated-artifact');
+    expect(edgesBetween('devhub-e2e', 'devhub').map((e) => e.kind)).toContain('verification');
     expect(edgesBetween('consumer-retrieval', 'react-ui')[0]?.kind).toBe('generated-artifact');
     expect(edgesBetween('consumer-eval', 'react-native-ui')[0]?.kind).toBe('verification');
   });
