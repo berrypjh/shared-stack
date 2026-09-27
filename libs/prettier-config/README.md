@@ -27,4 +27,4 @@ pnpm add -D @berrypjh/prettier-config prettier
 ### Override
 
 - `*.md`, `*.mdx`: `proseWrap: preserve`
-- `*.yml`, `*.yaml`: `singleQuote: false` (YAML 표준)
+- `*.yml`, `*.yaml`: `singleQuote: false`(YAML 표준)
