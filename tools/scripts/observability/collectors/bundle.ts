@@ -6,15 +6,12 @@ import { ReportParseError } from '../adapters/report';
 import { parseSizeLimitReport, readSizeLimitCases } from '../adapters/size-limit';
 import { parseTreeshakeReport } from '../adapters/treeshake';
 import { normalizeSizeLimit, normalizeTreeshake, type ReportFailure } from '../normalizers/bundle';
-import type { ExecutionRecord } from '../normalizers/tests';
 import { commandById } from '../registry';
 import { sha256 } from '../safe-fs';
 import type { RawFile } from '../store';
 
-import { type Exec, executionOf } from './exec';
+import { type Exec, type Execution, executionOf } from './exec';
 import { readImport } from './imports';
-
-type Execution = Omit<ExecutionRecord, 'cache'>;
 
 type Captured = { text: string | null; execution: Execution | null; failure: ReportFailure | null };
 

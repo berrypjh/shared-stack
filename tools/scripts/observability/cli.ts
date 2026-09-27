@@ -29,14 +29,14 @@ import { collectStatic, gitReader, readToolVersions } from './static';
 import { STORE_ROOT, writeRun } from './store';
 
 /**
- * quality-lab 수집 CLI.
+ * 품질 관측 수집 CLI. 결과는 DevHub 평가 화면이 읽는다.
  *
  *   pnpm quality:collect --profile=static --run-id=local-static-01
  *   pnpm quality:collect --profile=core --run-id=local-quality-01
- *   pnpm quality:collect --profile=core --run-id=<id> --import=test.react-ui:tmp/quality-lab/imports/react-ui.json --only-imports
+ *   pnpm quality:collect --profile=core --run-id=<id> --import=bundle.size-limit:tmp/observability/imports/size-limit.json --only-imports
  *   pnpm quality:export --run-id=local-static-01
  *
- * 순서: 계약 lib build → collect(tmp/quality-lab) → export(apps/quality-lab/public/observability) → Vite.
+ * 순서: 계약 lib build → collect(tmp/observability) → export(apps/devhub/public/observability) → Vite.
  */
 
 export class CliUsageError extends Error {}
@@ -119,7 +119,7 @@ export const parseArgs = (argv: string[]): CliCommand => {
     throw new CliUsageError(`--profile must be one of ${PROFILES.join(', ')}\n${USAGE}`);
   if (profile === 'a11y') {
     throw new CliUsageError(
-      `--profile=a11y is collected by pnpm quality --base-url=http://localhost:4300\n${USAGE}`,
+      `--profile=a11y is collected by pnpm quality --base-url=http://localhost:4400\n${USAGE}`,
     );
   }
   const from = flags.get('from');

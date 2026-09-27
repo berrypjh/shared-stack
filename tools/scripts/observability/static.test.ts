@@ -178,8 +178,7 @@ describe('collectStatic', () => {
     for (const observation of artifact.observations) {
       expect(observation.availability).toBe('not-run');
       expect(observation.reason).toBeTruthy();
-      if (observation.domain === 'verification') expect(observation.status).toBe('not-run');
-      else expect(observation.value).toBeNull();
+      expect(observation.value).toBeNull();
     }
   });
 

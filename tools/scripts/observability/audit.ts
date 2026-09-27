@@ -8,22 +8,19 @@ import {
 import { normalizeAxeResults, WCAG_TAGS } from './adapters/axe';
 
 /**
- * quality-lab 을 localhost 에서 axe 로 검사한다. URL·route·theme·viewport 는 여기 정한 목록뿐이고,
+ * DevHub 평가 화면을 localhost 에서 axe 로 검사한다. URL·route·theme·viewport 는 여기 정한 목록뿐이고,
  * 브라우저 조작은 주입한 `openBrowser` 가 한다 — 이 모듈은 결과를 정규화하고 실패를 그대로 남긴다.
  */
 
-/** quality-lab NAV 의 route. `audit.test.ts` 가 nav.ts 와 같은지 확인한다. */
-export const QUALITY_LAB_ROUTES = [
-  '/',
-  '/quality/tests',
-  '/quality/checks',
-  '/quality/packages',
-  '/bundles',
-  '/ai',
-  '/design-system',
-  '/accessibility',
-  '/browser',
-  '/runs',
+/** DevHub 평가 화면의 route. `audit.test.ts` 가 `screens.ts` 와 같은지 확인한다. */
+export const AUDIT_ROUTES = [
+  '/evaluation',
+  '/evaluation/packages',
+  '/evaluation/bundles',
+  '/evaluation/ai',
+  '/evaluation/design-system',
+  '/evaluation/accessibility',
+  '/evaluation/runs',
 ] as const;
 
 export const AUDIT_THEMES = ['light', 'dark'] as const;
@@ -36,7 +33,7 @@ export const AUDIT_VIEWPORTS = [
 export const AUDIT_SCOPE = 'document';
 
 export const USAGE =
-  'usage: pnpm quality --base-url=http://localhost:4300 [--run-id=<id>]  (quality-lab 을 pnpm quality:lab 으로 먼저 띄운다)';
+  'usage: pnpm quality --base-url=http://localhost:4400 [--run-id=<id>]  (DevHub 를 pnpm dev:devhub 로 먼저 띄운다)';
 
 export class QualityArgsError extends Error {}
 
@@ -51,7 +48,7 @@ const defaultRunId = (date: Date) =>
     date.getUTCHours(),
   )}${pad(date.getUTCMinutes())}`;
 
-/** localhost quality-lab 만 받는다. 경로·query·credential 이 붙은 URL 은 거부한다. */
+/** localhost DevHub 만 받는다. 경로·query·credential 이 붙은 URL 은 거부한다. */
 export const parseQualityArgs = (argv: string[], now: () => Date): QualityArgs => {
   const values: Partial<Record<'base-url' | 'run-id', string>> = {};
   for (const arg of argv) {
@@ -92,16 +89,16 @@ export const parseQualityArgs = (argv: string[], now: () => Date): QualityArgs =
 export type AuditTargetSpec = {
   id: string;
   label: string;
-  route: (typeof QUALITY_LAB_ROUTES)[number];
+  route: (typeof AUDIT_ROUTES)[number];
   theme: (typeof AUDIT_THEMES)[number];
   viewport: (typeof AUDIT_VIEWPORTS)[number];
 };
 
 export const auditTargets = (): AuditTargetSpec[] =>
-  QUALITY_LAB_ROUTES.flatMap((route) =>
+  AUDIT_ROUTES.flatMap((route) =>
     AUDIT_THEMES.flatMap((theme) =>
       AUDIT_VIEWPORTS.map((viewport) => ({
-        id: `quality-lab:${route}:${theme}:${viewport.name}`,
+        id: `devhub:${route}:${theme}:${viewport.name}`,
         label: `${route} · ${theme} · ${viewport.name} ${viewport.width}×${viewport.height}`,
         route,
         theme,
@@ -120,7 +117,7 @@ export const AUDIT_LIMITATIONS = [
   '자동 검사는 WCAG 일부만 봅니다 — keyboard 흐름·focus 가시성·스크린리더·읽기 순서·복합 대비는 수동 확인 대상입니다',
   'incomplete 는 사람이 확인해야 하는 결과이고 통과가 아닙니다',
   'rule 통과 수는 접근성 성공률이 아닙니다',
-  '안정화: networkidle 뒤 h1 이 보이고 aria-busy 가 사라지고 글꼴이 로드된 다음 reduced-motion 으로 검사합니다',
+  '안정화: networkidle 뒤 main 의 h1 이 보이고 테마가 적용되고 aria-busy 가 사라지고 글꼴이 로드된 다음 reduced-motion 으로 검사합니다',
 ];
 
 const errorText = (error: unknown) =>
@@ -144,7 +141,7 @@ const head = (spec: AuditTargetSpec) => ({
   scope: AUDIT_SCOPE,
 });
 
-export const runQualityLabAudit = async ({
+export const runDevhubAudit = async ({
   baseUrl,
   now,
   reachable,
@@ -157,8 +154,8 @@ export const runQualityLabAudit = async ({
 }): Promise<AccessibilitySummary> => {
   const startedAt = now().toISOString();
   const base = {
-    id: 'a11y:quality-lab',
-    sourceScope: 'quality-lab' as const,
+    id: 'a11y:devhub',
+    sourceScope: 'devhub' as const,
     source: 'axe-playwright' as const,
     tags: [...WCAG_TAGS],
     enabledRules: ['color-contrast'],
@@ -181,7 +178,7 @@ export const runQualityLabAudit = async ({
   if (!(await reachable())) {
     return stopped(
       'not-run',
-      `${baseUrl} 에 연결할 수 없습니다 — 다른 터미널에서 pnpm quality:lab 으로 먼저 띄웁니다`,
+      `${baseUrl} 에 연결할 수 없습니다 — 다른 터미널에서 pnpm dev:devhub 로 먼저 띄웁니다`,
     );
   }
 

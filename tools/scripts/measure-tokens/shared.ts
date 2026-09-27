@@ -6,7 +6,7 @@ import { MEASURE_TARGETS, type MeasureTargetName, readScenarioFiles } from './re
  * measure-tokens CLI 의 target 선택과 출력 헬퍼.
  * `MEASURE_TARGET` 환경변수로 선택한다 (기본 `design-tokens`, 후방 호환).
  *
- * 시나리오 등록부와 내용 구성은 `registry.ts` 가 가진다 — quality-lab 수집기와 같은 한 벌이다.
+ * 시나리오 등록부와 내용 구성은 `registry.ts` 가 가진다 — 품질 관측 수집기와 같은 한 벌이다.
  */
 const targetName = (process.env.MEASURE_TARGET ?? 'design-tokens') as MeasureTargetName;
 const target = MEASURE_TARGETS[targetName];

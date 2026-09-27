@@ -16,14 +16,14 @@ import type { RunnerCase, RunnerReport } from '../adapters/report';
  * test 를 다시 실행하지 않고, accessible name 을 직접 계산하지 않는다.
  */
 
-const IMPORTS = 'tmp/quality-lab/imports/a11y';
+const IMPORTS = 'tmp/observability/imports/a11y';
 
 export const A11Y_IMPORTS = {
   storybook: `${IMPORTS}/storybook.jsonl`,
   designTokens: `${IMPORTS}/design-tokens.vitest.json`,
   reactUi: `${IMPORTS}/react-ui.vitest.json`,
   demoWeb: `${IMPORTS}/demo-web.vitest.json`,
-  qualityLab: `${IMPORTS}/quality-lab.vitest.json`,
+  devhub: `${IMPORTS}/devhub.vitest.json`,
   manual: `${IMPORTS}/manual.json`,
 } as const;
 
@@ -39,7 +39,7 @@ export const REPORT_COMMANDS = {
   designTokens: reportCommand('libs/design-tokens', 'vitest.config.mts', A11Y_IMPORTS.designTokens),
   reactUi: reportCommand('libs/react-ui', 'vitest.config.mts', A11Y_IMPORTS.reactUi),
   demoWeb: reportCommand('apps/demo-web', 'vite.config.mts', A11Y_IMPORTS.demoWeb),
-  qualityLab: reportCommand('apps/quality-lab', 'vite.config.mts', A11Y_IMPORTS.qualityLab),
+  devhub: reportCommand('apps/devhub', 'vite.config.mts', A11Y_IMPORTS.devhub),
 } as const;
 
 type Verdict = Pick<AutomatedCheck, 'status' | 'cases' | 'reason'>;
@@ -193,16 +193,20 @@ const UI_CHECKS = [
     files: ['apps/demo-web/src/app/app.spec.tsx', 'apps/demo-web/src/app/pages/pages.spec.tsx'],
   },
   {
-    id: 'ui-test:quality-lab-shell',
-    label: 'quality-lab shell landmark·이름·포커스 단언 (Testing Library, jsdom)',
+    id: 'ui-test:devhub-shell',
+    label:
+      'DevHub 화면 h1·aria-controls·페이지 안 링크의 포커스 대상과 평가 탐색기 landmark·이름 단언 (Testing Library, jsdom)',
     kind: 'dom-test',
-    report: 'qualityLab',
-    files: ['apps/quality-lab/src/app/app.spec.tsx'],
+    report: 'devhub',
+    files: [
+      'apps/devhub/src/app/semantics.spec.tsx',
+      'apps/devhub/src/app/evaluation-shell.spec.tsx',
+    ],
   },
 ] as const;
 
 export const uiTestSummary = (
-  reports: Record<'reactUi' | 'demoWeb' | 'qualityLab', RunnerReport | null>,
+  reports: Record<'reactUi' | 'demoWeb' | 'devhub', RunnerReport | null>,
 ): AccessibilitySummary =>
   checkSummary(
     'ui-test',

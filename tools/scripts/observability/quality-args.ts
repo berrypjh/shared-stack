@@ -5,12 +5,12 @@ import { parseQualityArgs, QualityArgsError } from './audit';
 /**
  * `pnpm quality` 의 두 가지 일.
  *
- *   pnpm quality --base-url=http://localhost:4300 [--run-id=<id>]   # 접근성 audit 을 새 run 으로 수집
+ *   pnpm quality --base-url=http://localhost:4400 [--run-id=<id>]   # 접근성 audit 을 새 run 으로 수집
  *   pnpm quality --run-id=<id> [--replace-baseline]                  # 이미 export 한 run 을 baseline 으로 가리킴
  */
 
 export const QUALITY_USAGE = [
-  'usage: pnpm quality --base-url=http://localhost:4300 [--run-id=<id>]',
+  'usage: pnpm quality --base-url=http://localhost:4400 [--run-id=<id>]',
   '       pnpm quality --run-id=<export 한 run id> [--replace-baseline]',
 ].join('\n');
 

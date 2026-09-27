@@ -82,7 +82,7 @@ describe('generic — 저장소 사실 · 다른 저장소 문구가 없다', ()
     /캘린더|등록했습니다|저장했습니다/,
     /\beas\b|\bexpo\b/i,
     /\bapps\/|\blibs\//,
-    /devhub|quality-lab|demo-/i,
+    /devhub|demo-/i,
     /use client|shadow-xs/,
   ];
 

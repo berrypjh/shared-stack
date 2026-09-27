@@ -16,7 +16,7 @@ export const HASH = 'c'.repeat(64);
 export const sha256 = (text: string) => createHash('sha256').update(text).digest('hex');
 
 export const tempDir = (label: string) =>
-  fs.mkdtemp(path.join(os.tmpdir(), `quality-lab-${label}-`));
+  fs.mkdtemp(path.join(os.tmpdir(), `observability-${label}-`));
 
 /** 실측 0 과 not-run 을 함께 담는다. 첫 observation 은 raw evidence 와 공개 evidence 를 모두 가진다. */
 export const fixtureArtifact = (runId = 'fixture-01'): RunArtifact => ({
@@ -61,10 +61,10 @@ export const fixtureArtifact = (runId = 'fixture-01'): RunArtifact => ({
       ],
     },
     {
-      id: 'test.quality-lab',
-      domain: 'test',
-      unit: 'count',
-      scope: '@berrypjh/quality-lab',
+      id: 'context.tokens-measure',
+      domain: 'context',
+      unit: 'tokens',
+      scope: 'workspace',
       availability: 'not-run',
       value: null,
       denominator: null,
@@ -73,7 +73,6 @@ export const fixtureArtifact = (runId = 'fixture-01'): RunArtifact => ({
       evidence: [],
     },
   ],
-  tests: [],
   bundles: [],
   contexts: [],
   evals: [],

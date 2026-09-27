@@ -18,7 +18,7 @@ import { missingAs, readJson, replaceJson, withLock } from './safe-fs';
 import { readRun } from './store';
 
 /** Vite 가 `/observability/*` 로 서빙하는 디렉터리. `.gitignore` 에 있다. */
-export const PUBLIC_ROOT = 'apps/quality-lab/public/observability';
+export const PUBLIC_ROOT = 'apps/devhub/public/observability';
 
 /** 공개할 수 없는 evidence(raw·tmp·held-out·credential 경로)를 걷어낸다. 값과 상태는 그대로다. */
 export const toPublicArtifact = (artifact: RunArtifact): RunArtifact =>

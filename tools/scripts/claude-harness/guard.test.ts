@@ -110,7 +110,6 @@ const PORT_BLOCKED = [
   'nx run @berrypjh/devhub:serve',
   'pnpm start',
   'pnpm run storybook',
-  'pnpm quality:lab',
   'pnpm local-registry',
   'npx expo start',
   'nx e2e @berrypjh/devhub-e2e',

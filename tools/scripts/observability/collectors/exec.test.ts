@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { cacheOriginOf, executionOf, runArgv } from './exec';
+import { executionOf, runArgv } from './exec';
 
 const NODE = process.execPath;
 
@@ -71,40 +71,5 @@ describe('executionOf', () => {
       status: 'cancelled',
       reason: 'signal SIGINT 로 끝났다',
     });
-  });
-});
-
-describe('cacheOriginOf — 대상 task 줄만 본다', () => {
-  const argv = ['pnpm', 'nx', 'test', '@berrypjh/demo-web'];
-
-  it('Nx 를 거치지 않으면 not-applicable', () => {
-    expect(cacheOriginOf(['pnpm', 'exec', 'vitest', 'run'], '')).toBe('not-applicable');
-  });
-
-  it.each([
-    '> nx run @berrypjh/demo-web:test --reporter=json  [local cache]',
-    '> nx run @berrypjh/demo-web:test  [remote cache]',
-    '> nx run @berrypjh/demo-web:test  [existing outputs match the cache, left as is]',
-  ])('대상 task 줄에 cache 표시가 있으면 restored: %s', (output) => {
-    expect(cacheOriginOf(argv, output)).toBe('restored');
-  });
-
-  it('의존 task 만 cache 에서 왔으면 대상은 fresh 다', () => {
-    const output =
-      '> nx run @berrypjh/react-ui:build  [local cache]\n\n> nx run @berrypjh/demo-web:test --reporter=json\n';
-    expect(cacheOriginOf(argv, output)).toBe('fresh');
-  });
-
-  it('`nx run project:target` 형태도 읽는다', () => {
-    expect(
-      cacheOriginOf(
-        ['pnpm', 'nx', 'run', '@berrypjh/demo-web:test'],
-        '> nx run @berrypjh/demo-web:test  [local cache]',
-      ),
-    ).toBe('restored');
-  });
-
-  it('대상 task 줄을 찾지 못하면 추측하지 않고 unknown 이다', () => {
-    expect(cacheOriginOf(argv, 'Successfully ran target test for project x')).toBe('unknown');
   });
 });

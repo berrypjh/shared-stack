@@ -20,7 +20,7 @@ export const STORYBOOK_A11Y = {
   enabledRules: ['color-contrast'],
 } as const;
 
-export const STORYBOOK_RESULTS_PATH = 'tmp/quality-lab/imports/a11y/storybook.jsonl';
+export const STORYBOOK_RESULTS_PATH = 'tmp/observability/imports/a11y/storybook.jsonl';
 export const STORYBOOK_INDEX_PATH = 'libs/react-ui/storybook-static/index.json';
 
 export class StorybookA11yImportError extends Error {}

@@ -84,7 +84,7 @@ describe('skill 본문 — generic', () => {
       /\bgo\b/i,
       /\bapps\//,
       /\blibs\//,
-      /devhub|quality-lab|demo-/i,
+      /devhub|demo-/i,
       /tools:check|pnpm verify/,
     ];
     expect(markers.filter((marker) => marker.test(skill)).map(String)).toEqual([]);

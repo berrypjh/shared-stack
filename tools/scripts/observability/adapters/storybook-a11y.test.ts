@@ -124,7 +124,7 @@ describe('storybookSummary', () => {
     expect(summary.outcome).toBe('not-run');
     expect(summary.targets).toEqual([]);
     expect(summary.reason).toContain(
-      'QUALITY_A11Y_RESULTS=tmp/quality-lab/imports/a11y/storybook.jsonl',
+      'QUALITY_A11Y_RESULTS=tmp/observability/imports/a11y/storybook.jsonl',
     );
   });
 

@@ -84,9 +84,9 @@ describe('parseVitestReport', () => {
   const report = parseVitestReport(JSON.stringify(PROBE));
 
   it('case 는 report 의 assertion 결과 그대로다 — describe.each 확장도 runner 가 센 만큼', () => {
-    expect(report.cases.map((c) => [c.file, c.fullName, c.status])).toEqual([
-      ['/ws/a/cases.test.ts', "group 'one' same name", 'passed'],
-      ['/ws/a/cases.test.ts', "group 'two' same name", 'passed'],
+    expect(report.cases.map((c) => [c.file, c.title, c.status])).toEqual([
+      ['/ws/a/cases.test.ts', 'same name', 'passed'],
+      ['/ws/a/cases.test.ts', 'same name', 'passed'],
       ['/ws/a/cases.test.ts', 'skipped case', 'skipped'],
       ['/ws/a/cases.test.ts', 'todo case', 'todo'],
       ['/ws/a/cases.test.ts', 'flaky', 'passed'],
@@ -95,39 +95,15 @@ describe('parseVitestReport', () => {
     ]);
   });
 
-  it('suite 수는 runner 가 보고한 값이다', () => {
-    expect(report.suites).toBe(5);
-  });
-
-  it('retry 필드가 없으므로 시도 수는 실패 메시지에서 파생한다', () => {
-    const attempts = Object.fromEntries(report.cases.map((c) => [c.fullName, c.attempts]));
-    expect(attempts['flaky']).toEqual({ value: 2, provenance: 'derived-from-report' });
-    expect(attempts['fails']).toEqual({ value: 3, provenance: 'derived-from-report' });
-    expect(attempts['skipped case']).toEqual({ value: 0, provenance: 'derived-from-report' });
-    expect(attempts["group 'one' same name"]).toEqual({
-      value: 1,
-      provenance: 'derived-from-report',
-    });
-  });
-
-  it('skip·todo 는 duration 이 없다', () => {
-    const skipped = report.cases.find((c) => c.status === 'skipped');
-    expect(skipped?.durationMs).toBeNull();
-  });
-
-  it('test 가 없는 파일은 case 없이 파일 오류로 남는다', () => {
-    expect(report.files).toEqual([
-      { file: '/ws/a/cases.test.ts', error: null },
-      { file: '/ws/b/cases.test.ts', error: null },
-      { file: '/ws/b/empty.test.ts', error: 'No test suite found in file /ws/b/empty.test.ts' },
-    ]);
+  it('test 가 없는 파일은 case 를 남기지 않는다', () => {
+    expect(report.cases.some((c) => c.file === '/ws/b/empty.test.ts')).toBe(false);
   });
 
   it('assertion 이 없어도 빈 report 는 유효하다', () => {
     const empty = parseVitestReport(
       JSON.stringify({ ...PROBE, numTotalTestSuites: 0, testResults: [] }),
     );
-    expect(empty).toMatchObject({ suites: 0, files: [], cases: [] });
+    expect(empty).toEqual({ cases: [] });
   });
 
   it('JSON 이 아니면 corrupt, 모양이 다르면 invalid', () => {

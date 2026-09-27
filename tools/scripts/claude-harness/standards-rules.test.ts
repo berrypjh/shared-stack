@@ -135,11 +135,11 @@ describe('shared-stack 적용 fixture', () => {
     expect(pathsOf('cross-runtime-pure')).toEqual(['libs/ui-core/src/**']);
   });
 
-  it('consumer rule 은 demo · quality-lab 의 소비 경로에만 매핑하고 libs 에는 없다', () => {
+  it('consumer rule 은 demo · devhub 의 소비 경로에만 매핑하고 libs 에는 없다', () => {
     const paths = pathsOf('berry-consumer');
     expect(paths.length).toBeGreaterThan(0);
     for (const entry of paths) {
-      expect(entry).toMatch(/^apps\/(demo-web|demo-mobile|quality-lab)\/src\/\*\*$/);
+      expect(entry).toMatch(/^apps\/(demo-web|demo-mobile|devhub)\/src\/\*\*$/);
     }
   });
 

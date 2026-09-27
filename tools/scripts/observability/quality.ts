@@ -21,7 +21,7 @@ import {
 } from './collectors/a11y';
 import { contrastGuards, DESIGN_PATHS } from './collectors/design-system';
 import { readImport } from './collectors/imports';
-import { type QualityArgs, runQualityLabAudit } from './audit';
+import { type QualityArgs, runDevhubAudit } from './audit';
 import { openPlaywrightBrowser } from './audit-browser';
 import { setBaseline } from './baseline';
 import { exportRun, PUBLIC_ROOT } from './export';
@@ -33,11 +33,11 @@ import { STORE_ROOT, writeRun } from './store';
 /**
  * 접근성 수집 CLI.
  *
- *   pnpm quality:lab                                  # 다른 터미널에서 먼저 띄운다
- *   pnpm quality --base-url=http://localhost:4300 [--run-id=<id>]
+ *   pnpm dev:devhub                                       # 다른 터미널에서 먼저 띄운다
+ *   pnpm quality --base-url=http://localhost:4400 [--run-id=<id>]
  *
- * quality-lab 을 localhost 에서 axe 로 검사하고, 이미 만든 Storybook·vitest·수동 기록을
- * `tmp/quality-lab/imports/a11y/` 에서 읽는다. 없으면 그 출처는 not-run 이다. 수집한 run 은
+ * DevHub 평가 화면을 localhost 에서 axe 로 검사하고, 이미 만든 Storybook·vitest·수동 기록을
+ * `tmp/observability/imports/a11y/` 에서 읽는다. 없으면 그 출처는 not-run 이다. 수집한 run 은
  * store 에 쓰고 공개 artifact 로 export 한다.
  */
 
@@ -80,11 +80,11 @@ const collect = async ({ baseUrl, runId }: QualityArgs): Promise<RunArtifact> =>
     optional(() => readImport(REPO_ROOT, A11Y_IMPORTS.storybook)),
     optional(() => readImport(REPO_ROOT, A11Y_IMPORTS.manual)),
   ]);
-  const [designTokens, reactUi, demoWeb, qualityLab] = await Promise.all([
+  const [designTokens, reactUi, demoWeb, devhub] = await Promise.all([
     readReport(A11Y_IMPORTS.designTokens),
     readReport(A11Y_IMPORTS.reactUi),
     readReport(A11Y_IMPORTS.demoWeb),
-    readReport(A11Y_IMPORTS.qualityLab),
+    readReport(A11Y_IMPORTS.devhub),
   ]);
 
   const accessibility: AccessibilitySummary[] = [
@@ -95,9 +95,9 @@ const collect = async ({ baseUrl, runId }: QualityArgs): Promise<RunArtifact> =>
     }),
     tokenContrastSummary({ guards: contrastGuards(contrast, contrastTest), report: designTokens }),
     staticCssSummary({ report: reactUi }),
-    uiTestSummary({ reactUi, demoWeb, qualityLab }),
+    uiTestSummary({ reactUi, demoWeb, devhub }),
     manualSummary({ text: manualText }),
-    await runQualityLabAudit({
+    await runDevhubAudit({
       baseUrl,
       now,
       reachable: reachable(baseUrl),
@@ -113,7 +113,7 @@ const collect = async ({ baseUrl, runId }: QualityArgs): Promise<RunArtifact> =>
         ? 'complete'
         : 'partial',
       profile: 'a11y',
-      scope: ['@berrypjh/quality-lab', '@berrypjh/react-ui', '@berrypjh/design-tokens'],
+      scope: ['@berrypjh/devhub', '@berrypjh/react-ui', '@berrypjh/design-tokens'],
       source,
       collection: { sha: source.sha, startedAt, finishedAt: now().toISOString() },
       tools: readToolVersions(REPO_ROOT, process.env),
@@ -121,7 +121,6 @@ const collect = async ({ baseUrl, runId }: QualityArgs): Promise<RunArtifact> =>
     },
     inventory,
     observations: [],
-    tests: [],
     bundles: [],
     contexts: [],
     evals: [],

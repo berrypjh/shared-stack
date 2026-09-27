@@ -79,8 +79,8 @@ describe('collectEval', () => {
   });
 
   it('tmp/llm-evals 밖은 읽지 않는다', async () => {
-    await expect(collect('tmp/quality-lab/runs')).rejects.toBeInstanceOf(BoundaryError);
-    await expect(collect('tmp/llm-evals/../quality-lab')).rejects.toBeInstanceOf(BoundaryError);
+    await expect(collect('tmp/observability/runs')).rejects.toBeInstanceOf(BoundaryError);
+    await expect(collect('tmp/llm-evals/../observability')).rejects.toBeInstanceOf(BoundaryError);
   });
 
   it('traces 가 없으면 partial 이고 summary 는 그대로 보인다', async () => {

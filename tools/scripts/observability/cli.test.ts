@@ -19,8 +19,8 @@ describe('parseArgs — 등록된 형태만 받는다', () => {
         'collect',
         '--profile=core',
         '--run-id=local-quality-01',
-        '--import=test.react-ui:tmp/quality-lab/imports/react-ui.json',
-        '--import=bundle.size-limit:tmp/quality-lab/imports/size-limit.json',
+        '--import=bundle.treeshake.react-ui:tmp/observability/imports/treeshake.json',
+        '--import=bundle.size-limit:tmp/observability/imports/size-limit.json',
         '--only-imports',
       ]),
     ).toEqual({
@@ -28,8 +28,8 @@ describe('parseArgs — 등록된 형태만 받는다', () => {
       profile: 'core',
       runId: 'local-quality-01',
       imports: {
-        'test.react-ui': 'tmp/quality-lab/imports/react-ui.json',
-        'bundle.size-limit': 'tmp/quality-lab/imports/size-limit.json',
+        'bundle.treeshake.react-ui': 'tmp/observability/imports/treeshake.json',
+        'bundle.size-limit': 'tmp/observability/imports/size-limit.json',
       },
       onlyImports: true,
     });
@@ -75,16 +75,7 @@ describe('parseArgs — 등록된 형태만 받는다', () => {
         'collect',
         '--profile=static',
         '--run-id=a',
-        '--import=test.react-ui:tmp/quality-lab/imports/a.json',
-      ],
-    ],
-    [['collect', '--profile=core', '--run-id=a', '--import=rm -rf:tmp/quality-lab/imports/a.json']],
-    [
-      [
-        'collect',
-        '--profile=core',
-        '--run-id=a',
-        '--import=eval.consumer-smoke:tmp/quality-lab/imports/a.json',
+        '--import=bundle.size-limit:tmp/observability/imports/a.json',
       ],
     ],
     [
@@ -92,7 +83,7 @@ describe('parseArgs — 등록된 형태만 받는다', () => {
         'collect',
         '--profile=core',
         '--run-id=a',
-        '--import=test.react-ui:libs/react-ui/package.json',
+        '--import=rm -rf:tmp/observability/imports/a.json',
       ],
     ],
     [
@@ -100,13 +91,37 @@ describe('parseArgs — 등록된 형태만 받는다', () => {
         'collect',
         '--profile=core',
         '--run-id=a',
-        '--import=test.react-ui:tmp/quality-lab/imports/a.json',
-        '--import=test.react-ui:tmp/quality-lab/imports/b.json',
+        '--import=eval.consumer-smoke:tmp/observability/imports/a.json',
+      ],
+    ],
+    [
+      [
+        'collect',
+        '--profile=core',
+        '--run-id=a',
+        '--import=test.react-ui:tmp/observability/imports/a.json',
+      ],
+    ],
+    [
+      [
+        'collect',
+        '--profile=core',
+        '--run-id=a',
+        '--import=bundle.size-limit:libs/react-ui/package.json',
+      ],
+    ],
+    [
+      [
+        'collect',
+        '--profile=core',
+        '--run-id=a',
+        '--import=bundle.size-limit:tmp/observability/imports/a.json',
+        '--import=bundle.size-limit:tmp/observability/imports/b.json',
       ],
     ],
     [['collect', '--profile=core', '--run-id=a', '--only-imports=yes']],
     [['collect', '--profile=eval', '--run-id=a']],
-    [['collect', '--profile=eval', '--run-id=a', '--from=tmp/quality-lab/runs']],
+    [['collect', '--profile=eval', '--run-id=a', '--from=tmp/observability/runs']],
     [['collect', '--profile=eval', '--run-id=a', '--from=tmp/llm-evals']],
     [
       [

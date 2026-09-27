@@ -30,7 +30,7 @@ const SIZE_REPORT = JSON.stringify([
 beforeEach(async () => {
   workspace = await tempDir('bundle-workspace');
   await fs.writeFile(path.join(workspace, '.size-limit.cjs'), CONFIG);
-  await fs.mkdir(path.join(workspace, 'tmp/quality-lab/imports'), { recursive: true });
+  await fs.mkdir(path.join(workspace, 'tmp/observability/imports'), { recursive: true });
 });
 
 afterEach(async () => {
@@ -124,17 +124,17 @@ describe('collectSizeLimit', () => {
 
   it('import 한 report 는 실행하지 않고 읽는다 — imports 밖 경로는 거부한다', async () => {
     await fs.writeFile(
-      path.join(workspace, 'tmp/quality-lab/imports/size-limit.json'),
+      path.join(workspace, 'tmp/observability/imports/size-limit.json'),
       SIZE_REPORT,
     );
     const { exec, calls } = recordingExec({ stdout: '' });
-    const imported = await sizeLimit(exec, 'tmp/quality-lab/imports/size-limit.json');
+    const imported = await sizeLimit(exec, 'tmp/observability/imports/size-limit.json');
     expect(calls).toEqual([]);
     expect(imported.execution).toBeNull();
     expect(imported.measurements[0].value).toBe(10574);
 
     await expect(
-      sizeLimit(exec, 'tmp/quality-lab/imports/../../../.size-limit.cjs'),
+      sizeLimit(exec, 'tmp/observability/imports/../../../.size-limit.cjs'),
     ).rejects.toBeInstanceOf(BoundaryError);
     await expect(sizeLimit(exec, '.size-limit.cjs')).rejects.toBeInstanceOf(BoundaryError);
   });

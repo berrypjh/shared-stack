@@ -26,7 +26,7 @@ const results = (overrides: Record<string, unknown> = {}) => ({
   testEngine: { name: 'axe-core', version: '4.11.1' },
   testRunner: { name: 'axe' },
   testEnvironment: { userAgent: 'Mozilla/5.0 HeadlessChrome/140', windowWidth: 1280 },
-  url: 'http://localhost:4300/bundles',
+  url: 'http://localhost:4400/evaluation/bundles',
   timestamp: '2026-09-13T12:00:00.000Z',
   toolOptions: {},
   violations: [],

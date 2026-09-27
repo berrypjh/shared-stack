@@ -1,9 +1,7 @@
 import { spawn } from 'node:child_process';
 import { performance } from 'node:perf_hooks';
 
-import { type CACHE_ORIGINS, sanitizeExcerpt } from '@berrypjh/observability-contracts';
-
-import type { ExecutionRecord } from '../normalizers/tests';
+import { sanitizeExcerpt } from '@berrypjh/observability-contracts';
 
 export type ExecResult = {
   exitCode: number | null;
@@ -12,6 +10,16 @@ export type ExecResult = {
   wallMs: number;
   stdout: string;
   stderr: string;
+};
+
+/** 프로세스 한 번의 실행 상태. `completed` 는 exit 0, `failed` 는 그 밖의 exit code 다. */
+export type Execution = {
+  status: 'completed' | 'failed' | 'timeout' | 'cancelled';
+  exitCode: number | null;
+  timeoutMs: number;
+  wallMs: number;
+  excerpt: string | null;
+  reason: string | null;
 };
 
 export type ExecOptions = { cwd: string; timeoutMs: number; env?: NodeJS.ProcessEnv };
@@ -71,10 +79,7 @@ export const excerptOf = (result: Pick<ExecResult, 'stdout' | 'stderr'>): string
 };
 
 /** 프로세스 결과를 실행 상태로. timeout·signal 중단은 이유를 남긴다. */
-export const executionOf = (
-  result: ExecResult,
-  timeoutMs: number,
-): Omit<ExecutionRecord, 'cache'> => {
+export const executionOf = (result: ExecResult, timeoutMs: number): Execution => {
   const excerpt = excerptOf(result);
   const common = { timeoutMs, wallMs: result.wallMs, excerpt };
   if (result.timedOut) {
@@ -99,31 +104,4 @@ export const executionOf = (
     exitCode: result.exitCode,
     reason: null,
   };
-};
-
-const CACHE_MARKER = /\[(?:local|remote) cache\]|existing outputs match the cache/;
-const escapeRegExp = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
-/** `nx test <project>` 또는 `nx run <project>:<target>` 에서 대상 task 를 읽는다. */
-const nxTaskOf = (argv: readonly string[]): string | null => {
-  const index = argv.indexOf('nx');
-  if (index === -1) return null;
-  return argv[index + 1] === 'run'
-    ? (argv[index + 2] ?? null)
-    : `${argv[index + 2]}:${argv[index + 1]}`;
-};
-
-/**
- * Nx 가 대상 task 를 cache 에서 복원했는지. 의존 task 의 cache 표시는 대상과 무관하므로
- * `> nx run <project>:<target>` 줄만 본다. 그 줄이 없으면 추측하지 않는다.
- */
-export const cacheOriginOf = (
-  argv: readonly string[],
-  output: string,
-): (typeof CACHE_ORIGINS)[number] => {
-  const task = nxTaskOf(argv);
-  if (task === null) return 'not-applicable';
-  const line = new RegExp(`^.*> nx run ${escapeRegExp(task)}(?:\\s.*)?$`, 'm').exec(output)?.[0];
-  if (line === undefined) return 'unknown';
-  return CACHE_MARKER.test(line) ? 'restored' : 'fresh';
 };

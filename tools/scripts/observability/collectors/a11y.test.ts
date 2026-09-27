@@ -39,22 +39,11 @@ const GUARDS: DesignSystem['contrastGuards'] = [
 
 const testCase = (file: string, title: string, status: RunnerCase['status']): RunnerCase => ({
   file: `/workspace/${file}`,
-  ancestors: [],
   title,
-  fullName: title,
   status,
-  attempts: null,
-  durationMs: 1,
 });
 
-const report = (cases: RunnerCase[]): RunnerReport => ({
-  format: 'vitest-json',
-  suites: null,
-  files: [],
-  cases,
-  errors: [],
-  interrupted: false,
-});
+const report = (cases: RunnerCase[]): RunnerReport => ({ cases });
 
 const CONTRAST = 'libs/design-tokens/src/lib/contrast.test.ts';
 
@@ -74,7 +63,7 @@ describe('tokenContrastSummary — token pair 검사이고 DOM 대비가 아니�
     ]);
     expect(summary.limitations.join(' ')).toContain('실제 DOM 대비가 아닙니다');
     expect(summary.reason).toContain(
-      '--outputFile="$PWD/tmp/quality-lab/imports/a11y/design-tokens.vitest.json"',
+      '--outputFile="$PWD/tmp/observability/imports/a11y/design-tokens.vitest.json"',
     );
   });
 
@@ -120,13 +109,13 @@ describe('uiTestSummary', () => {
         testCase('libs/react-ui/src/components/stories.aria.test.ts', 'id 참조', 'passed'),
       ]),
       demoWeb: report([testCase('apps/demo-web/src/app/pages/pages.spec.tsx', 'name', 'skipped')]),
-      qualityLab: null,
+      devhub: null,
     });
     accessibilitySummarySchema.parse(summary);
     expect(summary.checks.map((check) => [check.id, check.kind, check.status])).toEqual([
       ['ui-test:story-aria-refs', 'source-scan', 'passed'],
       ['ui-test:demo-web-names', 'dom-test', 'unknown'],
-      ['ui-test:quality-lab-shell', 'dom-test', 'not-run'],
+      ['ui-test:devhub-shell', 'dom-test', 'not-run'],
     ]);
     expect(summary.outcome).toBe('partial');
   });

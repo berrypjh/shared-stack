@@ -15,7 +15,7 @@ import { z } from 'zod';
  * impact null 을 pass 로 읽지 않는다. 결과가 없으면 0 위반이 아니라 오류다.
  */
 
-/** Storybook test-runner 와 quality-lab audit 이 같은 WCAG tag 로 검사한다. */
+/** Storybook test-runner 와 DevHub 평가 화면 audit 이 같은 WCAG tag 로 검사한다. */
 export const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'] as const;
 
 export class AxeResultError extends Error {}

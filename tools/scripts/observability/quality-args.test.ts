@@ -20,9 +20,9 @@ describe('parseQualityCommand — pnpm quality 의 두 가지 일', () => {
   });
 
   it('--base-url 이 있으면 localhost 접근성 audit 이다', () => {
-    expect(parseQualityCommand(['--base-url=http://localhost:4300'], now)).toEqual({
+    expect(parseQualityCommand(['--base-url=http://localhost:4400'], now)).toEqual({
       mode: 'audit',
-      baseUrl: 'http://localhost:4300',
+      baseUrl: 'http://localhost:4400',
       runId: 'a11y-20260913-1200',
     });
   });
@@ -32,7 +32,7 @@ describe('parseQualityCommand — pnpm quality 의 두 가지 일', () => {
       [],
       ['--replace-baseline'],
       ['--run-id=../x'],
-      ['--base-url=http://localhost:4300', '--replace-baseline'],
+      ['--base-url=http://localhost:4400', '--replace-baseline'],
       ['--run-id=a', '--run-id=b'],
     ]) {
       expect(() => parseQualityCommand(argv, now)).toThrow(QualityArgsError);

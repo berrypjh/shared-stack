@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 
 /**
- * 패키지별 시나리오 등록부와 내용 구성. measure-tokens CLI(`shared.ts`)와 quality-lab 수집기가
+ * 패키지별 시나리오 등록부와 내용 구성. measure-tokens CLI(`shared.ts`)와 품질 관측 수집기가
  * 같은 파일 목록·같은 이어 붙이기로 token 을 세도록 여기 한 벌만 둔다.
  *
  * 새 패키지 추가는 여기 항목 추가만 하면 됨.

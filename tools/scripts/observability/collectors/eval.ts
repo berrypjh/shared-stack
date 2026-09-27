@@ -127,7 +127,6 @@ export const collectEval = async (
     },
     inventory: null,
     observations: [],
-    tests: [],
     bundles: [],
     contexts:
       context.imported.status === 'parsed'

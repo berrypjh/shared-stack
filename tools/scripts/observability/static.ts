@@ -204,38 +204,18 @@ export const readToolVersions = (root: string, env: NodeJS.ProcessEnv): Record<s
 
 const NOT_RUN_REASON = 'static profile 은 정의만 읽고 명령을 실행하지 않습니다';
 
-const notRun = (command: CommandSpec): Observation => {
-  const evidence = [
-    { source: 'command' as const, commandId: command.id, exitCode: null, excerpt: null },
-  ];
-  if (command.domain === 'verification') {
-    return {
-      id: command.id,
-      domain: 'verification',
-      scope: command.scope,
-      kind: command.kind,
-      status: 'not-run',
-      availability: 'not-run',
-      outcome: null,
-      exitCode: null,
-      durationMs: null,
-      reason: NOT_RUN_REASON,
-      evidence,
-    };
-  }
-  return {
-    id: command.id,
-    domain: command.domain,
-    unit: command.unit,
-    scope: command.scope,
-    availability: 'not-run',
-    value: null,
-    denominator: null,
-    outcome: null,
-    reason: NOT_RUN_REASON,
-    evidence,
-  };
-};
+const notRun = (command: CommandSpec): Observation => ({
+  id: command.id,
+  domain: command.domain,
+  unit: command.unit,
+  scope: command.scope,
+  availability: 'not-run',
+  value: null,
+  denominator: null,
+  outcome: null,
+  reason: NOT_RUN_REASON,
+  evidence: [{ source: 'command', commandId: command.id, exitCode: null, excerpt: null }],
+});
 
 export type StaticInput = {
   workspaceRoot: string;
@@ -275,7 +255,6 @@ export const collectStatic = async (
     },
     inventory,
     observations: COMMANDS.map(notRun),
-    tests: [],
     bundles: [],
     contexts: [],
     evals: [],
