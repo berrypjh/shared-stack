@@ -9,8 +9,8 @@ import {
 import type { Page } from '@playwright/test';
 
 /**
- * E2E 전용 공개 JSON. 계약 schema 로 만들고 `page.route` 로만 주입한다 — `public/observability`
- * 에 쓰지 않으므로 실측 run 으로 배포되지 않는다. 앱 소스를 import 하지 않는다.
+ * 평가 화면 E2E 전용 공개 JSON. 계약 schema 로 만들고 `page.route` 로만 주입한다 —
+ * `public/observability` 에 쓰지 않으므로 실측 실행으로 배포되지 않는다. 앱 소스를 import 하지 않는다.
  */
 
 const SHA = 'a'.repeat(40);

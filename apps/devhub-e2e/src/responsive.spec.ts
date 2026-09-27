@@ -11,6 +11,8 @@ const PAGES = [
   '/documents/root-readme',
   '/records/react-ui-cascade-layers',
   '/sources/libs/design-tokens/src/lib/pipeline.ts',
+  '/evaluation',
+  '/evaluation/bundles',
 ];
 
 for (const width of [320, 390]) {
