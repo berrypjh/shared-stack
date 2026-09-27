@@ -93,6 +93,17 @@ export type Application = ProjectBase & {
   readonly visibility?: Visibility;
 };
 
+/**
+ * 설정 패키지가 정하는 규칙 하나. `evidence.symbol` 은 설정 파일에 글자 그대로 있는 키,
+ * `value` 는 그 파일에 적힌 값의 원문이다(공백과 닫는 괄호 앞 쉼표만 다를 수 있다). 테스트가 둘 다 파일과 대조한다.
+ * `evidence.path` 는 그 패키지의 커밋된 진입점 하나다 — 화면은 그 진입점의 specifier 로 표를 나눈다.
+ */
+export type Setting = {
+  readonly value: string;
+  readonly note: string;
+  readonly evidence: SourceRef & { readonly symbol: string };
+};
+
 export type Package = ProjectBase & {
   readonly kind: PackageKind;
   readonly packageName: string;
@@ -103,6 +114,8 @@ export type Package = ProjectBase & {
   readonly barrel?: SourceRef;
   /** 공개 표면(exports ↔ 산출물)을 고정하는 테스트. */
   readonly surfaceGuard?: SourceRef;
+  /** 설정 패키지(`config`)가 소비자에게 정해 주는 규칙. 값은 파일이 말하고 여기는 뜻만 적는다. */
+  readonly settings?: readonly Setting[];
 };
 
 /** Nx 프로젝트가 아니어도 저장소의 일부인 도구. 플러그인도 여기 둔다. */

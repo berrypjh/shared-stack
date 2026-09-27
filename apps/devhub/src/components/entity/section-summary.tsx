@@ -4,7 +4,7 @@ import { List, ListItem } from '@berrypjh/react-ui';
 import { Link } from 'react-router-dom';
 
 import type { Entity, Section } from '@/lib/catalog/entities';
-import { APP_ROLE, PLATFORM, VISIBILITY } from '@/lib/catalog/labels';
+import { PLATFORM, VISIBILITY } from '@/lib/catalog/labels';
 
 import { LINK } from '../ui/entity-link';
 
@@ -19,8 +19,6 @@ const captionOf = (entity: Entity) => {
       ]
         .filter(Boolean)
         .join(' · ');
-    case 'applications':
-      return `${APP_ROLE[entity.record.role]} · ${PLATFORM[entity.record.platform]}`;
     case 'packages':
       return `${entity.record.packageName} · ${VISIBILITY[entity.record.visibility]} · ${PLATFORM[entity.record.platform]}`;
     case 'documents':

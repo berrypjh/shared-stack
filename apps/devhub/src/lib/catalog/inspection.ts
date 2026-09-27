@@ -1,10 +1,8 @@
 import { downstreamOf, testsOf, upstreamOf, verifiersOf } from '../../domain/graph';
 import type {
-  Application,
   Catalog,
   DocumentRef,
   EvidenceGap,
-  Package,
   PackageEntry,
   Platform,
   Relation,
@@ -14,11 +12,9 @@ import type {
 } from '../../domain/model';
 
 /**
- * 상세 정보 칸의 모델. 카탈로그에서만 만들고 화면은 그리기만 한다.
+ * 패키지 화면의 상세 정보 칸 모델. 카탈로그에서만 만들고 화면은 그리기만 한다.
  * 섹션은 늘 같은 순서로 모두 있다 — 비면 숨기지 않고 `empty` 에 이유를 둔다.
  */
-
-export type SubjectKind = 'application' | 'package';
 
 export type RelationItem = {
   relation: Relation;
@@ -26,35 +22,26 @@ export type RelationItem = {
   other: string;
 };
 
-export type VisibilityFact =
-  | { value: Visibility; evidence: SourceRef }
-  | { value: null; reason: string };
-
-export type Exports =
-  | {
-      visibility: Visibility;
-      entries: readonly PackageEntry[];
-      manifest: SourceRef;
-      barrel?: SourceRef;
-      guard?: SourceRef;
-    }
-  | { reason: string };
-
 export type Inspection = {
   id: string;
-  kind: SubjectKind;
   title: string;
   purpose: string;
   platform: Platform;
-  visibility: VisibilityFact;
+  /** 매니페스트의 `private` 에서 온다. */
+  visibility: { value: Visibility; evidence: SourceRef };
   overview: {
     root: SourceRef;
-    nxProject: string | null;
-    nxManifest: SourceRef | null;
-    packageName: string | null;
+    nxProject: string;
+    packageName: string;
     gaps: readonly EvidenceGap[];
   };
-  exports: Exports;
+  exports: {
+    visibility: Visibility;
+    entries: readonly PackageEntry[];
+    manifest: SourceRef;
+    barrel?: SourceRef;
+    guard?: SourceRef;
+  };
   upstream: RelationItem[];
   downstream: RelationItem[];
   artifacts: RelationItem[];
@@ -73,55 +60,13 @@ export type Inspection = {
   };
 };
 
-type Subject = { kind: 'application'; record: Application } | { kind: 'package'; record: Package };
-
-const subjectOf = (catalog: Catalog, id: string): Subject | undefined => {
-  const app = catalog.applications.find((a) => a.id === id);
-  if (app) return { kind: 'application', record: app };
-  const pkg = catalog.packages.find((p) => p.id === id);
-  return pkg && { kind: 'package', record: pkg };
-};
-
 const otherEnd = (relation: Relation, id: string) =>
   relation.from === id ? relation.to : relation.from;
 
-const visibilityOf = (subject: Subject): VisibilityFact => {
-  const { record } = subject;
-  if (record.visibility && record.packageManifest) {
-    return { value: record.visibility, evidence: record.packageManifest };
-  }
-  return {
-    value: null,
-    reason: 'package.json 이 없어 배포 단위가 아니다 — 공개 여부가 정의되지 않는다',
-  };
-};
-
-const exportsOf = (subject: Subject): Exports => {
-  if (subject.kind === 'package') {
-    const pkg = subject.record;
-    return {
-      visibility: pkg.visibility,
-      entries: pkg.entries,
-      manifest: pkg.packageManifest,
-      barrel: pkg.barrel,
-      guard: pkg.surfaceGuard,
-    };
-  }
-  return subject.record.packageManifest
-    ? {
-        reason:
-          'package.json 에 exports · main 이 없다 — 다른 패키지가 import 하는 진입점이 아니다',
-      }
-    : { reason: 'package.json 이 없어 진입점이 없다' };
-};
-
-const rootRef = (subject: Subject): SourceRef => ({ path: subject.record.root, directory: true });
-
-/** 항목 하나의 상세 정보. 카탈로그에 없는 ID 면 `undefined`. */
+/** 패키지 하나의 상세 정보. 카탈로그의 패키지가 아니면 `undefined`. */
 export const inspect = (catalog: Catalog, id: string): Inspection | undefined => {
-  const subject = subjectOf(catalog, id);
-  if (!subject) return undefined;
-  const { record } = subject;
+  const record = catalog.packages.find((pkg) => pkg.id === id);
+  if (!record) return undefined;
 
   const documentById = new Map(catalog.documents.map((doc) => [doc.id, doc]));
   const flows = (relations: Relation[]) =>
@@ -129,36 +74,34 @@ export const inspect = (catalog: Catalog, id: string): Inspection | undefined =>
 
   const upstream = upstreamOf(catalog, id);
   const downstream = downstreamOf(catalog, id);
-  const nxManifest = 'nxManifest' in record ? record.nxManifest : null;
-  const manifests = [
-    ...(nxManifest ? [nxManifest] : []),
-    ...(record.packageManifest && record.packageManifest.path !== nxManifest?.path
-      ? [record.packageManifest]
-      : []),
-  ];
+  const root: SourceRef = { path: record.root, directory: true };
   const noTest = record.gaps?.find((gap) => gap.kind === 'no-test');
 
   return {
     id,
-    kind: subject.kind,
     title: record.id,
     purpose: record.purpose,
     platform: record.platform,
-    visibility: visibilityOf(subject),
+    visibility: { value: record.visibility, evidence: record.packageManifest },
     overview: {
-      root: rootRef(subject),
+      root,
       nxProject: record.nxProject,
-      nxManifest,
-      packageName: record.packageName ?? null,
+      packageName: record.packageName,
       gaps: record.gaps ?? [],
     },
-    exports: exportsOf(subject),
+    exports: {
+      visibility: record.visibility,
+      entries: record.entries,
+      manifest: record.packageManifest,
+      barrel: record.barrel,
+      guard: record.surfaceGuard,
+    },
     upstream: flows(upstream.filter((relation) => relation.kind !== 'generated-artifact')),
     downstream: flows(downstream.filter((relation) => relation.kind !== 'generated-artifact')),
     artifacts: flows(
       [...upstream, ...downstream].filter((relation) => relation.kind === 'generated-artifact'),
     ),
-    source: [rootRef(subject), ...manifests, ...record.source],
+    source: [root, record.nxManifest, record.packageManifest, ...record.source],
     documents: record.docs.flatMap((docId) => documentById.get(docId) ?? []),
     tests: testsOf(catalog, id),
     related: [

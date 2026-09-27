@@ -1,8 +1,8 @@
 import { type LegendItem } from '@berrypjh/devhub-ui';
 
+import { catalog } from '@/data';
 import type { Relation } from '@/domain/model';
 import type { ArchNode } from '@/lib/catalog/architecture';
-import { entityById } from '@/lib/catalog/entities';
 import { APP_ROLE, PLATFORM, RELATION_KIND, VISIBILITY } from '@/lib/catalog/labels';
 
 /** 관계 종류마다의 선 모양. 색이 아니라 모양과 라벨 글자로 구분한다. 범례도 여기서 만든다. */
@@ -41,13 +41,11 @@ const KIND: Record<ArchNode['kind'], string> = {
 
 /** 노드의 종류 글 한 줄. 그림의 상자 모양과 같은 것을 글자로 말한다. */
 export const kindLine = (node: ArchNode) => {
-  const entity = entityById(node.id);
   if (node.kind === 'package' && node.visibility) {
     return `${KIND.package} · ${VISIBILITY[node.visibility]}`;
   }
-  if (entity?.section === 'applications') {
-    return `${KIND.application} · ${APP_ROLE[entity.record.role]}`;
-  }
+  const app = catalog.applications.find((candidate) => candidate.id === node.id);
+  if (app) return `${KIND.application} · ${APP_ROLE[app.role]}`;
   return KIND[node.kind];
 };
 

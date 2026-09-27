@@ -28,7 +28,6 @@ const SECTIONS = [
 
 type SectionKey = (typeof SECTIONS)[number][0];
 const TITLE = Object.fromEntries(SECTIONS) as Record<SectionKey, string>;
-const KIND = { application: '애플리케이션', package: '패키지' } as const;
 
 const Section = ({
   id,
@@ -78,17 +77,9 @@ const Overview = ({ inspection }: { inspection: Inspection }) => {
       </List>
       <dl className="grid grid-cols-[6rem_minmax(0,1fr)] gap-x-md gap-y-xs typo-body-small">
         <dt className="text-text-light">Nx 프로젝트</dt>
-        <dd className="devhub-code">
-          {overview.nxProject ?? (
-            <span className="font-sans text-text-light">없음 — Nx 프로젝트가 아니다</span>
-          )}
-        </dd>
+        <dd className="devhub-code">{overview.nxProject}</dd>
         <dt className="text-text-light">패키지 이름</dt>
-        <dd className="devhub-code">
-          {overview.packageName ?? (
-            <span className="font-sans text-text-light">없음 — package.json 이 없다</span>
-          )}
-        </dd>
+        <dd className="devhub-code">{overview.packageName}</dd>
       </dl>
       {overview.gaps.length > 0 && (
         <List className="flex flex-col gap-xs">
@@ -107,27 +98,21 @@ const VisibilitySection = ({ inspection }: { inspection: Inspection }) => {
   const { visibility } = inspection;
   return (
     <Section id="visibility">
-      {visibility.value === null ? (
-        <Empty reason={visibility.reason} />
-      ) : (
-        <>
-          <p className="typo-body-small">
-            {visibility.value === 'public' ? (
-              <>
-                <strong>공개</strong> — package.json 에 private 이 없어 npm 에 배포된다
-              </>
-            ) : (
-              <>
-                <strong>Internal</strong> — package.json 의 private: true. 배포되지 않고
-                워크스페이스 안에서만 쓴다
-              </>
-            )}
-          </p>
-          <List className="flex flex-col gap-sm">
-            <FileRow source={visibility.evidence} label="근거" />
-          </List>
-        </>
-      )}
+      <p className="typo-body-small">
+        {visibility.value === 'public' ? (
+          <>
+            <strong>공개</strong> — package.json 에 private 이 없어 npm 에 배포된다
+          </>
+        ) : (
+          <>
+            <strong>Internal</strong> — package.json 의 private: true. 배포되지 않고 워크스페이스
+            안에서만 쓴다
+          </>
+        )}
+      </p>
+      <List className="flex flex-col gap-sm">
+        <FileRow source={visibility.evidence} label="근거" />
+      </List>
       <p className="typo-body-small">플랫폼: {PLATFORM[inspection.platform]}</p>
     </Section>
   );
@@ -139,13 +124,6 @@ const VisibilitySection = ({ inspection }: { inspection: Inspection }) => {
  */
 const ExportsSection = ({ inspection }: { inspection: Inspection }) => {
   const { exports } = inspection;
-  if ('reason' in exports) {
-    return (
-      <Section id="exports">
-        <Empty reason={exports.reason} />
-      </Section>
-    );
-  }
   return (
     <Section id="exports" count={exports.entries.length}>
       <p className="typo-caption-small text-text-light">
@@ -198,16 +176,14 @@ export const InspectorPanel = ({
   <div className="flex flex-col divide-y divide-stroke-light">
     <header className="flex flex-col gap-sm pb-lg">
       <div className="flex items-center justify-between gap-sm">
-        <p className="typo-caption-small text-text-light">{KIND[inspection.kind]}</p>
+        <p className="typo-caption-small text-text-light">패키지</p>
         <Pager entities={siblings} current={inspection.id} unit={unit} />
       </div>
       <h2 className="typo-body-medium-strong break-all">{inspection.title}</h2>
       <p className="flex flex-wrap gap-x-md typo-caption-small">
-        {inspection.visibility.value && (
-          <span className="rounded-sm border border-stroke-default px-xs">
-            {inspection.visibility.value === 'public' ? '공개(배포)' : 'Internal'}
-          </span>
-        )}
+        <span className="rounded-sm border border-stroke-default px-xs">
+          {inspection.visibility.value === 'public' ? '공개(배포)' : 'Internal'}
+        </span>
         <span className="text-text-light">{PLATFORM[inspection.platform]}</span>
       </p>
       <nav aria-label="상세 목차">

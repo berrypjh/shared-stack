@@ -3,7 +3,7 @@ import { List, ListItem } from '@berrypjh/react-ui';
 import { Link } from 'react-router-dom';
 
 import type { ArchitectureModel, ArchNode } from '@/lib/catalog/architecture';
-import { entityById } from '@/lib/catalog/entities';
+import { findEntity } from '@/lib/catalog/entities';
 import { RELATION_KIND } from '@/lib/catalog/labels';
 
 import { kindLine, nodeHref, platformLine } from './presentation';
@@ -11,7 +11,7 @@ import { kindLine, nodeHref, platformLine } from './presentation';
 const LINK = 'text-text-link underline-offset-2 hover:underline';
 
 /**
- * 고른 노드: 종류 · 플랫폼 · 위치, 전체 관계(필터와 상관없이)와 근거 파일, 항목 화면 링크.
+ * 고른 노드: 종류 · 플랫폼 · 위치, 전체 관계(필터와 상관없이)와 근거 파일. 패키지는 항목 화면 링크도 둔다.
  * 관계 링크는 상대 노드를 고르며 `#devhub-inspector` 로 상세 정보에 머문다.
  */
 export const NodeInspector = ({
@@ -25,7 +25,7 @@ export const NodeInspector = ({
 }) => {
   const edges = model.edges.filter((edge) => edge.source === node.id || edge.target === node.id);
   const labelOf = (id: string) => model.nodes.find((n) => n.id === id)?.label ?? id;
-  const entity = entityById(node.id);
+  const entity = findEntity('packages', node.id);
   return (
     <div className="flex flex-col gap-lg">
       <header className="flex flex-col gap-xs">

@@ -1,4 +1,4 @@
-import type { EvidenceGap, Package, PackageEntry } from '../domain/model';
+import type { EvidenceGap, Package, PackageEntry, Setting } from '../domain/model';
 
 /** `exports` 의 subpath 를 소비자 specifier 로. `.` 은 패키지 이름이다. */
 const specifierOf = (packageName: string, subpath: string) =>
@@ -30,6 +30,18 @@ const measureFailure: EvidenceGap = {
   note: '토큰 측정 시나리오가 dist/AGENTS.md 를 읽는데 이 패키지는 그 파일을 만들지 않아 측정이 실패한다',
   evidence: [{ path: 'tools/scripts/measure-tokens/README.md' }],
 };
+
+/** 설정 파일의 키 하나: 값의 원문과 그 뜻. */
+const setting = (path: string, symbol: string, value: string, note: string): Setting => ({
+  value,
+  note,
+  evidence: { path, symbol },
+});
+
+const ES = 'libs/eslint-config';
+const PR = 'libs/prettier-config/index.js';
+const TS = 'libs/tsconfig';
+const CL = 'libs/commitlint-config/index.js';
 
 const DT = 'libs/design-tokens';
 const UC = 'libs/ui-core';
@@ -212,8 +224,82 @@ export const packages: Package[] = [
       committed('libs/eslint-config', '@berrypjh/eslint-config/react', 'react.mjs'),
     ],
     docs: ['eslint-config-readme'],
-    source: [{ path: 'libs/eslint-config/base.mjs' }],
-    gaps: [noTest('libs/eslint-config')],
+    source: [{ path: `${ES}/base.mjs` }],
+    settings: [
+      setting(
+        `${ES}/base.mjs`,
+        'nx.configs',
+        "...nx.configs['flat/base'], ...nx.configs['flat/typescript'], ...nx.configs['flat/javascript']",
+        'Nx 의 기본 · TypeScript · JavaScript flat config 를 먼저 깐다. 아래 규칙은 그 위에 더한다',
+      ),
+      setting(
+        `${ES}/base.mjs`,
+        'simple-import-sort/imports',
+        String.raw`['^\\u0000'], ['^node:'], ['^react(/|$)', '^next(/|$)', '^react-native(/|$)'], ['^@?\\w'], ['^@/'], ['^\\.\\.(?!/?$)', '^\\.\\./?$'], ['^\\./(?=.*/)(?!/?$)', '^\\.(?!/?$)', '^\\./?$'], ['^.+\\.s?css$']`,
+        'import 순서를 그룹으로 고정한다 — side effect · node: · react/next/react-native · 외부 패키지 · @/ 별칭 · 상위 상대 경로 · 같은 폴더 · 스타일. 어긋나면 오류이고 자동 수정된다',
+      ),
+      setting(
+        `${ES}/base.mjs`,
+        'simple-import-sort/exports',
+        "'error'",
+        'export 문도 같은 방식으로 정렬한다',
+      ),
+      setting(
+        `${ES}/base.mjs`,
+        '@typescript-eslint/no-unused-vars',
+        "'off'",
+        '기본 미사용 변수 검사를 끈다. 아래 unused-imports 플러그인이 대신 맡는다(no-unused-vars 도 같이 끈다)',
+      ),
+      setting(
+        `${ES}/base.mjs`,
+        'unused-imports/no-unused-imports',
+        "'error'",
+        '쓰지 않는 import 는 오류다. 자동 수정으로 지워진다',
+      ),
+      setting(
+        `${ES}/base.mjs`,
+        'unused-imports/no-unused-vars',
+        "['warn', { vars: 'all', varsIgnorePattern: '^_', args: 'after-used', argsIgnorePattern: '^_' }]",
+        '쓰지 않는 변수는 경고다. _ 로 시작하는 이름은 봐주고, 인자는 마지막으로 쓰인 것 뒤만 본다',
+      ),
+      setting(
+        `${ES}/base.mjs`,
+        '@typescript-eslint/no-explicit-any',
+        "'error'",
+        'TypeScript 파일에서 any 를 금지한다',
+      ),
+      setting(
+        `${ES}/nx.mjs`,
+        'enforceBuildableLibDependency',
+        'true',
+        'buildable lib 가 buildable 이 아닌 lib 에 기대면 오류다',
+      ),
+      setting(
+        `${ES}/nx.mjs`,
+        'allow',
+        String.raw`['^.*/eslint(\\.base)?\\.config\\.[cm]?[jt]s$']`,
+        'eslint 설정 파일끼리의 import 는 경계 검사에서 뺀다',
+      ),
+      setting(
+        `${ES}/nx.mjs`,
+        'depConstraints',
+        "[{ sourceTag: '*', onlyDependOnLibsWithTags: ['*'] }]",
+        'tag 제약은 모두 허용이다. 소비 저장소가 자기 tag 로 덮어쓴다',
+      ),
+      setting(
+        `${ES}/react.mjs`,
+        'nx.configs',
+        "...nx.configs['flat/react']",
+        'Nx 의 React flat config — react · react-hooks · jsx-a11y 플러그인 선언과 안전성 규칙',
+      ),
+      setting(
+        `${ES}/react.mjs`,
+        'flatConfigs.recommended',
+        '...jsxA11y.flatConfigs.recommended.rules',
+        'jsx-a11y 권장 규칙 전부를 .jsx · .tsx 에 켠다. Nx 기본보다 강하다',
+      ),
+    ],
+    gaps: [noTest(ES)],
   },
   {
     id: 'prettier-config',
@@ -228,7 +314,55 @@ export const packages: Package[] = [
     purpose: '공유 Prettier 설정',
     entries: [committed('libs/prettier-config', '@berrypjh/prettier-config', 'index.js')],
     docs: ['prettier-config-readme'],
-    source: [{ path: 'libs/prettier-config/index.js' }],
+    source: [{ path: PR }],
+    settings: [
+      setting(PR, 'printWidth', '100', '한 줄 100자. Prettier 기본 80보다 넓다'),
+      setting(PR, 'tabWidth', '2', '들여쓰기 2칸. 기본값과 같다'),
+      setting(PR, 'useTabs', 'false', '탭 대신 공백. 기본값과 같다'),
+      setting(PR, 'singleQuote', 'true', '문자열은 작은따옴표. 기본은 큰따옴표다'),
+      setting(PR, 'jsxSingleQuote', 'false', 'JSX 속성은 큰따옴표. 기본값과 같다'),
+      setting(PR, 'semi', 'true', '문장 끝 세미콜론. 기본값과 같다'),
+      setting(
+        PR,
+        'trailingComma',
+        "'all'",
+        '마지막 항목 뒤에도 쉼표(함수 인자 포함). Prettier 3 기본값과 같다',
+      ),
+      setting(PR, 'arrowParens', "'always'", '화살표 함수 인자가 하나여도 괄호. 기본값과 같다'),
+      setting(PR, 'bracketSpacing', 'true', '객체 리터럴 중괄호 안 공백. 기본값과 같다'),
+      setting(PR, 'bracketSameLine', 'false', '여러 줄 JSX 의 닫는 > 는 다음 줄. 기본값과 같다'),
+      setting(
+        PR,
+        'singleAttributePerLine',
+        'false',
+        'JSX 속성을 한 줄에 하나로 강제하지 않는다. 기본값과 같다',
+      ),
+      setting(PR, 'endOfLine', "'lf'", '줄 끝은 LF. Windows 에서도 CRLF 를 만들지 않는다'),
+      setting(
+        PR,
+        'htmlWhitespaceSensitivity',
+        "'css'",
+        'HTML 공백은 CSS display 값을 따른다. 기본값과 같다',
+      ),
+      setting(
+        PR,
+        'embeddedLanguageFormatting',
+        "'auto'",
+        '코드 안의 다른 언어(markdown 코드 블록 등)도 포맷한다. 기본값과 같다',
+      ),
+      setting(
+        PR,
+        "files: ['*.md', '*.mdx']",
+        "{ proseWrap: 'preserve', printWidth: 100, tabWidth: 2, embeddedLanguageFormatting: 'auto' }",
+        'markdown 은 문단을 다시 감싸지 않는다. 나머지는 위와 같다',
+      ),
+      setting(
+        PR,
+        "files: ['*.yml', '*.yaml']",
+        '{ tabWidth: 2, singleQuote: false }',
+        'YAML 은 큰따옴표. 위의 singleQuote 를 YAML 에서만 되돌린다',
+      ),
+    ],
     gaps: [noTest('libs/prettier-config')],
   },
   {
@@ -248,8 +382,127 @@ export const packages: Package[] = [
       committed('libs/tsconfig', '@berrypjh/tsconfig/library.json', 'library.json'),
     ],
     docs: ['tsconfig-readme'],
-    source: [{ path: 'libs/tsconfig/base.json' }],
-    gaps: [noTest('libs/tsconfig')],
+    source: [{ path: `${TS}/base.json` }],
+    settings: [
+      setting(`${TS}/base.json`, 'target', '"es2022"', 'ES2022 문법으로 낸다'),
+      setting(
+        `${TS}/base.json`,
+        'lib',
+        '["es2022"]',
+        '타입 선언은 ES2022 만. DOM 은 소비자가 더한다',
+      ),
+      setting(
+        `${TS}/base.json`,
+        'strict',
+        'true',
+        '엄격 검사 전부(strictNullChecks · noImplicitAny 등)',
+      ),
+      setting(
+        `${TS}/base.json`,
+        'skipLibCheck',
+        'true',
+        '.d.ts 는 검사하지 않는다. 의존성의 타입 충돌로 빌드가 서지 않게 한다',
+      ),
+      setting(
+        `${TS}/base.json`,
+        'noFallthroughCasesInSwitch',
+        'true',
+        'switch 의 case 가 break 없이 흘러내리면 오류',
+      ),
+      setting(
+        `${TS}/base.json`,
+        'noImplicitOverride',
+        'true',
+        '상속한 멤버를 덮을 때 override 키워드가 없으면 오류',
+      ),
+      setting(
+        `${TS}/base.json`,
+        'noImplicitReturns',
+        'true',
+        '어떤 경로는 값을 돌려주고 어떤 경로는 아니면 오류',
+      ),
+      setting(`${TS}/base.json`, 'noUnusedLocals', 'true', '쓰지 않는 지역 변수는 오류'),
+      setting(
+        `${TS}/base.json`,
+        'isolatedModules',
+        'true',
+        '파일 하나만 보고 변환할 수 있게 강제한다. esbuild · SWC 같은 단일 파일 변환기와 맞춘다',
+      ),
+      setting(
+        `${TS}/base.json`,
+        'importHelpers',
+        'true',
+        '변환 헬퍼를 파일마다 넣지 않고 tslib 에서 import 한다. 소비자는 tslib 를 설치한다',
+      ),
+      setting(
+        `${TS}/base.json`,
+        'forceConsistentCasingInFileNames',
+        'true',
+        'import 경로의 대소문자가 실제 파일과 다르면 오류',
+      ),
+      setting(
+        `${TS}/library.json`,
+        'extends',
+        '"./base.json"',
+        'base 위에 npm 라이브러리용 모듈 설정을 더한다',
+      ),
+      setting(
+        `${TS}/library.json`,
+        'module',
+        '"nodenext"',
+        'Node 의 ESM · CJS 규칙대로 모듈을 낸다',
+      ),
+      setting(
+        `${TS}/library.json`,
+        'moduleResolution',
+        '"nodenext"',
+        'package.json exports 와 확장자 규칙을 Node 처럼 푼다',
+      ),
+      setting(`${TS}/library.json`, 'resolveJsonModule', 'true', 'JSON 파일을 import 할 수 있다'),
+      setting(
+        `${TS}/next.json`,
+        'extends',
+        '"./base.json"',
+        'base 위에 번들러 기반 앱용 설정을 더한다',
+      ),
+      setting(
+        `${TS}/next.json`,
+        'composite',
+        'true',
+        '프로젝트 참조(references)의 대상이 될 수 있다',
+      ),
+      setting(
+        `${TS}/next.json`,
+        'declarationMap',
+        'true',
+        '.d.ts 에서 원본 .ts 로 가는 source map 을 낸다',
+      ),
+      setting(
+        `${TS}/next.json`,
+        'emitDeclarationOnly',
+        'true',
+        'JS 는 번들러가 만들고 tsc 는 타입 선언만 낸다',
+      ),
+      setting(
+        `${TS}/next.json`,
+        'module',
+        '"esnext"',
+        '최신 ESM 문법 그대로 낸다. 번들러가 처리한다',
+      ),
+      setting(
+        `${TS}/next.json`,
+        'moduleResolution',
+        '"bundler"',
+        '번들러 방식으로 모듈을 푼다. 확장자 없는 상대 import 를 허용한다',
+      ),
+      setting(
+        `${TS}/next.json`,
+        'noEmitOnError',
+        'true',
+        '타입 오류가 있으면 아무것도 내지 않는다',
+      ),
+    ],
+    gaps: [noTest(TS)],
   },
   {
     id: 'commitlint-config',
@@ -264,7 +517,39 @@ export const packages: Package[] = [
     purpose: '공유 commitlint 설정 (Conventional Commits)',
     entries: [committed('libs/commitlint-config', '@berrypjh/commitlint-config', 'index.js')],
     docs: ['commitlint-config-readme'],
-    source: [{ path: 'libs/commitlint-config/index.js' }],
+    source: [{ path: CL }],
+    settings: [
+      setting(
+        CL,
+        'extends',
+        "['@commitlint/config-conventional']",
+        'Conventional Commits 기본 규칙에서 시작한다. 아래 규칙은 그 기본값을 덮어쓴다',
+      ),
+      setting(
+        CL,
+        'no-header-bang',
+        "[2, 'always']",
+        '이 저장소가 더한 규칙. 헤더에 !: 가 있으면 오류다. major 변경은 footer 의 BREAKING CHANGE 로만 적는다',
+      ),
+      setting(
+        CL,
+        'type-enum',
+        "['feat', 'fix', 'docs', 'design', 'style', 'refactor', 'test', 'chore', 'build', 'ci', 'revert']",
+        '허용 type. 이 목록 밖의 type 은 오류다. 기본 목록에 design 을 더하고 perf 를 뺐다',
+      ),
+      setting(
+        CL,
+        'subject-case',
+        "[0, 'always', ['sentence-case', 'start-case', 'pascal-case', 'upper-case']]",
+        '레벨 0 이라 검사하지 않는다. 기본은 sentence-case · start-case · pascal-case · upper-case 제목을 오류로 막는다',
+      ),
+      setting(
+        CL,
+        'body-max-line-length',
+        "[0, 'always', 200]",
+        '레벨 0 이라 검사하지 않는다. 200 은 꺼진 규칙의 값이라 효과가 없다. 기본은 본문 한 줄 100자 초과를 오류로 막는다',
+      ),
+    ],
     gaps: [noTest('libs/commitlint-config')],
   },
 ];

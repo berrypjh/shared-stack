@@ -83,6 +83,7 @@ const citedRefs = (): { ref: SourceRef; origin: string }[] => [
   ...packages.flatMap((pkg) => [
     ...(pkg.barrel ? [{ ref: pkg.barrel, origin: `${pkg.id} barrel` }] : []),
     ...(pkg.surfaceGuard ? [{ ref: pkg.surfaceGuard, origin: `${pkg.id} surface guard` }] : []),
+    ...(pkg.settings ?? []).map((item) => ({ ref: item.evidence, origin: `${pkg.id} setting` })),
     ...pkg.entries
       .filter((entry) => entry.origin === 'committed')
       .map((entry) => ({ ref: { path: entry.target }, origin: `${pkg.id} entry` })),
@@ -274,6 +275,41 @@ describe('package manifests', () => {
     const pinned = readJson<{ packageManager?: string }>('package.json').packageManager;
     const unpinnedGap = repository.gaps?.some((gap) => gap.kind === 'not-found');
     expect({ pinned, unpinnedGap }).toEqual({ pinned: undefined, unpinnedGap: true });
+  });
+});
+
+describe('package settings', () => {
+  /** 공백과 닫는 괄호 앞 쉼표를 지운다 — 파일의 줄바꿈 · trailing comma 와 카탈로그의 한 줄 표기가 같아진다. */
+  const compact = (text: string) => text.replace(/\s+/g, '').replace(/,([\]}])/g, '$1');
+
+  it('quote each value from the setting file, up to whitespace and trailing commas', () => {
+    const problems = packages.flatMap((pkg) =>
+      (pkg.settings ?? []).flatMap((item) =>
+        compact(read(item.evidence.path)).includes(compact(item.value))
+          ? []
+          : [`${pkg.id} ${item.evidence.symbol}: value not in ${item.evidence.path}`],
+      ),
+    );
+    expect(problems).toEqual([]);
+  });
+
+  it('cite a committed entry point of their own package, so the screen can name it', () => {
+    const problems = packages.flatMap((pkg) => {
+      const entries = pkg.entries.filter((entry) => entry.origin === 'committed');
+      return (pkg.settings ?? []).flatMap((item) =>
+        entries.some((entry) => entry.target === item.evidence.path)
+          ? []
+          : [`${pkg.id} ${item.evidence.symbol}: ${item.evidence.path} is not a committed entry`],
+      );
+    });
+    expect(problems).toEqual([]);
+  });
+
+  it('belong to config packages only', () => {
+    for (const pkg of packages) {
+      if (pkg.settings)
+        expect({ id: pkg.id, kind: pkg.kind }).toEqual({ id: pkg.id, kind: 'config' });
+    }
   });
 });
 

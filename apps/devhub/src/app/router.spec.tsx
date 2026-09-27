@@ -5,7 +5,7 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter, useNavigate } from 'react-router-dom';
 
 import { catalog } from '@/data';
-import { SECTIONS, VIEWS } from '@/lib/catalog/entities';
+import { linkOf, SECTIONS, VIEWS } from '@/lib/catalog/entities';
 
 import App from './app';
 
@@ -38,8 +38,6 @@ describe('routes', () => {
   it.each([
     ['/', 'berrypjh/shared-stack'],
     ['/architecture', '현재 구조'],
-    ['/applications', '애플리케이션'],
-    ['/applications/devhub', 'devhub'],
     ['/packages', '패키지'],
     ['/packages/react-ui', 'react-ui'],
     ['/documents', '문서'],
@@ -52,6 +50,12 @@ describe('routes', () => {
       renderAt(path);
     });
     expect(h1()).toBe(heading);
+  });
+
+  it('has no applications section: an app opens as its architecture node', () => {
+    renderAt('/applications/devhub');
+    expect(h1()).toBe('없는 화면');
+    expect(linkOf('devhub')?.href).toBe('/architecture/devhub');
   });
 
   it('names the document after the screen', () => {
@@ -88,7 +92,6 @@ describe('navigation data', () => {
       '소비 흐름',
       '아키텍처',
       '패키지',
-      '애플리케이션',
       '문서',
       '기록',
     ]);
@@ -99,7 +102,7 @@ describe('navigation data', () => {
     const headings = within(explorerNav())
       .getAllByRole('heading', { level: 2 })
       .map((heading) => heading.querySelector('a')?.textContent);
-    expect(headings).toEqual(['소비 흐름', '기록', '패키지', '애플리케이션', '문서']);
+    expect(headings).toEqual(['소비 흐름', '기록', '패키지', '문서']);
   });
 
   it('lists every catalog entry in the explorer, linked to its route', () => {
@@ -139,7 +142,7 @@ describe('navigation data', () => {
   it('offers one open-all or close-all toggle in every section with more than one group', () => {
     renderAt('/');
     const nav = within(explorerNav());
-    for (const title of ['소비 흐름', '기록', '패키지', '애플리케이션', '문서']) {
+    for (const title of ['소비 흐름', '기록', '패키지', '문서']) {
       const toggle = new RegExp(`^${title} 묶음 모두 (열기|닫기)$`);
       expect(nav.getAllByRole('button', { name: toggle })).toHaveLength(1);
     }

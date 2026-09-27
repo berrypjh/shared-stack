@@ -1,6 +1,5 @@
 import { catalog } from '../../data';
 import type {
-  Application,
   ConsumerJourney,
   DocumentRef,
   Package,
@@ -8,14 +7,7 @@ import type {
   RecordRef,
 } from '../../domain/model';
 
-import {
-  ACTOR,
-  APP_GROUP,
-  DOCUMENT_GROUP,
-  PACKAGE_KIND,
-  RECORD_KIND,
-  ROOT_DOCUMENT_GROUP,
-} from './labels';
+import { ACTOR, DOCUMENT_GROUP, PACKAGE_KIND, RECORD_KIND, ROOT_DOCUMENT_GROUP } from './labels';
 import { entityHref } from './routes';
 
 /**
@@ -25,13 +17,12 @@ import { entityHref } from './routes';
 
 export const PRODUCT_NAME = 'Shared Stack DevHub';
 
-export type SectionId = 'journeys' | 'applications' | 'packages' | 'documents' | 'records';
+export type SectionId = 'journeys' | 'packages' | 'documents' | 'records';
 
 type EntityBase = { id: string; label: string; href: string; group?: string };
 
 export type Entity =
   | (EntityBase & { section: 'journeys'; record: ConsumerJourney })
-  | (EntityBase & { section: 'applications'; record: Application })
   | (EntityBase & { section: 'packages'; record: Package })
   | (EntityBase & { section: 'documents'; record: DocumentRef })
   | (EntityBase & { section: 'records'; record: RecordRef });
@@ -114,23 +105,6 @@ export const SECTIONS: Section[] = [
     ),
   },
   {
-    id: 'applications',
-    title: '애플리케이션',
-    path: '/applications',
-    entities: [...new Set(Object.values(APP_GROUP))].flatMap((title) =>
-      catalog.applications
-        .filter((record) => APP_GROUP[record.role] === title)
-        .map((record) => ({
-          section: 'applications' as const,
-          id: record.id,
-          label: record.id,
-          href: hrefOf('applications', record.id),
-          group: title,
-          record,
-        })),
-    ),
-  },
-  {
     id: 'documents',
     title: '문서',
     path: '/documents',
@@ -164,16 +138,14 @@ const viewOf = (section: Section): View => ({
 const sectionOf = (id: SectionId) => SECTIONS.find((section) => section.id === id) as Section;
 
 /**
- * 상단 바 순서. 개요 · 소비 흐름 · 아키텍처 다음에 패키지 · 애플리케이션 · 문서 · 기록이다.
+ * 상단 바 순서. 개요 · 소비 흐름 · 아키텍처 다음에 패키지 · 문서 · 기록이다.
  * 탐색기(`SECTIONS`)는 흐름 바로 다음에 기록을 두어 최근 결정이 먼저 보이고, 상단 바는 문서 옆에 기록을 둔다.
  */
 export const VIEWS: View[] = [
   { id: 'overview', label: '개요', path: '/' },
   viewOf(sectionOf('journeys')),
   { id: 'architecture', label: '아키텍처', path: '/architecture' },
-  ...(['packages', 'applications', 'documents', 'records'] as const).map((id) =>
-    viewOf(sectionOf(id)),
-  ),
+  ...(['packages', 'documents', 'records'] as const).map((id) => viewOf(sectionOf(id))),
 ];
 
 export const findSection = (id: SectionId): Section =>
@@ -182,20 +154,15 @@ export const findSection = (id: SectionId): Section =>
 export const findEntity = (section: SectionId, id: string): Entity | undefined =>
   findSection(section).entities.find((entity) => entity.id === id);
 
-/** 앱 · 패키지를 ID 로 찾는다. 관계의 양 끝이나 흐름 단계의 담당처럼 섹션을 모를 때. */
-export const entityById = (id: string): Entity | undefined =>
-  SECTIONS.flatMap((section) => section.entities).find(
-    (entity) =>
-      entity.section !== 'documents' &&
-      entity.section !== 'records' &&
-      entity.section !== 'journeys' &&
-      entity.id === id,
-  );
-
-/** ID 가 가리키는 화면과 이름. 도구는 자기 화면이 없어 아키텍처 그림의 그 노드로 간다. */
+/**
+ * ID 가 가리키는 화면과 이름. 관계의 양 끝이나 흐름 단계의 담당처럼 종류를 모를 때.
+ * 패키지는 자기 화면으로, 앱 · 도구는 자기 화면이 없어 아키텍처 그림의 그 노드로 간다.
+ */
 export const linkOf = (id: string): { href: string; label: string } | undefined => {
-  const entity = entityById(id);
-  if (entity) return entity;
+  const pkg = findEntity('packages', id);
+  if (pkg) return pkg;
+  const app = catalog.applications.find((candidate) => candidate.id === id);
+  if (app) return { href: entityHref('application', app.id), label: app.id };
   const tool = catalog.tools.find((candidate) => candidate.id === id);
   return tool && { href: entityHref('tool', tool.id), label: tool.name };
 };

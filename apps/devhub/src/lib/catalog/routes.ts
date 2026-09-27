@@ -5,9 +5,9 @@
 
 export type EntityKind = 'application' | 'package' | 'tool';
 
-/** 도구는 자기 화면이 없어 아키텍처 그림의 그 노드로 간다. */
+/** 앱 · 도구는 자기 화면이 없어 아키텍처 그림의 그 노드로 간다. */
 const SECTION: Record<EntityKind, string> = {
-  application: 'applications',
+  application: 'architecture',
   package: 'packages',
   tool: 'architecture',
 };

@@ -39,14 +39,6 @@ export const APP_ROLE: Record<Application['role'], string> = {
   e2e: 'E2E',
 };
 
-/** 탐색기의 앱 묶음. 역할 하나에 앱이 하나뿐이라 뷰어 · 탐색기는 "내부 도구"로 합친다. 순서가 화면 순서다. */
-export const APP_GROUP: Record<Application['role'], string> = {
-  demo: '데모',
-  viewer: '내부 도구',
-  explorer: '내부 도구',
-  e2e: 'E2E',
-};
-
 export const RELATION_KIND: Record<Relation['kind'], string> = {
   'build-dependency': '빌드 의존',
   'consumer-dependency': '소비 의존',

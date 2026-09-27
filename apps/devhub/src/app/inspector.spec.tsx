@@ -71,21 +71,6 @@ describe('package inspector', () => {
   });
 });
 
-describe('application inspectors', () => {
-  it('say there is no manifest rather than guessing visibility or entry points', () => {
-    renderAt('/applications/quality-lab-e2e');
-    expect(section('공개 여부').getByText(/package\.json 이 없어/)).toBeTruthy();
-    expect(section('진입점').getByText(/package\.json 이 없어 진입점이 없다/)).toBeTruthy();
-    expect(inspector().queryByText('Internal')).toBeNull();
-  });
-
-  it('read an app manifest for visibility and name its missing entry point', () => {
-    renderAt('/applications/quality-lab');
-    expect(inspector().getAllByText('Internal')).toHaveLength(2);
-    expect(section('진입점').getByText(/exports · main 이 없다/)).toBeTruthy();
-  });
-});
-
 describe('links inside the inspector', () => {
   it('open a related entry and stay in the details', async () => {
     const user = userEvent.setup();

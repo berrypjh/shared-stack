@@ -13,33 +13,28 @@ const must = (id: string) => {
 };
 
 describe('inspect', () => {
-  it('covers every application and package, and nothing else', () => {
-    for (const entity of [...catalog.applications, ...catalog.packages]) {
-      expect(inspect(catalog, entity.id)?.id).toBe(entity.id);
-    }
+  it('covers every package, and nothing else', () => {
+    for (const pkg of catalog.packages) expect(inspect(catalog, pkg.id)?.id).toBe(pkg.id);
+    for (const app of catalog.applications) expect(inspect(catalog, app.id)).toBeUndefined();
     expect(inspect(catalog, 'root-readme')).toBeUndefined();
     expect(inspect(catalog, 'no-such-id')).toBeUndefined();
   });
 
-  it('takes visibility only from a manifest, and says so when there is none', () => {
+  it('takes visibility only from the manifest', () => {
     expect(must('react-ui').visibility).toMatchObject({ value: 'public' });
     expect(must('ui-core').visibility).toMatchObject({
       value: 'internal',
       evidence: { path: 'libs/ui-core/package.json' },
     });
-    expect(must('devhub').visibility).toMatchObject({ value: 'internal' });
-    expect(must('quality-lab-e2e').visibility).toMatchObject({ value: null });
   });
 
   it('lists package entry points from the manifest, with the barrel and surface guard', () => {
     const exports = must('react-ui').exports;
-    if (!('entries' in exports)) throw new Error('react-ui has entries');
     expect(exports.entries.map((entry) => entry.specifier)).toContain(
       '@berrypjh/react-ui/styles.css',
     );
     expect(exports.barrel?.path).toBe('libs/react-ui/src/index.ts');
     expect(exports.guard?.path).toBe('tools/lib/package-boundary.test.ts');
-    expect(must('devhub').exports).toHaveProperty('reason');
   });
 
   it('splits dependencies from generated artifacts and verification', () => {
