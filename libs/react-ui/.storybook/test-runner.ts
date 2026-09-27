@@ -12,7 +12,7 @@ import { checkA11y, configureAxe, getAxeResults, injectAxe } from 'axe-playwrigh
  * `wcag22a`·`wcag22aaa` 태그는 axe에 없다 — 없는 태그를 적으면 조용히 아무것도 검사하지 않으므로 넣지 않는다.
  * 2.4.13 Focus Appearance는 WCAG 2.2에서 AAA다.
  * 품질 목표로 삼을 수는 있어도 이 AA 게이트에 넣지 않는다.
- * `QUALITY_A11Y_RESULTS`가 있을 때만 story마다 skip 여부와 axe 원본 결과를 JSONL로 남긴다 (quality-lab 수집용, `tmp/quality-lab/imports` 안).
+ * `QUALITY_A11Y_RESULTS`가 있을 때만 story마다 skip 여부와 axe 원본 결과를 JSONL로 남긴다 (품질 관측 수집용, `tmp/observability/imports` 안).
  * 검사·skip·실패 기준은 그대로다 — 같은 범위·옵션으로 결과를 한 번 더 읽어 저장할 뿐이고, 판정은 아래 `checkA11y`가 한다.
  */
 const AXE_RUN_OPTIONS = {
@@ -22,7 +22,7 @@ const AXE_RUN_OPTIONS = {
   },
 };
 
-const IMPORTS_DIR = path.resolve('tmp/quality-lab/imports');
+const IMPORTS_DIR = path.resolve('tmp/observability/imports');
 
 const resultsFile = (() => {
   const target = process.env.QUALITY_A11Y_RESULTS;
