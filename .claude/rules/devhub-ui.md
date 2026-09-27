@@ -25,6 +25,8 @@ src/
   styles.css            typo-* · devhub-code · devhub-grid 유틸, color-scheme, body, :focus-visible — 앱의 Tailwind entry 가 @import
   provider/             DevHubProvider · useDevHub* · isCurrentPath — 라우터 접점
   ui/icon.tsx           선 아이콘 전부(aria-hidden). 두 DevHub 가 쓰는 이름의 합집합
+  ui/data-table.tsx     DataTable — caption 과 이름 있는 스크롤 영역(react-ui TableScroll)을 가진 표
+  chart/bar-chart.tsx   BarChart — HTML+SVG 가로 막대. 값 글이 늘 보이고 null 은 막대를 그리지 않는다
   theme/                theme.ts(키 · head 스크립트 · 적용 · 구독) · theme-switch
   shell/                devhub-shell(3칸 틀) · top-bar · explorer(+drawer) · workspace(main · ids) · inspector(aside) · use-route-focus · use-document-title
   canvas/               viewport(계산) · use-pan-zoom · canvas-viewport(이동 · 확대 · 크게 보기) · canvas-edges · view-switch

@@ -1,4 +1,4 @@
-# quality-lab metric 카탈로그
+# 품질 관측 metric 카탈로그
 
 모든 값은 `@berrypjh/observability-contracts` (schemaVersion **1**)로 검증된다. 이 문서는 계약의 의미를 사람이 읽는 형태로 옮긴 것이고, 어긋나면 계약(`libs/observability-contracts/src`)이 우선이다.
 
@@ -8,30 +8,14 @@
 | ------------ | ------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
 | availability | `available` · `not-run` · `unsupported` · `unavailable` · `permission-required` · `not-measured` · `not-applicable` · `invalid` | `available`만 값을 갖는다. 나머지는 `value: null` + 이유. 0 · pass로 바꾸지 않는다 |
 | outcome      | `pass` · `fail` · `warn` · `info` · `null`                                                                                      | availability와 별개의 축. 판정 근거가 없으면 `null`                                |
-| domain       | `test` · `bundle` · `context` · `eval` · `verification` · `a11y` · `browser`                                                    |                                                                                    |
+| domain       | `bundle` · `context` · `eval` · `a11y`                                                                                          |                                                                                    |
 | unit         | `count` · `bytes` · `bytes-delta` · `tokens` · `tokens-delta` · `ms` · `ratio`                                                  | ratio는 0–1                                                                        |
 | 출처 모름    | `'unknown'`                                                                                                                     | `null`(비어 있음)과 구분한다                                                       |
 | run state    | `running` · `complete` · `partial` · `failed` · `cancelled`                                                                     | 값 하나라도 빠지면 `partial`                                                       |
 | profile      | `static` · `core` · `eval` · `a11y`                                                                                             |                                                                                    |
-| freshness    | `fresh` · `stale` · `unknown`                                                                                                   | run의 source SHA ↔ 앱 build · serve 시점 `git rev-parse HEAD`                     |
+| freshness    | `fresh` · `stale` · `unknown`                                                                                                   | run의 source SHA ↔ DevHub build · serve 시점 `git rev-parse HEAD`                 |
 
 provenance는 두 SHA로 나뉜다: `metadata.source.sha`(측정 대상 코드)와 `metadata.collection.sha`(수집기). eval은 여기에 원본 run의 `origin.gitSha`가 따로 있다.
-
-## test — `tests[]` (core)
-
-| 항목                         | 내용                                                                                                                                                                                                                          |
-| ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| source                       | `vitest:@berrypjh/observability-contracts` · `vitest:@berrypjh/quality-lab` · `vitest:@berrypjh/react-ui` · `jest:@berrypjh/react-native-ui` · `vitest:@berrypjh/demo-web` · `vitest:tools`                                   |
-| execution                    | `completed` · `failed` · `timeout` · `cancelled` · `imported` · `not-run` · `unsupported` · `unavailable` (프로세스 상태, case 상태가 아님)                                                                                   |
-| report                       | `parsed` · `missing` · `corrupt` · `invalid` · `not-requested`. report가 없으면 case · count · outcome이 없다                                                                                                                 |
-| count 출처                   | `sourceFiles` = source-scan (case 수 아님) · `reportedFiles` · `suites` · `cases` · `passed` · `failed` · `skipped` · `todo` = runner-report · `retriedCases` · `attempts` = derived-from-report · `wallMs` = collector-clock |
-| observation `test.<project>` | value = passed ÷ (passed + failed), **denominator = 실행된 case**(skip · todo 제외), unit ratio. 실행 case 0 → `not-applicable`                                                                                               |
-| outcome                      | `pass`는 completed/imported + failed 0 + case 있음일 때만. cache 복원은 새 report가 아니다                                                                                                                                    |
-| coverage                     | 수집기 없음 → `not-measured` + 이유                                                                                                                                                                                           |
-
-## verification — observations (core)
-
-`lint.quality-lab` · `typecheck.quality-lab` · `typecheck.observability-contracts` · `typecheck.react-ui.lib` · `typecheck.react-ui.storybook` · `typecheck.react-ui.spec` · `build.observability-contracts`. kind `public-import` · `typecheck` · `test` · `build` · `lint`, status `passed` · `failed` · `not-run` · `unsupported` · `timeout` (eval harness와 같은 어휘), exit code · 발췌(정제) 포함. `--only-imports`는 전부 `not-run`.
 
 ## bundle — `bundles[]` (core)
 
@@ -83,23 +67,17 @@ held-out(`test` split) trace의 gold evidence · 발췌와 변경 파일 내용�
 | 출처 id               | source                  | 무엇                                                                           |
 | --------------------- | ----------------------- | ------------------------------------------------------------------------------ |
 | `a11y:storybook`      | `storybook-test-runner` | story 별 axe (skip은 통과가 아님)                                              |
-| `a11y:quality-lab`    | `axe-playwright`        | localhost quality-lab route × theme × viewport                                 |
+| `a11y:devhub`         | `axe-playwright`        | localhost DevHub 평가 route × theme × viewport                                 |
 | `a11y:token-contrast` | `vitest-report`         | token 색 쌍 대비 test (WCAG 4.5:1 text · 3:1 non-text, 1.2:1은 WCAG 기준 아님) |
 | `a11y:static-css`     | `vitest-report`         | compiled CSS 텍스트 검사                                                       |
-| `a11y:ui-test`        | `vitest-report`         | react-ui · demo-web · quality-lab UI test                                      |
+| `a11y:ui-test`        | `vitest-report`         | react-ui · demo-web · devhub UI test                                           |
 | `a11y:manual`         | `manual-record`         | 사람의 관찰                                                                    |
 
+- `a11y:devhub`의 target id는 `devhub:<route>:<theme>:<viewport>`이고 theme은 브라우저 color scheme으로 고른다.
 - audit outcome: `completed` · `partial` · `scan-failed` · `not-run` — 검사 실행의 결과이지 접근성 판정이 아니다
 - axe: rule 수와 node 수를 나누고 `incomplete`를 violation과 섞지 않는다. node는 최대 20개만 싣는다
 - check: `passed` · `failed` · `unknown`(report에 case 없음 · 전부 skip) · `not-run`(report 없음)
 - manual: `observed-ok` · `observed-issue` · `not-run`. 합친 점수는 없다
-
-## browser — 세션 (artifact 아님)
-
-- support: `supported` · `unsupported` · `unavailable` · `permission-required` · `not-measured`
-- value state: `sampled` · `awaiting-sample` · `error` · `not-sampled` — `sampled`의 false · 0은 실제 값
-- performance entry는 개별 관측(scope `hard-navigation` · `document-lifetime` · `interaction`)이고 Web Vitals를 계산하지 않는다
-- 저장 · 전송하지 않는다 (`persisted: false`, `transmitted: false`)
 
 ## design system — `designSystem`·`packageSurfaces` (static)
 
@@ -112,7 +90,7 @@ held-out(`test` split) trace의 gold evidence · 발췌와 변경 파일 내용�
 - 실행 비교 상태: `comparable` · `incompatible` · `unknown` · `no-baseline` + 이유(`blocks` · `unknown` · `informs`)
 - 행 상태: `compared` · `incompatible` · `unknown` · `not-measured` · `added` · `removed`. 모두 `report-only`
 - delta: 부호 있는 절대 차이 · 상대 차이(기준 0이면 N/A) · 비율은 percentage point. median 차이는 검정이 아니다
-- 비교 대상 metric(`series`): bundle 값 · context tokens · eval primary 5개. test · verification · a11y · design system은 비교 · 추세 대상이 아니다
+- 비교 대상 metric(`series`): bundle 값 · context tokens · eval primary 5개. a11y · design system은 비교 · 추세 대상이 아니다
 - eval 비교 key: sourceId · variant · metric · K · taskCount · trialsPerTask · conditions(gitSha · ref 제외). model 설정 · timeout 모름, task 부분집합은 `unknown`
 - source SHA · lockfile · toolchain · dirty 차이는 막지 않고 알린다. 같은 run · 다른 profile · 공유 지표 없음은 `incompatible`
 - 추세 점: `point`(구간 번호) · `gap`(요약 없음) · `not-measured` · `unknown-conditions` · `absent`(그 metric이 없는 run, 구간을 끊지 않음)
@@ -128,6 +106,8 @@ schemaVersion은 1 그대로다. 아래는 모두 **이전 artifact를 계속 �
 | `summary.series`                 | `null`            | 추세 값을 모름 (빈 목록이 아님) → 다시 export |
 | `evals[].originalComparison`     | `null`            | evaluator 비교를 가져오지 않음 → 다시 수집    |
 | profile `a11y`                   | —                 | 새 profile                                    |
+
+제거한 것 — test 결과(`run.tests`, `summary.sections.tests` · `testCases`), domain `test` · `verification` · `browser`, failure domain `test` · `verification` · `browser`. test와 lint · typecheck · build 결과는 CI가 보고하고, 브라우저 세션은 저장소 측정이 아니다. 이 필드를 가진 이전 artifact · 요약은 계약을 통과하지 않으므로 다시 수집 · export한다.
 
 원본 도구와 의미가 달라진 곳:
 

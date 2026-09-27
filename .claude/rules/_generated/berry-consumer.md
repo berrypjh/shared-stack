@@ -2,7 +2,6 @@
 paths:
   - "apps/demo-web/src/**"
   - "apps/demo-mobile/src/**"
-  - "apps/quality-lab/src/**"
   - "apps/devhub/src/**"
 ---
 <!-- berry-dev/standards format 1 | Source: berry-dev/standards/rules/berry-consumer.md | Plugin: berry-dev@0.1.0 | Do not edit. Run: pnpm harness:sync -->

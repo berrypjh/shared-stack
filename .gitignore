@@ -165,8 +165,8 @@ storybook-static
 # log
 *.log
 
-# quality-lab 수집·export 산출물 (tmp/quality-lab 는 위의 tmp 가 덮는다)
-apps/quality-lab/public/observability/
+# 품질 관측 수집기의 export 산출물. DevHub 평가 화면이 읽는다 (tmp/observability 는 위의 tmp 가 덮는다)
+apps/devhub/public/observability/
 
 # 플러그인 배포 산출물
 !plugins/*/dist

@@ -17,13 +17,12 @@ Nx monorepo. package manager는 **pnpm**이고, target이 있으면 Nx target으
 | `@berrypjh/react-ui`                                     | `libs/react-ui`                | React               | 웹 UI 컴포넌트                                                                                                      |
 | `@berrypjh/react-native-ui`                              | `libs/react-native-ui`         | React Native        | 모바일 UI 컴포넌트                                                                                                  |
 | `@berrypjh/devhub-ui`                                    | `libs/devhub-ui`               | React               | 이 저장소와 다른 저장소의 DevHub가 함께 쓰는 셸 · 캔버스 · markdown · 검색 · 테마. `DevHubProvider`로 router와 분리 |
-| `@berrypjh/observability-contracts`                      | `libs/observability-contracts` | zod                 | quality-lab 수집기와 앱이 함께 쓰는 schema. 비공개 · 릴리스하지 않음                                                |
+| `@berrypjh/observability-contracts`                      | `libs/observability-contracts` | zod                 | 품질 관측 수집기와 DevHub 평가 화면이 함께 쓰는 schema. 비공개 · 릴리스하지 않음                                    |
 | `@berrypjh/{eslint,prettier,tsconfig,commitlint}-config` | `libs/*-config`                | —                   | 다른 저장소가 쓰는 공유 설정                                                                                        |
 | `@berrypjh/demo-web`                                     | `apps/demo-web`                | React · Vite        | 웹 데모                                                                                                             |
 | `@berrypjh/demo-mobile`                                  | `apps/demo-mobile`             | Expo · React Native | 모바일 데모                                                                                                         |
-| `@berrypjh/devhub`                                       | `apps/devhub`                  | Vite                | 저장소 구조와 근거를 탐색하는 비공개 앱. `quality-lab`과 별개                                                       |
-| `@berrypjh/quality-lab`                                  | `apps/quality-lab`             | Vite                | export된 품질 수집 결과를 `observability-contracts`로 검증한 뒤 보여 주는 비공개 앱                                 |
-| `@berrypjh/{devhub,quality-lab}-e2e`                     | `apps/*-e2e`                   | Playwright          | 두 앱의 E2E                                                                                                         |
+| `@berrypjh/devhub`                                       | `apps/devhub`                  | Vite                | 저장소 구조와 근거를 탐색하는 비공개 앱. "평가" 섹션이 export된 품질 수집 결과를 검증해 보여 준다                   |
+| `@berrypjh/devhub-e2e`                                   | `apps/devhub-e2e`              | Playwright          | DevHub의 E2E                                                                                                        |
 | `commit-mcp`                                             | `plugins/berry-commit`         | Node                | Claude Code plugin `berry-commit`의 MCP 서버                                                                        |
 
 Nx 프로젝트가 아닌 곳도 있다.
@@ -33,12 +32,12 @@ Nx 프로젝트가 아닌 곳도 있다.
 | `plugins/berry-dev`        | Claude Code plugin — 공통 rule 원본과 `sync` · `check` CLI, `repo-verify` · `frontend-quality` skill, secret guard hook. 설계는 `docs/claude-harness` |
 | `.claude/rules/_generated` | `pnpm harness:sync`가 `plugins/berry-dev/standards`에서 만든 rule. **손으로 고치지 않는다** — `.claude/standards.json`이나 원본을 고친다              |
 | `tools/lib`                | 도구 공용 헬퍼 (토큰 수 계산 등)                                                                                                                      |
-| `tools/scripts`            | 토큰 측정 · tree-shaking 검사 · 릴리스 · 소비자 카탈로그 생성 · quality-lab 수집기(`tools/scripts/observability`)                                     |
+| `tools/scripts`            | 토큰 측정 · tree-shaking 검사 · 릴리스 · 소비자 카탈로그 생성 · 품질 관측 수집기(`tools/scripts/observability`)                                       |
 | `tools/consumer-retrieval` | 플랫폼 → 패키지 → 심볼 → 토큰으로 조회를 좁히는 결정적 resolver (`pnpm ui:lookup`)                                                                    |
 | `tools/evals/consumer`     | 소비자 평가 harness — dataset · variant · grader · 검증 · 보고                                                                                        |
-| `docs/`                    | quality-lab 설계 · 사용법(`docs/quality-lab`), demo 앱(`docs/demo`), harness 설계(`docs/claude-harness`), 개발 기록(`docs/records`)                   |
+| `docs/`                    | 품질 관측 설계 · 사용법(`docs/observability`), demo 앱(`docs/demo`), harness 설계(`docs/claude-harness`), 개발 기록(`docs/records`)                   |
 
-품질 관측은 별도 흐름이다 — `observability-contracts → tools/scripts/observability (collect · export) → apps/quality-lab`.
+품질 관측은 별도 흐름이다 — `observability-contracts → tools/scripts/observability (collect · export) → apps/devhub` "평가" 섹션.
 
 **프로젝트별 지침은 `.claude/rules/<프로젝트>.md` path rule에 있다.** 그 프로젝트의 파일을 열면 자동으로 로드된다. 문서 자리는 이렇게 나눈다.
 
@@ -105,6 +104,6 @@ architecture를 auto memory에만 두지 않는다. **secret과 credential은 �
 | ---------------------------------------------------------- | --------------------------------------------------------------- |
 | [README.md](README.md)                                     | 패키지 · 설치 · 명령                                            |
 | [.claude/harness.profile.md](.claude/harness.profile.md)   | 검증 명령 · 영향 범위 · AI 세션 제약 · UI 역할                  |
-| [docs/quality-lab](docs/quality-lab/architecture.md)       | quality-lab 구조 · metric · 수집기 · 검증 · 제약                |
+| [docs/observability](docs/observability/architecture.md)   | 품질 관측 수집 구조 · metric · 수집기 · 검증 · 제약             |
 | [docs/claude-harness](docs/claude-harness/architecture.md) | berry-dev plugin 설계 · 계약 · 도입 · 검증                      |
 | [docs/records](docs/records/)                              | 날짜별 개발 기록(결정 · 수정 · 구현). devhub "기록" 화면에 등록 |

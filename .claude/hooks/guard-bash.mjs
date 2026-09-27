@@ -15,7 +15,7 @@ import { findSecretReason } from '../../plugins/berry-dev/scripts/secret-policy.
 const PORT_BOUND = [
   {
     pattern:
-      /\bnx\s+(?:serve|dev|start|preview|storybook)\b|\bnx\s+run\s+\S+:(?:serve|dev|start|preview|storybook)\b|\bpnpm\s+(?:run\s+)?(?:start|quality:lab|storybook|local-registry)\b|\bexpo\s+start\b/,
+      /\bnx\s+(?:serve|dev|start|preview|storybook)\b|\bnx\s+run\s+\S+:(?:serve|dev|start|preview|storybook)\b|\bpnpm\s+(?:run\s+)?(?:start|storybook|local-registry)\b|\bexpo\s+start\b/,
     what: 'dev 서버 (Vite, Storybook, Expo, local registry)',
   },
   {

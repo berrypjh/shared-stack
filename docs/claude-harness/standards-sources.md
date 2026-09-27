@@ -36,16 +36,16 @@
 
 ## berry-consumer (선택)
 
-| 문장                                                               | shared-stack                                                                                                                                                                                                                                | snapdone                                                                         |
-| ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| UI 패키지는 공개 패키지 · `exports`로만, private · 내부 경로 금지  | [libs/react-ui/AGENTS.consumer.md](../../libs/react-ui/AGENTS.consumer.md) 찾는 순서 2, [.claude/rules/demo-web.md](../../.claude/rules/demo-web.md) · [.claude/rules/quality-lab.md](../../.claude/rules/quality-lab.md) "소비자처럼 쓴다" | `.claude/rules/web.md` "private … `/src` · 내부 `dist` 경로를 import하지 않는다" |
-| 조회 순서 — 플랫폼 → agents → bin의 find · api · token → 공개 타입 | AGENTS.consumer 찾는 순서 1~6, bin 이름은 `libs/react-ui/package.json` · `libs/react-native-ui/package.json`의 `bin`                                                                                                                        | `web.md` · `mobile.md` 공용 UI API 조회 1~6                                      |
-| 목록을 복제하지 않음 · 전체 파일을 컨텍스트에 넣지 않음            | AGENTS.consumer "이 문서는 심볼 목록을 중복 관리하지 않는다" · "파일 전체를 컨텍스트에 넣지 않는다"                                                                                                                                         | `AGENTS.md` "공용 UI 컴포넌트 · 토큰은 설치된 패키지의 공개 CLI로 조회"          |
-| 설치된 버전의 bin · 레지스트리 latest 실행 금지                    | 없음 — 아래 "남은 차이"                                                                                                                                                                                                                     | `web.md` "bare `npx @berrypjh/react-ui`는 쓰지 않는다"                           |
-| 비어 있어도 복사 · 로컬 재구현 금지 · 패키지 작업으로 분리         | [.claude/rules/demo-web.md](../../.claude/rules/demo-web.md) "라이브러리를 고치지 않는다. … 그 패키지에서 한다"                                                                                                                             | `web.md` "source를 읽거나 복사할 사유가 아니다 … upstream에 요청"                |
-| 구현 읽기는 명시적 upstream 조사 때의 마지막 단계                  | AGENTS.consumer 찾는 순서 7 "구현 · 디버깅 질문에만"                                                                                                                                                                                        | `web.md` 같은 줄                                                                 |
+| 문장                                                               | shared-stack                                                                                                                                                                                                                      | snapdone                                                                         |
+| ------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| UI 패키지는 공개 패키지 · `exports`로만, private · 내부 경로 금지  | [libs/react-ui/AGENTS.consumer.md](../../libs/react-ui/AGENTS.consumer.md) 찾는 순서 2, [.claude/rules/demo-web.md](../../.claude/rules/demo-web.md) · [.claude/rules/devhub.md](../../.claude/rules/devhub.md) "소비자처럼 쓴다" | `.claude/rules/web.md` "private … `/src` · 내부 `dist` 경로를 import하지 않는다" |
+| 조회 순서 — 플랫폼 → agents → bin의 find · api · token → 공개 타입 | AGENTS.consumer 찾는 순서 1~6, bin 이름은 `libs/react-ui/package.json` · `libs/react-native-ui/package.json`의 `bin`                                                                                                              | `web.md` · `mobile.md` 공용 UI API 조회 1~6                                      |
+| 목록을 복제하지 않음 · 전체 파일을 컨텍스트에 넣지 않음            | AGENTS.consumer "이 문서는 심볼 목록을 중복 관리하지 않는다" · "파일 전체를 컨텍스트에 넣지 않는다"                                                                                                                               | `AGENTS.md` "공용 UI 컴포넌트 · 토큰은 설치된 패키지의 공개 CLI로 조회"          |
+| 설치된 버전의 bin · 레지스트리 latest 실행 금지                    | 없음 — 아래 "남은 차이"                                                                                                                                                                                                           | `web.md` "bare `npx @berrypjh/react-ui`는 쓰지 않는다"                           |
+| 비어 있어도 복사 · 로컬 재구현 금지 · 패키지 작업으로 분리         | [.claude/rules/demo-web.md](../../.claude/rules/demo-web.md) "라이브러리를 고치지 않는다. … 그 패키지에서 한다"                                                                                                                   | `web.md` "source를 읽거나 복사할 사유가 아니다 … upstream에 요청"                |
+| 구현 읽기는 명시적 upstream 조사 때의 마지막 단계                  | AGENTS.consumer 찾는 순서 7 "구현 · 디버깅 질문에만"                                                                                                                                                                              | `web.md` 같은 줄                                                                 |
 
-- 적용 — 패키지를 소비하는 앱 코드. shared-stack은 `apps/{demo-web,demo-mobile,quality-lab}/src/**`, snapdone은 web · mobile 앱 소스
+- 적용 — 패키지를 소비하는 앱 코드. shared-stack은 `apps/{demo-web,demo-mobile,devhub}/src/**`, snapdone은 web · mobile 앱 소스
 - 제외 — `libs/**`(maintainer). maintainer 작업은 각 패키지 `AGENTS.md`를 따른다
 - `canUseSourceFallback`([levels.ts](../../tools/consumer-retrieval/levels.ts))는 바꾸지 않음. 그 함수는 eval harness의 retrieval 측정 정책이고 "L2 not-found" 분기도 L4를 허용한다. 이 rule은 AGENTS.consumer 7단계와 같게 명시적 조사로 한정한다
 - 프로젝트에 남긴 것 — 버전 고정(overrides) · peer 범위, `pnpm --dir <app> exec` 같은 실행 경로, 로컬 primitive 금지와 앱 소유 목록, 테마 소유 방식, Tailwind · CSS 연결
@@ -54,11 +54,11 @@
 
 ## ko-ui (선택)
 
-| 문장                                       | shared-stack                                                                                                                                                   | snapdone                                                |
-| ------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
-| 어미 · 형식은 한 가지, 값은 profile        | 없음(한국어 UI는 있으나 문체 정책 문서 없음)                                                                                                                   | `.claude/rules/ko-ui.md` 언어 절                        |
-| 내부 코드 · 용어를 화면에 그대로 내지 않음 | [.claude/rules/devhub.md](../../.claude/rules/devhub.md) 파일 절 "labels(어휘 → 글자)", [quality-lab labels.ts](../../apps/quality-lab/src/app/data/labels.ts) | `ko-ui.md` "영어 AI 개발 용어를 화면에 노출하지 않는다" |
-| 긴 문자열 · 줄바꿈 · 말줄임 확인           | [libs/devhub-ui/src/styles.css](../../libs/devhub-ui/src/styles.css) `word-break: keep-all`                                                                    | `ko-ui.md` 한국어 길이 절                               |
+| 문장                                       | shared-stack                                                                                                                                                    | snapdone                                                |
+| ------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| 어미 · 형식은 한 가지, 값은 profile        | 없음(한국어 UI는 있으나 문체 정책 문서 없음)                                                                                                                    | `.claude/rules/ko-ui.md` 언어 절                        |
+| 내부 코드 · 용어를 화면에 그대로 내지 않음 | [.claude/rules/devhub.md](../../.claude/rules/devhub.md) 파일 절 "labels(어휘 → 글자)", [DevHub 평가 labels.ts](../../apps/devhub/src/lib/evaluation/labels.ts) | `ko-ui.md` "영어 AI 개발 용어를 화면에 노출하지 않는다" |
+| 긴 문자열 · 줄바꿈 · 말줄임 확인           | [libs/devhub-ui/src/styles.css](../../libs/devhub-ui/src/styles.css) `word-break: keep-all`                                                                     | `ko-ui.md` 한국어 길이 절                               |
 
 - 적용 — 프로젝트가 고른 한국어 화면 경로. snapdone은 web · mobile 화면. shared-stack fixture는 **채택하지 않음**(문서화된 UI 문체 정책이 없어 채택은 프로젝트 판단)
 - 제외 — 개발자용 식별자 · 로그 · 테스트 이름, 다른 locale
@@ -75,7 +75,7 @@
 | 코드 · 인용 · 링크 · 구조 보존                  | devhub "깨진 문서 링크는 숨기지 않는다"(링크를 테스트가 대조)                                 | `docs.md` 바꾸지 않는 것 절                      |
 
 - 적용 — 프로젝트가 고른 한국어 문서. shared-stack fixture는 `docs/records/**/*.md`
-- 제외 — 고르지 않은 문서(shared-stack의 `docs/quality-lab` · README · AGENTS), 영어 문서, 코드 주석
+- 제외 — 고르지 않은 문서(shared-stack의 `docs/observability` · README · AGENTS), 영어 문서, 코드 주석
 - 프로젝트에 남긴 것 — 기록 파일 이름 · 네 절 구성 · 등록 규칙(devhub), 나쁨 · 좋음 예문, 전환 진행 상태
 
 ## shared-stack 적용 fixture

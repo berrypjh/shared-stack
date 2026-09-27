@@ -7,12 +7,14 @@ paths:
 
 Vite + React. shared-stack의 구조와 근거(패키지 · 앱 · 도구 · 문서 · 기록)를 한곳에서 탐색하는 private 앱이다.
 
-**quality-lab과 별도 앱이다.** 품질 수집 결과(test · bundle · eval metric)는 quality-lab이 보여 주고, DevHub는 그 값을 다시 계산하거나 복제하지 않는다.
+개요 · 소비 흐름 · 아키텍처 · 섹션(패키지 · 문서 · 기록) 화면이 카탈로그를 그린다. 앱 · 도구는 자기 화면이 없고 아키텍처 그림의 노드(`/architecture/<id>`)로 간다(`lib/catalog/entities.ts`의 `linkOf`).
 
-개요 · 소비 흐름 · 아키텍처 · 섹션(애플리케이션 · 패키지 · 문서 · 기록) 화면이 카탈로그를 그린다. 도구는 자기 화면이 없고 아키텍처 그림의 노드(`/architecture/<id>`)로 간다(`lib/catalog/entities.ts`의 `linkOf`).
+**"평가"(`/evaluation`)는 품질 관측 수집기의 결과를 보인다.** 수집 · export는 Node(`tools/scripts/observability`)가 `apps/devhub/public/observability`(gitignore)에 쓰고, 이 앱은 Vite 기본 `publicDir`(`apps/devhub/public`)로 그 JSON을 `/observability/`에서 fetch해 `@berrypjh/observability-contracts`로 검증한 뒤에만 보인다. 값을 다시 계산하거나 합치지 않는다. 수집 체계의 설명은 `docs/observability/`(구조 · metric · 수집기 · 검증 · 제약 · 사용법)에 있다.
 
-- **탐색기 순서** — 소비 흐름 · 기록 · 패키지 · 애플리케이션 · 문서. 기록은 소비 흐름 바로 다음(최근 결정이 먼저 보이게), 패키지는 그것을 쓰는 앱보다 먼저다. 상단 바는 같은 순서에서 기록만 문서 옆에 둔다
-- **항목 화면**(앱 · 패키지 · 도구) — 상세 정보 칸이 근거 모델(`lib/catalog/inspection.ts`)을 그린다
+- **탐색기 순서** — 개요 · 아키텍처 보기 바로 아래 평가, 그다음 소비 흐름 · 기록 · 패키지 · 문서. 기록은 소비 흐름 바로 다음(최근 결정이 먼저 보이게). 상단 바는 개요 · 소비 흐름 · 아키텍처 · 평가 · 패키지 · 문서 · 기록
+- **평가 화면** — `lib/evaluation/screens.ts`가 화면 한 벌(주소 · 이름 · 설명 · 묶음)의 정본이다. CI가 이미 알려 주는 것(test · lint · typecheck · build 결과)은 싣지 않고, 이 저장소가 따로 재는 것(번들 크기 · AI 평가 · 접근성 · 디자인 시스템 · 패키지 표면)과 실행 비교만 보인다. 탐색기의 평가 섹션은 개요를 섹션 제목으로, 나머지를 `품질` · `AI` · `디자인 · 접근성` · `실행` 네 묶음으로 보인다. 고른 실행(`?run=`)은 화면을 옮겨도 이어 가고 필터는 가져가지 않는다. 오른쪽 상세 정보 칸은 고른 실행의 metadata(`components/evaluation/run-inspector.tsx`)다
+- **패키지 화면** — 상세 정보 칸이 근거 모델(`lib/catalog/inspection.ts`)을 그린다. 설정 패키지는 설정 파일마다 규칙 표(규칙 · 값 · 설명)를 더한다
+- **앱 · 도구** — 아키텍처 노드의 상세 정보(`components/architecture/node-inspector.tsx`)가 종류 · 위치 · 관계를 보인다
 - **문서 · 기록 화면** — 저장소 markdown 본문(build 시점에 묶은 원문)과 "이 페이지에서", 근거 · 역참조를 그린다
 
 같은 모양의 DevHub가 snapdone에도 있다. **폴더 · 파일 이름 · 화면 어휘를 그쪽과 같게 유지한다.**
@@ -26,12 +28,12 @@ Vite + React. shared-stack의 구조와 근거(패키지 · 앱 · 도구 · 문
 - **상태 어휘를 한 필드에 섞지 않는다.** 공개 여부(`Visibility`), 산출물 출처(`ArtifactOrigin`), 근거 공백(`EvidenceGap.kind`), 실행 조건(`CommandConstraint`)은 각자의 타입이다. `planned` 같은 기본값이 없다
 - **공개 여부는 매니페스트의 `private`만 근거다.** `package.json`이 없으면 "정의되지 않음"이지 추측하지 않는다. 진입점은 `exports`(없으면 main · files)만이고, build 산출물 경로는 위치를 알리는 글일 뿐 import 대상으로 보이지 않는다
 - **흐름은 저장소가 증명하는 것만 싣는다.** 단계는 `implemented` · `partial` · `documented-only` 중 하나다. 소스가 없으면 `implemented`가 아니고, 저장소 밖 단계(설치 등)는 문서만 인용하는 `documented-only`다. `partial`은 근거 공백을 함께 둔다
-- 소스가 말하지 않는 웹 · RN 동등성을 주장하지 않고 quality-lab 측정값을 싣지 않는다. 흐름 화면은 요약, 근거(소스 · 테스트 · 문서 · 공백)는 단계 상세 정보에 둔다
+- 소스가 말하지 않는 웹 · RN 동등성을 주장하지 않는다. 측정값은 카탈로그에 싣지 않고 평가 화면만 export 된 실행에서 읽는다. 흐름 화면은 요약, 근거(소스 · 테스트 · 문서 · 공백)는 단계 상세 정보에 둔다
 - **스냅샷은 build 환경의 사실이다.** `vite.config.mts`가 `lib/repository/snapshot.ts`(Node 전용, 셸 없는 git)로 읽어 `define`으로 넣는다. 못 읽으면 `unavailable`과 `null` — 커밋 · 브랜치를 추측하지 않는다
 
 ### 화면과 패키지
 
-- **소비자처럼 쓴다.** UI는 `@berrypjh/react-ui`와 `@berrypjh/devhub-ui`의 공개 exports(`.` · `/styles.css` · `/tailwind`)만 쓴다. `@berrypjh/ui-core` · `@berrypjh/design-tokens` · 다른 패키지의 source 경로를 import하지 않는다
+- **소비자처럼 쓴다.** UI는 `@berrypjh/react-ui`와 `@berrypjh/devhub-ui`의 공개 exports(`.` · `/styles.css` · `/tailwind`)만, 실행 검증은 `@berrypjh/observability-contracts` 만 쓴다. `@berrypjh/ui-core` · `@berrypjh/design-tokens` · 다른 패키지의 source 경로를 import하지 않는다
 - **화면의 공용 부분은 devhub-ui에 있다.** 셸 · 탐색기 · 작업 영역 · 상세 정보 틀 · 그림 · markdown · 검색 combobox · 테마 · 아이콘은 `libs/devhub-ui`다. 이 앱에는 카탈로그를 그 컴포넌트에 넘기는 조립(`components/shell/devhub-shell.tsx`)과 저장소 사실에 묶인 화면만 둔다. 라우터는 `components/shell/router-adapter.tsx`가 `DevHubProvider`로 넘긴다
 - **라이브러리에 있는 것을 다시 만들지 않는다.** react-ui에 없는 것은 devhub-ui에, 이 저장소에만 있는 것만 앱에 둔다
 - **DevHub 작업마다 라이브러리화를 판단한다.** 화면 부품이 카탈로그 · 경로 · 이 저장소 어휘를 몰라도 그려지면 devhub-ui에 만들고, 앱은 데이터와 글자만 넘긴다. 공개 API는 선택 prop · 필드를 더하는 식으로 넓혀 기존 소비자(snapdone)를 깨지 않는다. 예 — 탐색기 묶음 접기는 `ExplorerGroup.collapsed`
@@ -48,9 +50,17 @@ Vite + React. shared-stack의 구조와 근거(패키지 · 앱 · 도구 · 문
 
 ### 검색
 
-- **명령 · CI 카탈로그는 두지 않는다.** 루트 script · Nx target · workflow 목록은 매니페스트와 `.github/workflows`가 정본이고, 여기 옮겨 적으면 어긋난다. quality-lab의 결과 화면 · metric도 다시 그리지 않는다
+- **명령 · CI 카탈로그는 두지 않는다.** 루트 script · Nx target · workflow 목록은 매니페스트와 `.github/workflows`가 정본이고, 여기 옮겨 적으면 어긋난다
 - **검색은 카탈로그에서 유도한다.** 따로 적은 검색 목록 · 퍼지 의존성이 없다. 순위는 정확 → 앞부분 → 이름 단어 → 설명 단어 → 부분 글자 → 관련 순이고, 같으면 종류 · 길이 · 글자 순이다(`lib/search/rank.ts`, 테스트가 고정)
 - 검색 결과 종류는 글자로 보인다. 모든 결과 주소는 실제 화면과 해시 대상으로 열린다(`app/search-links.spec.tsx`). 단축키는 macOS ⌘K · 그 밖 Ctrl+K만이고, macOS Ctrl+K · 다른 수정 키 · IME 조합 중 입력은 건드리지 않는다
+
+### 평가
+
+- **명령 버튼은 복사만 한다.** 브라우저가 수집 · export를 부르는 경로가 없다. localhost 접근성 audit은 `pnpm quality --base-url=http://localhost:4400`(Node)이 평가 화면을 대상으로 하고, axe는 앱 bundle에 없다
+- **개요 · 목록은 run 요약만 읽는다.** 요약이 없는 이전 export는 run 전체를 몰래 받지 않고 다시 export하라고 알린다. 필터는 표시만 바꾸고 원본 count를 바꾸지 않는다
+- **상태를 섞지 않는다.** 비정상 상태는 `lib/evaluation/status.ts` 한 벌이고 숫자 · 성공으로 바꾸지 않는다. 접근성 근거(axe · token 대비 · CSS 텍스트 · UI test · 수동)는 출처별로 나누고 합친 점수가 없다
+- **차트는 같은 데이터의 표와 함께 둔다.** 차트 · 표는 devhub-ui의 `BarChart` · `DataTable`이고, 한 차트에는 같은 조건 · 단위의 값만 둔다. 새 파생값(합산 점수 · 감소율)을 만들지 않는다
+- **비교는 명시한 기준만 한다.** 최신 실행을 자동 baseline으로 삼지 않고, delta는 계약의 비교 조건이 같을 때만 보인다. 모든 비교는 보고 전용이다
 
 ## 기록 (`docs/records/`)
 
@@ -69,7 +79,7 @@ src/
   app/                     route 조립만. 화면 하나에 파일 하나
     app.tsx                이동 뒤 포커스 자리 · 건너뛰기 링크 둘(셸 밖) · route
     router.tsx             route 표. 셸은 레이아웃 route, page 가 <main> 과 <aside> 를 그린다
-    overview-page · section-page · application-page · package-page(EntityDetail 공통)
+    overview-page · section-page · package-page(EntityDetail) · evaluation-<id>-page(평가 화면마다 하나)
     document-page · record-page · journey-page · architecture-page · source-page · not-found-page
     *.spec.tsx             화면 계약: route · 셸 · 검색 · 상세 정보 · 문서 · 기록 · 흐름 · semantics(h1 하나 · #대상 포커스)
   components/
@@ -81,6 +91,9 @@ src/
     doc/                   doc-link(문서 · 기록 · 소스 · 외부 · 깨진 링크) · document-body(use() 로 원문 → devhub-ui DocContent) · document-inspector
     architecture/          architecture-map · architecture-outline · filter-bar · node-inspector · relation-lists · presentation
     flow/                  flow-canvas · journey-outline · step-inspector · presentation
+    evaluation/            evaluation-frame(화면 머리 · 오른쪽 칸) · evaluation-provider(client · 기준 SHA) · run-bar(실행 선택)
+                           · status-notice · run-inspector · alternative-runs · use-run-data(index · 요약 · run 전체)
+                           · 화면마다 폴더(overview · packages · bundles · ai · design-system · accessibility · runs)
     ui/                    view-icons(보기 · 섹션마다 아이콘 하나) · entity-link
                            (셸 · 그림 · markdown · 검색 · 테마 · 아이콘 · pager · record-meta 는 @berrypjh/devhub-ui)
   domain/
@@ -93,6 +106,9 @@ src/
     markdown/              documents(불러오기 · ReadableDoc) · doc-links(링크 해석) · sources(원문 묶음) — 파서 · 목차는 devhub-ui
     repository/            snapshot(Node 전용 git) · current-snapshot(define 값) · source-links(커밋 고정) · source-usage
                            · editor-link
+    evaluation/            client(공개 JSON → 계약 검증 · 파일마다 한 번만 받음) · query(URL query 허용 목록) · status(비정상 상태 한 벌)
+                           · labels · format(상태 · 값 → 글) · links(실패 행 → 근거 화면) · screens(화면 한 벌)
+                           · 화면마다 순수 로직(packages · bundles · ai · design-system · accessibility · comparison · run-detail)
     search/                entries(카탈로그 → 항목 · 종류 순서) · view(종류 글자 · 제안 한 줄) — 순위 · 단축키는 devhub-ui
   data/
     index.ts               catalog = repository · applications · packages · tools · relations · documents · records ·
@@ -100,6 +116,8 @@ src/
     catalog.spec.ts        무결성: ID · 참조 · 경로 · 매니페스트 일치(peerDependencies 포함) · 누락 · 문서 제목 · 기록 · 화면 경계
     records.ts             기록 — docs/records 파일마다 하나
     journeys/              실행 위치(contexts) · 흐름 하나에 파일 하나 · journeys.spec.ts(참조 · 경로 · 상태 규칙 · 도달성 · 웹/RN 포함)
+  test/evaluation/         평가 test 전용 fixture · render(실제 route, 가짜 fetch · 기준 SHA). tsconfig.app 에서 제외
+public/observability/      수집기의 export 산출물 (gitignore). build 가 dist/observability 로 복사한다
 ```
 
 - **import** — `app` · `components`에서 `data` · `domain` · `lib`(그리고 app → components)는 `@/`로, 같은 층 안에서는 상대 경로로 쓴다. `lib` · `data` · `domain`은 상대 경로만 쓴다
@@ -114,11 +132,11 @@ pnpm nx typecheck @berrypjh/devhub   # tsc app + spec (react-ui 를 먼저 build
 pnpm nx lint @berrypjh/devhub
 pnpm nx test @berrypjh/devhub
 pnpm nx build @berrypjh/devhub
-pnpm devhub                          # http://localhost:4400
+pnpm dev:devhub                      # http://localhost:4400
 ```
 
-- **실제 브라우저**(셸 키보드 · 반응형 · 검색 · 딥링크 · dialog 포커스 · 기록)는 `apps/devhub-e2e`가 본다
-- **jsdom 쪽 구조 계약**(h1 하나 · `aria-controls` · `#` 대상이 포커스를 받음)은 `app/semantics.spec.tsx`다
+- **실제 브라우저**(셸 키보드 · 반응형 · 검색 · 딥링크 · dialog 포커스 · 기록 · 평가)는 `apps/devhub-e2e`가 본다
+- **jsdom 쪽 구조 계약**(h1 하나 · `aria-controls` · `#` 대상이 포커스를 받음)은 `app/semantics.spec.tsx`, 평가 섹션의 탐색기 · 오른쪽 칸은 `app/evaluation-shell.spec.tsx`다. 둘 다 a11y 수집기의 UI test 근거(`ui-test:devhub-shell`)다
 - **dev 서버 · e2e는 AI 세션에서 포트 바인딩이 막혀 실행할 수 없다.** 화면 확인은 사용자에게 요청한다
 
 ## Gotcha

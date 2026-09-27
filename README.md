@@ -85,14 +85,13 @@ claude plugin install berry-commit@berrypjh
 | `libs/ui-core`                                      | TypeScript              | 플랫폼 중립 계약 · 공통 로직. 내부                         |
 | `libs/react-ui`                                     | React · Vite · Tailwind | 웹 컴포넌트 라이브러리                                     |
 | `libs/react-native-ui`                              | React Native            | 모바일 컴포넌트 라이브러리                                 |
-| `libs/devhub-ui`                                    | React                   | DevHub 셸 · 그림 · markdown · 검색                         |
+| `libs/devhub-ui`                                    | React                   | DevHub 셸 · 그림 · 차트 · 표 · markdown · 검색             |
 | `libs/{eslint,prettier,tsconfig,commitlint}-config` | —                       | 공유 설정                                                  |
-| `libs/observability-contracts`                      | zod                     | quality-lab 수집기 · 화면이 함께 쓰는 계약. 내부           |
+| `libs/observability-contracts`                      | zod                     | 품질 관측 수집기 · DevHub 평가 화면의 계약. 내부           |
 | `apps/demo-web`                                     | React · Vite            | 웹 라이브러리 데모                                         |
 | `apps/demo-mobile`                                  | Expo                    | 모바일 라이브러리 데모                                     |
-| `apps/devhub`                                       | Vite                    | 저장소 구조 · 근거 탐색기                                  |
-| `apps/quality-lab`                                  | Vite                    | 품질 수집 결과 뷰어                                        |
-| `apps/*-e2e`                                        | Playwright              | devhub · quality-lab E2E                                   |
+| `apps/devhub`                                       | Vite                    | 저장소 구조 · 근거 탐색기 · 품질 평가 화면                 |
+| `apps/devhub-e2e`                                   | Playwright              | DevHub E2E                                                 |
 | `plugins/`                                          | Node                    | Claude Code plugin (`berry-commit` · `berry-dev`)          |
 | `tools/`                                            | TypeScript              | 측정 · 릴리스 · 카탈로그 생성 · 조회 · 평가 · 품질 수집    |
 
@@ -105,8 +104,7 @@ pnpm install
 pnpm start          # 웹 데모 (React + Vite)
 pnpm start:mobile   # 모바일 데모 (Expo)
 pnpm storybook      # Storybook
-pnpm devhub         # DevHub
-pnpm quality:lab    # quality-lab
+pnpm dev:devhub     # DevHub (평가 화면 포함)
 ```
 
 ## 검증

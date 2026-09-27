@@ -48,9 +48,9 @@ berry-dev의 generic rule · 절차(`repo-verify` 등)가 가리키는 shared-st
 
 포트 바인딩이 막혀 멈추거나 실패한다. 사용자에게 실행을 요청하고, 결과를 받기 전에는 unsupported로 보고한다.
 
-- dev 서버 · preview · Storybook · local registry — `serve` · `dev` · `start` · `preview` · `storybook` target, `pnpm start` · `pnpm devhub` · `pnpm quality:lab` · `pnpm storybook` · `pnpm local-registry`
-- Playwright e2e — `@berrypjh/devhub-e2e` · `@berrypjh/quality-lab-e2e`의 `e2e`, `pnpm storybook:a11y`
-- 판정 목록은 [hooks/guard-bash.mjs](./hooks/guard-bash.mjs)의 `PORT_BOUND`다. `pnpm devhub`는 그 목록에 없지만 `nx serve` 별칭이다
+- dev 서버 · preview · Storybook · local registry — `serve` · `dev` · `start` · `preview` · `storybook` target, `pnpm start` · `pnpm dev:devhub` · `pnpm storybook` · `pnpm local-registry`
+- Playwright e2e — `@berrypjh/devhub-e2e`의 `e2e`, `pnpm storybook:a11y`
+- 판정 목록은 [hooks/guard-bash.mjs](./hooks/guard-bash.mjs)의 `PORT_BOUND`다. `pnpm dev:devhub`는 그 목록에 없지만 `nx serve` 별칭이다
 
 ## UI
 
@@ -58,11 +58,11 @@ berry-dev의 generic rule · 절차(`repo-verify` 등)가 가리키는 shared-st
 
 ### 역할
 
-| 경로                                                                      | 역할       | 따를 문서                                                       |
-| ------------------------------------------------------------------------- | ---------- | --------------------------------------------------------------- |
-| `libs/react-ui` · `libs/react-native-ui` · `libs/devhub-ui`               | maintainer | 각 패키지 `AGENTS.md`                                           |
-| `libs/ui-core`                                                            | UI 아님    | 플랫폼 중립 계약 — [.claude/rules/ui-core.md](rules/ui-core.md) |
-| `apps/demo-web` · `apps/demo-mobile` · `apps/quality-lab` · `apps/devhub` | consumer   | 각 앱 `AGENTS.md`의 "소비자처럼 쓴다"                           |
+| 경로                                                        | 역할       | 따를 문서                                                       |
+| ----------------------------------------------------------- | ---------- | --------------------------------------------------------------- |
+| `libs/react-ui` · `libs/react-native-ui` · `libs/devhub-ui` | maintainer | 각 패키지 `AGENTS.md`                                           |
+| `libs/ui-core`                                              | UI 아님    | 플랫폼 중립 계약 — [.claude/rules/ui-core.md](rules/ui-core.md) |
+| `apps/demo-web` · `apps/demo-mobile` · `apps/devhub`        | consumer   | 각 앱 `AGENTS.md`의 "소비자처럼 쓴다"                           |
 
 - 한 작업이 lib와 앱을 함께 고치면 파일마다 역할을 따로 판정한다. lib 수정은 maintainer로, 앱 수정은 consumer로 본다
 
@@ -80,9 +80,9 @@ berry-dev의 generic rule · 절차(`repo-verify` 등)가 가리키는 shared-st
 
 ### 확인 수단
 
-| 방식      | 있는 것                                                                                                                                   | 이 세션에서                         |
-| --------- | ----------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
-| 자동      | `@berrypjh/react-ui` test(jsdom · conformance · forced-colors 규칙), `@berrypjh/react-native-ui` test(jest), devhub · quality-lab 앱 test | 실행 가능                           |
-| 자동(axe) | `pnpm storybook:a11y` — Storybook을 띄워 axe 검사. PR에서는 `pr-check.yml`의 a11y job                                                     | 포트 — unsupported, CI · 사용자에게 |
-| 실제 web  | `@berrypjh/devhub-e2e` · `@berrypjh/quality-lab-e2e` Playwright, Storybook                                                                | 포트 — unsupported, 사용자에게      |
-| 실제 RN   | `apps/demo-mobile`을 사람이 기기 · 시뮬레이터에서 본다([.claude/rules/demo-mobile.md](rules/demo-mobile.md))                              | 수단 없음 — unsupported             |
+| 방식      | 있는 것                                                                                                                                     | 이 세션에서                         |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
+| 자동      | `@berrypjh/react-ui` test(jsdom · conformance · forced-colors 규칙), `@berrypjh/react-native-ui` test(jest), devhub 앱 test(평가 화면 포함) | 실행 가능                           |
+| 자동(axe) | `pnpm storybook:a11y` — Storybook을 띄워 axe 검사. PR에서는 `pr-check.yml`의 a11y job                                                       | 포트 — unsupported, CI · 사용자에게 |
+| 실제 web  | `@berrypjh/devhub-e2e` Playwright, Storybook                                                                                                | 포트 — unsupported, 사용자에게      |
+| 실제 RN   | `apps/demo-mobile`을 사람이 기기 · 시뮬레이터에서 본다([.claude/rules/demo-mobile.md](rules/demo-mobile.md))                                | 수단 없음 — unsupported             |
