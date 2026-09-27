@@ -19,6 +19,7 @@ export {
   type View,
   zoomAt,
 } from './canvas/viewport';
+export { type Bar, BarChart, type BarGroup } from './chart/bar-chart';
 export { CopyButton } from './doc/copy-button';
 export { DocContent, type RenderLink } from './doc/doc-content';
 export { DocToc } from './doc/doc-toc';
@@ -88,4 +89,5 @@ export {
   themeScript,
 } from './theme/theme';
 export { ThemeSwitch } from './theme/theme-switch';
+export { DataTable } from './ui/data-table';
 export { Icon, type IconName } from './ui/icon';

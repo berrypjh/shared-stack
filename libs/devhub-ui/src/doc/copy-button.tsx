@@ -20,11 +20,14 @@ const MESSAGE: Record<Result, string> = {
  */
 export const CopyButton = ({ text, label }: { text: string; label: string }) => {
   const [result, setResult] = useState<Result>('idle');
+  // 보안 문맥이 아니면 `navigator.clipboard` 가 없다 — 동기로 던지지 않고 실패로 알린다.
   const copy = () =>
-    navigator.clipboard.writeText(text).then(
-      () => setResult('copied'),
-      () => setResult('failed'),
-    );
+    Promise.resolve()
+      .then(() => navigator.clipboard.writeText(text))
+      .then(
+        () => setResult('copied'),
+        () => setResult('failed'),
+      );
   return (
     <span className="inline-flex items-center">
       <Button

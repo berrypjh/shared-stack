@@ -39,9 +39,12 @@ export type ExplorerSection = {
 
 export type ExplorerView = { id: string; label: string; href: string; icon: IconName };
 
+/** 항목 주소의 경로 부분. 항목이 query(예: 고른 실행 `?run=`)를 이어 가도 현재 항목은 경로로 정한다. */
+const pathOf = (href: string) => href.split(/[?#]/)[0];
+
 const useCurrent = () => {
   const { pathname } = useDevHub().router.location;
-  return (href: string) => (pathname === href ? ('page' as const) : undefined);
+  return (href: string) => (pathname === pathOf(href) ? ('page' as const) : undefined);
 };
 
 const Items = ({ items }: { items: ExplorerItem[] }) => {
@@ -99,7 +102,9 @@ const Group = ({
  */
 const useGroupsOpen = (groups: TitledGroup[]) => {
   const { pathname } = useDevHub().router.location;
-  const current = groups.find((group) => group.items.some((item) => item.href === pathname));
+  const current = groups.find((group) =>
+    group.items.some((item) => pathOf(item.href) === pathname),
+  );
   const [open, setOpen] = useState<Record<string, boolean>>(() =>
     Object.fromEntries(groups.map((group) => [group.title, !group.collapsed || group === current])),
   );

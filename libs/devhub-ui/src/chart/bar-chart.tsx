@@ -26,16 +26,16 @@ const BarRow = ({ bar }: { bar: Bar }) => {
     <ListItem
       data-key={bar.key}
       data-value={value ?? 'null'}
-      className="grid grid-cols-1 sm:grid-cols-[minmax(8rem,16rem)_minmax(6rem,1fr)_auto] items-center gap-x-sm gap-y-xs"
+      className="grid grid-cols-1 items-center gap-x-sm gap-y-xs sm:grid-cols-[minmax(8rem,16rem)_minmax(6rem,1fr)_auto]"
     >
-      <span className="text-text-default text-xsm break-all">{bar.label}</span>
+      <span className="typo-body-small break-all text-text-default">{bar.label}</span>
       {drawable ? (
         <svg
           aria-hidden="true"
           focusable="false"
           viewBox="0 0 100 10"
           preserveAspectRatio="none"
-          className="w-full h-[10px] overflow-visible"
+          className="h-[10px] w-full overflow-visible"
         >
           <rect x="0" y="0" width="100" height="10" className="fill-background-default" />
           <rect
@@ -61,11 +61,11 @@ const BarRow = ({ bar }: { bar: Bar }) => {
           )}
         </svg>
       ) : (
-        <span aria-hidden="true" className="text-text-light text-xxsm">
+        <span aria-hidden="true" className="typo-caption-small text-text-light">
           막대 없음
         </span>
       )}
-      <span className="text-text-default text-xsm font-mono break-keep">{bar.text}</span>
+      <span className="font-mono typo-body-small break-keep text-text-default">{bar.text}</span>
     </ListItem>
   );
 };
@@ -93,12 +93,12 @@ export const BarChart = ({
       className="m-0 flex flex-col gap-sm"
     >
       <figcaption className="flex flex-col gap-xs">
-        <span id={`${id}-title`} className="text-text-default text-sm leading-sm font-semiBold">
+        <span id={`${id}-title`} className="typo-body-small-strong text-text-default">
           {title}
         </span>
         <span
           id={`${id}-description`}
-          className="text-text-light text-xsm leading-xsm break-keep"
+          className="typo-caption-small break-keep text-text-light"
         >{`${description} · 단위 ${unit}`}</span>
       </figcaption>
       {groups.map((group) => (
@@ -108,7 +108,7 @@ export const BarChart = ({
           aria-label={group.label}
           className="flex flex-col gap-xs"
         >
-          <span aria-hidden="true" className="text-text-light text-xxsm font-semiBold">
+          <span aria-hidden="true" className="typo-caption-small text-text-light">
             {group.label}
           </span>
           <List className="flex flex-col gap-xs">
