@@ -1,5 +1,4 @@
 import {
-  baselinePointerSchema,
   publicIndexSchema,
   publicRunArtifactSchema,
   type RunArtifact,
@@ -14,7 +13,7 @@ import type { Page } from '@playwright/test';
  */
 
 const SHA = 'a'.repeat(40);
-export const OTHER_SHA = 'b'.repeat(40);
+const OTHER_SHA = 'b'.repeat(40);
 const HASH = 'c'.repeat(64);
 
 export const CX = 'bundle.size-limit.react-ui.cx-only';
@@ -96,7 +95,6 @@ export const coreRun = (
     contexts: [],
     evals: [],
     designSystem: null,
-    packageSurfaces: [],
     accessibility: [],
   });
 
@@ -111,17 +109,9 @@ export const COMPARE_RUNS = [
   }),
 ];
 
-export const POINTER = baselinePointerSchema.parse({
-  version: 1,
-  pointers: [{ profile: 'core', runId: 'run-base', setAt: '2026-09-13T10:00:00.000Z' }],
-  history: [
-    { profile: 'core', runId: 'run-base', setAt: '2026-09-13T10:00:00.000Z', replaced: null },
-  ],
-});
-
 export type PublicFiles = Record<string, unknown>;
 
-/** index·run·요약 한 벌. `extra` 로 baseline 포인터나 깨진 파일(문자열)을 덧붙인다. */
+/** index·run·요약 한 벌. `extra` 로 깨진 파일(문자열)을 덧붙인다. */
 export const publicFiles = (runs: RunArtifact[], extra: PublicFiles = {}): PublicFiles => {
   const files: PublicFiles = {
     '/observability/index.json': publicIndexSchema.parse({

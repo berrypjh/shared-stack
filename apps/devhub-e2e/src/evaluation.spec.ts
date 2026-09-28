@@ -1,6 +1,6 @@
 import { expect, type Page, test } from '@playwright/test';
 
-import { focusIsAtStart, horizontalOverflow } from './support/keyboard';
+import { focusIsAtStart } from './support/keyboard';
 import { COMPARE_RUNS, publicFiles, serveObservability } from './support/observability';
 
 /** 탐색기의 평가 섹션. 이동 목적지는 여기 적지 않는다 — 렌더된 하위 메뉴에서 읽는다. */
@@ -31,7 +31,7 @@ test.describe('평가 하위 메뉴', () => {
     expect(items.length).toBeGreaterThan(5);
 
     for (const { label, href } of items) {
-      await page.goto(href === '/evaluation' ? '/evaluation/runs' : '/evaluation');
+      await page.goto(href === '/evaluation' ? '/evaluation/bundles' : '/evaluation');
       await evaluation(page).getByRole('link', { name: label, exact: true }).click();
       await page.waitForURL((url) => url.pathname === href);
 
@@ -45,22 +45,9 @@ test.describe('평가 하위 메뉴', () => {
   });
 
   test('보고 있는 실행(run)은 하위 화면을 옮겨도 주소에 남는다', async ({ page }) => {
-    await page.goto('/evaluation/runs?run=run-base');
+    await page.goto('/evaluation/accessibility?run=run-base');
     await evaluation(page).getByRole('link', { name: '번들', exact: true }).click();
     await page.waitForURL((url) => url.pathname === '/evaluation/bundles');
     expect(new URL(page.url()).searchParams.get('run')).toBe('run-base');
-  });
-});
-
-test.describe('좁은 폭', () => {
-  test.use({ viewport: { width: 390, height: 844 } });
-
-  test('본문은 가로로 넘치지 않고 넓은 표는 이름 있는 스크롤 영역 안에 있다', async ({ page }) => {
-    await page.goto('/evaluation/runs?run=run-current&base=run-base');
-
-    const scroll = page.getByRole('region', { name: '변화 — run-current 대 run-base 표' });
-    await expect(scroll).toBeVisible();
-    await expect(scroll).toHaveAttribute('tabindex', '0');
-    expect(await horizontalOverflow(page)).toBeLessThanOrEqual(0);
   });
 });

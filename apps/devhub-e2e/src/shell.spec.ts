@@ -11,7 +11,7 @@ test.describe('데스크톱 셸', () => {
     await page.goto('/packages/react-ui');
     await expect(page.getByRole('banner')).toHaveCount(1);
     await expect(page.getByRole('main')).toHaveCount(1);
-    await expect(page.getByRole('navigation', { name: '보기' })).toBeVisible();
+    await expect(page.getByRole('navigation', { name: '저장소 항목' })).toBeVisible();
 
     const panes = [
       page.getByRole('complementary', { name: '탐색기' }),
@@ -48,7 +48,7 @@ test.describe('데스크톱 셸', () => {
   }) => {
     await page.goto('/');
     const records = page
-      .getByRole('navigation', { name: '보기' })
+      .getByRole('navigation', { name: '저장소 항목' })
       .getByRole('link', { name: '기록', exact: true });
     await tabTo(page, records);
     await page.keyboard.press('Enter');
@@ -67,7 +67,7 @@ test.describe('데스크톱 셸', () => {
     const skip = page.getByRole('link', skipToMain);
     for (const view of ['소비 흐름', '아키텍처', '문서', '개요']) {
       const link = page
-        .getByRole('navigation', { name: '보기' })
+        .getByRole('navigation', { name: '저장소 항목' })
         .getByRole('link', { name: view, exact: true });
       await link.click();
       await expect(link).toHaveAttribute('aria-current', 'page');
