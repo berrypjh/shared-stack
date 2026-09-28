@@ -275,7 +275,10 @@ export const records: RecordRef[] = [
       { path: 'apps/devhub/src/components/shell/devhub-shell.tsx', symbol: 'useEvaluationSection' },
       { path: 'tools/scripts/observability/export.ts', symbol: 'PUBLIC_ROOT' },
       { path: 'tools/scripts/observability/audit.ts', symbol: 'AUDIT_ROUTES' },
-      { path: 'libs/observability-contracts/src/accessibility.ts', symbol: 'AXE_SCOPES' },
+      {
+        path: 'libs/observability-contracts/src/accessibility.ts',
+        symbol: 'ACCESSIBILITY_SOURCE_SCOPES',
+      },
     ],
     docs: ['devhub-agents', 'observability-architecture', 'observability-contracts-agents'],
     tests: [

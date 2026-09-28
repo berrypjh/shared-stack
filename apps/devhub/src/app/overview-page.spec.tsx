@@ -31,12 +31,6 @@ describe('overview', () => {
     expect(repository.getByText(catalog.repository.webUrl)).toBeTruthy();
   });
 
-  it('shows what the repository does not pin, instead of a guessed version', () => {
-    renderOverview();
-    expect(within(region('저장소')).getByText(/pnpm 버전이 고정되지 않는다/)).toBeTruthy();
-    expect(within(region('저장소')).queryByText(/pnpm@/)).toBeNull();
-  });
-
   it('lists every package with its catalog visibility and every application', () => {
     renderOverview();
     const packages = within(region('패키지'));

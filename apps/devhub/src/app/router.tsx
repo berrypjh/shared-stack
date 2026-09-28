@@ -14,8 +14,6 @@ import { EvaluationAiPage } from './evaluation-ai-page';
 import { EvaluationBundlesPage } from './evaluation-bundles-page';
 import { EvaluationDesignSystemPage } from './evaluation-design-system-page';
 import { EvaluationOverviewPage } from './evaluation-overview-page';
-import { EvaluationPackagesPage } from './evaluation-packages-page';
-import { EvaluationRunsPage } from './evaluation-runs-page';
 import { JourneyPage } from './journey-page';
 import { RouteNotFound } from './not-found-page';
 import { OverviewPage } from './overview-page';
@@ -34,12 +32,10 @@ const DETAIL: Record<Exclude<SectionId, 'journeys'>, () => React.JSX.Element> = 
 /** 평가의 화면. 주소 · 이름은 `lib/evaluation/screens.ts` 가 정하고 여기는 화면만 잇는다. */
 const EVALUATION: Record<ScreenId, () => React.JSX.Element> = {
   overview: EvaluationOverviewPage,
-  packages: EvaluationPackagesPage,
   bundles: EvaluationBundlesPage,
   ai: EvaluationAiPage,
   'design-system': EvaluationDesignSystemPage,
   accessibility: EvaluationAccessibilityPage,
-  runs: EvaluationRunsPage,
 };
 
 /** 셸은 레이아웃 route 라 이동해도 남는다. page 는 `<main>` 과 `<aside>` 를 그린다. */

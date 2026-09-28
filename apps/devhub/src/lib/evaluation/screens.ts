@@ -18,13 +18,6 @@ export const EVALUATION_SCREENS = [
     lead: '실행 하나의 번들 budget · 컨텍스트 · 평가를 서로 합치지 않고 독립 카드로 보여 준다.',
   },
   {
-    id: 'packages',
-    path: '/evaluation/packages',
-    label: '패키지 표면',
-    lead: 'package.json 이 선언한 exports 와 실제 산출물, catalog 재생성 결과를 source 근거로 본다.',
-    group: '품질',
-  },
-  {
     id: 'bundles',
     path: '/evaluation/bundles',
     label: '번들',
@@ -49,15 +42,8 @@ export const EVALUATION_SCREENS = [
     id: 'accessibility',
     path: '/evaluation/accessibility',
     label: '접근성',
-    lead: '접근성 근거를 출처별로 나눠 본다. axe 검사 · token 대비 test · CSS 텍스트 검사 · UI test · 수동 확인은 서로 다른 근거이고 합친 점수는 없다.',
+    lead: 'DevHub 평가 화면을 localhost 에서 axe 로 검사한 결과다. rule · node 수를 보이고 합친 점수는 없다.',
     group: '디자인 · 접근성',
-  },
-  {
-    id: 'runs',
-    path: '/evaluation/runs',
-    label: '실행 기록',
-    lead: '공개 index 의 실행 목록과 고른 실행의 상세다.',
-    group: '실행',
   },
 ] as const satisfies readonly EvaluationScreen[];
 

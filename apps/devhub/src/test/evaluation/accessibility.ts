@@ -98,11 +98,8 @@ const axeBase = (id: string, sourceScope: string, source: string, version: strin
   tags: WCAG_TAGS,
   enabledRules: ['color-contrast'],
   exclusions: [],
-  index: null,
   startedAt: AT,
   finishedAt: '2026-09-13T12:05:00.000Z',
-  checks: [],
-  manual: [],
   limitations: ['incomplete 는 사람이 확인해야 하는 결과이고 통과가 아닙니다'],
 });
 
@@ -149,153 +146,7 @@ export const devhubSummary = ({
   ],
 });
 
-const story = (id: string) => ({ storyId: `buttons-button--${id}`, scope: '#storybook-root' });
-
-export const storybookSummary = () => ({
-  ...axeBase('a11y:storybook', 'storybook', 'storybook-test-runner', '4.11.1'),
-  index: { path: 'libs/react-ui/storybook-static/index.json', storyCount: 5, testStoryCount: 4 },
-  outcome: 'partial',
-  reason: 'scan 실패 1개 · 기록 없음 1개 · 검사 1개',
-  targets: [
-    scannedTarget('storybook:buttons-button--one', 'Buttons/Button · one', story('one')),
-    unscannedTarget(
-      'storybook:buttons-button--two',
-      'Buttons/Button · two',
-      story('two'),
-      'skipped',
-      'story context 가 검사를 껐습니다 — parameters.a11y.disable',
-    ),
-    unscannedTarget(
-      'storybook:buttons-button--three',
-      'Buttons/Button · three',
-      story('three'),
-      'scan-failed',
-      'axe 결과가 없습니다',
-    ),
-    unscannedTarget(
-      'storybook:buttons-button--four',
-      'Buttons/Button · four',
-      story('four'),
-      'not-run',
-      'test-runner 기록에 이 story 가 없습니다 (test tag story 인데 방문 기록 없음)',
-    ),
-  ],
-});
-
-const checkBase = (sourceScope: string) => ({
-  id: `a11y:${sourceScope}`,
-  sourceScope,
-  source: 'vitest-report',
-  engine: null,
-  tags: [],
-  enabledRules: [],
-  exclusions: [],
-  index: null,
-  startedAt: null,
-  finishedAt: null,
-  targets: [],
-  manual: [],
-});
-
-const CONTRAST = { path: 'libs/design-tokens/test/contrast.ts', line: 53 };
-
-export const tokenContrastSummary = () => ({
-  ...checkBase('token-contrast'),
-  outcome: 'completed',
-  reason: null,
-  checks: [
-    {
-      id: 'token-contrast:wcag-aa-text',
-      label: 'WCAG 2.1 AA 텍스트 대비 (1.4.3) — token pair',
-      kind: 'token-pair',
-      status: 'passed',
-      threshold: { ratio: 4.5, basis: 'wcag-2.1-aa-text' },
-      cases: { passed: 12, failed: 0, skipped: 0 },
-      evidence: [CONTRAST],
-      reason: null,
-    },
-    {
-      id: 'token-contrast:wcag-aa-non-text',
-      label: 'WCAG 2.1 AA 비텍스트 대비 (1.4.11) — token pair',
-      kind: 'token-pair',
-      status: 'unknown',
-      threshold: { ratio: 3, basis: 'wcag-2.1-aa-non-text' },
-      cases: null,
-      evidence: [CONTRAST],
-      reason: 'report 에 이 검사의 case 가 없습니다',
-    },
-    {
-      id: 'token-contrast:divider-visibility',
-      label: '프로젝트 가시성 가드 — token pair',
-      kind: 'token-pair',
-      status: 'failed',
-      threshold: { ratio: 1.2, basis: 'project-visibility-guard' },
-      cases: { passed: 5, failed: 1, skipped: 0 },
-      evidence: [{ path: 'libs/design-tokens/src/lib/contrast.test.ts', line: 48 }],
-      reason: null,
-    },
-  ],
-  limitations: ['token 색 쌍으로 계산한 test 결과입니다 — 실제 DOM 대비가 아닙니다'],
-});
-
-export const staticCssSummary = () => ({
-  ...checkBase('static-css'),
-  outcome: 'not-run',
-  reason: 'react-ui vitest report 를 import 하지 않았습니다',
-  checks: [
-    {
-      id: 'static-css:forced-colors',
-      label: 'compiled CSS 의 forced-colors outline 규칙 (텍스트 검사)',
-      kind: 'css-rule',
-      status: 'not-run',
-      threshold: null,
-      cases: null,
-      evidence: [{ path: 'libs/react-ui/src/components/forcedColors.test.ts', line: null }],
-      reason: 'react-ui vitest report 를 import 하지 않았습니다',
-    },
-  ],
-  limitations: ['Windows 실제 forced-colors 관찰이 아닙니다'],
-});
-
-export const manualSummary = () => ({
-  ...checkBase('manual'),
-  source: 'manual-record',
-  checks: [],
-  outcome: 'not-run',
-  reason: '수동 확인 기록이 없습니다',
-  manual: [
-    {
-      id: 'keyboard-tab-order',
-      label: 'Tab 순서가 화면 순서와 맞고 모든 컨트롤에 닿는다',
-      area: 'keyboard',
-      status: 'not-run',
-      note: null,
-      checkedAt: null,
-      environment: null,
-    },
-    {
-      id: 'screen-reader',
-      label: '스크린리더가 표 caption·행 머리·상태 알림을 읽는다',
-      area: 'screen-reader',
-      status: 'not-run',
-      note: null,
-      checkedAt: null,
-      environment: null,
-    },
-  ],
-  limitations: ['사람의 관찰 기록이고 자동 측정값이 아닙니다'],
-});
-
-export const accessibilityArtifact = (
-  runId: string,
-  summaries: unknown[] = [
-    storybookSummary(),
-    tokenContrastSummary(),
-    staticCssSummary(),
-    manualSummary(),
-    devhubSummary(),
-  ],
-) => ({
+export const accessibilityArtifact = (runId: string, summaries: unknown[] = [devhubSummary()]) => ({
   ...publicArtifact(runId, { profile: 'a11y' }),
   observations: [],
   accessibility: summaries,

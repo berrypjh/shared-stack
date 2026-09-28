@@ -5,7 +5,6 @@ export const DOMAIN_LABEL: Record<string, string> = {
   context: '컨텍스트',
   eval: '평가',
   a11y: '접근성',
-  'package-surface': '패키지 표면',
 };
 
 export const VERIFICATION_LABEL: Record<string, string> = {
@@ -90,10 +89,4 @@ export const REPAIR_LABEL: Record<string, string> = {
 export const CONTRAST_BASIS_LABEL: Record<string, string> = {
   'wcag-2.1-aa': 'WCAG 2.1 AA',
   'project-visibility-guard': '프로젝트 가시성 가드 (WCAG 기준 아님)',
-};
-
-export const REGENERATED_LABEL: Record<string, string> = {
-  identical: '재생성 결과 같음',
-  differs: '재생성 결과 다름',
-  'not-run': '재생성 안 함',
 };

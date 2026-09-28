@@ -24,15 +24,10 @@ describe('evaluation in the shell', () => {
         screen.path,
       );
     }
-    const groups = section.getAllByText(/^(품질|AI|디자인 · 접근성|실행)$/, {
+    const groups = section.getAllByText(/^(품질|AI|디자인 · 접근성)$/, {
       selector: 'summary span',
     });
-    expect(groups.map((group) => group.textContent)).toEqual([
-      '품질',
-      'AI',
-      '디자인 · 접근성',
-      '실행',
-    ]);
+    expect(groups.map((group) => group.textContent)).toEqual(['품질', 'AI', '디자인 · 접근성']);
   });
 
   it('carries the chosen run between screens and marks the current one by its path', async () => {
@@ -49,13 +44,13 @@ describe('evaluation in the shell', () => {
   });
 
   it('keeps the evaluation view out of the plain views and names each screen', async () => {
-    renderEvaluation('/evaluation/packages', {});
+    renderEvaluation('/evaluation/accessibility', {});
     await settled();
     const views = within(explorer().getAllByRole('list')[0]);
     expect(views.getByRole('link', { name: '아키텍처' })).toBeTruthy();
     expect(views.queryByRole('link', { name: '평가' })).toBeNull();
-    expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('패키지 표면');
-    expect(document.title).toContain('패키지 표면 · 평가');
+    expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('접근성');
+    expect(document.title).toContain('접근성 · 평가');
   });
 });
 

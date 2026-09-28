@@ -1,46 +1,17 @@
 /**
- * 접근성 결과를 글·격자로. 출처마다 뜻이 달라 합치지 않고, 점수나 성공률을 만들지 않는다.
- * impact 막대의 값은 collector 가 검증한 impact node 수 그대로다.
+ * DevHub 평가 화면을 axe 로 검사한 결과를 글·격자로. impact 막대의 값은 collector 가 검증한
+ * impact node 수 그대로다. 접근성 점수나 성공률은 만들지 않는다.
  */
 import {
   type AccessibilitySummary,
   type AuditTarget,
-  type AutomatedCheck,
   AXE_IMPACTS,
-  type ManualCheck,
 } from '@berrypjh/observability-contracts';
 
 import type { ViewState } from './status';
 
-type Scope = AccessibilitySummary['sourceScope'];
-
-export const SOURCE_SCOPE_LABEL: Record<Scope, string> = {
-  storybook: 'Storybook story (axe · #storybook-root)',
-  devhub: 'DevHub 평가 화면 (axe · document)',
-  'token-contrast': 'token 색 쌍 test',
-  'static-css': 'compiled CSS 텍스트 검사',
-  'ui-test': 'UI test (Testing Library)',
-  manual: '수동 확인',
-};
-
-/** Static/Test Results 와 Runtime Audit 에 보이는 출처. manual 은 두 보기 밖에 따로 둔다. */
-export const STATIC_SCOPES = ['storybook', 'token-contrast', 'static-css', 'ui-test'] as const;
-export const RUNTIME_SCOPES = ['devhub'] as const;
-
-export const PANELS = ['static', 'runtime'] as const;
-export type Panel = (typeof PANELS)[number];
-
-export const PANEL_LABEL: Record<Panel, string> = {
-  static: 'Static/Test Results',
-  runtime: 'Runtime Audit',
-};
-
-export const SOURCE_LABEL: Record<AccessibilitySummary['source'], string> = {
-  'axe-playwright': 'axe-playwright (Node Playwright)',
-  'storybook-test-runner': 'Storybook test-runner 기록',
-  'vitest-report': 'vitest JSON report',
-  'manual-record': '사람의 관찰 기록',
-};
+export const SOURCE_SCOPE_LABEL = 'DevHub 평가 화면 (axe · document)';
+export const SOURCE_LABEL = 'axe-playwright (Node Playwright)';
 
 export const OUTCOME_LABEL: Record<AccessibilitySummary['outcome'], string> = {
   completed: '완료',
@@ -71,27 +42,6 @@ export const TARGET_TONE: Record<AuditTarget['status'], string> = {
   'not-run': 'not-run',
 };
 
-export const CHECK_STATUS_LABEL: Record<AutomatedCheck['status'], string> = {
-  passed: '통과',
-  failed: '실패',
-  unknown: '판정 불가',
-  'not-run': '실행 안 함',
-};
-
-export const CHECK_TONE: Record<AutomatedCheck['status'], string> = {
-  passed: 'passed',
-  failed: 'failed',
-  unknown: 'unsupported',
-  'not-run': 'not-run',
-};
-
-export const CHECK_KIND_LABEL: Record<AutomatedCheck['kind'], string> = {
-  'token-pair': 'token 색 쌍',
-  'css-rule': 'CSS 규칙 텍스트',
-  'source-scan': '소스 텍스트 스캔',
-  'dom-test': 'DOM test (jsdom)',
-};
-
 /** 색 없이 읽히는 impact. 첫 단어는 axe 원본 이름이다. */
 export const IMPACT_LABEL: Record<(typeof AXE_IMPACTS)[number], string> = {
   critical: 'critical — 치명',
@@ -99,36 +49,6 @@ export const IMPACT_LABEL: Record<(typeof AXE_IMPACTS)[number], string> = {
   moderate: 'moderate — 보통',
   minor: 'minor — 경미',
   unknown: 'unknown — impact 없음',
-};
-
-const BASIS_LABEL: Record<NonNullable<AutomatedCheck['threshold']>['basis'], string> = {
-  'wcag-2.1-aa-text': 'WCAG 2.1 AA 텍스트',
-  'wcag-2.1-aa-non-text': 'WCAG 2.1 AA 비텍스트',
-  'project-visibility-guard': '프로젝트 가시성 가드 (WCAG 기준 아님)',
-};
-
-export const thresholdText = (threshold: AutomatedCheck['threshold']) =>
-  threshold ? `${threshold.ratio}:1 · ${BASIS_LABEL[threshold.basis]}` : '기준 없음';
-
-export const casesText = (cases: AutomatedCheck['cases']) =>
-  cases ? `통과 ${cases.passed} · 실패 ${cases.failed} · skip ${cases.skipped}` : 'case 없음';
-
-const MANUAL_STATUS_LABEL: Record<ManualCheck['status'], string> = {
-  'observed-ok': '문제 없음으로 관찰',
-  'observed-issue': '문제 관찰',
-  'not-run': '확인 안 함 (통과 아님)',
-};
-
-export const manualStatusText = (status: ManualCheck['status']) => MANUAL_STATUS_LABEL[status];
-
-export const MANUAL_AREA_LABEL: Record<ManualCheck['area'], string> = {
-  keyboard: '키보드',
-  focus: '포커스',
-  'screen-reader': '스크린리더',
-  order: '읽기 순서',
-  contrast: '복합 대비',
-  'forced-colors': 'forced-colors',
-  motion: '동작',
 };
 
 /** 검사한 target 의 impact 별 위반 node. 모두 0 이어도 축은 1 이다 — 실제 0 을 그린다. */
@@ -194,7 +114,7 @@ export const compareTarget = (
 /** 접근성 수집 명령. localhost audit 은 Node 가 DevHub 개발 서버의 평가 화면을 검사한다. */
 export const AUDIT_COMMANDS = ['pnpm dev:devhub', 'pnpm quality --base-url=http://localhost:4400'];
 
-/** 접근성 결과가 하나도 없는 실행. */
+/** 접근성 결과가 없는 실행. */
 export const missingRunState = (runId: string, alternatives: string[] | null): ViewState => ({
   kind: 'unsupported',
   title: `${runId} 에는 접근성 결과가 없다`,
@@ -204,22 +124,6 @@ export const missingRunState = (runId: string, alternatives: string[] | null): V
       ? ` 접근성 결과가 있는 실행: ${alternatives.join(', ')}`
       : ''),
   commands: AUDIT_COMMANDS,
-});
-
-/** 한 출처의 결과가 없는 실행. 없는 출처를 통과로 보지 않는다. */
-export const missingScopeState = (label: string): ViewState => ({
-  kind: 'unsupported',
-  title: `이 실행에 ${label} 결과가 없다`,
-  cause: '이 출처는 수집하지 않았다. 없는 출처를 통과로 보지 않는다.',
-  commands: [AUDIT_COMMANDS[1]],
-});
-
-/** 수동 확인 기록이 없는 실행. 기록이 없는 항목은 통과가 아니다. */
-export const missingManualState = (): ViewState => ({
-  kind: 'unsupported',
-  title: '이 실행에 수동 확인 기록이 없다',
-  cause: '수동 확인 목록을 수집하지 않은 실행이다. 기록이 없는 항목은 통과가 아니다.',
-  commands: [AUDIT_COMMANDS[1]],
 });
 
 /** 고른 대상을 검사하지 못했을 때. skip 은 story context 기록이라 해당 없음이다. */

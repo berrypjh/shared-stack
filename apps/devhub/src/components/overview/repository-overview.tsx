@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 import { catalog } from '@/data';
 import type { Platform } from '@/domain/model';
 import { SECTIONS } from '@/lib/catalog/entities';
-import { APP_ROLE, GAP_KIND, PACKAGE_KIND, PLATFORM, VISIBILITY } from '@/lib/catalog/labels';
+import { APP_ROLE, PACKAGE_KIND, PLATFORM, VISIBILITY } from '@/lib/catalog/labels';
 import { SNAPSHOT } from '@/lib/repository/current-snapshot';
 
 import { EntityLink, LINK } from '../ui/entity-link';
@@ -19,7 +19,7 @@ const ROWS = 'grid grid-cols-[7rem_minmax(0,1fr)] gap-x-md gap-y-sm typo-body-sm
 
 const purposeDocument = documents.find((doc) => doc.path === repository.purpose.source.path);
 
-/** 저장소가 무엇인지(문서 인용), 어디에 있는지, 무엇을 모르는지. */
+/** 저장소가 무엇인지(문서 인용), 어디에 있는지. */
 const RepositorySummary = () => (
   <WorkspaceSection id="overview-repository" title="저장소">
     <blockquote className="flex flex-col gap-xs border-l-2 border-stroke-primary pl-md">
@@ -43,11 +43,6 @@ const RepositorySummary = () => (
       <dt className="text-text-light">패키지 매니저</dt>
       <dd>{repository.packageManager}</dd>
     </dl>
-    {repository.gaps?.map((gap) => (
-      <p key={gap.note} className="typo-caption-small text-text-warning">
-        {GAP_KIND[gap.kind]} — {gap.note}
-      </p>
-    ))}
   </WorkspaceSection>
 );
 

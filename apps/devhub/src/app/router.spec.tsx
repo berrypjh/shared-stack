@@ -24,7 +24,6 @@ const renderAt = (path: string) =>
   );
 
 const h1 = () => screen.getByRole('heading', { level: 1 }).textContent;
-const views = () => within(screen.getByRole('navigation', { name: '보기' }));
 const explorerNav = () => screen.getByRole('navigation', { name: '저장소 항목' });
 const start = () => document.querySelector('[data-focus-start]');
 
@@ -81,21 +80,13 @@ describe('routes', () => {
 });
 
 describe('navigation data', () => {
-  it('draws the top views and the explorer from one list', () => {
+  it('opens the explorer with the views that have no section', () => {
     renderAt('/');
-    const top = views()
+    const hrefs = within(explorerNav())
       .getAllByRole('link')
+      .slice(0, VIEWS.length)
       .map((link) => link.getAttribute('href'));
-    expect(top).toEqual(VIEWS.map((view) => view.path));
-    expect(VIEWS.map((view) => view.label)).toEqual([
-      '개요',
-      '소비 흐름',
-      '아키텍처',
-      '평가',
-      '패키지',
-      '문서',
-      '기록',
-    ]);
+    expect(hrefs).toEqual(['/', '/architecture']);
   });
 
   it('orders the explorer sections with evaluation first and the records right after the journeys', () => {
@@ -170,9 +161,8 @@ describe('navigation data', () => {
     expect(documentGroups().length).toBeGreaterThan(1);
   });
 
-  it('marks the selection from the URL in both navigations', () => {
+  it('marks the selection from the URL in the explorer', () => {
     renderAt('/packages/react-ui');
-    expect(views().getByRole('link', { name: '패키지' }).getAttribute('aria-current')).toBe('page');
     const current = explorerNav().querySelectorAll('[aria-current="page"]');
     expect(Array.from(current).map((link) => link.getAttribute('href'))).toEqual([
       '/packages/react-ui',
@@ -190,7 +180,7 @@ describe('focus and scroll after a navigation', () => {
   it('returns to the top of the document after a view link, with the skip link next', async () => {
     const user = userEvent.setup();
     renderAt('/');
-    await user.click(views().getByRole('link', { name: '아키텍처' }));
+    await user.click(within(explorerNav()).getByRole('link', { name: '아키텍처' }));
 
     expect(h1()).toBe('현재 구조');
     expect(document.activeElement).toBe(start());

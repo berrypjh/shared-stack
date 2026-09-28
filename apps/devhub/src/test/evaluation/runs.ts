@@ -12,80 +12,8 @@ export const qualityArtifact = (runId = 'run-quality', metadata: Overrides = {})
   contexts: [contextMeasurement()],
 });
 
-const surface = (name: string, root: string, overrides: Overrides = {}) => ({
-  name,
-  path: root,
-  private: false,
-  sourceManifest: {
-    path: `${root}/package.json`,
-    exports: [
-      { subpath: '.', conditions: ['types'], target: './dist/index.d.ts' },
-      { subpath: './tokens', conditions: [], target: './dist/tokens.json' },
-    ],
-    bin: [],
-  },
-  emitted: [
-    { subpath: '.', conditions: ['types'], target: './dist/index.d.ts', status: 'present' },
-    { subpath: './tokens', conditions: [], target: './dist/tokens.json', status: 'present' },
-  ],
-  emittedBin: [],
-  build: 'complete',
-  emittedManifest: null,
-  tokensCopy: {
-    path: `${root}/dist/tokens.json`,
-    status: 'present',
-    identicalToDesignTokens: true,
-  },
-  catalog: {
-    path: `${root}/dist/llm-catalog.json`,
-    status: 'valid',
-    reason: null,
-    schemaVersion: 1,
-    platform: 'web',
-    symbolCount: 217,
-    deprecated: ['createTheme'],
-    propsUnion: [],
-    typeOmittedSymbols: [],
-    typeOmittedProps: [],
-    valueCounts: [],
-    regenerated: 'identical',
-    regeneratedReason: null,
-  },
-  tests: [
-    {
-      path: 'tools/lib/package-boundary.test.ts',
-      line: 273,
-      title: '%s 선언에 private import 가 없다',
-      evidenceKind: 'source-assertion',
-      execution: 'not-run',
-    },
-  ],
-  ...overrides,
-});
-
-/** static profile run — react-native-ui 는 산출물 일부 누락, react-ui 는 catalog drift. */
-export const designArtifact = (runId = 'run-design') => ({
-  ...publicArtifact(runId),
-  packageSurfaces: [
-    surface('@berrypjh/react-native-ui', 'libs/react-native-ui', {
-      emitted: [
-        { subpath: '.', conditions: ['types'], target: './dist/index.d.ts', status: 'present' },
-        { subpath: './tokens', conditions: [], target: './dist/tokens.json', status: 'missing' },
-      ],
-      build: 'partial',
-      catalog: {
-        ...surface('x', 'libs/x').catalog,
-        path: 'libs/react-native-ui/dist/llm-catalog.json',
-        platform: 'react-native',
-        symbolCount: 288,
-        deprecated: ['cx', 'Web'],
-      },
-    }),
-    surface('@berrypjh/react-ui', 'libs/react-ui', {
-      catalog: { ...surface('x', 'libs/x').catalog, regenerated: 'differs' },
-    }),
-  ],
-});
+/** static profile run — bundle·eval 이 없는 실행. "이 영역이 없다" 대체 화면을 시험한다. */
+export const designArtifact = (runId = 'run-design') => publicArtifact(runId);
 
 /** 공개 export 한 벌. `summaries: false` 는 요약 이전에 export 한 index 다. */
 export const publicFiles = (

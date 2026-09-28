@@ -24,7 +24,6 @@ export type Repository = {
   readonly packageManager: 'pnpm';
   /** 위 값을 읽은 파일. */
   readonly evidence: readonly SourceRef[];
-  readonly gaps?: readonly EvidenceGap[];
 };
 
 /** 코드가 도는 곳. */

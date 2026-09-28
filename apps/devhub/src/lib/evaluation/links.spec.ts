@@ -24,15 +24,15 @@ describe('failureHref — 도메인 실패는 그 도메인 화면의 근거 행
     );
   });
 
-  it('package surface 실패는 그 패키지의 표면 화면이다', () => {
-    expect(failureHref(failure('package-surface', 'package-surface.react-ui'), 'run-a')).toBe(
-      '/evaluation/packages?run=run-a&package=%40berrypjh%2Freact-ui',
-    );
-  });
-
   it('eval 실패는 AI 평가 화면이다', () => {
     expect(failureHref(failure('eval', 'eval:local-smoke-01'), 'run-a')).toBe(
       '/evaluation/ai?run=run-a',
+    );
+  });
+
+  it('a11y 실패는 접근성 화면이다', () => {
+    expect(failureHref(failure('a11y', 'a11y:devhub'), 'run-a')).toBe(
+      '/evaluation/accessibility?run=run-a',
     );
   });
 });

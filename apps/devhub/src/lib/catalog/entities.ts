@@ -123,30 +123,15 @@ export const SECTIONS: Section[] = [
   },
 ];
 
-/** 최상위 보기. 섹션이 없는 보기(개요 · 아키텍처) 다음에 섹션마다 보기 하나. 아이콘은 `components/ui/view-icons.ts` 가 `id` 로 고른다. */
+/** 이동해 가는 곳. 아이콘은 `components/ui/view-icons.ts` 가 `id` 로 고른다. */
 export type ViewId = 'overview' | 'architecture' | 'evaluation' | SectionId;
 
-export type View = { id: ViewId; label: string; path: string; section?: SectionId };
+export type View = { id: 'overview' | 'architecture'; label: string; path: string };
 
-const viewOf = (section: Section): View => ({
-  id: section.id,
-  label: section.title,
-  path: section.path,
-  section: section.id,
-});
-
-const sectionOf = (id: SectionId) => SECTIONS.find((section) => section.id === id) as Section;
-
-/**
- * 상단 바 순서. 개요 · 소비 흐름 · 아키텍처 · 평가 다음에 패키지 · 문서 · 기록이다.
- * 탐색기(`SECTIONS`)는 흐름 바로 다음에 기록을 두어 최근 결정이 먼저 보이고, 상단 바는 문서 옆에 기록을 둔다.
- */
+/** 섹션이 없는 보기. 탐색기 맨 위에 이 순서로 선다. */
 export const VIEWS: View[] = [
   { id: 'overview', label: '개요', path: '/' },
-  viewOf(sectionOf('journeys')),
   { id: 'architecture', label: '아키텍처', path: '/architecture' },
-  { id: 'evaluation', label: '평가', path: '/evaluation' },
-  ...(['packages', 'documents', 'records'] as const).map((id) => viewOf(sectionOf(id))),
 ];
 
 export const findSection = (id: SectionId): Section =>

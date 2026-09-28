@@ -3,12 +3,11 @@ import { EvaluationFrame } from '@/components/evaluation/evaluation-frame';
 import { RunBar } from '@/components/evaluation/run-bar';
 import { StatusNotice } from '@/components/evaluation/status-notice';
 import { useRunData, useSummaries } from '@/components/evaluation/use-run-data';
-import { PANELS } from '@/lib/evaluation/accessibility';
 import { loadingState } from '@/lib/evaluation/status';
 
-const SPEC = { keys: ['run', 'panel', 'base', 'target'], panels: PANELS } as const;
+const SPEC = { keys: ['run', 'base', 'target'] } as const;
 
-/** 접근성: 출처별 Static/Test Results · Runtime Audit 와 따로 둔 수동 확인. */
+/** 접근성: DevHub 평가 화면을 axe 로 검사한 결과. */
 export const EvaluationAccessibilityPage = () => {
   const data = useRunData('run', SPEC);
   const summaries = useSummaries(data.runIds);

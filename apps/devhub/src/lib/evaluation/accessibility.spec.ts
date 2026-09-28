@@ -2,13 +2,7 @@ import { accessibilitySummarySchema } from '@berrypjh/observability-contracts';
 
 import { BUNDLES_LIGHT, devhubSummary } from '../../test/evaluation/accessibility';
 
-import {
-  casesText,
-  compareTarget,
-  impactBars,
-  manualStatusText,
-  thresholdText,
-} from './accessibility';
+import { compareTarget, impactBars } from './accessibility';
 
 const quality = (options?: Parameters<typeof devhubSummary>[0]) =>
   accessibilitySummarySchema.parse(devhubSummary(options));
@@ -18,28 +12,6 @@ const targetOf = (summary: ReturnType<typeof quality>, id: string) => {
   if (!found) throw new Error(`no ${id}`);
   return found;
 };
-
-describe('thresholdText — WCAG 기준과 프로젝트 가드를 섞지 않는다', () => {
-  it('basis 마다 다른 글이다', () => {
-    expect(thresholdText({ ratio: 4.5, basis: 'wcag-2.1-aa-text' })).toBe(
-      '4.5:1 · WCAG 2.1 AA 텍스트',
-    );
-    expect(thresholdText({ ratio: 3, basis: 'wcag-2.1-aa-non-text' })).toBe(
-      '3:1 · WCAG 2.1 AA 비텍스트',
-    );
-    expect(thresholdText({ ratio: 1.2, basis: 'project-visibility-guard' })).toBe(
-      '1.2:1 · 프로젝트 가시성 가드 (WCAG 기준 아님)',
-    );
-    expect(thresholdText(null)).toBe('기준 없음');
-  });
-
-  it('case 수와 manual 상태를 통과로 뭉개지 않는다', () => {
-    expect(casesText(null)).toBe('case 없음');
-    expect(casesText({ passed: 12, failed: 0, skipped: 1 })).toBe('통과 12 · 실패 0 · skip 1');
-    expect(manualStatusText('not-run')).toBe('확인 안 함 (통과 아님)');
-    expect(manualStatusText('observed-ok')).toBe('문제 없음으로 관찰');
-  });
-});
 
 describe('impactBars — collector 의 impact node 수 그대로', () => {
   it('impact 순서를 고정하고 모두 0 이어도 막대 축은 1 이다', () => {

@@ -14,8 +14,6 @@ const CONTEXT_PANEL: Record<string, string> = {
 /** 실패 행에서 그 근거를 보여주는 화면으로. 필터까지 주소에 담아 한 번에 도착한다. */
 export const failureHref = (failure: RunFailure, run: string): string => {
   switch (failure.domain) {
-    case 'package-surface':
-      return `${screenPath('packages')}${queryString({ run, package: failure.scope })}`;
     case 'bundle':
       return `${screenPath('bundles')}${queryString({ run })}#bundle-${failure.id}`;
     case 'context': {
@@ -24,7 +22,7 @@ export const failureHref = (failure: RunFailure, run: string): string => {
     }
     case 'eval':
       return `${screenPath('ai')}${queryString({ run })}`;
-    default:
-      return `${screenPath('runs')}${queryString({ run })}#observations`;
+    case 'a11y':
+      return `${screenPath('accessibility')}${queryString({ run })}`;
   }
 };

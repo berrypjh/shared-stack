@@ -4,7 +4,6 @@ import {
   type ExplorerGroup,
   type ExplorerSection,
   TopBar,
-  type TopBarView,
 } from '@berrypjh/devhub-ui';
 
 import type { ReactNode } from 'react';
@@ -21,24 +20,13 @@ import { SECTION_ICON, VIEW_ICON } from '../ui/view-icons';
 
 import { GlobalSearch } from './global-search';
 
-/** 상단 바의 보기. 개요만 그 주소에서만 현재이고, 섹션 보기는 그 섹션의 항목 주소에서도 현재다. */
-const TOP_VIEWS: TopBarView[] = VIEWS.map((view) => ({
+/** 탐색기 맨 위의 섹션 없는 보기(개요 · 아키텍처). 평가는 하위 화면이 있어 아래 섹션으로 둔다. */
+const EXPLORER_VIEWS = VIEWS.map((view) => ({
   id: view.id,
   label: view.label,
   href: view.path,
   icon: VIEW_ICON[view.id],
-  exact: view.path === '/',
 }));
-
-/** 탐색기의 섹션 없는 보기(개요 · 아키텍처). 평가는 하위 화면이 있어 아래 섹션으로 둔다. */
-const EXPLORER_VIEWS = VIEWS.filter((view) => !view.section && view.id !== 'evaluation').map(
-  (view) => ({
-    id: view.id,
-    label: view.label,
-    href: view.path,
-    icon: VIEW_ICON[view.id],
-  }),
-);
 
 /**
  * 묶음(`group`)이 있는 섹션은 묶음마다 접고 펴는 제목을 단다. 순서는 카탈로그에서 온 그대로다.
@@ -102,7 +90,6 @@ export const DevHubShell = ({ children }: { children: ReactNode }) => {
     <Shell
       topBar={
         <TopBar
-          views={TOP_VIEWS}
           summary={
             <>
               <span className="devhub-code">

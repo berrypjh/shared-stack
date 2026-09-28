@@ -44,7 +44,6 @@ describe('shell landmarks', () => {
     renderApp();
     expect(banners()).toHaveLength(1);
     expect(screen.getAllByRole('main')).toHaveLength(1);
-    expect(screen.getByRole('navigation', { name: '보기' })).toBeTruthy();
     expect(screen.getByRole('navigation', { name: '저장소 항목' })).toBeTruthy();
     expect(explorer()).toBeTruthy();
     expect(screen.getByRole('complementary', { name: '상세 정보' })).toBeTruthy();
@@ -65,14 +64,12 @@ describe('shell landmarks', () => {
     }
   });
 
-  it('marks the current view with aria-current in both navigations', () => {
+  it('marks the current view with aria-current in the explorer', () => {
     renderApp();
-    for (const name of ['보기', '저장소 항목']) {
-      const link = within(screen.getByRole('navigation', { name })).getByRole('link', {
-        name: '개요',
-      });
-      expect(link.getAttribute('aria-current')).toBe('page');
-    }
+    const link = within(screen.getByRole('navigation', { name: '저장소 항목' })).getByRole('link', {
+      name: '개요',
+    });
+    expect(link.getAttribute('aria-current')).toBe('page');
   });
 });
 

@@ -64,11 +64,10 @@ const entityRefs = (catalog: Catalog): Cited[] => {
 
 /** 카탈로그가 인용하는 모든 저장소 경로(문서 경로는 문서로 따로 있다). */
 const citedRefs = (catalog: Catalog): Cited[] => [
-  ...[
-    ...catalog.repository.evidence,
-    catalog.repository.purpose.source,
-    ...(catalog.repository.gaps ?? []).flatMap((gap) => gap.evidence),
-  ].map((ref) => ({ ref, by: { kind: 'repository' as const, label: '저장소 개요', href: '/' } })),
+  ...[...catalog.repository.evidence, catalog.repository.purpose.source].map((ref) => ({
+    ref,
+    by: { kind: 'repository' as const, label: '저장소 개요', href: '/' },
+  })),
   ...entityRefs(catalog),
   ...catalog.relations.map((relation) => ({
     ref: relation.evidence,

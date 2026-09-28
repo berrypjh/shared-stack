@@ -61,7 +61,6 @@ export const publicArtifact = (runId: string, metadata: Overrides = {}) => ({
   contexts: [],
   evals: [],
   designSystem: null,
-  packageSurfaces: [],
   accessibility: [],
 });
 

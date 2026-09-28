@@ -6,17 +6,11 @@ import { OUTCOME_LABEL, OUTCOME_TONE, SOURCE_LABEL } from '@/lib/evaluation/acce
 import { StatusLabel } from '../status-label';
 
 const factRows = (summary: AccessibilitySummary): [string, string][] => [
-  ['출처', SOURCE_LABEL[summary.source]],
+  ['출처', SOURCE_LABEL],
   ['engine', summary.engine ? `${summary.engine.name} ${summary.engine.version}` : '없음'],
   ['WCAG tag', summary.tags.join(', ') || '없음'],
   ['켠 rule', summary.enabledRules.join(', ') || '없음'],
   ['제외 범위', summary.exclusions.join(', ') || '없음'],
-  [
-    'index',
-    summary.index
-      ? `${summary.index.path} · story ${summary.index.storyCount}개 · test story ${summary.index.testStoryCount}개`
-      : '없음',
-  ],
   [
     '시각',
     summary.startedAt

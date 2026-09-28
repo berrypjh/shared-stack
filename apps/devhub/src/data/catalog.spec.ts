@@ -57,9 +57,6 @@ const isCanonical = (path: string) =>
 const citedRefs = (): { ref: SourceRef; origin: string }[] => [
   ...catalog.repository.evidence.map((ref) => ({ ref, origin: 'repository' })),
   { ref: catalog.repository.purpose.source, origin: 'repository purpose' },
-  ...(catalog.repository.gaps ?? []).flatMap((gap) =>
-    gap.evidence.map((ref) => ({ ref, origin: 'repository gap' })),
-  ),
   ...entities.flatMap((entity) => [
     {
       ref:
@@ -271,10 +268,6 @@ describe('package manifests', () => {
     expect(repository.webUrl).toBe(`https://github.com/${repository.owner}/${repository.name}`);
     expect(readJson<{ defaultBase: string }>('nx.json').defaultBase).toBe(repository.defaultBranch);
     expect(read(repository.purpose.source.path)).toContain(repository.purpose.text);
-    // 패키지 매니저 버전이 고정되지 않았다는 gap 이 아직 사실인지.
-    const pinned = readJson<{ packageManager?: string }>('package.json').packageManager;
-    const unpinnedGap = repository.gaps?.some((gap) => gap.kind === 'not-found');
-    expect({ pinned, unpinnedGap }).toEqual({ pinned: undefined, unpinnedGap: true });
   });
 });
 

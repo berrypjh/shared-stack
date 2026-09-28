@@ -88,10 +88,7 @@ export const AxeSummary = ({
   return (
     <>
       {summary.targets.length > 0 && (
-        <TargetTable
-          caption={`${SOURCE_SCOPE_LABEL[summary.sourceScope]} 검사 대상`}
-          targets={summary.targets}
-        />
+        <TargetTable caption={`${SOURCE_SCOPE_LABEL} 검사 대상`} targets={summary.targets} />
       )}
       {selected && (
         <Section title="고른 대상" level={3}>
