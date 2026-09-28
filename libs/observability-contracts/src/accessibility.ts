@@ -1,31 +1,15 @@
 import { z } from 'zod';
 
 import { excerptSchema, safeText } from './evidence.js';
-import { countSchema, isoTimeSchema, reasonSchema, relativePathSchema } from './primitives.js';
+import { countSchema, isoTimeSchema, reasonSchema } from './primitives.js';
 
 /**
- * 접근성 검사 결과. 출처(sourceScope)마다 뜻이 달라 합치지 않는다 — axe 결과·token pair test·
- * compiled CSS 텍스트 검사·DOM test·사람의 관찰은 서로 다른 근거다. 접근성 점수는 만들지 않는다.
+ * 접근성 검사 결과. DevHub 평가 화면을 axe 로 검사한 결과만 담는다. 접근성 점수는 만들지 않는다.
  */
 
-export const ACCESSIBILITY_SOURCE_SCOPES = [
-  'storybook',
-  'devhub',
-  'token-contrast',
-  'static-css',
-  'ui-test',
-  'manual',
-] as const;
+export const ACCESSIBILITY_SOURCE_SCOPES = ['devhub'] as const;
 
-/** axe 가 DOM 을 검사한 출처. 나머지는 test 결과나 사람의 기록이다. */
-export const AXE_SCOPES = ['storybook', 'devhub'] as const;
-
-export const ACCESSIBILITY_SOURCES = [
-  'axe-playwright',
-  'storybook-test-runner',
-  'vitest-report',
-  'manual-record',
-] as const;
+export const ACCESSIBILITY_SOURCES = ['axe-playwright'] as const;
 
 /** axe impact. 원본 null 은 adapter 가 node impact 로 채우거나 unknown 으로 둔다. */
 export const AXE_IMPACTS = ['critical', 'serious', 'moderate', 'minor', 'unknown'] as const;
@@ -34,30 +18,6 @@ export const AXE_IMPACTS = ['critical', 'serious', 'moderate', 'minor', 'unknown
 export const AUDIT_OUTCOMES = ['completed', 'partial', 'scan-failed', 'not-run'] as const;
 
 export const AUDIT_TARGET_STATUSES = ['scanned', 'skipped', 'scan-failed', 'not-run'] as const;
-
-export const CHECK_KINDS = ['token-pair', 'css-rule', 'source-scan', 'dom-test'] as const;
-export const CHECK_STATUSES = ['passed', 'failed', 'unknown', 'not-run'] as const;
-
-/** 사람의 관찰. 자동 측정의 passed 와 다른 어휘다. */
-export const MANUAL_STATUSES = ['observed-ok', 'observed-issue', 'not-run'] as const;
-export const MANUAL_AREAS = [
-  'keyboard',
-  'focus',
-  'screen-reader',
-  'order',
-  'contrast',
-  'forced-colors',
-  'motion',
-] as const;
-
-/** WCAG 기준과 프로젝트가 스스로 건 가시성 바닥을 섞지 않는다. */
-export const CONTRAST_BASES = [
-  'wcag-2.1-aa-text',
-  'wcag-2.1-aa-non-text',
-  'project-visibility-guard',
-] as const;
-
-export const WCAG_BASIS_RATIO = { 'wcag-2.1-aa-text': 4.5, 'wcag-2.1-aa-non-text': 3 } as const;
 
 export const MAX_AXE_NODES = 20;
 
@@ -131,7 +91,7 @@ export const auditTargetSchema = z
         height: z.number().int().positive(),
       })
       .nullable(),
-    /** axe 가 본 범위. `#storybook-root` 또는 `document`. */
+    /** axe 가 본 범위. DevHub 평가 화면은 `document`. */
     scope: safeText(100),
     status: z.enum(AUDIT_TARGET_STATUSES),
     reason: reasonSchema.nullable(),
@@ -174,74 +134,6 @@ export const auditTargetSchema = z
     }
   });
 
-const locationSchema = z.strictObject({
-  path: relativePathSchema,
-  line: z.number().int().positive().nullable(),
-});
-
-/** axe 가 아닌 자동 검사. 결과는 runner report 의 case 에서만 온다. */
-export const automatedCheckSchema = z
-  .strictObject({
-    id: z.string().regex(/^[a-z0-9-]+:[a-z0-9-]+$/, 'check id'),
-    label: safeText(200),
-    kind: z.enum(CHECK_KINDS),
-    status: z.enum(CHECK_STATUSES),
-    threshold: z
-      .strictObject({ ratio: z.number().positive(), basis: z.enum(CONTRAST_BASES) })
-      .nullable(),
-    cases: z
-      .strictObject({ passed: countSchema, failed: countSchema, skipped: countSchema })
-      .nullable(),
-    evidence: z.array(locationSchema).max(10),
-    reason: reasonSchema.nullable(),
-  })
-  .superRefine((check, ctx) => {
-    const issue = (message: string) => ctx.addIssue({ code: 'custom', message });
-    const { threshold, cases } = check;
-    if (threshold && threshold.basis !== 'project-visibility-guard') {
-      if (threshold.ratio !== WCAG_BASIS_RATIO[threshold.basis]) {
-        issue('a WCAG basis keeps its fixed ratio');
-      }
-    }
-    switch (check.status) {
-      case 'passed':
-        if (!cases || cases.passed === 0 || cases.failed > 0) {
-          issue('passed needs passing cases and no failures');
-        }
-        break;
-      case 'failed':
-        if (!cases || cases.failed === 0) issue('failed needs a failing case');
-        break;
-      case 'unknown':
-        if (check.reason === null) issue('unknown says why');
-        break;
-      case 'not-run':
-        if (check.reason === null || cases !== null) issue('not-run has a reason and no cases');
-        break;
-    }
-  });
-
-export const manualCheckSchema = z
-  .strictObject({
-    id: z.string().regex(/^[a-z0-9-]{1,60}$/),
-    label: safeText(200),
-    area: z.enum(MANUAL_AREAS),
-    status: z.enum(MANUAL_STATUSES),
-    note: reasonSchema.nullable(),
-    checkedAt: isoTimeSchema.nullable(),
-    /** 브라우저·보조기술·OS. 관찰이 어디서 나왔는지다. */
-    environment: safeText(200).nullable(),
-  })
-  .superRefine((check, ctx) => {
-    const observed = check.status !== 'not-run';
-    if (observed !== (check.checkedAt !== null) || observed !== (check.environment !== null)) {
-      ctx.addIssue({
-        code: 'custom',
-        message: 'only an observation has a check time and an environment',
-      });
-    }
-  });
-
 export const accessibilitySummarySchema = z
   .strictObject({
     id: z.string().regex(/^a11y:[a-z0-9-]+$/),
@@ -256,44 +148,22 @@ export const accessibilitySummarySchema = z
     enabledRules: z.array(ruleIdSchema).max(20),
     /** 검사 범위에서 뺀 selector. */
     exclusions: z.array(safeText(200)).max(20),
-    /** Storybook build index. */
-    index: z
-      .strictObject({
-        path: relativePathSchema,
-        storyCount: countSchema,
-        testStoryCount: countSchema,
-      })
-      .nullable(),
     startedAt: isoTimeSchema.nullable(),
     finishedAt: isoTimeSchema.nullable(),
     outcome: z.enum(AUDIT_OUTCOMES),
     reason: reasonSchema.nullable(),
     targets: z.array(auditTargetSchema),
-    checks: z.array(automatedCheckSchema),
-    manual: z.array(manualCheckSchema),
     /** 이 출처가 볼 수 없는 것. */
     limitations: z.array(reasonSchema).max(20),
   })
   .superRefine((summary, ctx) => {
     const issue = (message: string) => ctx.addIssue({ code: 'custom', message });
-    const axe = (AXE_SCOPES as readonly string[]).includes(summary.sourceScope);
-    if (axe && (summary.checks.length > 0 || summary.manual.length > 0)) {
-      issue('an axe scope holds only targets');
-    }
-    if (!axe && summary.targets.length > 0) issue('only an axe scope holds targets');
-    if (summary.sourceScope === 'manual' && summary.checks.length > 0) {
-      issue('the manual scope holds only manual checks');
-    }
-    if (summary.sourceScope !== 'manual' && summary.manual.length > 0) {
-      issue('only the manual scope holds manual checks');
-    }
     if (summary.outcome !== 'completed' && summary.reason === null) {
       issue('an outcome other than completed says why');
     }
     for (const id of duplicateIds(summary.targets.map((target) => target.id))) {
       issue(`duplicate target ${id}`);
     }
-    if (!axe) return;
     const statuses = summary.targets.map((target) => target.status);
     if (
       summary.outcome === 'completed' &&
@@ -312,6 +182,4 @@ export type AxeRule = z.infer<typeof axeRuleSchema>;
 export type AxeCounts = z.infer<typeof axeCountsSchema>;
 export type ImpactNodes = z.infer<typeof impactNodesSchema>;
 export type AuditTarget = z.infer<typeof auditTargetSchema>;
-export type AutomatedCheck = z.infer<typeof automatedCheckSchema>;
-export type ManualCheck = z.infer<typeof manualCheckSchema>;
 export type AccessibilitySummary = z.infer<typeof accessibilitySummarySchema>;

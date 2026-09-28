@@ -4,17 +4,14 @@ import {
   componentTokenSchema,
   designSystemSchema,
   designSystemSignalSchema,
-  packageSurfaceSchema,
   runArtifactSchema,
   SIGNAL_STATES,
   tokenCatalogSchema,
 } from '../src/index.js';
 
 import {
-  catalogSummary,
   componentToken,
   designSystem,
-  packageSurface,
   ref,
   signal,
   testRef,
@@ -191,61 +188,14 @@ describe('designSystem', () => {
   });
 });
 
-describe('packageSurface — source manifest 와 실제 산출물을 분리한다', () => {
-  it('fixture 가 통과한다', () => {
-    expect(ok(packageSurfaceSchema, packageSurface())).toBe(true);
-  });
-
-  it('산출물 일부만 있으면 partial 이다', () => {
-    const [index, tokens] = packageSurface().emitted;
-    const emitted = [index, { ...tokens, status: 'missing' }];
-    expect(ok(packageSurfaceSchema, packageSurface({ emitted }))).toBe(false);
-    expect(ok(packageSurfaceSchema, packageSurface({ emitted, build: 'partial' }))).toBe(true);
-    const none = emitted.map((entry) => ({ ...entry, status: 'missing' }));
-    expect(ok(packageSurfaceSchema, packageSurface({ emitted: none, build: 'missing' }))).toBe(
-      true,
-    );
-  });
-
-  it('catalog 재생성을 하지 않았으면 이유를 남긴다', () => {
-    expect(
-      ok(
-        packageSurfaceSchema,
-        packageSurface({ catalog: catalogSummary({ regenerated: 'not-run' }) }),
-      ),
-    ).toBe(false);
-  });
-
-  it('deprecated·typeOmitted·valueCount 를 보존한다', () => {
-    const parsed = packageSurfaceSchema.parse(packageSurface());
-    expect(parsed.catalog).toMatchObject({
-      deprecated: ['cx', 'Web'],
-      typeOmittedProps: ['Select.options'],
-      valueCounts: [{ symbol: 'Icon', prop: 'name', count: 40 }],
-    });
-  });
-});
-
-describe('RunArtifact.designSystem·packageSurfaces', () => {
-  it('artifact 는 design system 과 package surface 를 담는다', () => {
-    expect(
-      ok(
-        runArtifactSchema,
-        artifact({ designSystem: designSystem(), packageSurfaces: [packageSurface()] }),
-      ),
-    ).toBe(true);
+describe('RunArtifact.designSystem', () => {
+  it('artifact 는 design system 을 담는다', () => {
+    expect(ok(runArtifactSchema, artifact({ designSystem: designSystem() }))).toBe(true);
   });
 
   it('이전에 수집된 run 은 수집하지 않은 것으로 읽힌다', () => {
-    const {
-      designSystem: _designSystem,
-      packageSurfaces: _packageSurfaces,
-      ...before
-    } = artifact();
-    expect(runArtifactSchema.parse(before)).toMatchObject({
-      designSystem: null,
-      packageSurfaces: [],
-    });
+    const { designSystem: _designSystem, ...before } = artifact();
+    expect(runArtifactSchema.parse(before)).toMatchObject({ designSystem: null });
   });
 
   it('source 위치는 안전한 상대 경로다', () => {

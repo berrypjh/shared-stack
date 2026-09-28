@@ -4,7 +4,7 @@ import { safeText } from './evidence.js';
 import { countSchema, reasonSchema, relativePathSchema } from './primitives.js';
 
 /**
- * 토큰·테마·component state·catalog·package surface 를 source 와 검사 근거로 잇는 계약.
+ * 토큰·테마·component state 를 source 와 검사 근거로 잇는 계약.
  * 파일 존재나 문자열 참조는 behavior 통과가 아니다 — test 는 실행 결과 없이 위치만 가진다.
  */
 
@@ -271,102 +271,9 @@ export const designSystemSchema = z
     }
   });
 
-const subpathSchema = z.string().regex(/^\.(\/[\w.@-]+)*$/);
-const targetSchema = z.string().regex(/^\.\/[\w./@-]+$/);
-const exportEntrySchema = z.strictObject({
-  subpath: subpathSchema,
-  conditions: z.array(z.string().regex(/^[\w-]+$/)),
-  target: targetSchema,
-});
-const binSchema = z.strictObject({ name: z.string().regex(/^[\w@./-]+$/), target: targetSchema });
-const presence = z.enum(['present', 'missing']);
-
-export const catalogSummarySchema = z
-  .strictObject({
-    path: relativePathSchema,
-    status: z.enum(['valid', 'invalid', 'missing']),
-    reason: reasonSchema.nullable(),
-    schemaVersion: z.number().int().nullable(),
-    platform: z.enum(DS_PLATFORMS).nullable(),
-    symbolCount: countSchema.nullable(),
-    deprecated: z.array(nameSchema),
-    propsUnion: z.array(nameSchema),
-    typeOmittedSymbols: z.array(nameSchema),
-    /** `Symbol.prop`. catalog 에 없는 prop 은 여기서도 판정하지 않는다 (상속 prop 은 싣지 않는다). */
-    typeOmittedProps: z.array(nameSchema),
-    valueCounts: z.array(
-      z.strictObject({ symbol: nameSchema, prop: nameSchema, count: z.number().int().positive() }),
-    ),
-    /** 기존 catalog generator 로 다시 만들어 dist 바이트와 비교한 결과. */
-    regenerated: z.enum(['identical', 'differs', 'not-run']),
-    regeneratedReason: reasonSchema.nullable(),
-  })
-  .superRefine((summary, ctx) => {
-    const issue = (message: string) => ctx.addIssue({ code: 'custom', message });
-    if ((summary.status === 'valid') !== (summary.reason === null)) issue('a reason unless valid');
-    if ((summary.regenerated === 'not-run') !== (summary.regeneratedReason !== null)) {
-      issue('regeneration that did not run says why');
-    }
-    if (summary.status !== 'valid' && summary.symbolCount !== null)
-      issue('only a valid catalog is counted');
-  });
-
-export const BUILD_STATES = ['complete', 'partial', 'missing', 'not-applicable'] as const;
-
-export const packageSurfaceSchema = z
-  .strictObject({
-    name: z.string().regex(/^@?[\w.-]+(\/[\w.-]+)?$/),
-    path: relativePathSchema,
-    private: z.boolean(),
-    /** 소스 package.json 이 선언한 것. */
-    sourceManifest: z.strictObject({
-      path: relativePathSchema,
-      exports: z.array(exportEntrySchema),
-      bin: z.array(binSchema),
-    }),
-    /** 선언된 target 이 실제로 만들어졌는지. */
-    emitted: z.array(exportEntrySchema.extend({ status: presence })),
-    emittedBin: z.array(binSchema.extend({ status: presence })),
-    build: z.enum(BUILD_STATES),
-    /** 빌드가 dist 에 남긴 manifest 사본. 없으면 null. */
-    emittedManifest: z
-      .strictObject({
-        path: relativePathSchema,
-        status: presence,
-        exportsRemoved: z.boolean().nullable(),
-      })
-      .nullable(),
-    tokensCopy: z
-      .strictObject({
-        path: relativePathSchema,
-        status: presence,
-        identicalToDesignTokens: z.boolean().nullable(),
-      })
-      .nullable(),
-    catalog: catalogSummarySchema.nullable(),
-    /** 이 표면을 고정하는 기존 test 위치. 실행 결과는 싣지 않는다. */
-    tests: z.array(testRefSchema),
-  })
-  .superRefine((surface, ctx) => {
-    const statuses = surface.emitted.map((entry) => entry.status);
-    const expected =
-      statuses.length === 0
-        ? 'not-applicable'
-        : statuses.every((status) => status === 'present')
-          ? 'complete'
-          : statuses.every((status) => status === 'missing')
-            ? 'missing'
-            : 'partial';
-    if (surface.build !== expected) {
-      ctx.addIssue({ code: 'custom', path: ['build'], message: `build must be ${expected}` });
-    }
-  });
-
 export type SourceRef = z.infer<typeof sourceRefSchema>;
 export type TestRef = z.infer<typeof testRefSchema>;
 export type DesignSystemSignal = z.infer<typeof designSystemSignalSchema>;
 export type ComponentToken = z.infer<typeof componentTokenSchema>;
 export type TokenCatalog = z.infer<typeof tokenCatalogSchema>;
 export type DesignSystem = z.infer<typeof designSystemSchema>;
-export type CatalogSummary = z.infer<typeof catalogSummarySchema>;
-export type PackageSurface = z.infer<typeof packageSurfaceSchema>;

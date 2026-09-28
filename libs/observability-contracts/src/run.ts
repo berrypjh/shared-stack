@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { accessibilitySummarySchema } from './accessibility.js';
 import { bundleMeasurementSchema } from './bundle.js';
 import { contextMeasurementSchema } from './context.js';
-import { designSystemSchema, packageSurfaceSchema } from './design-system.js';
+import { designSystemSchema } from './design-system.js';
 import { evalRunSchema } from './eval.js';
 import { isPublicEvidencePath } from './evidence.js';
 import { DOMAINS, observationSchema } from './observation.js';
@@ -22,7 +22,7 @@ import {
 
 export const RUN_STATES = ['running', 'complete', 'partial', 'failed', 'cancelled'] as const;
 /**
- * `static` 은 정의와 design system·package 표면 근거를 읽는다. `core` 는 bundle·context 를 수집한다.
+ * `static` 은 정의와 design system 근거를 읽는다. `core` 는 bundle·context 를 수집한다.
  * `eval` 은 이미 만든 consumer eval 산출물을 다시 실행하지 않고 가져온다.
  * `a11y` 는 DevHub 평가 화면 localhost audit 과 이미 만든 접근성 test·Storybook 결과를 가져온다.
  */
@@ -120,8 +120,6 @@ export const runArtifactSchema = z
     evals: z.array(evalRunSchema).default([]),
     /** 토큰·테마·상태 근거. 수집하지 않은 run (이전 run 포함) 은 null. */
     designSystem: designSystemSchema.nullable().default(null),
-    /** package exports·산출물·catalog 표면. 수집하지 않았으면 `[]`. */
-    packageSurfaces: z.array(packageSurfaceSchema).default([]),
     /** 출처별 접근성 결과. 수집하지 않았으면 `[]`. */
     accessibility: z.array(accessibilitySummarySchema).default([]),
   })
@@ -168,9 +166,6 @@ export const publicRunArtifactSchema = runArtifactSchema.superRefine((artifact, 
       (entry) => entry.path,
     ),
     ...artifact.contexts.flatMap((measurement) => measurement.files),
-    ...artifact.accessibility.flatMap((summary) =>
-      summary.checks.flatMap((check) => check.evidence.map((location) => location.path)),
-    ),
   ];
   for (const path of paths) {
     if (!isPublicEvidencePath(path)) {

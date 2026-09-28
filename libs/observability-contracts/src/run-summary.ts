@@ -2,7 +2,6 @@ import { z } from 'zod';
 
 import { EVAL_NOTICE_CODES, EXECUTOR_CLASSES } from './eval.js';
 import { isPublicEvidencePath } from './evidence.js';
-import { metricPoints, seriesPointSchema } from './metrics.js';
 import { type Observation, observationSchema } from './observation.js';
 import { countSchema, reasonSchema } from './primitives.js';
 import { type RunArtifact, runMetadataSchema } from './run.js';
@@ -13,7 +12,7 @@ import { type RunArtifact, runMetadataSchema } from './run.js';
  * fail 인 행만 옮긴다. not-run·unsupported 는 실패가 아니고 여기 오지 않는다.
  */
 
-export const FAILURE_DOMAINS = ['bundle', 'context', 'eval', 'a11y', 'package-surface'] as const;
+export const FAILURE_DOMAINS = ['bundle', 'context', 'eval', 'a11y'] as const;
 
 const failureSchema = z.strictObject({
   domain: z.enum(FAILURE_DOMAINS),
@@ -32,7 +31,6 @@ export const runSummarySchema = z
       contexts: countSchema,
       evals: countSchema,
       designSystem: z.boolean(),
-      packageSurfaces: countSchema,
       /** 요약 이전 export 에는 없다 — 접근성 결과가 없던 run 이다. */
       accessibility: countSchema.default(0),
     }),
@@ -45,8 +43,6 @@ export const runSummarySchema = z
         notices: z.array(z.enum(EVAL_NOTICE_CODES)),
       }),
     ),
-    /** 추세용 metric 점. 이 필드 이전 요약은 null — 추세를 모른다(빈 목록이 아니다). */
-    series: z.array(seriesPointSchema).nullable().default(null),
   })
   .superRefine((summary, ctx) => {
     const seen = new Set<string>();
@@ -107,25 +103,6 @@ const failuresOf = (artifact: RunArtifact): RunFailure[] => {
       ),
     });
   }
-  for (const surface of artifact.packageSurfaces) {
-    const base = { domain: 'package-surface' as const, id: surface.name, scope: surface.name };
-    if (surface.build === 'partial' || surface.build === 'missing') {
-      const present = surface.emitted.filter((entry) => entry.status === 'present').length;
-      failures.push({
-        ...base,
-        reason: `${surface.name} build ${surface.build} — 산출물 ${present}/${surface.emitted.length} 개만 있다`,
-      });
-    }
-    if (surface.tokensCopy?.identicalToDesignTokens === false) {
-      failures.push({
-        ...base,
-        reason: `${surface.name} ${surface.tokensCopy.path} 이 design-tokens 원본과 다르다`,
-      });
-    }
-    if (surface.catalog?.regenerated === 'differs') {
-      failures.push({ ...base, reason: `${surface.name} catalog 재생성 결과가 dist 와 다르다` });
-    }
-  }
   for (const evalRun of artifact.evals) {
     for (const [part, status] of Object.entries(evalRun.import)) {
       if (status.status !== 'invalid') continue;
@@ -148,7 +125,6 @@ export const summarizeRun = (artifact: RunArtifact): RunSummary => ({
     contexts: artifact.contexts.length,
     evals: artifact.evals.length,
     designSystem: artifact.designSystem !== null,
-    packageSurfaces: artifact.packageSurfaces.length,
     accessibility: artifact.accessibility.length,
   },
   failures: failuresOf(artifact),
@@ -157,5 +133,4 @@ export const summarizeRun = (artifact: RunArtifact): RunSummary => ({
     executorClass: evalRun.executorClass,
     notices: evalRun.notices.map((notice) => notice.code),
   })),
-  series: metricPoints(artifact),
 });

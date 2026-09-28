@@ -9,7 +9,6 @@ import {
   summarizeRun,
 } from '../src/index.js';
 
-import { packageSurface } from './design-system-fixtures.js';
 import { evalRun } from './eval-fixtures.js';
 import { artifact, available, HASH, missing } from './fixtures.js';
 import { sizeLimitMeasurement } from './measurement-fixtures.js';
@@ -30,14 +29,12 @@ describe('summarizeRun — 화면이 run 전체를 받기 전에 읽는 요약',
     const summary = summarize({
       bundles: [sizeLimitMeasurement()],
       evals: [evalRun()],
-      packageSurfaces: [packageSurface()],
     });
     expect(summary.sections).toEqual({
       bundles: 1,
       contexts: 0,
       evals: 1,
       designSystem: false,
-      packageSurfaces: 1,
       accessibility: 0,
     });
   });
@@ -84,33 +81,6 @@ describe('summarizeRun — 화면이 run 전체를 받기 전에 읽는 요약',
         reason: '@berrypjh/react-ui — cx only: 757 B 초과 (한도 11 KB)',
       },
     ]);
-  });
-
-  it('package 표면의 partial·복사본 불일치·catalog drift 를 싣는다', () => {
-    const base = packageSurface();
-    const [index, tokens] = base.emitted;
-    const summary = summarize({
-      packageSurfaces: [
-        packageSurface({
-          emitted: [index, { ...tokens, status: 'missing' }],
-          build: 'partial',
-          tokensCopy: { ...base.tokensCopy, identicalToDesignTokens: false },
-          catalog: { ...base.catalog, regenerated: 'differs' },
-        }),
-      ],
-    });
-    expect(summary.failures).toEqual(
-      [
-        '@berrypjh/react-native-ui build partial — 산출물 1/2 개만 있다',
-        '@berrypjh/react-native-ui libs/react-native-ui/dist/tokens.json 이 design-tokens 원본과 다르다',
-        '@berrypjh/react-native-ui catalog 재생성 결과가 dist 와 다르다',
-      ].map((reason) => ({
-        domain: 'package-surface',
-        id: '@berrypjh/react-native-ui',
-        scope: '@berrypjh/react-native-ui',
-        reason,
-      })),
-    );
   });
 
   it('eval 은 executor 종류와 notice 만 요약한다 — 성공률을 요약하지 않는다', () => {
