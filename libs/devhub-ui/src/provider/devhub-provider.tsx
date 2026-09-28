@@ -50,7 +50,3 @@ export const useDevHub = (): DevHubConfig => {
 export const useDevHubLink = () => useDevHub().router.Link;
 export const useDevHubLocation = () => useDevHub().router.location;
 export const useDevHubNavigate = () => useDevHub().router.navigate;
-
-/** `href` 가 현재 경로인가. `exact` 가 아니면 그 아래 경로도 현재다(섹션 보기가 항목 주소에서도 현재). */
-export const isCurrentPath = (pathname: string, href: string, exact: boolean) =>
-  exact ? pathname === href : pathname === href || pathname.startsWith(`${href}/`);

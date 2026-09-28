@@ -1,0 +1,22 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "out-tsc/storybook",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "jsx": "preserve",
+    "lib": ["ES2022", "DOM"]
+  },
+  "exclude": ["src/**/*.spec.*", "src/**/*.test.*"],
+  "include": ["src/**/*.stories.*", ".storybook/**/*"],
+  "references": [
+    {
+      "path": "./tsconfig.lib.json"
+    }
+  ],
+  "files": [
+    "../../node_modules/@nx/react/typings/styled-jsx.d.ts",
+    "../../node_modules/@nx/react/typings/cssmodule.d.ts",
+    "../../node_modules/@nx/react/typings/image.d.ts"
+  ]
+}

@@ -16,7 +16,7 @@
     "importHelpers": false
   },
   "include": ["src/**/*.ts", "src/**/*.tsx"],
-  "exclude": ["src/**/*.spec.*", "src/**/*.test.*"],
+  "exclude": ["src/**/*.spec.*", "src/**/*.test.*", "src/**/*.stories.*", ".storybook/**/*"],
   "references": [
     {
       "path": "../react-ui/tsconfig.lib.json"

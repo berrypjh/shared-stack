@@ -37,7 +37,6 @@ export {
   type DevHubLocation,
   DevHubProvider,
   type DevHubRouter,
-  isCurrentPath,
   useDevHub,
   useDevHubLink,
   useDevHubLocation,
@@ -70,7 +69,7 @@ export {
 } from './shell/explorer';
 export { ExplorerDrawerProvider, ExplorerPane, ExplorerToggle } from './shell/explorer-drawer';
 export { Inspector } from './shell/inspector';
-export { TopBar, type TopBarView } from './shell/top-bar';
+export { TopBar } from './shell/top-bar';
 export { useDocumentTitle } from './shell/use-document-title';
 export { useRouteFocus } from './shell/use-route-focus';
 export {
