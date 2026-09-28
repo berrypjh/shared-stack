@@ -11,8 +11,8 @@ Vite + React. shared-stack의 구조와 근거(패키지 · 앱 · 도구 · 문
 
 **"평가"(`/evaluation`)는 품질 관측 수집기의 결과를 보인다.** 수집 · export는 Node(`tools/scripts/observability`)가 `apps/devhub/public/observability`(gitignore)에 쓰고, 이 앱은 Vite 기본 `publicDir`(`apps/devhub/public`)로 그 JSON을 `/observability/`에서 fetch해 `@berrypjh/observability-contracts`로 검증한 뒤에만 보인다. 값을 다시 계산하거나 합치지 않는다. 수집 체계의 설명은 `docs/observability/`(구조 · metric · 수집기 · 검증 · 제약 · 사용법)에 있다.
 
-- **탐색기 순서** — 개요 · 아키텍처 보기 바로 아래 평가, 그다음 소비 흐름 · 기록 · 패키지 · 문서. 기록은 소비 흐름 바로 다음(최근 결정이 먼저 보이게). 상단 바는 개요 · 소비 흐름 · 아키텍처 · 평가 · 패키지 · 문서 · 기록
-- **평가 화면** — `lib/evaluation/screens.ts`가 화면 한 벌(주소 · 이름 · 설명 · 묶음)의 정본이다. CI가 이미 알려 주는 것(test · lint · typecheck · build 결과)은 싣지 않고, 이 저장소가 따로 재는 것(번들 크기 · AI 평가 · 접근성 · 디자인 시스템 · 패키지 표면)과 실행 비교만 보인다. 탐색기의 평가 섹션은 개요를 섹션 제목으로, 나머지를 `품질` · `AI` · `디자인 · 접근성` · `실행` 네 묶음으로 보인다. 고른 실행(`?run=`)은 화면을 옮겨도 이어 가고 필터는 가져가지 않는다. 오른쪽 상세 정보 칸은 고른 실행의 metadata(`components/evaluation/run-inspector.tsx`)다
+- **탐색기 순서** — 개요 · 아키텍처 보기 바로 아래 평가, 그다음 소비 흐름 · 기록 · 패키지 · 문서. 기록은 소비 흐름 바로 다음(최근 결정이 먼저 보이게). 화면 사이 이동은 탐색기만 한다 — 상단 바는 제품명 · 요약 · 검색 · 테마뿐이다
+- **평가 화면** — `lib/evaluation/screens.ts`가 화면 한 벌(주소 · 이름 · 설명 · 묶음)의 정본이다. CI가 이미 알려 주는 것(test · lint · typecheck · build 결과)은 싣지 않고, 이 저장소가 따로 재는 것(번들 크기 · AI 평가 · 접근성 · 디자인 시스템)만 보인다. 실행 목록 · baseline 포인터 · 추세 화면은 없다 — 비교는 번들 · 접근성 화면이 `?base=`로 직접 고른 실행과의 report-only diff뿐이다. 패키지 exports · 산출물은 dist를 직접 본다. 탐색기의 평가 섹션은 개요를 섹션 제목으로, 나머지를 `품질` · `AI` · `디자인 · 접근성` 세 묶음으로 보인다. 고른 실행(`?run=`)은 화면을 옮겨도 이어 가고 필터는 가져가지 않는다. 오른쪽 상세 정보 칸은 고른 실행의 metadata(`components/evaluation/run-inspector.tsx`)다
 - **패키지 화면** — 상세 정보 칸이 근거 모델(`lib/catalog/inspection.ts`)을 그린다. 설정 패키지는 설정 파일마다 규칙 표(규칙 · 값 · 설명)를 더한다
 - **앱 · 도구** — 아키텍처 노드의 상세 정보(`components/architecture/node-inspector.tsx`)가 종류 · 위치 · 관계를 보인다
 - **문서 · 기록 화면** — 저장소 markdown 본문(build 시점에 묶은 원문)과 "이 페이지에서", 근거 · 역참조를 그린다
@@ -58,7 +58,7 @@ Vite + React. shared-stack의 구조와 근거(패키지 · 앱 · 도구 · 문
 
 - **명령 버튼은 복사만 한다.** 브라우저가 수집 · export를 부르는 경로가 없다. localhost 접근성 audit은 `pnpm quality --base-url=http://localhost:4400`(Node)이 평가 화면을 대상으로 하고, axe는 앱 bundle에 없다
 - **개요 · 목록은 run 요약만 읽는다.** 요약이 없는 이전 export는 run 전체를 몰래 받지 않고 다시 export하라고 알린다. 필터는 표시만 바꾸고 원본 count를 바꾸지 않는다
-- **상태를 섞지 않는다.** 비정상 상태는 `lib/evaluation/status.ts` 한 벌이고 숫자 · 성공으로 바꾸지 않는다. 접근성 근거(axe · token 대비 · CSS 텍스트 · UI test · 수동)는 출처별로 나누고 합친 점수가 없다
+- **상태를 섞지 않는다.** 비정상 상태는 `lib/evaluation/status.ts` 한 벌이고 숫자 · 성공으로 바꾸지 않는다. 접근성 근거는 DevHub 평가 화면의 axe 검사 하나이고 합친 점수가 없다
 - **차트는 같은 데이터의 표와 함께 둔다.** 차트 · 표는 devhub-ui의 `BarChart` · `DataTable`이고, 한 차트에는 같은 조건 · 단위의 값만 둔다. 새 파생값(합산 점수 · 감소율)을 만들지 않는다
 - **비교는 명시한 기준만 한다.** 최신 실행을 자동 baseline으로 삼지 않고, delta는 계약의 비교 조건이 같을 때만 보인다. 모든 비교는 보고 전용이다
 
@@ -93,7 +93,7 @@ src/
     flow/                  flow-canvas · journey-outline · step-inspector · presentation
     evaluation/            evaluation-frame(화면 머리 · 오른쪽 칸) · evaluation-provider(client · 기준 SHA) · run-bar(실행 선택)
                            · status-notice · run-inspector · alternative-runs · use-run-data(index · 요약 · run 전체)
-                           · 화면마다 폴더(overview · packages · bundles · ai · design-system · accessibility · runs)
+                           · 화면마다 폴더(overview · bundles · ai · design-system · accessibility)
     ui/                    view-icons(보기 · 섹션마다 아이콘 하나) · entity-link
                            (셸 · 그림 · markdown · 검색 · 테마 · 아이콘 · pager · record-meta 는 @berrypjh/devhub-ui)
   domain/
@@ -108,7 +108,7 @@ src/
                            · editor-link
     evaluation/            client(공개 JSON → 계약 검증 · 파일마다 한 번만 받음) · query(URL query 허용 목록) · status(비정상 상태 한 벌)
                            · labels · format(상태 · 값 → 글) · links(실패 행 → 근거 화면) · screens(화면 한 벌)
-                           · 화면마다 순수 로직(packages · bundles · ai · design-system · accessibility · comparison · run-detail)
+                           · 화면마다 순수 로직(bundles · ai · design-system · accessibility)
     search/                entries(카탈로그 → 항목 · 종류 순서) · view(종류 글자 · 제안 한 줄) — 순위 · 단축키는 devhub-ui
   data/
     index.ts               catalog = repository · applications · packages · tools · relations · documents · records ·
@@ -136,7 +136,7 @@ pnpm dev:devhub                      # http://localhost:4400
 ```
 
 - **실제 브라우저**(셸 키보드 · 반응형 · 검색 · 딥링크 · dialog 포커스 · 기록 · 평가)는 `apps/devhub-e2e`가 본다
-- **jsdom 쪽 구조 계약**(h1 하나 · `aria-controls` · `#` 대상이 포커스를 받음)은 `app/semantics.spec.tsx`, 평가 섹션의 탐색기 · 오른쪽 칸은 `app/evaluation-shell.spec.tsx`다. 둘 다 a11y 수집기의 UI test 근거(`ui-test:devhub-shell`)다
+- **jsdom 쪽 구조 계약**(h1 하나 · `aria-controls` · `#` 대상이 포커스를 받음)은 `app/semantics.spec.tsx`, 평가 섹션의 탐색기 · 오른쪽 칸은 `app/evaluation-shell.spec.tsx`다
 - **dev 서버 · e2e는 AI 세션에서 포트 바인딩이 막혀 실행할 수 없다.** 화면 확인은 사용자에게 요청한다
 
 ## Gotcha

@@ -23,7 +23,7 @@ React. 저장소마다 있는 DevHub 앱(shared-stack `apps/devhub`, snapdone `a
 src/
   index.ts              공개 표면 전부. 새 export 는 여기에만 더한다
   styles.css            typo-* · devhub-code · devhub-grid 유틸, color-scheme, body, :focus-visible — 앱의 Tailwind entry 가 @import
-  provider/             DevHubProvider · useDevHub* · isCurrentPath — 라우터 접점
+  provider/             DevHubProvider · useDevHub* — 라우터 접점
   ui/icon.tsx           선 아이콘 전부(aria-hidden). 두 DevHub 가 쓰는 이름의 합집합
   ui/data-table.tsx     DataTable — caption 과 이름 있는 스크롤 영역(react-ui TableScroll)을 가진 표
   chart/bar-chart.tsx   BarChart — HTML+SVG 가로 막대. 값 글이 늘 보이고 null 은 막대를 그리지 않는다
@@ -35,6 +35,38 @@ src/
   entity/               pager · record-meta · inspector-section(InspectorSection · Empty)
   search/               rank(등급 · 종류 순서는 앱이 줌) · text · shortcut · global-search(결과 함수는 앱이 줌)
 ```
+
+`*.spec.ts`는 같은 폴더, `*.stories.tsx`는 storybook용(publish 안 됨, `dist`에 들어가지 않는다).
+
+## Storybook
+
+`react-ui`와 같은 모양(`main.ts` · `preview.ts` · `test-runner.ts`)이지만, 이 패키지는 라우터를 몰라서
+(`DevHubProvider`) · Tailwind 를 스스로 돌리지 않아서(소비 앱이 돈다) 둘을 이야기 전용으로 흉내 낸다.
+
+- **`DevHubProvider`는 `.storybook/StoryRouter.tsx`가 채운다.** `Link`는 누르면 막는 `<a href>`, `navigate`는
+  기본이 콘솔 로그다. 개별 이야기는 `parameters.router`(`{ pathname, hash, productName }`)로 "현재 주소"를 바꾼다
+- **Tailwind는 이야기 전용 설정(`postcss.config.js` · `tailwind.config.js` · `.storybook/preview.css`)으로 돈다.**
+  `preview.css`가 `@import 'tailwindcss'` → 이 패키지의 `src/styles.css`(`@utility`) → `@config`(react-ui 의 preset)
+  → `@source '../src'` 순서다 — 소비 앱의 `styles.css`와 같은 순서다. 토큰 실값(`--ds-*`)은
+  `import '@berrypjh/react-ui/styles.css'`(`preview.ts`)가 들여온다
+- **테마는 `<html data-theme>` 하나다.** react-ui 처럼 이름 있는 테마 레지스트리가 아니라 라이트 · 다크뿐이라,
+  Storybook 테마 툴바는 `ThemeSwitch` 가 읽는 자리를 그대로 맞춘다(전역 decorator)
+- **`parameters.viewport.value`가 있는 이야기는 `test-runner.ts`가 실제 Playwright 창을 그 크기로 맞춘다**
+  (`.storybook/viewports.ts`). addon-viewport 는 manager 안에서만 리사이즈하고 `test-runner` 가 여는
+  `iframe.html`은 그 적용을 받지 않아서, `lg:hidden` 처럼 실제 창 폭에 매인 요소를 이야기 안에서 클릭 · 검사하려면
+  이 hook 이 필요하다(공식 addon-viewport 레시피)
+- **기존 위반은 `parameters.a11y.disable = true` 로 baseline 처리한다.** 예 — `doc-toc.stories.tsx`(터치 영역
+  WCAG 2.5.8). 새로 만든 문제가 아니라 Storybook 이 처음으로 드러낸 것이면, 고치는 것은 그 이야기를 만든
+  작업의 범위가 아닐 수 있다 — 알려진 것으로 남기고 왜 남겼는지 주석에 적는다
+
+```bash
+pnpm nx storybook @berrypjh/devhub-ui        # storybook
+pnpm nx build-storybook @berrypjh/devhub-ui  # static storybook
+pnpm storybook:devhub-ui:a11y                # static storybook + test-storybook(axe) 로컬 실행
+```
+
+react-ui 와 달리 Chromatic(`​.github/workflows/chromatic.yml`)에는 연결하지 않았다 — 이 패키지의 Storybook 을
+CI 시각 회귀에 묶는 것은 별도 결정이다.
 
 ## 검증
 

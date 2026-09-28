@@ -4,12 +4,12 @@
 
 ## profile
 
-| profile  | 명령                                                                          | 읽는 것                                                                                                                                              | 쓰는 영역                                                                         | 실행                                         |
-| -------- | ----------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- | -------------------------------------------- |
-| `static` | `quality:collect --profile=static --run-id=<id>`                              | inventory(manifest · exports · script 이름 · 등록 명령 · workflow · lockfile 해시), design-tokens 산출물 · 문서, package 표면, catalog 메모리 재생성 | `inventory` · `designSystem` · `packageSurfaces`, 등록 명령은 전부 `not-run` 관측 | 명령 실행 없음                               |
-| `core`   | `quality:collect --profile=core --run-id=<id> [--import=…]… [--only-imports]` | 등록 명령 출력 또는 import report, `.size-limit.cjs`, token 입력 파일                                                                                | `bundles` · `contexts`                                                            | registry의 bundle 명령                       |
-| `eval`   | `quality:collect --profile=eval --from=tmp/llm-evals/<dir> --run-id=<id>`     | `summary.json` · `traces.jsonl` · `routing.json` · `context.json`, `tools/evals/consumer/baseline/<split>.json` 존재 여부                            | `evals`                                                                           | 없음 (harness · executor를 다시 돌리지 않음) |
-| `a11y`   | `quality --base-url=http://localhost:<port> [--run-id=<id>]`                  | localhost DevHub 평가 화면 (axe-playwright), `tmp/observability/imports/a11y/*`                                                                      | `accessibility`                                                                   | 브라우저 audit만. 등록 명령 없음             |
+| profile  | 명령                                                                          | 읽는 것                                                                                                                   | 쓰는 영역                                                     | 실행                                         |
+| -------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- | -------------------------------------------- |
+| `static` | `quality:collect --profile=static --run-id=<id>`                              | inventory(manifest · exports · script 이름 · 등록 명령 · workflow · lockfile 해시), design-tokens 산출물 · 문서           | `inventory` · `designSystem`, 등록 명령은 전부 `not-run` 관측 | 명령 실행 없음                               |
+| `core`   | `quality:collect --profile=core --run-id=<id> [--import=…]… [--only-imports]` | 등록 명령 출력 또는 import report, `.size-limit.cjs`, token 입력 파일                                                     | `bundles` · `contexts`                                        | registry의 bundle 명령                       |
+| `eval`   | `quality:collect --profile=eval --from=tmp/llm-evals/<dir> --run-id=<id>`     | `summary.json` · `traces.jsonl` · `routing.json` · `context.json`, `tools/evals/consumer/baseline/<split>.json` 존재 여부 | `evals`                                                       | 없음 (harness · executor를 다시 돌리지 않음) |
+| `a11y`   | `quality --base-url=http://localhost:<port> [--run-id=<id>]`                  | localhost DevHub 평가 화면 (axe-playwright)                                                                               | `accessibility`                                               | 브라우저 audit만. 등록 명령 없음             |
 
 `quality:collect --profile=a11y`는 거부한다 — a11y는 `pnpm quality`가 모은다.
 
@@ -40,37 +40,28 @@ import report에는 **그 report를 만든 commit이 기록되지 않는다.** r
 
 ## eval import
 
-- `sourceId`는 `eval:<디렉터리 이름>`이다. 다른 디렉터리의 eval은 다른 series로 본다
+- `sourceId`는 `eval:<디렉터리 이름>`이다. 다른 디렉터리의 eval은 다른 출처로 본다
 - 원본 run 조건(`origin`: runId · createdAt · gitSha · executor · model · K · task 수 · trials · conditions)은 수집기 metadata와 섞지 않는다. 원본 SHA와 수집 SHA가 다를 수 있다
 - trace 합계가 summary와 어긋나면 trace를 invalid로 두고 `partial-import` notice를 단다
 - 변경 파일 내용은 `redacted`, held-out(`test` split) trace의 gold evidence · 발췌는 공개하지 않는다
 - evaluator 원래 비교(`originalComparison`): summary의 `comparison`을 warnings까지 옮긴다. 없으면 baseline 파일을 직접 읽어 없음(`no-baseline`) · 깨짐(`corrupt-baseline` + 이유)을 나누고, 있지만 비교를 요청하지 않은 run은 `null` + `baseline-not-requested` notice
 
-## a11y import
+## a11y
 
-| 출처                     | 파일                                                                                             | 없을 때                      |
-| ------------------------ | ------------------------------------------------------------------------------------------------ | ---------------------------- |
-| Storybook axe            | `tmp/observability/imports/a11y/storybook.jsonl` (+ `libs/react-ui/storybook-static/index.json`) | `not-run`                    |
-| token 대비 test          | `design-tokens.vitest.json`                                                                      | check `unknown`/`not-run`    |
-| compiled CSS 텍스트 검사 | `react-ui.vitest.json`                                                                           | 〃                           |
-| UI test                  | `react-ui` · `demo-web` · `devhub` `.vitest.json`                                                | 〃                           |
-| 수동 확인                | `manual.json`                                                                                    | `not-run`                    |
-| DevHub audit             | `--base-url`에 연결                                                                              | 연결 불가면 `not-run` + 이유 |
+`--base-url`이 가리키는 DevHub 개발 서버(`pnpm dev:devhub`)에 axe-playwright로 접근성 audit을 돈다. 연결하지 못하면 `not-run` + 이유다. import는 없다 — 다른 출처(Storybook · vitest report · 수동 확인)는 모으지 않는다.
 
 ## store · export
 
 ```
 tmp/observability/
   index.json                 store index (중복 ID·경로 불일치 거부)
-  baseline.json              profile 별 baseline run ID 포인터 + history
   runs/<id>/run.json         계약 검증된 artifact
   runs/<id>/manifest.json    파일별 sha256·bytes (읽을 때 대조)
   runs/<id>/raw/             원본 report·입력 (공개하지 않음)
 apps/devhub/public/observability/
   index.json                 공개 index (run·summary 경로)
   runs/<id>.json             공개 artifact
-  runs/<id>.summary.json     summarizeRun 결과 (목록·추세용)
-  baseline.json              store 와 같은 포인터
+  runs/<id>.summary.json     summarizeRun 결과 (목록용)
 ```
 
 - `writeRun`은 staging에 쓰고 manifest를 만든 뒤 rename한다. 같은 ID는 `DuplicateRunError`

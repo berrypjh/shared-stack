@@ -4,19 +4,19 @@
 
 저장소 root에서 실행한다.
 
-| gate         | 명령                                                                                                        | 무엇을 막나                                                                                                        |
-| ------------ | ----------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
-| 계약 build   | `pnpm nx build @berrypjh/observability-contracts`                                                           | tools · DevHub가 읽는 dist                                                                                         |
-| 계약 type    | `pnpm nx typecheck @berrypjh/observability-contracts`                                                       | lib가 zod 외 의존(Node · DOM)을 쓰는 것                                                                            |
-| 계약 test    | `pnpm nx test @berrypjh/observability-contracts`                                                            | schema refinement · 요약 · 비교 · 추세 의미                                                                        |
-| tools        | `pnpm tools:check` (`tsc -p tools/tsconfig.json` + `vitest run --config tools/vitest.tools.config.mts`)     | collector · parser · normalizer · store · export · baseline. `tools/`는 Nx project가 아니라 affected가 닿지 않는다 |
-| DevHub test  | `pnpm nx test @berrypjh/devhub`                                                                             | 평가 화면 동작 · 상태 표시 · 평가 섹션의 탐색기 · 오른쪽 칸(`app/evaluation-shell.spec.tsx`)                       |
-| DevHub type  | `pnpm nx typecheck @berrypjh/devhub`                                                                        | app + spec                                                                                                         |
-| DevHub lint  | `pnpm nx lint @berrypjh/devhub`                                                                             | jsx-a11y 포함                                                                                                      |
-| DevHub build | `pnpm nx build @berrypjh/devhub`                                                                            | production bundle (react-ui · devhub-ui dist 해석)                                                                 |
-| E2E type     | `pnpm nx typecheck @berrypjh/devhub-e2e`                                                                    |                                                                                                                    |
-| E2E          | `pnpm nx e2e @berrypjh/devhub-e2e` (`evaluation*.spec.ts`, `responsive.spec.ts`)                            | 실제 chromium의 하위 메뉴 이동 · 실행 유지 · 비교 · 포인터 · 추세 · keyboard · 좁은 폭                             |
-| 구조         | `pnpm nx show project @berrypjh/devhub --json`, `pnpm nx graph --file=tmp/observability/project-graph.json` | devhub → contracts · react-ui · devhub-ui, e2e → devhub(implicit)                                                  |
+| gate         | 명령                                                                                                        | 무엇을 막나                                                                                             |
+| ------------ | ----------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| 계약 build   | `pnpm nx build @berrypjh/observability-contracts`                                                           | tools · DevHub가 읽는 dist                                                                              |
+| 계약 type    | `pnpm nx typecheck @berrypjh/observability-contracts`                                                       | lib가 zod 외 의존(Node · DOM)을 쓰는 것                                                                 |
+| 계약 test    | `pnpm nx test @berrypjh/observability-contracts`                                                            | schema refinement · 요약 의미                                                                           |
+| tools        | `pnpm tools:check` (`tsc -p tools/tsconfig.json` + `vitest run --config tools/vitest.tools.config.mts`)     | collector · parser · normalizer · store · export. `tools/`는 Nx project가 아니라 affected가 닿지 않는다 |
+| DevHub test  | `pnpm nx test @berrypjh/devhub`                                                                             | 평가 화면 동작 · 상태 표시 · 평가 섹션의 탐색기 · 오른쪽 칸(`app/evaluation-shell.spec.tsx`)            |
+| DevHub type  | `pnpm nx typecheck @berrypjh/devhub`                                                                        | app + spec                                                                                              |
+| DevHub lint  | `pnpm nx lint @berrypjh/devhub`                                                                             | jsx-a11y 포함                                                                                           |
+| DevHub build | `pnpm nx build @berrypjh/devhub`                                                                            | production bundle (react-ui · devhub-ui dist 해석)                                                      |
+| E2E type     | `pnpm nx typecheck @berrypjh/devhub-e2e`                                                                    |                                                                                                         |
+| E2E          | `pnpm nx e2e @berrypjh/devhub-e2e` (`evaluation*.spec.ts`, `responsive.spec.ts`)                            | 실제 chromium의 하위 메뉴 이동 · 실행 유지 · keyboard · 좁은 폭                                         |
+| 구조         | `pnpm nx show project @berrypjh/devhub --json`, `pnpm nx graph --file=tmp/observability/project-graph.json` | devhub → contracts · react-ui · devhub-ui, e2e → devhub(implicit)                                       |
 
 `pnpm tools`라는 script는 없다. `tools:check`가 그 역할이다.
 
@@ -30,17 +30,16 @@
 
 경로는 `apps/devhub/src/` 기준이다.
 
-| 상태                       | 대표 test                                                                                                                                          |
-| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| N/A · not-applicable       | `lib/evaluation/ai.spec.ts`, `app/evaluation-ai-page.spec.tsx`, `app/evaluation-bundles-page.spec.tsx`, `components/evaluation/bar-chart.spec.tsx` |
-| unsupported                | 개요 · 실행 기록을 뺀 `app/evaluation-*-page.spec.tsx`                                                                                             |
-| not-run                    | `app/evaluation-accessibility-page.spec.tsx`, `app/evaluation-design-system-page.spec.tsx`, `lib/evaluation/status.spec.ts`                        |
-| timeout                    | `lib/evaluation/ai.spec.ts` (eval trace 검증 timeout)                                                                                              |
-| invalid · missing          | `lib/evaluation/client.spec.ts`, `lib/evaluation/run-detail.spec.ts`                                                                               |
-| stale                      | `components/evaluation/runs/run-detail.spec.tsx`, `app/evaluation-overview-page.spec.tsx`, `lib/evaluation/client.spec.ts`                         |
-| partial                    | `components/evaluation/runs/run-detail.spec.tsx`, `app/evaluation-packages-page.spec.tsx`, `app/evaluation-accessibility-page.spec.tsx`            |
-| no-baseline · incompatible | `app/evaluation-runs-page.spec.tsx`, `lib/evaluation/comparison.spec.ts`, 계약 `tests/comparison.test.ts`                                          |
-| not-measured               | `lib/evaluation/format.spec.ts`, 계약 `tests/comparison.test.ts`                                                                                   |
+| 상태                 | 대표 test                                                                                                                                          |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| N/A · not-applicable | `lib/evaluation/ai.spec.ts`, `app/evaluation-ai-page.spec.tsx`, `app/evaluation-bundles-page.spec.tsx`, `components/evaluation/bar-chart.spec.tsx` |
+| unsupported          | 개요를 뺀 `app/evaluation-*-page.spec.tsx`                                                                                                         |
+| not-run              | `app/evaluation-accessibility-page.spec.tsx`, `app/evaluation-design-system-page.spec.tsx`, `lib/evaluation/status.spec.ts`                        |
+| timeout              | `lib/evaluation/ai.spec.ts` (eval trace 검증 timeout)                                                                                              |
+| invalid · missing    | `lib/evaluation/client.spec.ts`                                                                                                                    |
+| stale                | `app/evaluation-overview-page.spec.tsx`, `lib/evaluation/client.spec.ts`                                                                           |
+| partial              | `app/evaluation-accessibility-page.spec.tsx`                                                                                                       |
+| not-measured         | `lib/evaluation/format.spec.ts`                                                                                                                    |
 
 ## 실측 대조 — 2026-09-13
 

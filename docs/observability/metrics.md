@@ -64,50 +64,37 @@ held-out(`test` split) trace의 gold evidence · 발췌와 변경 파일 내용�
 
 ## accessibility — `accessibility[]` (a11y)
 
-| 출처 id               | source                  | 무엇                                                                           |
-| --------------------- | ----------------------- | ------------------------------------------------------------------------------ |
-| `a11y:storybook`      | `storybook-test-runner` | story 별 axe (skip은 통과가 아님)                                              |
-| `a11y:devhub`         | `axe-playwright`        | localhost DevHub 평가 route × theme × viewport                                 |
-| `a11y:token-contrast` | `vitest-report`         | token 색 쌍 대비 test (WCAG 4.5:1 text · 3:1 non-text, 1.2:1은 WCAG 기준 아님) |
-| `a11y:static-css`     | `vitest-report`         | compiled CSS 텍스트 검사                                                       |
-| `a11y:ui-test`        | `vitest-report`         | react-ui · demo-web · devhub UI test                                           |
-| `a11y:manual`         | `manual-record`         | 사람의 관찰                                                                    |
+| 출처 id       | source           | 무엇                                           |
+| ------------- | ---------------- | ---------------------------------------------- |
+| `a11y:devhub` | `axe-playwright` | localhost DevHub 평가 route × theme × viewport |
 
-- `a11y:devhub`의 target id는 `devhub:<route>:<theme>:<viewport>`이고 theme은 브라우저 color scheme으로 고른다.
+- target id는 `devhub:<route>:<theme>:<viewport>`이고 theme은 브라우저 color scheme으로 고른다.
 - audit outcome: `completed` · `partial` · `scan-failed` · `not-run` — 검사 실행의 결과이지 접근성 판정이 아니다
-- axe: rule 수와 node 수를 나누고 `incomplete`를 violation과 섞지 않는다. node는 최대 20개만 싣는다
-- check: `passed` · `failed` · `unknown`(report에 case 없음 · 전부 skip) · `not-run`(report 없음)
-- manual: `observed-ok` · `observed-issue` · `not-run`. 합친 점수는 없다
+- axe: rule 수와 node 수를 나누고 `incomplete`를 violation과 섞지 않는다. node는 최대 20개만 싣는다. 합친 점수는 없다
 
-## design system — `designSystem`·`packageSurfaces` (static)
+## design system — `designSystem` (static)
 
 - 관측 종류 `declared` · `consumed` · `tested` · `unknown` · `not-applicable`, state 어휘 `pressed` · `focus-visible` · `size-sm` · `size-md` · `reduced-motion`
 - test 근거는 `behavior-assertion`과 `source-assertion`을 나눈다. source 참조만으로 tested가 아니다
-- 산출물 `present` · `missing` · `invalid`, package build `complete` · `partial` · `missing` · `not-applicable`, catalog 재생성 `identical`/`differs`
 
-## 비교·추세
+## 비교
 
-- 실행 비교 상태: `comparable` · `incompatible` · `unknown` · `no-baseline` + 이유(`blocks` · `unknown` · `informs`)
-- 행 상태: `compared` · `incompatible` · `unknown` · `not-measured` · `added` · `removed`. 모두 `report-only`
-- delta: 부호 있는 절대 차이 · 상대 차이(기준 0이면 N/A) · 비율은 percentage point. median 차이는 검정이 아니다
-- 비교 대상 metric(`series`): bundle 값 · context tokens · eval primary 5개. a11y · design system은 비교 · 추세 대상이 아니다
-- eval 비교 key: sourceId · variant · metric · K · taskCount · trialsPerTask · conditions(gitSha · ref 제외). model 설정 · timeout 모름, task 부분집합은 `unknown`
-- source SHA · lockfile · toolchain · dirty 차이는 막지 않고 알린다. 같은 run · 다른 profile · 공유 지표 없음은 `incompatible`
-- 추세 점: `point`(구간 번호) · `gap`(요약 없음) · `not-measured` · `unknown-conditions` · `absent`(그 metric이 없는 run, 구간을 끊지 않음)
+DevHub 화면마다 고른 baseline 실행(`?base=`)과의 report-only diff다. 실행 목록·baseline 포인터·추세 화면은 없다 — 최신 실행을 자동 baseline으로 삼지 않고, 비교는 그 화면이 다루는 조건이 같을 때만 delta를 낸다(위 각 domain의 "비교 조건").
 
 ## 호환·migration
 
 schemaVersion은 1 그대로다. 아래는 모두 **이전 artifact를 계속 읽는** 추가 필드이고, 기본값은 "없음/모름"이다.
 
-| 필드                             | 이전 artifact에서 | 뜻                                            |
-| -------------------------------- | ----------------- | --------------------------------------------- |
-| `run.accessibility`              | `[]`              | 접근성 결과를 수집하지 않은 run               |
-| `summary.sections.accessibility` | `0`               | 〃                                            |
-| `summary.series`                 | `null`            | 추세 값을 모름 (빈 목록이 아님) → 다시 export |
-| `evals[].originalComparison`     | `null`            | evaluator 비교를 가져오지 않음 → 다시 수집    |
-| profile `a11y`                   | —                 | 새 profile                                    |
+| 필드                             | 이전 artifact에서 | 뜻                                         |
+| -------------------------------- | ----------------- | ------------------------------------------ |
+| `run.accessibility`              | `[]`              | 접근성 결과를 수집하지 않은 run            |
+| `summary.sections.accessibility` | `0`               | 〃                                         |
+| `evals[].originalComparison`     | `null`            | evaluator 비교를 가져오지 않음 → 다시 수집 |
+| profile `a11y`                   | —                 | 새 profile                                 |
 
-제거한 것 — test 결과(`run.tests`, `summary.sections.tests` · `testCases`), domain `test` · `verification` · `browser`, failure domain `test` · `verification` · `browser`. test와 lint · typecheck · build 결과는 CI가 보고하고, 브라우저 세션은 저장소 측정이 아니다. 이 필드를 가진 이전 artifact · 요약은 계약을 통과하지 않으므로 다시 수집 · export한다.
+제거한 것 — test 결과(`run.tests`, `summary.sections.tests` · `testCases`), domain `test` · `verification` · `browser`, failure domain `test` · `verification` · `browser`. test와 lint · typecheck · build 결과는 CI가 보고하고, 브라우저 세션은 저장소 측정이 아니다.
+package 표면(`run.packageSurfaces`, `summary.sections.packageSurfaces`, failure domain `package-surface`), 실행 비교·추세(`summary.series`, `compareRuns`·`baseline.json`·`/evaluation/runs`)도 뺐다 — package 표면은 dist를 직접 보고, 비교는 화면마다 고른 `?base=` report-only diff만 남았다.
+이 필드를 가진 이전 artifact · 요약은 계약을 통과하지 않으므로 다시 수집 · export한다.
 
 원본 도구와 의미가 달라진 곳:
 

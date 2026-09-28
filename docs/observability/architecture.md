@@ -1,6 +1,6 @@
 # 품질 관측 아키텍처
 
-shared-stack의 bundle · context · AI 평가 · 디자인 시스템 · package 표면 · 접근성 신호를 **실제 수집 결과로만** 보여준다. test와 lint · typecheck · build 결과는 CI가 보고하므로 모으지 않는다. 결과는 DevHub의 "평가" 섹션(`/evaluation`)이 보여 준다. 숫자를 지어내지 않고, 측정하지 못한 값은 0이 아니라 이유가 있는 빈 값으로 남긴다.
+shared-stack의 bundle · context · AI 평가 · 디자인 시스템 · 접근성 신호를 **실제 수집 결과로만** 보여준다. test와 lint · typecheck · build 결과는 CI가 보고하므로 모으지 않는다. 결과는 DevHub의 "평가" 섹션(`/evaluation`)이 보여 준다. 숫자를 지어내지 않고, 측정하지 못한 값은 0이 아니라 이유가 있는 빈 값으로 남긴다.
 
 ## 경계
 
@@ -37,10 +37,10 @@ pnpm dev:devhub                                           # http://localhost:440
 
 ## Profile
 
-| profile  | 하는 일                                                                                                                             |
-| -------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| `static` | manifest · exports · script 이름 · 등록 theme(parse-only) · workflow 해시와 design system · package 표면 근거를 읽는다. 명령 실행 0 |
-| `core`   | registry의 bundle 명령 실행(또는 import) + context in-process 측정                                                                  |
+| profile  | 하는 일                                                                                                              |
+| -------- | -------------------------------------------------------------------------------------------------------------------- |
+| `static` | manifest · exports · script 이름 · 등록 theme(parse-only) · workflow 해시와 design system 근거를 읽는다. 명령 실행 0 |
+| `core`   | registry의 bundle 명령 실행(또는 import) + context in-process 측정                                                   |
 
 실행 가능한 명령은 `tools/scripts/observability/registry.ts`의 argv 뿐이다. CLI는 profile · run id · import만 받고 argv를 만들 방법이 없다. 실행은 `execFile` 계열(shell 없음)과 제한 시간으로 한다.
 
@@ -58,7 +58,7 @@ pnpm dev:devhub                                           # http://localhost:440
 - **size-limit 값은 size-limit 의미 그대로다.** 기본 brotli, esbuild 빈 프로젝트 상수 차감, `KB` = 1000 B (설치된 `bytes-iec`). headroom = limit − current, 같으면 pass, 초과는 음수 headroom
 - **treeshake는 보고 전용 진단이다.** raw · gzip을 따로 남기고 한도 · 비율 게이트를 두지 않는다
 - **비교는 조건이 같을 때만.** bundle은 방법 · 압축 · 보정 · entry · import · target · externals · 도구 · config 해시, context는 scope · provider · model · tokenizer 버전 · 내용 구성이 같아야 delta를 준다
-- **실행 비교는 명시한 두 run만.** Level 1 현재 run, Level 2 사람이 고른 baseline(`baseline.json`은 profile마다 run ID 포인터 — `pnpm quality --run-id=<id>`가 store · public에 같은 내용으로 쓰고, 다른 run으로 바꾸려면 `--replace-baseline`, history는 쌓기만 한다), Level 3 불변 run + index 요약의 `series`. 최신 run을 자동 baseline으로 삼지 않는다. source SHA 차이는 비교 대상이라 막지 않고, 방법 · 압축 · tokenizer · scope · eval 조건(K · task 수 · model 설정 · timeout)은 metric 별 `comparableKey`에 넣는다. 모르는 조건은 unknown, 함께 가진 지표가 없으면 incompatible이다. delta는 부호 있는 절대 차이, 기준 0의 상대 차이는 N/A, 비율은 %p이고, median 차이는 통계 검정이 아니며 threshold를 만들지 않는다
+- **실행 비교는 화면에서 명시한 두 run만.** 화면마다 고른 baseline 실행(`?base=`)과 report-only로 diff 한다. 최신 실행을 자동 baseline으로 삼지 않고, 비교 조건(방법 · 압축 · tokenizer · scope 등)이 다르면 delta 없이 이유만 남긴다
 - **evaluator 원래 비교를 따로 둔다.** summary의 `comparison`(warnings 포함)을 그대로 옮기고, 없으면 baseline 파일이 없음(no-baseline) · 깨짐(corrupt-baseline) · 있지만 요청 안 함을 나눈다 — evaluator의 `readBaseline`은 모든 오류를 없음으로 돌리므로 importer가 먼저 읽는다
 - **export는 같은 ID의 다른 run을 덮어쓰지 않는다.** 공개 run의 metadata가 다르면 거부한다
 - **E2E는 별도 프로젝트다.** `apps/devhub-e2e`는 앱 소스를 import하지 않고, 계약으로 만든 fixture를 `page.route`로만 주입한다 (public export에 쓰지 않는다)

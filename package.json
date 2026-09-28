@@ -5,6 +5,7 @@
   "scripts": {
     "build": "nx run-many -t build",
     "build-storybook": "nx build-storybook @berrypjh/react-ui",
+    "build-storybook:devhub-ui": "nx build-storybook @berrypjh/devhub-ui",
     "build:apps": "nx run-many -t build --projects=@berrypjh/demo-web,@berrypjh/demo-mobile",
     "build:libs": "nx run-many -t build --projects=@berrypjh/design-tokens,@berrypjh/ui-core,@berrypjh/react-ui,@berrypjh/react-native-ui",
     "build:libs:web": "nx run-many -t build --projects=@berrypjh/design-tokens,@berrypjh/ui-core,@berrypjh/react-ui",
@@ -41,6 +42,8 @@
     "start:mobile": "nx run @berrypjh/demo-mobile:start",
     "storybook": "nx storybook @berrypjh/react-ui",
     "storybook:a11y": "concurrently -k -s first -n SB,A11Y \"http-server libs/react-ui/storybook-static -p 6006 --silent\" \"wait-on tcp:6006 && test-storybook --url http://localhost:6006 --config-dir libs/react-ui/.storybook\"",
+    "storybook:devhub-ui": "nx storybook @berrypjh/devhub-ui",
+    "storybook:devhub-ui:a11y": "concurrently -k -s first -n SB,A11Y \"http-server libs/devhub-ui/storybook-static -p 6007 --silent\" \"wait-on tcp:6007 && test-storybook --url http://localhost:6007 --config-dir libs/devhub-ui/.storybook\"",
     "test": "nx run-many -t test",
     "test:ci": "nx run-many -t test --configuration=ci",
     "test:watch": "nx run-many -t test --watch",

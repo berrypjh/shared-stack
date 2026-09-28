@@ -14,18 +14,14 @@
 ## eval
 
 - `local-*` eval run은 `smoke-scripted`(harness 확인용 고정 입력) 결과다. 모델 성능이 아니다
-- eval series ID에 `sourceId`(출력 디렉터리 이름)가 들어가서 다른 디렉터리에서 만든 eval 끼리는 짝이 되지 않는다 (비교하면 added/removed만 있고 `metrics.shared`로 incompatible)
 - task 부분집합은 `taskCount < datasetTaskCount`로만 안다. 같은 개수의 다른 task 조합은 구분하지 못한다
 - `originalComparison` 필드 이전에 수집한 eval run은 `null`(가져오지 않음)이다. 다시 수집해야 채워진다
-- eval 비교 · 추세는 primary 5개 metric만 다룬다. secondary · diagnostic은 화면 표에만 있다
 
 ## 비교·기록
 
-- 비교는 보고 전용이다. threshold · 통계 검정 · 신뢰구간이 없고 median 차이는 검정이 아니다
-- toolchain · lockfile · dirty 차이는 실행 단위에서 `informs`로만 알린다 (비교를 막지 않음)
-- `series` 필드 이전 요약은 `null`이라 추세에서 gap이다. `pnpm quality:export`로 다시 export하면 채워진다
-- 추세는 표로만 보여준다 (chart dependency 없음)
-- 공개 run 충돌 검사는 metadata만 비교한다. baseline 포인터 삭제 명령은 없다
+- 실행 목록 · baseline 포인터 · 추세 화면은 없다. 비교는 번들 · 접근성 화면이 `?base=`로 직접 고른 실행과의 report-only diff뿐이다
+- 비교는 보고 전용이다. threshold · 통계 검정 · 신뢰구간이 없다
+- 공개 run 충돌 검사는 metadata만 비교한다
 - 지금 계약을 통과하는 실측 core run이 없다. 이전 core run(`local-quality-01` · `local-core-12`)은 제거한 test 결과를 담고 있어 다시 수집해야 한다. 서로 다른 측정 사이의 실제 bundle 회귀 비교는 아직 없다
 
 ## 접근성·브라우저

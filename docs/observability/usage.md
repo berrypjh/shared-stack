@@ -1,6 +1,6 @@
 # 품질 관측 사용법
 
-shared-stack의 bundle · context · eval · 디자인 시스템 · package 표면 · 접근성 수집 결과를 모으고 보여 주는 체계. test와 lint · typecheck · build 결과는 CI가 보고하므로 모으지 않는다. 결과는 DevHub(`apps/devhub`)의 "평가" 섹션에서 본다.
+shared-stack의 bundle · context · eval · 디자인 시스템 · 접근성 수집 결과를 모으고 보여 주는 체계. test와 lint · typecheck · build 결과는 CI가 보고하므로 모으지 않는다. 결과는 DevHub(`apps/devhub`)의 "평가" 섹션에서 본다.
 
 수집과 export는 Node CLI(`tools/scripts/observability`)가 하고, 평가 섹션은 export된 JSON을 `@berrypjh/observability-contracts`로 검증한 뒤에만 표시한다. **브라우저는 명령을 실행하지 않는다.**
 
@@ -46,30 +46,24 @@ pnpm build:libs:web          # design-tokens → ui-core → react-ui dist (DevH
 
 ### 가져올 report 만들기
 
-| import                     | 만드는 명령 (root)                                                                                                                                                                                                         | 비용             |
-| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------- |
-| `bundle.size-limit` (core) | `pnpm size --json > tmp/observability/imports/bundle.size-limit.json`                                                                                                                                                      | 중간 (dist 필요) |
-| a11y token · CSS · UI test | `pnpm exec vitest run --root <project> --config <config> --reporter=json --outputFile="$PWD/tmp/observability/imports/a11y/<name>.vitest.json"` (정확한 조합은 `collectors/a11y.ts`의 `REPORT_COMMANDS`, 화면의 복사 버튼) | 중간             |
-| a11y Storybook             | `pnpm build-storybook` 뒤 `QUALITY_A11Y_RESULTS=tmp/observability/imports/a11y/storybook.jsonl pnpm storybook:a11y`                                                                                                        | **큼**           |
-| a11y 수동                  | `tmp/observability/imports/a11y/manual.json`에 관찰 기록                                                                                                                                                                   | 사람             |
+| import                     | 만드는 명령 (root)                                                    | 비용             |
+| -------------------------- | --------------------------------------------------------------------- | ---------------- |
+| `bundle.size-limit` (core) | `pnpm size --json > tmp/observability/imports/bundle.size-limit.json` | 중간 (dist 필요) |
 
-## 기록과 baseline
+## 비교
 
-- **실행 기록 화면**(`/evaluation/runs`) — index의 요약만 읽고, 고른 실행 상세만 run 전체를 받는다
-- **비교** — 명시한 기준만 한다. `/evaluation/runs?run=<현재>&base=<기준>`. 최신 실행이 자동으로 기준이 되지 않는다
-- **baseline 포인터** — `pnpm quality --run-id=<export 한 id>`가 그 run의 profile에 대해 run ID만 가리키는 `baseline.json`을 store · public에 쓴다. 다른 run으로 바꾸려면 `--replace-baseline`. 화면은 포인터를 보여 주고 링크로만 고른다
-- **추세** — `/evaluation/runs?run=<id>&series=<metric id>`. 같은 profile · 비교 조건의 이웃한 점만 잇는다
+실행 목록 · baseline 포인터 · 추세 화면은 없다. 비교는 각 화면(번들 · 접근성)이 `?base=<다른 run id>`로 직접 고른 실행과의 report-only diff뿐이고, 최신 실행을 자동으로 기준 삼지 않는다.
 
 ## 산출물 위치
 
 전부 commit하지 않는다.
 
-| 경로                                            | 내용                                                                         | git            |
-| ----------------------------------------------- | ---------------------------------------------------------------------------- | -------------- |
-| `tmp/observability/runs/<id>/`                  | `run.json` · `manifest.json` · `raw/`(원본 report · 입력)                    | ignore (`tmp`) |
-| `tmp/observability/imports/`                    | 가져올 report                                                                | ignore         |
-| `tmp/observability/baseline.json`, `index.json` | store index · 포인터                                                         | ignore         |
-| `apps/devhub/public/observability/`             | 공개 run · 요약 · index · 포인터 (raw · held-out · credential evidence 제외) | ignore         |
+| 경로                                | 내용                                                                | git            |
+| ----------------------------------- | ------------------------------------------------------------------- | -------------- |
+| `tmp/observability/runs/<id>/`      | `run.json` · `manifest.json` · `raw/`(원본 report · 입력)           | ignore (`tmp`) |
+| `tmp/observability/imports/`        | 가져올 report                                                       | ignore         |
+| `tmp/observability/index.json`      | store index                                                         | ignore         |
+| `apps/devhub/public/observability/` | 공개 run · 요약 · index (raw · held-out · credential evidence 제외) | ignore         |
 
 `pnpm nx build @berrypjh/devhub`은 public 디렉터리를 그대로 `dist/observability`로 복사한다. **build 결과를 배포하면 로컬 수집 결과도 함께 나간다.**
 

@@ -28,11 +28,8 @@ src/
   context.ts       token 측정 scope·tokenizer·missing-input 과 비교 조건
   run.ts           metadata·inventory·artifact·index·manifest
   freshness.ts     source SHA 비교
-  accessibility.ts 출처별 접근성 결과 (axe target·token pair·CSS·UI test·manual). rule/node 수·incomplete 분리, 점수 없음
-                   axe scope 는 storybook·devhub
-  metrics.ts       run 의 비교 가능한 metric 점(bundle·context·eval primary)과 comparableKey. source SHA 는 key 가 아니다
-  comparison.ts    명시한 두 실행 비교(comparable·incompatible·unknown·no-baseline + 이유)·delta·baseline 포인터 schema
-  history.ts       요약 기반 실행 기록(시간순·gap 자리 보존)·비교 키가 같은 이웃한 점만 잇는 추세
+  accessibility.ts DevHub 평가 화면을 axe 로 검사한 결과. rule/node 수·incomplete 분리, 점수 없음
+  metrics.ts       stableJson — key 순서에 상관없이 같은 값을 같은 문자열로 만드는 안정 직렬화
 tests/             test 전용 fixture 와 schema test
 ```
 

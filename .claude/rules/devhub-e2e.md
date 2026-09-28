@@ -32,8 +32,7 @@ src/
   document.spec.ts       "이 페이지에서" — 넓으면 옆, 좁으면 접힘 · 키보드로 절 이동 · 앵커 주소로 열기
   canvas.spec.ts         아키텍처 그림 · 목록 선택 · 흐름 단계 선택 · 크게 보기 dialog 포커스 복귀
   records.spec.ts        기록 목록(최신순 · 날짜 · 종류) · 기록 하나(본문 · 목차 · 상세 정보) · 다음 기록은 상세 정보에 머묾
-  evaluation.spec.ts     평가 하위 메뉴 이동 · 이동 뒤 포커스 · 고른 실행(?run=) 유지 · 좁은 폭의 넓은 표 스크롤 영역
-  evaluation-runs.spec.ts     명시한 baseline 비교 · 포인터 · 비교 불가 · not-measured · 추세 구간
+  evaluation.spec.ts     평가 하위 메뉴 이동 · 이동 뒤 포커스 · 고른 실행(?run=) 유지
 ```
 
 ## 검증
