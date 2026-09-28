@@ -111,7 +111,7 @@ describe('runDevhubAudit', () => {
     const scan = vi.fn(async (target: { id: string }) => {
       if (target.id === 'devhub:/evaluation/ai:dark:desktop')
         throw new Error('page.goto: net::ERR_CONNECTION_RESET at /Users/park/x');
-      if (target.id === 'devhub:/evaluation/runs:light:mobile') return undefined;
+      if (target.id === 'devhub:/evaluation/design-system:light:mobile') return undefined;
       return axe();
     });
     const summary = await runDevhubAudit({
@@ -129,7 +129,9 @@ describe('runDevhubAudit', () => {
       counts: null,
     });
     expect(byId['devhub:/evaluation/ai:dark:desktop'].reason).toContain('~/x');
-    expect(byId['devhub:/evaluation/runs:light:mobile'].reason).toContain('axe 결과가 없습니다');
+    expect(byId['devhub:/evaluation/design-system:light:mobile'].reason).toContain(
+      'axe 결과가 없습니다',
+    );
     expect(byId['devhub:/evaluation/bundles:light:desktop']).toMatchObject({
       status: 'scanned',
       scope: 'document',

@@ -15,12 +15,10 @@ import { normalizeAxeResults, WCAG_TAGS } from './adapters/axe';
 /** DevHub 평가 화면의 route. `audit.test.ts` 가 `screens.ts` 와 같은지 확인한다. */
 export const AUDIT_ROUTES = [
   '/evaluation',
-  '/evaluation/packages',
   '/evaluation/bundles',
   '/evaluation/ai',
   '/evaluation/design-system',
   '/evaluation/accessibility',
-  '/evaluation/runs',
 ] as const;
 
 export const AUDIT_THEMES = ['light', 'dark'] as const;
@@ -160,9 +158,6 @@ export const runDevhubAudit = async ({
     tags: [...WCAG_TAGS],
     enabledRules: ['color-contrast'],
     exclusions: [],
-    index: null,
-    checks: [],
-    manual: [],
     limitations: AUDIT_LIMITATIONS,
     startedAt,
   };

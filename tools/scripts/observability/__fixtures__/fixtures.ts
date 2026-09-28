@@ -77,7 +77,6 @@ export const fixtureArtifact = (runId = 'fixture-01'): RunArtifact => ({
   contexts: [],
   evals: [],
   designSystem: null,
-  packageSurfaces: [],
   accessibility: [],
 });
 

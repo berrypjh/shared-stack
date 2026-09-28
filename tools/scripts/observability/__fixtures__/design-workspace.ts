@@ -1,5 +1,5 @@
 /**
- * design-system·package-surface collector test 전용 workspace. 셀 source 파일은 실제
+ * design-system collector test 전용 workspace. 셀 source 파일은 실제
  * `STATE_CELLS` 패턴에서 만든다 — spec 과 fixture 가 따로 놀지 않는다.
  */
 import fs from 'node:fs/promises';

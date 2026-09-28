@@ -6,9 +6,7 @@ import { type Profile, PROFILES, runIdSchema } from '@berrypjh/observability-con
 import { baselineFile } from '../../evals/consumer/ci/baseline';
 import { VARIANTS } from '../../evals/consumer/variants/index';
 import { openAIModelFromEnv } from '../../lib/token-count';
-import { REPO_ROOT, TARGETS } from '../generate-consumer-catalog/config';
-import { buildCatalog } from '../generate-consumer-catalog/generate';
-import { serializeCatalog } from '../generate-consumer-catalog/schema';
+import { REPO_ROOT } from '../generate-consumer-catalog/config';
 import { MEASURE_TARGETS } from '../measure-tokens/registry';
 
 import {
@@ -22,7 +20,6 @@ import { collectEval, EVAL_DIR_PATTERN, EVALS_DIR } from './collectors/eval';
 import { readEvalBaselineFile } from './collectors/eval-baseline';
 import { runArgv } from './collectors/exec';
 import { IMPORTS_DIR } from './collectors/imports';
-import { collectPackageSurfaces } from './collectors/package-surface';
 import { exportRun, PUBLIC_ROOT } from './export';
 import { PROFILE_COMMANDS } from './registry';
 import { collectStatic, gitReader, readToolVersions } from './static';
@@ -138,12 +135,6 @@ export const parseArgs = (argv: string[]): CliCommand => {
 
 const COMMAND_TIMEOUT_MS = 15 * 60 * 1000;
 
-/** 기존 catalog generator 로 메모리에서만 다시 만든다. dist 에 쓰지 않는다. */
-const regenerateCatalog = async (packagePath: string): Promise<string | null> => {
-  const target = Object.values(TARGETS).find((candidate) => candidate.packageRoot === packagePath);
-  return target ? serializeCatalog(await buildCatalog(target)) : null;
-};
-
 const collect = async (args: Extract<CliCommand, { command: 'collect' }>) => {
   const common = {
     workspaceRoot: REPO_ROOT,
@@ -166,10 +157,6 @@ const collect = async (args: Extract<CliCommand, { command: 'collect' }>) => {
       ...common,
       collectDesign: async () => ({
         designSystem: await collectDesignSystem({ workspaceRoot: REPO_ROOT }),
-        packageSurfaces: await collectPackageSurfaces({
-          workspaceRoot: REPO_ROOT,
-          regenerateCatalog: regenerateCatalog,
-        }),
       }),
     });
   }

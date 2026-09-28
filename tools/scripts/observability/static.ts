@@ -10,7 +10,6 @@ import {
   type Inventory,
   isoTimeSchema,
   type Observation,
-  type PackageSurface,
   type RunArtifact,
   runArtifactSchema,
   type RunSource,
@@ -226,7 +225,7 @@ export type StaticInput = {
   toolVersions: Record<string, string>;
 };
 
-export type DesignEvidence = { designSystem: DesignSystem; packageSurfaces: PackageSurface[] };
+export type DesignEvidence = { designSystem: DesignSystem };
 
 /**
  * static profile. 정의를 읽어 inventory 로 남기고, 등록 명령은 전부 not-run 으로 기록한다.
@@ -259,7 +258,6 @@ export const collectStatic = async (
     contexts: [],
     evals: [],
     designSystem: design?.designSystem ?? null,
-    packageSurfaces: design?.packageSurfaces ?? [],
   });
 
   const inputs = { workflows: inventory.workflows, lockfileHash: source.lockfileHash };

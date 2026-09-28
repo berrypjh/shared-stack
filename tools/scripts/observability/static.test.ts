@@ -188,9 +188,9 @@ describe('collectStatic', () => {
     expect(JSON.stringify(raw[0].value)).toContain(sha256(WORKFLOW_SOURCE));
   });
 
-  it('design 수집기를 받지 않으면 design system·package surface 는 수집하지 않은 것이다', async () => {
+  it('design 수집기를 받지 않으면 design system 은 수집하지 않은 것이다', async () => {
     const { artifact } = await collect();
-    expect(artifact).toMatchObject({ designSystem: null, packageSurfaces: [] });
+    expect(artifact).toMatchObject({ designSystem: null });
   });
 
   it('design 수집기를 받으면 그 결과를 싣는다 — 명령은 여전히 실행하지 않는다', async () => {
@@ -204,7 +204,7 @@ describe('collectStatic', () => {
         env: {},
         now: clock('2026-09-13T14:00:00.000Z'),
         toolVersions: { node: 'v24.20.0' },
-        collectDesign: async () => ({ designSystem, packageSurfaces: [] }),
+        collectDesign: async () => ({ designSystem }),
       });
       expect(runArtifactSchema.parse(artifact)).toEqual(artifact);
       expect(artifact.designSystem).toEqual(designSystem);
