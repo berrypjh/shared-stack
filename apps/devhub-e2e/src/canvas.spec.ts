@@ -35,8 +35,9 @@ test.describe('아키텍처', () => {
     const outline = page
       .getByRole('region', { name: '구성 요소와 관계' })
       .getByRole('list', { name: '구성 요소' });
+    // 고른 항목의 제목은 " · 선택됨" 이 붙는다 — 고르기 전후 같은 링크를 가리킨다.
     const heading = outline
-      .getByRole('heading', { name: 'react-ui', exact: true })
+      .getByRole('heading', { name: /^react-ui( · 선택됨)?$/ })
       .getByRole('link');
 
     await heading.click();

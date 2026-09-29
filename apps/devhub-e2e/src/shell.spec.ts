@@ -31,6 +31,7 @@ test.describe('데스크톱 셸', () => {
 
   test('첫 Tab 은 본문으로 건너뛰기, 둘째는 상세 정보로 건너뛰기다', async ({ page }) => {
     await page.goto('/packages/react-ui');
+    await page.getByRole('link', skipToMain).waitFor({ state: 'attached' });
     await page.keyboard.press('Tab');
     await expect(page.getByRole('link', skipToMain)).toBeFocused();
     await expect(page.getByRole('link', skipToMain)).toBeInViewport();

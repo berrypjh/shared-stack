@@ -16,6 +16,8 @@ test.describe('기록', () => {
   });
 
   test('기록 하나는 본문 · "이 페이지에서" · 상세 정보를 함께 보인다', async ({ page }) => {
+    // "이 페이지에서"가 본문 옆에 오는 기준은 화면이 아니라 작업 영역 폭(@3xl)이다 — 좁은 창에서는 접힌다.
+    await page.setViewportSize({ width: 1920, height: 1080 });
     await page.goto('/records');
     const first = page.getByRole('main').getByRole('listitem').first().getByRole('link');
     await enterMain(page);

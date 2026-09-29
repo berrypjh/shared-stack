@@ -5,6 +5,8 @@ import { expect, type Locator, type Page } from '@playwright/test';
  * `locator.focus()` 와 달리 키보드로 문서 순서대로 닿는다는 것을 보인다.
  */
 export const tabTo = async (page: Page, target: Locator, limit = 60) => {
+  // 앱이 그리기 전에 누른 Tab 은 대상 없이 사라져 횟수만 쓴다. 대상이 생긴 뒤부터 센다.
+  await target.waitFor({ state: 'attached' });
   for (let press = 0; press < limit; press += 1) {
     await page.keyboard.press('Tab');
     if (await target.evaluate((element) => element === document.activeElement)) return;

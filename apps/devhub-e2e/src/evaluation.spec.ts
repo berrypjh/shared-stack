@@ -27,8 +27,9 @@ test.describe('평가 하위 메뉴', () => {
   }) => {
     await page.goto('/evaluation');
     const items = await targets(page);
-    // 수집이 조용히 비면 아래 반복은 아무것도 확인하지 않고 통과한다.
-    expect(items.length).toBeGreaterThan(5);
+    // 수집이 조용히 비거나 접힌 묶음이 있으면 아래 반복이 화면을 빠뜨린 채 통과한다.
+    // 개요 + 번들 · AI 평가 두 화면(apps/devhub 의 lib/evaluation/screens.ts)이 모두 렌더돼야 한다.
+    expect(items).toHaveLength(3);
 
     for (const { label, href } of items) {
       await page.goto(href === '/evaluation' ? '/evaluation/bundles' : '/evaluation');
@@ -45,7 +46,7 @@ test.describe('평가 하위 메뉴', () => {
   });
 
   test('보고 있는 실행(run)은 하위 화면을 옮겨도 주소에 남는다', async ({ page }) => {
-    await page.goto('/evaluation/accessibility?run=run-base');
+    await page.goto('/evaluation/ai?run=run-base');
     await evaluation(page).getByRole('link', { name: '번들', exact: true }).click();
     await page.waitForURL((url) => url.pathname === '/evaluation/bundles');
     expect(new URL(page.url()).searchParams.get('run')).toBe('run-base');

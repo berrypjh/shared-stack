@@ -90,12 +90,9 @@ export const coreRun = (
     },
     inventory: null,
     observations: [],
-    tests: [],
     bundles,
     contexts: [],
     evals: [],
-    designSystem: null,
-    accessibility: [],
   });
 
 export const COMPARE_RUNS = [

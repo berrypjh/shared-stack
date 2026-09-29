@@ -32,7 +32,8 @@ for (const width of [320, 390]) {
 const drawer = (page: Page) => ({
   toggle: page.getByRole('button', { name: '탐색기', exact: true }),
   items: page.getByRole('navigation', { name: '저장소 항목' }),
-  pane: page.getByRole('complementary', { name: '탐색기' }),
+  // 닫힌 서랍은 invisible 이라 접근성 트리에서 빠진다 — 닫힌 채로 스타일을 읽는 검사도 찾을 수 있게 한다.
+  pane: page.getByRole('complementary', { name: '탐색기', includeHidden: true }),
 });
 
 /** 서랍 계약: 열면 현재 항목으로 포커스, Escape · 닫기 · 바깥 누르기는 닫고 버튼으로 돌아간다. */
