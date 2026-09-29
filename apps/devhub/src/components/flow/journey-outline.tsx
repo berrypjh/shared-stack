@@ -1,11 +1,12 @@
 import { Link } from 'react-router-dom';
 
 import { catalog } from '@/data';
-import type { ConsumerJourney } from '@/domain/model';
+import type { Journey } from '@/domain/model';
+import { stepHref } from '@/lib/catalog/routes';
 
 import { LINK } from '../ui/entity-link';
 
-import { ownerLabel, statusLine, stepHref } from './presentation';
+import { ownerLabel, statusLine } from './presentation';
 
 const contextName = (id: string) => catalog.contexts.find((c) => c.id === id)?.name ?? id;
 
@@ -17,7 +18,7 @@ export const JourneyOutline = ({
   journey,
   selectedId,
 }: {
-  journey: ConsumerJourney;
+  journey: Journey;
   selectedId?: string;
 }) => {
   const orderOf = (id: string) => journey.steps.findIndex((step) => step.id === id) + 1;

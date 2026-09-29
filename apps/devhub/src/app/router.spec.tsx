@@ -94,7 +94,7 @@ describe('navigation data', () => {
     const headings = within(explorerNav())
       .getAllByRole('heading', { level: 2 })
       .map((heading) => heading.querySelector('a')?.textContent);
-    expect(headings).toEqual(['평가', '소비 흐름', '기록', '패키지', '플러그인', '문서']);
+    expect(headings).toEqual(['작업 흐름', '평가', '기록', '패키지', '플러그인', '문서']);
   });
 
   it('lists every catalog entry in the explorer, linked to its route', () => {
@@ -163,7 +163,7 @@ describe('navigation data', () => {
   it('offers one open-all or close-all toggle in every section with more than one group', () => {
     renderAt('/');
     const nav = within(explorerNav());
-    for (const title of ['평가', '소비 흐름', '기록', '패키지', '문서']) {
+    for (const title of ['평가', '기록', '패키지', '문서']) {
       const toggle = new RegExp(`^${title} 묶음 모두 (열기|닫기)$`);
       expect(nav.getAllByRole('button', { name: toggle })).toHaveLength(1);
     }

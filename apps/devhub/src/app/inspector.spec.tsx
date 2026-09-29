@@ -41,7 +41,7 @@ describe('package inspector', () => {
     const visibility = section('공개 여부');
     expect(visibility.getByText(/private: true/)).toBeTruthy();
     expect(visibility.getByText('package.json')).toBeTruthy();
-    expect(section('진입점').getByText(/소비자 API 가 아니다/)).toBeTruthy();
+    expect(section('진입점').getByText(/소비자 API 가 아님/)).toBeTruthy();
   });
 
   it('lists exactly the manifest entry points, and never links a build output as an import', () => {
@@ -49,7 +49,7 @@ describe('package inspector', () => {
     const pkg = catalog.packages.find((p) => p.id === 'react-ui');
     const exports = section('진입점');
     for (const entry of pkg?.entries ?? []) expect(exports.getByText(entry.specifier)).toBeTruthy();
-    expect(exports.getByText(/dist 안의 다른 파일을 직접 import 하지 않는다/)).toBeTruthy();
+    expect(exports.getByText(/dist 안의 다른 파일을 직접 import 하지 않음/)).toBeTruthy();
     const links = exports.getAllByRole('link').map((link) => link.getAttribute('href') ?? '');
     expect(links.some((href) => href.includes('/dist/'))).toBe(false);
     expect(
@@ -59,8 +59,8 @@ describe('package inspector', () => {
 
   it('shows the reason instead of an empty list', () => {
     renderAt('/packages/eslint-config');
-    expect(section('테스트').getByText(/테스트 파일도 test target 도 없다/)).toBeTruthy();
-    expect(section('위 · 아래').getAllByText(/카탈로그에 없다/)).toHaveLength(2);
+    expect(section('테스트').getByText(/테스트 파일도 test target 도 없음/)).toBeTruthy();
+    expect(section('위 · 아래').getAllByText(/카탈로그에 없음/)).toHaveLength(2);
   });
 
   it('groups source files by the project that owns them', () => {

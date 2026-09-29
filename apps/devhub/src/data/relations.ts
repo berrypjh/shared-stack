@@ -200,7 +200,7 @@ export const relations: Relation[] = [
     from: 'devhub-e2e',
     to: 'devhub',
     summary:
-      'devhub 개발 서버를 띄워 실제 브라우저로 셸 키보드 · 반응형 · 검색 · 딥링크 · 평가 화면을 확인한다',
+      'devhub 개발 서버를 띄워 실제 브라우저로 셸 키보드 · 반응형 · 검색 · 딥링크 · 평가 화면을 확인함',
     evidence: { path: 'apps/devhub-e2e/playwright.config.ts' },
   },
   {
@@ -208,7 +208,7 @@ export const relations: Relation[] = [
     id: 'claude-harness-verifies-berry-dev',
     from: 'claude-harness',
     to: 'berry-dev',
-    summary: 'standards sync · check 결과, secret guard hook, skill 구조를 실제 파일로 확인한다',
+    summary: 'standards sync · check 결과, secret guard hook, skill 구조를 실제 파일로 확인함',
     evidence: { path: 'tools/scripts/claude-harness/guard.test.ts' },
   },
   {
@@ -216,7 +216,7 @@ export const relations: Relation[] = [
     id: 'package-boundary-verifies-react-ui',
     from: 'tools-lib',
     to: 'react-ui',
-    summary: 'exports map 과 빌드 산출물이 맞는지 확인한다',
+    summary: 'exports map 과 빌드 산출물이 맞는지 확인함',
     evidence: { path: 'tools/lib/package-boundary.test.ts' },
   },
   {
@@ -224,7 +224,7 @@ export const relations: Relation[] = [
     id: 'package-boundary-verifies-react-native-ui',
     from: 'tools-lib',
     to: 'react-native-ui',
-    summary: 'exports map 과 빌드 산출물이 맞는지 확인한다',
+    summary: 'exports map 과 빌드 산출물이 맞는지 확인함',
     evidence: { path: 'tools/lib/package-boundary.test.ts' },
   },
   {
@@ -232,7 +232,7 @@ export const relations: Relation[] = [
     id: 'consumer-eval-verifies-react-ui',
     from: 'consumer-eval',
     to: 'react-ui',
-    summary: '소비자 작업을 공개 진입점만으로 풀 수 있는지 결정적 grader 로 채점한다',
+    summary: '소비자 작업을 공개 진입점만으로 풀 수 있는지 결정적 grader 로 채점함',
     evidence: { path: 'tools/evals/consumer/fixtures/web-basic/package.json' },
   },
   {
@@ -241,7 +241,7 @@ export const relations: Relation[] = [
     from: 'consumer-eval',
     to: 'react-native-ui',
     summary:
-      '소비자 작업을 공개 진입점만으로 풀 수 있는지 채점한다. RN 컴포넌트 테스트 실행은 지원하지 않는다',
+      '소비자 작업을 공개 진입점만으로 풀 수 있는지 채점함. RN 컴포넌트 테스트 실행은 지원하지 않음',
     evidence: { path: 'tools/evals/consumer/fixtures/react-native-basic/package.json' },
   },
 ];

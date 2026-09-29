@@ -6,7 +6,7 @@ const renderChart = () =>
   render(
     <BarChart
       title="Budget 사용"
-      description="각 막대는 자기 한도 기준입니다"
+      description="각 막대는 자기 한도 기준"
       unit="bytes"
       groups={[
         {
@@ -41,7 +41,7 @@ describe('BarChart', () => {
     renderChart();
     const figure = screen.getByRole('figure', { name: 'Budget 사용' });
     const description = document.getElementById(figure.getAttribute('aria-describedby') ?? '');
-    expect(description?.textContent).toBe('각 막대는 자기 한도 기준입니다 · 단위 bytes');
+    expect(description?.textContent).toBe('각 막대는 자기 한도 기준 · 단위 bytes');
     expect(within(figure).getByRole('group', { name: '@berrypjh/react-ui' })).toBeTruthy();
   });
 

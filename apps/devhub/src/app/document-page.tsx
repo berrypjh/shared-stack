@@ -45,7 +45,7 @@ export const DocumentPage = () => {
             key={doc.id}
             fallback={
               <p role="status" className="typo-body-small text-text-light">
-                문서를 불러오는 중입니다
+                문서를 불러오는 중
               </p>
             }
           >

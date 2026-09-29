@@ -1,14 +1,14 @@
 import { catalog } from '../../data';
 import type {
-  ConsumerJourney,
   DocumentRef,
+  Journey,
   Package,
   PackageKind,
   Plugin,
   RecordRef,
 } from '../../domain/model';
 
-import { ACTOR, DOCUMENT_GROUP, PACKAGE_KIND, RECORD_KIND } from './labels';
+import { DOCUMENT_GROUP, PACKAGE_KIND, RECORD_KIND } from './labels';
 import { entityHref } from './routes';
 
 /**
@@ -30,7 +30,7 @@ type EntityBase = {
 };
 
 export type Entity =
-  | (EntityBase & { section: 'journeys'; record: ConsumerJourney })
+  | (EntityBase & { section: 'journeys'; record: Journey })
   | (EntityBase & { section: 'packages'; record: Package })
   | (EntityBase & { section: 'plugins'; record: Plugin })
   | (EntityBase & { section: 'documents'; record: DocumentRef })
@@ -66,20 +66,15 @@ export const RECORDS_NEWEST_FIRST: RecordRef[] = [...catalog.records].sort((a, b
 export const SECTIONS: Section[] = [
   {
     id: 'journeys',
-    title: '소비 흐름',
+    title: '작업 흐름',
     path: '/journeys',
-    entities: (['consumer', 'maintainer'] as const).flatMap((actor) =>
-      catalog.journeys
-        .filter((record) => record.actor === actor)
-        .map((record) => ({
-          section: 'journeys' as const,
-          id: record.id,
-          label: record.title,
-          href: hrefOf('journeys', record.id),
-          group: ACTOR[actor],
-          record,
-        })),
-    ),
+    entities: catalog.journeys.map((record) => ({
+      section: 'journeys' as const,
+      id: record.id,
+      label: record.title,
+      href: hrefOf('journeys', record.id),
+      record,
+    })),
   },
   {
     id: 'records',

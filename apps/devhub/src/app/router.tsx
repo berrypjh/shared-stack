@@ -48,7 +48,7 @@ const ShellLayout = () => (
  *
  * ```
  * /                         개요
- * /journeys                 소비 흐름 목록
+ * /journeys                 작업 흐름 목록
  * /journeys/<id>[/steps/<stepId>]  흐름 그림 · 목록 — 단계 선택이 바뀌어도 화면은 남는다
  * /sources/<경로>[#symbol-이름]  저장소 경로 하나 — 인용하는 곳 · symbol
  * /evaluation[/<화면>]       평가 — export 한 공개 JSON 을 계약으로 검증해 보인다(화면은 screens.ts)

@@ -8,7 +8,7 @@ import { publicArtifact, SHA } from '@/test/evaluation/fixtures';
 import { renderEvaluation } from '@/test/evaluation/render';
 
 /** 화면이 빈 index 를 받아 미수집 상태를 그릴 때까지 기다린다 — 뒤늦은 상태 변경이 테스트 밖으로 새지 않게. */
-const settled = () => within(screen.getByRole('main')).findByText('아직 수집한 실행이 없다');
+const settled = () => within(screen.getByRole('main')).findByText('아직 수집한 실행이 없음');
 
 const explorer = () => within(screen.getByRole('navigation', { name: '저장소 항목' }));
 const evaluation = () => within(explorer().getByRole('region', { name: /^평가/ }) as HTMLElement);
@@ -81,7 +81,7 @@ describe('run inspector', () => {
     renderInspector(
       data({
         run,
-        freshness: { status: 'fresh', reason: `run source 가 기준 ${SHA.slice(0, 7)} 과 같다` },
+        freshness: { status: 'fresh', reason: `run source 가 기준 ${SHA.slice(0, 7)} 과 같음` },
       }),
     );
     expect(screen.getByRole('heading', { level: 2, name: 'run-a' })).toBeTruthy();
@@ -93,7 +93,7 @@ describe('run inspector', () => {
 
   it('gives the reason instead of empty rows', () => {
     renderInspector(data({ loading: true, selectedRunId: null, runIds: [] }));
-    expect(screen.getByText('없음 — 실행을 불러오는 중이다')).toBeTruthy();
+    expect(screen.getByText('없음 — 실행을 불러오는 중')).toBeTruthy();
   });
 });
 
@@ -104,7 +104,7 @@ describe('evaluation empty state', () => {
     async ({ path }) => {
       renderEvaluation(path, {});
       const main = within(screen.getByRole('main'));
-      expect(await main.findByRole('heading', { name: '아직 수집한 실행이 없다' })).toBeTruthy();
+      expect(await main.findByRole('heading', { name: '아직 수집한 실행이 없음' })).toBeTruthy();
       expect(main.getByText('pnpm quality:export --run-id=<새-run-id>')).toBeTruthy();
       expect(main.queryByRole('table')).toBeNull();
     },

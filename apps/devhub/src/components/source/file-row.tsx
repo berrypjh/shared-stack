@@ -10,9 +10,9 @@ import { type LinkGap, sourceLink } from '@/lib/repository/source-links';
 import { EditorLink } from './editor-link';
 
 const GAP: Record<LinkGap, string> = {
-  uncommitted: '스냅샷 커밋에 없는 경로(커밋되지 않음) — 링크를 만들지 않았다',
-  'unknown-commit': `스냅샷 커밋을 몰라 최신 ${catalog.repository.defaultBranch} 로 연결했다`,
-  unverified: '이 경로가 스냅샷 커밋에 있는지 확인하지 못했다',
+  uncommitted: '스냅샷 커밋에 없는 경로(커밋되지 않음) — 링크를 만들지 않았음',
+  'unknown-commit': `스냅샷 커밋을 몰라 최신 ${catalog.repository.defaultBranch} 로 연결했음`,
+  unverified: '이 경로가 스냅샷 커밋에 있는지 확인하지 못했음',
 };
 
 /**

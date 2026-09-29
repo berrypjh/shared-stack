@@ -31,7 +31,7 @@ const isQueryKey = (key: string): key is QueryKey =>
   (QUERY_KEYS as readonly string[]).includes(key);
 
 const oneOf = (key: string, raw: string, allowed: readonly string[] = []) =>
-  allowed.includes(raw) ? null : `${key} 은 ${allowed.join(', ')} 중 하나여야 한다`;
+  allowed.includes(raw) ? null : `${key} 은 ${allowed.join(', ')} 중 하나여야 함`;
 
 const valueIssue = (key: QueryKey, raw: string, spec: QuerySpec): string | null => {
   switch (key) {
@@ -39,19 +39,19 @@ const valueIssue = (key: QueryKey, raw: string, spec: QuerySpec): string | null 
     case 'base':
       return runIdSchema.safeParse(raw).success
         ? null
-        : `${key} 은 소문자 kebab-case 실행 id 여야 한다: ${raw}`;
+        : `${key} 은 소문자 kebab-case 실행 id 여야 함: ${raw}`;
     case 'package':
-      return PACKAGE.test(raw) ? null : `package 이름 형식이 아니다: ${raw}`;
+      return PACKAGE.test(raw) ? null : `package 이름 형식이 아님: ${raw}`;
     case 'variant':
-      return SLUG.test(raw) ? null : `variant 는 소문자 kebab-case id 여야 한다: ${raw}`;
+      return SLUG.test(raw) ? null : `variant 는 소문자 kebab-case id 여야 함: ${raw}`;
     case 'panel':
       return oneOf('panel', raw, spec.panels);
     case 'platform':
       return oneOf('platform', raw, PLATFORMS);
     case 'target':
-      return /^[\w.:/@-]{1,200}$/.test(raw) ? null : `target 은 검사 대상 id 형식이어야 한다`;
+      return /^[\w.:/@-]{1,200}$/.test(raw) ? null : `target 은 검사 대상 id 형식이어야 함`;
     case 'series':
-      return /^[\w.:/@-]{1,300}$/.test(raw) ? null : 'series 는 지표 id 형식이어야 한다';
+      return /^[\w.:/@-]{1,300}$/.test(raw) ? null : 'series 는 지표 id 형식이어야 함';
   }
 };
 
@@ -65,11 +65,11 @@ export const parseQuery = (search: URLSearchParams, spec: QuerySpec): ParsedQuer
       continue;
     }
     if (!spec.keys.includes(key)) {
-      issues.push(`이 페이지는 ${key} 를 받지 않는다`);
+      issues.push(`이 페이지는 ${key} 를 받지 않음`);
       continue;
     }
     if (seen.has(key)) {
-      issues.push(`${key} 이 두 번 있다`);
+      issues.push(`${key} 이 두 번 있음`);
       continue;
     }
     seen.add(key);

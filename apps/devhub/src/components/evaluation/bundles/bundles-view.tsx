@@ -84,11 +84,11 @@ export const BundlesView = ({
           />
         </div>
         <p role="status" aria-live="polite" className="typo-body-small text-text-default">
-          {`size-limit ${sizeLimitCount}행 중 필터와 일치 ${rows.length}행 — 필터 결과는 부분 집합이며 판정을 다시 계산하지 않는다`}
+          {`size-limit ${sizeLimitCount}행 중 필터와 일치 ${rows.length}행 — 필터 결과는 부분 집합이며 판정을 다시 계산하지 않음`}
         </p>
         <p className="typo-body-small break-keep text-text-light">
           baseline delta 는 package·method·압축·조정·entry·import·target·config hash·tool·externals
-          가 모두 같을 때만 낸다 (계약의 <Mono>compareBundle</Mono>).
+          가 모두 같을 때만 냄 (계약의 <Mono>compareBundle</Mono>).
         </p>
         {other.status === 'error' && <StatusNotice level={3} state={other.view} />}
         {collectorJudgements.length > 0 && (

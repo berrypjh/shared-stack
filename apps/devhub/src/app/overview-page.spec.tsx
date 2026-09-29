@@ -92,7 +92,7 @@ describe('snapshot', () => {
         <SnapshotSummary snapshot={unavailable} />
       </>,
     );
-    expect(screen.getByText(/스냅샷 커밋을 알 수 없습니다/)).toBeTruthy();
+    expect(screen.getByText(/스냅샷 커밋을 알 수 없음 — build 시점/)).toBeTruthy();
     expect(screen.getByText('스냅샷 커밋을 알 수 없음')).toBeTruthy();
     expect(container.textContent).not.toMatch(/[0-9a-f]{7,40}/);
   });

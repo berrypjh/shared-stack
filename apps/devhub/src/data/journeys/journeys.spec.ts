@@ -122,26 +122,3 @@ describe('journey status', () => {
     expect(wrong).toEqual([]);
   });
 });
-
-describe('journey coverage', () => {
-  it('gives web and React Native their own consumer journey', () => {
-    const byPlatform = (platform: string) =>
-      journeys.filter((journey) => journey.platform === platform && journey.actor === 'consumer');
-    expect(byPlatform('web')).toHaveLength(1);
-    expect(byPlatform('react-native')).toHaveLength(1);
-  });
-
-  it('shows retrieval, eval, the plugin, observability, and release as owners', () => {
-    const owners = new Set(steps.map(({ step }) => step.owner));
-    for (const id of [
-      'consumer-retrieval',
-      'consumer-eval',
-      'berry-commit',
-      'observability-collectors',
-      'devhub',
-      'release-scripts',
-    ]) {
-      expect(owners.has(id)).toBe(true);
-    }
-  });
-});

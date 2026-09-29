@@ -15,11 +15,11 @@ export const SnapshotBlock = ({ snapshot }: { snapshot: RepositorySnapshot }) =>
         <dt className="text-text-light">커밋</dt>
         <dd className="devhub-code">{snapshot.commit}</dd>
         <dt className="text-text-light">브랜치</dt>
-        <dd>{snapshot.branch ?? '알 수 없음 — detached HEAD 이거나 읽지 못했다'}</dd>
+        <dd>{snapshot.branch ?? '알 수 없음 — detached HEAD 이거나 읽지 못했음'}</dd>
         <dt className="text-text-light">작업 트리</dt>
         <dd className={snapshot.dirty ? 'text-text-warning' : undefined}>
           {snapshot.dirty === null
-            ? '알 수 없음 — git status 를 읽지 못했다'
+            ? '알 수 없음 — git status 를 읽지 못했음'
             : TREE[`${snapshot.dirty}`]}
         </dd>
         <dt className="text-text-light">읽은 때</dt>
@@ -27,8 +27,8 @@ export const SnapshotBlock = ({ snapshot }: { snapshot: RepositorySnapshot }) =>
       </dl>
     ) : (
       <p className="typo-body-small text-text-warning">
-        스냅샷 커밋을 알 수 없습니다 — build 시점에 git 을 읽지 못했습니다. 커밋 · 브랜치 · 작업
-        트리 상태를 추측하지 않습니다.
+        스냅샷 커밋을 알 수 없음 — build 시점에 git 을 읽지 못했음. 커밋 · 브랜치 · 작업 트리 상태를
+        추측하지 않음.
       </p>
     )}
   </WorkspaceSection>

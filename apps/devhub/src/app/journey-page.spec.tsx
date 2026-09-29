@@ -36,16 +36,13 @@ beforeEach(() => {
 afterEach(() => scrollTo.mockRestore());
 
 describe('journey list', () => {
-  it('lists every journey, web and React Native consumers first-class', () => {
+  it('lists every journey without groups, like plugins', () => {
     renderAt('/journeys');
     const main = screen.getByRole('main');
     expect(hrefs(within(main).getAllByRole('link'))).toEqual(
       expect.arrayContaining(catalog.journeys.map((j) => `/journeys/${j.id}`)),
     );
-    expect(within(main).getByRole('heading', { name: '소비자 흐름' })).toBeTruthy();
-    expect(within(main).getByRole('heading', { name: '유지보수 흐름' })).toBeTruthy();
-    expect(main.textContent).toContain('웹 · 단계');
-    expect(main.textContent).toContain('React Native · 단계');
+    expect(within(main).queryAllByRole('heading', { level: 3 })).toEqual([]);
   });
 });
 
@@ -74,24 +71,15 @@ describe('graph and text', () => {
       expect(nextLinks).toHaveLength(model.edges.length);
     },
   );
-
-  it('marks a documented-only step in words and with a dashed box', () => {
-    renderAt('/journeys/web-consumer');
-    const install = nodeLinks().find((a) =>
-      a.getAttribute('href')?.endsWith('/steps/install'),
-    ) as HTMLElement;
-    expect(install.textContent).toContain('○ 문서에만 있음');
-    expect(install.className).toContain('border-dashed');
-  });
 });
 
 describe('step selection', () => {
   it('comes from the URL: current step, summary, skip link, and inspector', () => {
-    const journey = journeyOf('token-pipeline');
+    const journey = journeyOf('release');
     const step = journey.steps[2];
-    renderAt(`/journeys/token-pipeline/steps/${step.id}`);
+    renderAt(`/journeys/release/steps/${step.id}`);
     const current = within(flow()).getAllByRole('link', { current: 'page' });
-    expect(hrefs(current)).toEqual([`/journeys/token-pipeline/steps/${step.id}`]);
+    expect(hrefs(current)).toEqual([`/journeys/release/steps/${step.id}`]);
     expect(current[0].textContent).toContain('· 선택됨');
     expect(
       screen.getByText(`단계 ${journey.steps.length}개`, { exact: false }).textContent,
@@ -105,12 +93,12 @@ describe('step selection', () => {
 
   it('keeps focus, scroll, and the view mode when the step changes in one flow', async () => {
     const user = userEvent.setup();
-    const journey = journeyOf('web-consumer');
-    renderAt('/journeys/web-consumer');
+    const journey = journeyOf('release');
+    renderAt('/journeys/release');
     await showList(user);
     const heading = () =>
       outline(journey.title).querySelector(
-        'h3 a[href="/journeys/web-consumer/steps/render"]',
+        'h3 a[href="/journeys/release/steps/version"]',
       ) as HTMLElement;
     await user.click(heading());
 
@@ -120,82 +108,66 @@ describe('step selection', () => {
     expect(screen.getByRole('button', { name: '목록' }).getAttribute('aria-pressed')).toBe('true');
   });
 
-  it('treats another flow as a new screen: back to the top of the document', async () => {
-    const user = userEvent.setup();
-    renderAt('/journeys/web-consumer/steps/render');
-    const explorer = screen.getByRole('navigation', { name: '저장소 항목' });
-    await user.click(within(explorer).getByRole('link', { name: journeyOf('rn-consumer').title }));
-
-    expect(scrollTo).toHaveBeenCalled();
-    expect(document.activeElement).toBe(document.querySelector('[data-focus-start]'));
-    expect(within(flow()).queryAllByRole('link', { current: 'page' })).toHaveLength(0);
-  });
-
   it('tells an unknown journey apart from an unknown step', () => {
     const { unmount } = renderAt('/journeys/no-such-journey');
     expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('카탈로그에 없는 항목');
-    expect(screen.getByRole('link', { name: '소비 흐름 목록으로 가기' }).getAttribute('href')).toBe(
+    expect(screen.getByRole('link', { name: '작업 흐름 목록으로 가기' }).getAttribute('href')).toBe(
       '/journeys',
     );
     unmount();
 
-    const journey = journeyOf('rn-consumer');
-    renderAt('/journeys/rn-consumer/steps/no-such-step');
+    const journey = journeyOf('release');
+    renderAt('/journeys/release/steps/no-such-step');
     expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('카탈로그에 없는 항목');
     expect(
       screen.getByRole('link', { name: `${journey.title} 목록으로 가기` }).getAttribute('href'),
-    ).toBe('/journeys/rn-consumer');
+    ).toBe('/journeys/release');
   });
 });
 
 describe('step inspector', () => {
   it('shows every section in order, with reasons where empty', () => {
-    renderAt('/journeys/web-consumer/steps/install');
+    renderAt('/journeys/release/steps/push');
     const headings = within(inspector())
       .getAllByRole('heading', { level: 3 })
       .map((h) => [...h.childNodes].find((n) => n.nodeType === Node.TEXT_NODE)?.textContent);
-    expect(headings).toEqual(['개요', '다음 단계', '소스', '테스트', '문서', '근거 공백']);
-    expect(inspector().textContent).toContain(
-      '없음 — 저장소 밖에서 일어나는 단계라 저장소 소스가 없다',
-    );
+    expect(headings).toEqual(['개요', '다음 단계', '소스', '문서', '테스트', '근거 공백']);
   });
 
   it('links next steps, the owner, and the pager into the inspector', () => {
-    const journey = journeyOf('token-pipeline');
-    renderAt('/journeys/token-pipeline/steps/facade');
+    const journey = journeyOf('release');
+    renderAt('/journeys/release/steps/version');
     const panel = within(inspector());
     const next = within(panel.getByRole('region', { name: /^다음 단계/ })).getAllByRole('link');
-    expect(hrefs(next)).toEqual([
-      `/journeys/token-pipeline/steps/web#${INSPECTOR_ID}`,
-      `/journeys/token-pipeline/steps/rn#${INSPECTOR_ID}`,
-    ]);
-    expect(panel.getByRole('link', { name: 'ui-core' }).getAttribute('href')).toBe(
-      `/packages/ui-core#${INSPECTOR_ID}`,
+    expect(hrefs(next)).toEqual([`/journeys/release/steps/changelog#${INSPECTOR_ID}`]);
+    expect(panel.getByRole('link', { name: '릴리스 스크립트' }).getAttribute('href')).toBe(
+      `/architecture/release-scripts#${INSPECTOR_ID}`,
     );
     const pager = panel.getByRole('navigation', { name: '단계 이동' });
     expect(
-      within(pager).getByRole('link', { name: `이전 단계: 2. ${journey.steps[1].intent}` }),
+      within(pager).getByRole('link', { name: `이전 단계: 1. ${journey.steps[0].intent}` }),
     ).toBeTruthy();
     expect(
-      within(pager).getByRole('link', { name: `다음 단계: 4. ${journey.steps[3].intent}` }),
+      within(pager).getByRole('link', { name: `다음 단계: 3. ${journey.steps[2].intent}` }),
     ).toBeTruthy();
   });
 
-  it('lists the recorded gap of a partial step', () => {
-    const step = journeyOf('eval-verification').steps.find(
-      (s) => s.status === 'partial',
+  it('lists the recorded gap of a step', () => {
+    const step = journeyOf('release').steps.find(
+      (s) => s.gaps?.length,
     ) as (typeof catalog.journeys)[number]['steps'][number];
-    renderAt(`/journeys/eval-verification/steps/${step.id}`);
-    expect(inspector().textContent).toContain('◐ 일부 구현');
+    renderAt(`/journeys/release/steps/${step.id}`);
     expect(inspector().textContent).toContain(step.gaps?.[0].note as string);
   });
 
-  it('summarises the flow when no step is chosen', () => {
-    renderAt('/journeys/plugin-distribution');
+  it('summarises the flow when no step is chosen, in the same four sections as every other item', () => {
+    renderAt('/journeys/release');
     const panel = within(inspector());
-    expect(panel.getByRole('heading', { level: 2 }).textContent).toBe(
-      journeyOf('plugin-distribution').title,
-    );
-    expect(panel.getByRole('link', { name: 'berry-commit' })).toBeTruthy();
+    expect(panel.getByRole('heading', { level: 2 }).textContent).toBe(journeyOf('release').title);
+    const headings = panel
+      .getAllByRole('heading', { level: 3 })
+      .map((h) => [...h.childNodes].find((n) => n.nodeType === Node.TEXT_NODE)?.textContent);
+    expect(headings).toEqual(['개요', '소스', '문서', '테스트']);
+    expect(panel.getByRole('link', { name: '릴리스 스크립트' })).toBeTruthy();
   });
 });

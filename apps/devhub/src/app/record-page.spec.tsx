@@ -82,7 +82,7 @@ describe('record page', () => {
       expect(panel.getByText(source.path.split('/').pop() as string)).toBeTruthy();
     }
     expect(panel.getByText('AGENTS.consumer.md')).toBeTruthy();
-    expect(panel.getByText(/이 기록을 지키는 테스트 묶음이 카탈로그에 없다/)).toBeTruthy();
+    expect(panel.getByText(/이 기록을 지키는 테스트 묶음이 카탈로그에 없음/)).toBeTruthy();
   });
 
   it('pages between records in newest-first order', async () => {

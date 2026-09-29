@@ -57,13 +57,13 @@ export const RecordInspector = ({ record }: { record: RecordRef }) => {
       </InspectorSection>
 
       <InspectorSection {...DOCS} count={documents.length}>
-        <DocumentRows items={documents} empty="이 기록이 정한 것을 지금 담은 문서가 없다" />
+        <DocumentRows items={documents} empty="이 기록이 정한 것을 지금 담은 문서가 없음" />
       </InspectorSection>
 
       <InspectorSection {...TESTS} count={tests.length} summary={countByRunner(tests)}>
         <TestRows
           items={tests}
-          empty="이 기록을 지키는 테스트 묶음이 카탈로그에 없다. 확인 방법은 본문의 검증 절에"
+          empty="이 기록을 지키는 테스트 묶음이 카탈로그에 없음. 확인 방법은 본문의 검증 절에"
         />
       </InspectorSection>
     </div>

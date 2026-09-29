@@ -31,8 +31,8 @@ export const EntityNotFound = ({ section, id }: { section: Place; id: string }) 
       <WorkspaceFrame>
         <WorkspaceHeader eyebrow={section.title} icon={section.icon} title="카탈로그에 없는 항목" />
         <p className="typo-body-small">
-          {section.title}에 <span className="devhub-code">{id}</span> 항목이 없습니다. 이름이
-          바뀌었거나 카탈로그에 등록되지 않았습니다.
+          {section.title}에 <span className="devhub-code">{id}</span> 항목이 없음. 이름이 바뀌었거나
+          카탈로그에 등록되지 않았음.
         </p>
         <Link to={section.path} className={`typo-body-small ${LINK}`}>
           {section.title} 목록으로 가기

@@ -1,35 +1,28 @@
 import {
   Inspector,
-  INSPECTOR_ID,
   useDocumentTitle,
   ViewSwitch,
   WorkspaceFrame,
   WorkspaceHeader,
   WorkspaceSection,
 } from '@berrypjh/devhub-ui';
-import { List, ListItem } from '@berrypjh/react-ui';
 
 import { useLocation } from 'react-router-dom';
 
 import { EntityNotFound, placeOf } from '@/components/entity/entity-not-found';
 import { FlowCanvas, type FlowText } from '@/components/flow/flow-canvas';
+import { JourneyInspector } from '@/components/flow/journey-inspector';
 import { JourneyOutline } from '@/components/flow/journey-outline';
-import {
-  boxOf,
-  journeyHref,
-  LEGEND,
-  ownerLabel,
-  statusLine,
-  stepHref,
-} from '@/components/flow/presentation';
+import { boxOf, LEGEND, ownerLabel, statusLine } from '@/components/flow/presentation';
 import { StepInspector } from '@/components/flow/step-inspector';
-import { EntityLink } from '@/components/ui/entity-link';
+import { SECTION_ICON } from '@/components/ui/view-icons';
 import { catalog } from '@/data';
-import type { ConsumerJourney, StepStatus } from '@/domain/model';
+import type { Journey, StepStatus } from '@/domain/model';
 import { findSection } from '@/lib/catalog/entities';
 import { flowModel } from '@/lib/catalog/flow';
 import { inspectStep } from '@/lib/catalog/inspect-step';
-import { ACTOR, PLATFORM, STEP_STATUS } from '@/lib/catalog/labels';
+import { STEP_STATUS } from '@/lib/catalog/labels';
+import { journeyHref, stepHref } from '@/lib/catalog/routes';
 
 const SECTION = findSection('journeys');
 const STATUSES = Object.keys(STEP_STATUS) as StepStatus[];
@@ -40,35 +33,7 @@ const selectionOf = (pathname: string) => {
   return { journeyId, stepId: steps === 'steps' ? stepId : undefined };
 };
 
-/** 흐름 전체의 요약: 상태별 단계 수, 거치는 실행 위치, 담당. 근거는 단계를 골라 본다. */
-const JourneySummary = ({ journey }: { journey: ConsumerJourney }) => {
-  const owners = [...new Set(journey.steps.map((step) => step.owner))];
-  return (
-    <div className="flex flex-col gap-lg">
-      <header className="flex flex-col gap-xs">
-        <p className="typo-caption-small text-text-light">{ACTOR[journey.actor]}</p>
-        <h2 className="typo-body-medium-strong">{journey.title}</h2>
-        <p className="typo-body-small">
-          단계를 고르면 그 단계의 소스 · 테스트 · 문서 · 근거 공백이 여기에 나옵니다.
-        </p>
-      </header>
-      <section aria-labelledby="journey-owners" className="flex flex-col gap-sm">
-        <h3 id="journey-owners" className="typo-body-small-strong">
-          담당 <span className="typo-caption-small text-text-light">{owners.length}</span>
-        </h3>
-        <List className="flex flex-col gap-xs typo-body-small">
-          {owners.map((owner) => (
-            <ListItem key={owner}>
-              <EntityLink id={owner} hash={INSPECTOR_ID} />
-            </ListItem>
-          ))}
-        </List>
-      </section>
-    </div>
-  );
-};
-
-const JourneyView = ({ journey, stepId }: { journey: ConsumerJourney; stepId?: string }) => {
+const JourneyView = ({ journey, stepId }: { journey: Journey; stepId?: string }) => {
   const model = flowModel(journey, catalog.contexts);
   const inspection = stepId ? inspectStep(catalog, journey.id, stepId) : undefined;
   const lanes = model.lanes.map((lane) => lane.name).join(' → ');
@@ -81,14 +46,16 @@ const JourneyView = ({ journey, stepId }: { journey: ConsumerJourney; stepId?: s
     box: (node) => boxOf(node.status),
     href: (node) => stepHref(journey.id, node.id),
   };
-  useDocumentTitle(
-    inspection ? `${inspection.step.intent} · ${journey.title}` : `${journey.title} · 소비 흐름`,
-  );
+  useDocumentTitle(inspection ? `${inspection.step.intent} · ${journey.title}` : journey.title);
 
   if (stepId && !inspection) {
     return (
       <EntityNotFound
-        section={{ title: journey.title, path: journeyHref(journey.id), icon: 'flow' }}
+        section={{
+          title: journey.title,
+          path: journeyHref(journey.id),
+          icon: SECTION_ICON.journeys,
+        }}
         id={stepId}
       />
     );
@@ -97,15 +64,13 @@ const JourneyView = ({ journey, stepId }: { journey: ConsumerJourney; stepId?: s
   return (
     <>
       <WorkspaceFrame>
-        <WorkspaceHeader eyebrow={ACTOR[journey.actor]} icon="flow" title={journey.title} />
-        <p className="typo-body-small">{journey.goal}</p>
+        <WorkspaceHeader
+          eyebrow={SECTION.title}
+          icon={SECTION_ICON[SECTION.id]}
+          title={journey.title}
+        />
+        <p className="typo-paragraph-default">{journey.goal}</p>
         <dl className="grid grid-cols-[6rem_minmax(0,1fr)] gap-x-md gap-y-xs typo-body-small">
-          {journey.platform && (
-            <>
-              <dt className="text-text-light">플랫폼</dt>
-              <dd>{PLATFORM[journey.platform]}</dd>
-            </>
-          )}
           <dt className="text-text-light">단계</dt>
           <dd>
             {journey.steps.length}개 —{' '}
@@ -116,8 +81,8 @@ const JourneyView = ({ journey, stepId }: { journey: ConsumerJourney; stepId?: s
         </dl>
         <WorkspaceSection id="journey-flow" title="흐름">
           <p className="typo-caption-small text-text-light">
-            가로 줄은 실행 위치, 화살표는 다음 단계다. 점선 상자는 저장소 밖에서 일어나 문서만
-            말하는 단계다. 목록 보기에 같은 흐름이 글로 있다.
+            가로 줄은 실행 위치, 화살표는 다음 단계. 점선 상자는 저장소 밖에서 일어나 문서만 말하는
+            단계. 목록 보기에 같은 흐름이 글로 있음.
           </p>
           <ViewSwitch
             label={journey.title}
@@ -138,7 +103,7 @@ const JourneyView = ({ journey, stepId }: { journey: ConsumerJourney; stepId?: s
         {inspection ? (
           <StepInspector inspection={inspection} />
         ) : (
-          <JourneySummary journey={journey} />
+          <JourneyInspector journey={journey} siblings={SECTION.entities} />
         )}
       </Inspector>
     </>

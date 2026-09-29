@@ -44,7 +44,7 @@ describe('createClient — index → 요약 → 필요한 detail 만', () => {
     expect(await client.summary('run-a')).toEqual({
       status: 'missing',
       target: 'summary',
-      message: 'run-a 의 요약 파일이 index 에 없다 — 다시 export 한다',
+      message: 'run-a 의 요약 파일이 index 에 없음 — 다시 export 필요',
     });
     expect(urls(calls)).toEqual([INDEX]);
   });

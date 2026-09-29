@@ -34,7 +34,7 @@ export const EvaluationOverviewPage = () => {
             <StatusNotice
               level={3}
               state={notApplicableState(
-                'baseline 기능은 아직 없다. 이전 실행과의 차이를 계산하지 않는다.',
+                'baseline 기능은 아직 없음. 이전 실행과의 차이를 계산하지 않음.',
               )}
             />
           </Section>

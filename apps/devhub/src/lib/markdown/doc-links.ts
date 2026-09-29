@@ -33,7 +33,7 @@ const basename = (path: string) => path.slice(path.lastIndexOf('/') + 1);
 
 export const resolveDocLink = (catalog: Catalog, doc: LinkSource, href: string): DocLink => {
   if (SAFE_SCHEME.test(href)) return { kind: 'external', href };
-  if (SCHEME.test(href)) return { kind: 'broken', path: href, note: '허용하지 않는 주소 형식이다' };
+  if (SCHEME.test(href)) return { kind: 'broken', path: href, note: '허용하지 않는 주소 형식' };
   const hashAt = href.indexOf('#');
   const pathPart = hashAt === -1 ? href : href.slice(0, hashAt);
   const anchor = hashAt === -1 ? undefined : decodeURIComponent(href.slice(hashAt + 1));
@@ -45,7 +45,7 @@ export const resolveDocLink = (catalog: Catalog, doc: LinkSource, href: string):
     return {
       kind: 'broken',
       path: path ?? pathPart,
-      note: recorded?.note ?? '저장소 밖을 가리키는 경로다',
+      note: recorded?.note ?? '저장소 밖을 가리키는 경로',
     };
   }
   const directory = path.endsWith('/');

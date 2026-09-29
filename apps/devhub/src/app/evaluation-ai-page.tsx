@@ -74,7 +74,7 @@ const Ai = ({
               ))}
             </div>
             <p role="status" aria-live="polite" className="typo-body-small text-text-default">
-              {`variant ${variantIds.length}개 중 필터와 일치 ${matched.length}개 — metric 은 variant 별 원본 값이고 다시 계산하지 않는다`}
+              {`variant ${variantIds.length}개 중 필터와 일치 ${matched.length}개 — metric 은 variant 별 원본 값이고 다시 계산하지 않음`}
             </p>
           </Section>
           {noMatch ? (

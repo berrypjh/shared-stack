@@ -43,7 +43,7 @@ export const Provenance = ({ evalRun }: { evalRun: EvalRun }) => {
             `${origin.harnessVersion} · ${origin.createdAt} · ${shortSha(origin.gitSha)}`,
           ],
         ] as [string, string][])
-      : ([['조건', 'summary 를 읽지 못해 실행 조건을 모른다']] as [string, string][])),
+      : ([['조건', 'summary 를 읽지 못해 실행 조건을 모름']] as [string, string][])),
     [
       'import',
       Object.entries(evalRun.import)
@@ -76,10 +76,10 @@ export const Provenance = ({ evalRun }: { evalRun: EvalRun }) => {
 };
 
 const RATE_DESCRIPTION: Partial<Record<PrimaryKey, string>> = {
-  verifiedTaskSuccessRate: '검증까지 통과해 성공한 trial 비율이다. 분모는 trial 수다',
-  routingAccuracy: 'routing 이 맞은 비율이다. 분모는 원본 denominator 그대로다',
+  verifiedTaskSuccessRate: '검증까지 통과해 성공한 trial 비율. 분모는 trial 수',
+  routingAccuracy: 'routing 이 맞은 비율. 분모는 원본 denominator 그대로',
   falseSuccessRate:
-    '성공을 주장했지만 검증을 통과하지 못한 비율이다. 분모는 성공을 명시적으로 주장한 trial 수다',
+    '성공을 주장했지만 검증을 통과하지 못한 비율. 분모는 성공을 명시적으로 주장한 trial 수',
 };
 
 const RATE_KEYS = PRIMARY_KEYS.filter((key) => EVAL_METRICS.primary[key].kind === 'rate');
@@ -177,8 +177,8 @@ export const Scorecard = ({ evalRun, variants }: { evalRun: EvalRun; variants: E
         ))}
       </DataTable>
       <p className="typo-body-small break-keep text-text-light">
-        failureBreakdown 단위는 trial 수다. 성공한 trial 수(verifiedTaskSuccessRate 분자)와 합하면
-        trial 수가 된다.
+        failureBreakdown 단위는 trial 수. 성공한 trial 수(verifiedTaskSuccessRate 분자)와 합하면
+        trial 수가 됨.
       </p>
     </Section>
   );

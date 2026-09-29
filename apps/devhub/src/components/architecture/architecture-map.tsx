@@ -15,7 +15,7 @@ export const NoMatch = ({ clearHref }: { clearHref: string }) => (
     role="status"
     className="flex flex-col gap-sm rounded-lg border border-dashed border-stroke-default p-xl typo-body-small"
   >
-    <p>조건에 맞는 구성 요소가 없습니다.</p>
+    <p>조건에 맞는 구성 요소가 없음.</p>
     <Link to={clearHref} className="self-start text-text-link underline-offset-2 hover:underline">
       필터 모두 해제
     </Link>

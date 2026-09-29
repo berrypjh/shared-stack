@@ -50,7 +50,7 @@ export const RecordPage = () => {
             key={record.id}
             fallback={
               <p role="status" className="typo-body-small text-text-light">
-                기록을 불러오는 중입니다
+                기록을 불러오는 중
               </p>
             }
           >

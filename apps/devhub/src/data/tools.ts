@@ -8,7 +8,7 @@ export const tools: Tool[] = [
     root: 'tools/scripts/generate-consumer-catalog',
     rootKind: 'directory',
     platform: 'node',
-    purpose: '빌드된 선언에서 react-ui · react-native-ui 의 dist/llm-catalog.json 을 만든다',
+    purpose: '빌드된 선언에서 react-ui · react-native-ui 의 dist/llm-catalog.json 을 만듦',
     docs: [],
     source: [{ path: 'tools/scripts/generate-consumer-catalog/index.ts' }],
   },
@@ -19,7 +19,7 @@ export const tools: Tool[] = [
     rootKind: 'directory',
     platform: 'node',
     purpose:
-      '플랫폼 → 패키지 → 심볼 → 토큰으로 좁히는 결정적 resolver. 배포 패키지의 dist/cli.mjs 로도 번들된다',
+      '플랫폼 → 패키지 → 심볼 → 토큰으로 좁히는 결정적 resolver. 배포 패키지의 dist/cli.mjs 로도 번들됨',
     docs: ['consumer-retrieval-readme'],
     source: [
       { path: 'tools/consumer-retrieval/cli.ts' },
@@ -39,7 +39,7 @@ export const tools: Tool[] = [
     gaps: [
       {
         kind: 'unsupported',
-        note: 'programmatic LLM executor 가 없다. dev · test split 은 수집된 trace 를 replay 할 때만 채점한다',
+        note: 'programmatic LLM executor 가 없음. dev · test split 은 수집된 trace 를 replay 할 때만 채점함',
         evidence: [{ path: 'docs/tools/consumer-eval.md' }],
       },
     ],
@@ -51,7 +51,7 @@ export const tools: Tool[] = [
     rootKind: 'directory',
     platform: 'node',
     purpose:
-      '품질 결과를 수집해 계약으로 검증한 JSON 을 DevHub 의 public 경로로 export 한다 — 평가 화면이 읽는다',
+      '품질 결과를 수집해 계약으로 검증한 JSON 을 DevHub 의 public 경로로 export 함 — 평가 화면이 읽음',
     docs: ['observability-architecture'],
     source: [
       { path: 'tools/scripts/observability/cli.ts' },
@@ -65,7 +65,7 @@ export const tools: Tool[] = [
     rootKind: 'directory',
     platform: 'node',
     purpose:
-      'nx release 로 공개 패키지의 버전 · changelog · 배포를 한다(로컬 registry 또는 GitHub Packages)',
+      'nx release 로 공개 패키지의 버전 · changelog · 배포를 함(로컬 registry 또는 GitHub Packages)',
     docs: [],
     source: [
       { path: 'tools/scripts/release/release-npm.ts' },
@@ -78,13 +78,13 @@ export const tools: Tool[] = [
     root: 'tools/scripts/measure-tokens',
     rootKind: 'directory',
     platform: 'node',
-    purpose: '에이전트가 패키지를 분석할 때 읽는 입력 토큰 수를 시나리오별로 잰다',
+    purpose: '에이전트가 패키지를 분석할 때 읽는 입력 토큰 수를 시나리오별로 잼',
     docs: ['measure-tokens-readme'],
     source: [{ path: 'tools/scripts/measure-tokens/all.ts' }],
     gaps: [
       {
         kind: 'doc-code-mismatch',
-        note: 'claude.ts · openai.ts 의 사용법은 pnpm tokens:measure:claude · tokens:measure:openai 를 안내하지만 그런 루트 script 는 없다',
+        note: 'claude.ts · openai.ts 의 사용법은 pnpm tokens:measure:claude · tokens:measure:openai 를 안내하지만 그런 루트 script 는 없음',
         evidence: [
           { path: 'tools/scripts/measure-tokens/claude.ts', symbol: 'pnpm tokens:measure:claude' },
           { path: 'tools/scripts/measure-tokens/openai.ts', symbol: 'pnpm tokens:measure:openai' },
@@ -98,7 +98,7 @@ export const tools: Tool[] = [
     root: 'tools/scripts/treeshake',
     rootKind: 'directory',
     platform: 'node',
-    purpose: '심볼 하나만 import 한 entry 를 번들해 트리셰이킹 효과를 byte 로 잰다',
+    purpose: '심볼 하나만 import 한 entry 를 번들해 트리셰이킹 효과를 byte 로 잼',
     docs: ['treeshake-readme'],
     source: [{ path: 'tools/scripts/treeshake/check.ts' }],
   },
@@ -108,7 +108,7 @@ export const tools: Tool[] = [
     root: 'tools/scripts/build-react-ui-css.mjs',
     rootKind: 'file',
     platform: 'node',
-    purpose: 'react-ui 의 SCSS 를 sass · autoprefixer 로 dist/index.css 로 만든다',
+    purpose: 'react-ui 의 SCSS 를 sass · autoprefixer 로 dist/index.css 로 만듦',
     docs: ['react-ui-agents'],
     source: [{ path: 'tools/scripts/build-react-ui-css.mjs' }],
   },
@@ -171,7 +171,7 @@ export const tools: Tool[] = [
     gaps: [
       {
         kind: 'no-test',
-        note: '테스트 파일이 없다. project.json 에는 build · typecheck 만 있다',
+        note: '테스트 파일이 없음. project.json 에는 build · typecheck 만 있음',
         evidence: [{ path: 'plugins/berry-commit/project.json' }],
       },
     ],

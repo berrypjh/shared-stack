@@ -137,7 +137,7 @@ export const documents: DocumentRef[] = [
     brokenLinks: [
       {
         href: '../verification-guide.md',
-        note: 'docs/verification-guide.md 는 저장소 기록 어디에도 없다 — 처음부터 대상 없이 쓰인 링크다',
+        note: 'docs/verification-guide.md 는 저장소 기록 어디에도 없음 — 처음부터 대상 없이 쓰인 링크',
       },
     ],
   },

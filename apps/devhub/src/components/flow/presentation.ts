@@ -4,11 +4,6 @@ import type { StepStatus } from '@/domain/model';
 import { linkOf } from '@/lib/catalog/entities';
 import { STEP_STATUS } from '@/lib/catalog/labels';
 
-export const journeyHref = (journeyId: string) => `/journeys/${journeyId}`;
-
-export const stepHref = (journeyId: string, stepId: string) =>
-  `/journeys/${journeyId}/steps/${stepId}`;
-
 /** 상태 글 한 줄: 글리프와 글자. 색만으로 구분하지 않는다. */
 export const statusLine = (status: StepStatus) =>
   `${STEP_STATUS[status].glyph} ${STEP_STATUS[status].label}`;
@@ -25,8 +20,8 @@ export const boxOf = (status: StepStatus) =>
 export const LEGEND: LegendItem[] = [
   {
     box: 'solid',
-    label: `${statusLine('implemented')} · ${statusLine('partial')} — 저장소 소스가 있다`,
+    label: `${statusLine('implemented')} · ${statusLine('partial')} — 저장소 소스가 있음`,
   },
-  { box: 'dashed', label: `${statusLine('documented-only')} — 저장소 밖 단계, 문서만 말한다` },
+  { box: 'dashed', label: `${statusLine('documented-only')} — 저장소 밖 단계, 문서만 말함` },
   { line: null, label: '다음 단계' },
 ];

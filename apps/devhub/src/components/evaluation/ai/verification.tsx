@@ -85,7 +85,7 @@ const VariantVerification = ({
       </p>
       {runCount === 0 ? (
         <p className="typo-body-small text-text-default">
-          {`verification run 없음 — ${variant.verificationAuthority}, 검증을 실행하지 않았다`}
+          {`verification run 없음 — ${variant.verificationAuthority}, 검증을 실행하지 않았음`}
         </p>
       ) : (
         <DataTable
@@ -142,8 +142,8 @@ const VariantVerification = ({
 export const Verification = ({ evalRun, variant }: { evalRun: EvalRun; variant?: string }) => (
   <Section title="Verification" anchor="verification">
     <p className="typo-body-small break-keep text-text-light">
-      kind × status 의 단위는 verification run 수다 (trace 수가 아님). unsupported·not-run 은 통과가
-      아니다. 검증 대상 범위(targetScope)는 trace 계약에 없어 이 화면에 없다.
+      kind × status 의 단위는 verification run 수 (trace 수가 아님). unsupported·not-run 은 통과가
+      아님. 검증 대상 범위(targetScope)는 trace 계약에 없어 이 화면에 없음.
     </p>
     {evalRun.variants.length === 0 && (
       <StatusNotice

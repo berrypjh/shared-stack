@@ -12,13 +12,7 @@ import { LINK } from '../ui/entity-link';
 const captionOf = (entity: Entity) => {
   switch (entity.section) {
     case 'journeys':
-      return [
-        entity.record.platform && PLATFORM[entity.record.platform],
-        `단계 ${entity.record.steps.length}개`,
-        entity.record.goal,
-      ]
-        .filter(Boolean)
-        .join(' · ');
+      return `단계 ${entity.record.steps.length}개 · ${entity.record.goal}`;
     case 'packages':
       return `${entity.record.packageName} · ${VISIBILITY[entity.record.visibility]} · ${PLATFORM[entity.record.platform]}`;
     case 'plugins':

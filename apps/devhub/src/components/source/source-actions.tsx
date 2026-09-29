@@ -40,7 +40,7 @@ export const SourceActions = ({ source, lead }: { source: SourceRef; lead?: Reac
       views={views}
       warning={
         pinned.gap === 'uncommitted'
-          ? '스냅샷 커밋에 없는 경로(커밋되지 않음) — 링크를 만들지 않았다'
+          ? '스냅샷 커밋에 없는 경로(커밋되지 않음) — 링크를 만들지 않았음'
           : undefined
       }
       actions={

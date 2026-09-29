@@ -109,12 +109,12 @@ export const inspect = (catalog: Catalog, id: string): Inspection | undefined =>
       ...flows(catalog.relations.filter((r) => r.kind === 'verification' && r.from === id)),
     ],
     empty: {
-      upstream: '이 항목이 기대는 의존 관계가 카탈로그에 없다',
-      downstream: '이 항목에 기대는 의존 관계가 카탈로그에 없다',
-      artifacts: '이 항목이 만들거나 싣는 생성물 관계가 카탈로그에 없다',
-      documents: '이 항목을 설명하는 문서가 카탈로그에 없다',
-      tests: noTest ? noTest.note : '이 항목을 확인하는 테스트 묶음이 카탈로그에 없다',
-      related: '이 항목을 검증하거나 이 항목이 검증하는 관계가 없다',
+      upstream: '이 항목이 기대는 의존 관계가 카탈로그에 없음',
+      downstream: '이 항목에 기대는 의존 관계가 카탈로그에 없음',
+      artifacts: '이 항목이 만들거나 싣는 생성물 관계가 카탈로그에 없음',
+      documents: '이 항목을 설명하는 문서가 카탈로그에 없음',
+      tests: noTest ? noTest.note : '이 항목을 확인하는 테스트 묶음이 카탈로그에 없음',
+      related: '이 항목을 검증하거나 이 항목이 검증하는 관계가 없음',
     },
   };
 };

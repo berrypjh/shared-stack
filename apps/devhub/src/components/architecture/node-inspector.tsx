@@ -68,7 +68,7 @@ export const NodeInspector = ({
           </List>
         ) : (
           <p className="typo-body-small text-text-light">
-            없음 — 카탈로그에 이 구성 요소의 관계가 없다
+            없음 — 카탈로그에 이 구성 요소의 관계가 없음
           </p>
         )}
       </section>

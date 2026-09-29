@@ -81,9 +81,9 @@ describe('observationValueText — 값이 없으면 dash 가 아니라 이유를
         unit: 'ratio',
         value: null,
         denominator: null,
-        reason: 'static profile 은 실행하지 않는다',
+        reason: 'static profile 은 실행하지 않음',
       }),
-    ).toBe('실행 안 함 — static profile 은 실행하지 않는다');
+    ).toBe('실행 안 함 — static profile 은 실행하지 않음');
   });
 });
 
@@ -91,8 +91,8 @@ describe('countText', () => {
   it('0 은 0 이고 null 은 이유다', () => {
     expect(countText({ value: 0, reason: null })).toBe('0');
     expect(countText({ value: 1201, reason: null })).toBe('1,201');
-    expect(countText({ value: null, reason: 'report 가 없다' })).toBe(
-      '측정 안 됨 — report 가 없다',
+    expect(countText({ value: null, reason: 'report 가 없음' })).toBe(
+      '측정 안 됨 — report 가 없음',
     );
   });
 });

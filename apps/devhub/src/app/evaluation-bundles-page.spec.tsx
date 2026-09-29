@@ -34,7 +34,7 @@ describe('번들', () => {
       'size-limit',
       'brotli',
       'size-limit-empty-project-subtracted',
-      'baseline 으로 비교할 실행을 고르지 않았다',
+      'baseline 으로 비교할 실행을 고르지 않았음',
     ]) {
       expect(full.textContent).toContain(text);
     }
@@ -68,7 +68,7 @@ describe('번들', () => {
 
   it('baseline 실행에 같은 case 가 없으면 delta 가 아니라 missing 이다', async () => {
     renderEvaluation('/evaluation/bundles?run=run-bundle&base=run-core', files());
-    await main().findByText('run-core 에 이 case 가 없다');
+    await main().findByText('run-core 에 이 case 가 없음');
     expect(budgetRows()[1].textContent).not.toMatch(/baseline \d/);
     expect(budgetRows()[0].textContent).toContain('0 B (0.00%)');
   });
@@ -97,14 +97,14 @@ describe('번들', () => {
   it('tree-shake 가 실행되지 않았으면 이유·명령을 주고, floor 주석은 과거 조사로 표시한다', async () => {
     renderEvaluation('/evaluation/bundles?run=run-core', files());
     expect(
-      await main().findByText('run-core 는 이 영역을 실행하지 않았다 — tree-shaking 측정'),
+      await main().findByText('run-core 는 이 영역을 실행하지 않았음 — tree-shaking 측정'),
     ).toBeTruthy();
     expect(
       main().getByText(/--only-imports: import 한 report 가 없어 실행하지 않았다/),
     ).toBeTruthy();
     const note = main().getByRole('note', { name: '과거 조사 기록' });
     expect(note.textContent).toContain('.size-limit.cjs');
-    expect(note.textContent).toContain('현재 HEAD 의 원인을 확정한 측정이 아니다');
+    expect(note.textContent).toContain('현재 HEAD 의 원인을 확정한 측정이 아님');
   });
 
   it('package 필터는 부분 집합임을 알리고 원본 판정을 다시 계산하지 않는다', async () => {
@@ -115,14 +115,14 @@ describe('번들', () => {
     expect(budgetRows()).toHaveLength(1);
     expect(
       main().getByText(
-        'size-limit 2행 중 필터와 일치 1행 — 필터 결과는 부분 집합이며 판정을 다시 계산하지 않는다',
+        'size-limit 2행 중 필터와 일치 1행 — 필터 결과는 부분 집합이며 판정을 다시 계산하지 않음',
       ),
     ).toBeTruthy();
   });
 
   it('bundle 측정이 없는 실행은 unsupported 다', async () => {
     renderEvaluation('/evaluation/bundles?run=run-static', files());
-    expect(await main().findByText('run-static 에는 이 영역이 없다 — bundle 측정')).toBeTruthy();
+    expect(await main().findByText('run-static 에는 이 영역이 없음 — bundle 측정')).toBeTruthy();
   });
 
   it('#bundle-<id> 로 오면 그 budget 행이 포커스를 받는다', async () => {

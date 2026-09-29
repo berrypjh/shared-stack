@@ -60,7 +60,7 @@ export const Retrieval = ({ evalRun, variant }: { evalRun: EvalRun; variant?: st
     <Section title="Retrieval" anchor="retrieval">
       <p className="typo-body-small break-keep text-text-light">
         RR 은 전체 ranked list 에서의 reciprocal rank 다 (top-K 로 자르지 않음). evidence 중복(같은
-        evidence 를 다시 가져옴)과 tool call 중복(같은 대상을 다시 읽음)은 다른 신호다. required
+        evidence 를 다시 가져옴)과 tool call 중복(같은 대상을 다시 읽음)은 다른 신호. required
         evidence 가 없는 task 는 N/A 다.
       </p>
       <DataTable

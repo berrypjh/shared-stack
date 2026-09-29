@@ -1,6 +1,5 @@
 import type {
   Application,
-  ConsumerJourney,
   EvidenceGap,
   PackageKind,
   Platform,
@@ -72,11 +71,6 @@ export const RECORD_KIND: Record<RecordRef['kind'], string> = {
   decision: '설계 결정',
   fix: '문제 해결',
   implementation: '구현',
-};
-
-export const ACTOR: Record<ConsumerJourney['actor'], string> = {
-  consumer: '소비자 흐름',
-  maintainer: '유지보수 흐름',
 };
 
 /**

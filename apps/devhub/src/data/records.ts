@@ -52,11 +52,11 @@ export const records: RecordRef[] = [
     brokenLinks: [
       {
         href: '../demo/web.md',
-        note: '2026-09-30 삭제 — 데모 실행 방법은 루트 README.md 로 옮겼다',
+        note: '2026-09-30 삭제 — 데모 실행 방법은 루트 README.md 로 옮겼음',
       },
       {
         href: '../demo/mobile.md',
-        note: '2026-09-30 삭제 — 데모 실행 방법은 루트 README.md 로 옮겼다',
+        note: '2026-09-30 삭제 — 데모 실행 방법은 루트 README.md 로 옮겼음',
       },
     ],
   },
@@ -371,5 +371,20 @@ export const records: RecordRef[] = [
     ],
     docs: ['devhub-agents', 'observability-architecture'],
     tests: ['devhub-vitest', 'tools-vitest', 'observability-contracts-vitest'],
+  },
+  {
+    id: 'devhub-ko-ui',
+    path: 'docs/records/2026-09-30-devhub-ko-ui.md',
+    title: 'DevHub 화면 문구에 ko-ui 채택, 어미는 명사형',
+    kind: 'decision',
+    date: '2026-09-30',
+    summary:
+      'docs-ko 는 markdown 전용이라 DevHub 문구에는 ko-ui 를 켜고 profile 어미를 명사형으로. devhub-ui 제외, 기존 문구도 명사형으로 전환',
+    sources: [
+      { path: '.claude/standards.json', symbol: 'ko-ui' },
+      { path: '.claude/harness.profile.md', symbol: 'locale 과 제품 정책' },
+    ],
+    docs: ['harness-profile', 'standards-ko-ui', 'claude-harness-standards-sources'],
+    tests: ['tools-vitest', 'devhub-vitest'],
   },
 ];

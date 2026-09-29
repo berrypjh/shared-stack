@@ -24,7 +24,7 @@ const TreeshakePackage = ({ group }: { group: TreeshakeGroup }) => (
         <BarChart
           key={compression}
           title={`Tree-shaking — ${group.package} · ${COMPRESSION_TITLE[compression]}`}
-          description="esbuild standalone 번들 크기다. size-limit 조정값과 method 가 달라 budget 과 비교하지 않고, 축은 이 압축 안의 최댓값이다"
+          description="esbuild standalone 번들 크기. size-limit 조정값과 method 가 달라 budget 과 비교하지 않고, 축은 이 압축 안의 최댓값"
           unit="bytes"
           groups={TREESHAKE_KINDS.flatMap((kind) => {
             const items = bars.filter((bar) => bar.kind === kind);

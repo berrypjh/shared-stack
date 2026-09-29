@@ -13,9 +13,9 @@ export type BudgetBar =
 
 /** 같은 측정의 current·limit 로만 막대를 만든다. 값이 없으면 0 막대가 아니라 gap 이다. */
 export const budgetBarOf = (measurement: BundleMeasurement): BudgetBar => {
-  if (!measurement.budget) return { kind: 'none', reason: '한도가 없는 진단 값이다' };
+  if (!measurement.budget) return { kind: 'none', reason: '한도가 없는 진단 값' };
   if (measurement.value === null) {
-    return { kind: 'gap', reason: measurement.reason ?? '값이 없다' };
+    return { kind: 'gap', reason: measurement.reason ?? '값이 없음' };
   }
   const limit = measurement.budget.limitBytes;
   return { kind: 'budget', value: measurement.value, limit, over: measurement.value > limit };
@@ -34,10 +34,10 @@ export const baselineCellOf = (
   baseline: BaselineRun | null,
 ): BaselineCell => {
   if (!baseline) {
-    return { status: 'no-baseline', reason: 'baseline 으로 비교할 실행을 고르지 않았다' };
+    return { status: 'no-baseline', reason: 'baseline 으로 비교할 실행을 고르지 않았음' };
   }
   const previous = baseline.bundles.find((row) => row.id === current.id);
-  if (!previous) return { status: 'missing', reason: `${baseline.runId} 에 이 case 가 없다` };
+  if (!previous) return { status: 'missing', reason: `${baseline.runId} 에 이 case 가 없음` };
   const comparison = compareBundle(current, previous);
   if (!comparison.comparable || comparison.deltaBytes === null || previous.value === null) {
     return { status: 'not-comparable', reasons: comparison.reasons };
@@ -134,7 +134,7 @@ export const groupedBars = (
       caseName: scenario.caseName,
       kind: scenario.kind,
       value: row?.value ?? null,
-      reason: row ? row.reason : '이 압축으로 측정한 행이 없다',
+      reason: row ? row.reason : '이 압축으로 측정한 행이 없음',
     };
   });
   const values = bars.flatMap((bar) => (bar.value === null ? [] : [bar.value]));

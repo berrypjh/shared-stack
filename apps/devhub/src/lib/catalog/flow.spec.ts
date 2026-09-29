@@ -1,5 +1,6 @@
 // @vitest-environment node
 import { catalog } from '../../data';
+import type { Journey, JourneyStep } from '../../domain/model';
 
 import { flowModel, NODE } from './flow';
 import { inspectStep } from './inspect-step';
@@ -8,10 +9,32 @@ const models = catalog.journeys.map((journey) => ({
   journey,
   model: flowModel(journey, catalog.contexts),
 }));
-const of = (id: string) => {
-  const found = models.find(({ journey }) => journey.id === id);
-  if (!found) throw new Error(`no journey ${id}`);
-  return found;
+
+const step = (id: string, over: Partial<JourneyStep> = {}): JourneyStep => ({
+  id,
+  intent: id,
+  behavior: id,
+  context: 'ci',
+  owner: 'release-scripts',
+  status: 'implemented',
+  source: [{ path: 'nx.json' }],
+  tests: [],
+  docs: [],
+  next: [],
+  ...over,
+});
+
+/** 한 단계에서 두 레인으로 갈라지고, 저장소 밖 단계를 하나 가진 흐름. */
+const branching: Journey = {
+  id: 'branching',
+  title: '분기',
+  goal: '분기',
+  steps: [
+    step('start', { next: ['left', 'right'] }),
+    step('left'),
+    step('right', { context: 'registry' }),
+    step('outside', { status: 'documented-only', source: [], docs: ['root-agents'] }),
+  ],
 };
 
 describe('flow model', () => {
@@ -50,41 +73,32 @@ describe('flow model', () => {
     }
   });
 
-  it('splits the token build into web and React Native side by side', () => {
-    const { model } = of('token-pipeline');
-    const web = model.nodes.find((n) => n.id === 'web');
-    const rn = model.nodes.find((n) => n.id === 'rn');
-    expect(web?.x).toBe(rn?.x);
-    expect(web?.y).not.toBe(rn?.y);
-  });
-
-  it('starts web and React Native registration separately and joins them at verification', () => {
-    const { journey } = of('component-export');
-    const targets = new Set(journey.steps.flatMap((step) => step.next));
-    expect(journey.steps.filter((s) => !targets.has(s.id)).map((s) => s.id)).toEqual([
-      'web-register',
-      'rn-register',
-    ]);
+  it('draws the branches of one step side by side in their own lanes', () => {
+    const model = flowModel(branching, catalog.contexts);
+    const left = model.nodes.find((n) => n.id === 'left');
+    const right = model.nodes.find((n) => n.id === 'right');
+    expect(left?.x).toBe(right?.x);
+    expect(left?.y).not.toBe(right?.y);
   });
 });
 
 describe('inspectStep', () => {
   it('resolves the step, its context, next steps, and evidence lists', () => {
-    const inspection = inspectStep(catalog, 'token-pipeline', 'facade');
-    expect(inspection?.order).toBe(3);
-    expect(inspection?.context?.id).toBe('workspace');
-    expect(inspection?.next.map((n) => n.id)).toEqual(['web', 'rn']);
-    expect(inspection?.tests.map((suite) => suite.id)).toEqual(['ui-core-vitest']);
+    const inspection = inspectStep(catalog, 'release', 'version');
+    expect(inspection?.order).toBe(2);
+    expect(inspection?.context?.id).toBe('ci');
+    expect(inspection?.next.map((n) => n.id)).toEqual(['changelog']);
+    expect(inspection?.tests.map((suite) => suite.id)).toEqual(['tools-vitest']);
   });
 
   it('explains a documented-only step that has no repository source', () => {
-    const inspection = inspectStep(catalog, 'web-consumer', 'install');
+    const inspection = inspectStep({ ...catalog, journeys: [branching] }, 'branching', 'outside');
     expect(inspection?.step.source).toEqual([]);
-    expect(inspection?.empty.source).toContain('문서만 말한다');
+    expect(inspection?.empty.source).toContain('문서만 말함');
   });
 
   it('returns nothing for an unknown journey or step', () => {
-    expect(inspectStep(catalog, 'no-such-journey', 'install')).toBeUndefined();
-    expect(inspectStep(catalog, 'web-consumer', 'no-such-step')).toBeUndefined();
+    expect(inspectStep(catalog, 'no-such-journey', 'push')).toBeUndefined();
+    expect(inspectStep(catalog, 'release', 'no-such-step')).toBeUndefined();
   });
 });

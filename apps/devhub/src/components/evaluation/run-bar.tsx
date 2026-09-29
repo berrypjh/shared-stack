@@ -11,11 +11,11 @@ import type { RunData } from './use-run-data';
  */
 export const RunBar = ({ data }: { data: RunData }) => {
   const message = data.loading
-    ? '실행을 불러오는 중이다'
+    ? '실행을 불러오는 중'
     : data.view
       ? `${VIEW_STATE_LABEL[data.view.kind]}: ${data.view.title}`
       : data.selectedRunId
-        ? `${data.selectedRunId} 실행을 불러왔다`
+        ? `${data.selectedRunId} 실행을 불러왔음`
         : '';
 
   return (

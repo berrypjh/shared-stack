@@ -47,9 +47,9 @@ export const ArchitecturePage = () => {
       <WorkspaceFrame>
         <WorkspaceHeader eyebrow="아키텍처" icon="architecture" title="현재 구조" />
         <p className="typo-body-small">
-          카탈로그 관계만 그렸다. 선 하나가 관계 하나이고, 종류는 선 모양과 라벨로 나뉜다. 화살표는
-          흐름 방향이다: 의존은 기대는 대상 → 기대는 쪽, 생성물은 만든 쪽 → 싣는 쪽, 검증은 검증하는
-          쪽 → 대상.
+          카탈로그 관계만 그렸음. 선 하나가 관계 하나이고, 종류는 선 모양과 라벨로 나뉨. 화살표는
+          흐름 방향: 의존은 기대는 대상 → 기대는 쪽, 생성물은 만든 쪽 → 싣는 쪽, 검증은 검증하는 쪽
+          → 대상.
         </p>
         <WorkspaceSection id="architecture-map" title="구성 요소와 관계">
           <ViewSwitch

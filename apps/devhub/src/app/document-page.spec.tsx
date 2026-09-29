@@ -149,22 +149,19 @@ describe('document inspector', () => {
     expect(headings).toEqual(['개요', '소스', '문서', '테스트']);
   });
 
-  it('names who cites the document in the overview: entities and journey steps', async () => {
+  it('names who cites the document in the overview', async () => {
     await renderAt('/documents/consumer-retrieval-readme');
     const panel = within(inspector());
     const overview = within(panel.getByRole('region', { name: /^개요/ }));
     expect(overview.getByRole('link', { name: 'consumer-retrieval' }).getAttribute('href')).toBe(
       `/architecture/consumer-retrieval#${INSPECTOR_ID}`,
     );
-    expect(
-      overview.getByRole('link', { name: '1. 조회 도구를 패키지에 싣는다' }).getAttribute('href'),
-    ).toBe(`/journeys/retrieval-lookup/steps/bundle#${INSPECTOR_ID}`);
   });
 
   it('says why a document has no citations instead of leaving the section out', async () => {
     await renderAt('/documents/root-agents');
     expect(inspector().textContent).toContain(
-      '없음 — 앱 · 패키지 · 도구 중 이 문서를 근거로 드는 것이 없다',
+      '없음 — 앱 · 패키지 · 도구 중 이 문서를 근거로 드는 것이 없음',
     );
   });
 

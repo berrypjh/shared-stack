@@ -83,10 +83,10 @@ export const PluginInspector = ({
         <SourceGroups refs={source} />
       </InspectorSection>
       <InspectorSection {...DOCS} count={documents.length}>
-        <DocumentRows items={documents} empty="이 플러그인을 설명하는 문서가 카탈로그에 없다" />
+        <DocumentRows items={documents} empty="이 플러그인을 설명하는 문서가 카탈로그에 없음" />
       </InspectorSection>
       <InspectorSection {...TESTS} count={tests.length} summary={countByRunner(tests)}>
-        <TestRows items={tests} empty="이 플러그인을 직접 대상으로 하는 테스트 묶음이 없다" />
+        <TestRows items={tests} empty="이 플러그인을 직접 대상으로 하는 테스트 묶음이 없음" />
         {verifiers.length > 0 && (
           <p className="flex flex-wrap gap-x-sm typo-body-small">
             <span className="text-text-light">검증하는 쪽</span>

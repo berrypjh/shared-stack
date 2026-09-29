@@ -72,7 +72,7 @@ describe('개요 — 실제 loader 결과', () => {
     const link = await within(evals).findByRole('link', { name: 'run-eval' });
     expect(link.getAttribute('href')).toBe('/evaluation/ai?run=run-eval');
     expect(evals.textContent).toContain('이 영역이 있는 실행: run-eval');
-    expect(evals.textContent).not.toContain('이 영역이 있는 공개 실행이 없다');
+    expect(evals.textContent).not.toContain('이 영역이 있는 공개 실행이 없음');
   });
 
   it('어느 공개 실행에도 평가가 없으면 그렇게 말한다', async () => {
@@ -83,7 +83,7 @@ describe('개요 — 실제 loader 결과', () => {
         '/observability/runs/run-quality.summary.json',
       ),
     );
-    await waitFor(() => expect(evals.textContent).toContain('이 영역이 있는 공개 실행이 없다'));
+    await waitFor(() => expect(evals.textContent).toContain('이 영역이 있는 공개 실행이 없음'));
     expect(within(evals).queryByRole('link', { name: /^run-/ })).toBeNull();
   });
 
@@ -105,8 +105,8 @@ describe('개요 — 실제 loader 결과', () => {
       { expectedSha: OTHER_SHA },
     );
     const status = await region('실행 상태');
-    expect(await within(status).findByText('기준 source 와 다른 실행이다')).toBeTruthy();
-    expect(within(status).getByText('일부만 수집된 실행이다')).toBeTruthy();
+    expect(await within(status).findByText('기준 source 와 다른 실행')).toBeTruthy();
+    expect(within(status).getByText('일부만 수집된 실행')).toBeTruthy();
   });
 
   it('baseline 비교는 아직 없다고 말한다', async () => {
@@ -178,13 +178,13 @@ describe('개요 — 근거까지 두 단계', () => {
 describe('개요 — 비정상 상태', () => {
   it('주소의 run 이 index 에 없으면 명시 오류다', async () => {
     renderEvaluation('/evaluation?run=run-z', files());
-    expect(await main().findByText('run-z 실행이 index 에 없다')).toBeTruthy();
+    expect(await main().findByText('run-z 실행이 index 에 없음')).toBeTruthy();
     expect(main().queryByRole('region', { name: '번들 budget' })).toBeNull();
   });
 
   it('모르는 query 는 조용히 버리지 않는다', async () => {
     renderEvaluation('/evaluation?foo=1', files());
-    expect(await main().findByText('주소의 필터를 읽을 수 없다')).toBeTruthy();
+    expect(await main().findByText('주소의 필터를 읽을 수 없음')).toBeTruthy();
     expect(main().getByText(/알 수 없는 query: foo/)).toBeTruthy();
   });
 
@@ -192,7 +192,7 @@ describe('개요 — 비정상 상태', () => {
     const broken = files();
     broken['/observability/runs/run-quality.summary.json'] = { metadata: 'broken' };
     renderEvaluation('/evaluation', broken);
-    expect(await main().findByText('공개 artifact 가 계약과 맞지 않는다')).toBeTruthy();
+    expect(await main().findByText('공개 artifact 가 계약과 맞지 않음')).toBeTruthy();
     expect(main().getByText('pnpm quality:export --run-id=run-quality')).toBeTruthy();
   });
 
@@ -201,13 +201,13 @@ describe('개요 — 비정상 상태', () => {
       '/evaluation',
       publicFiles([qualityArtifact('run-quality')], { summaries: false }),
     );
-    expect(await main().findByText(/요약 파일이 index 에 없다/)).toBeTruthy();
+    expect(await main().findByText(/요약 파일이 index 에 없음/)).toBeTruthy();
     expect(calls.map((call) => call.url)).not.toContain('/observability/runs/run-quality.json');
   });
 
   it('데이터가 없는 clean clone 은 미수집 상태와 복사 버튼만 보여 준다', async () => {
     renderEvaluation('/evaluation', {});
-    expect(await main().findByRole('heading', { name: '아직 수집한 실행이 없다' })).toBeTruthy();
+    expect(await main().findByRole('heading', { name: '아직 수집한 실행이 없음' })).toBeTruthy();
     expect(main().getByText('pnpm quality:export --run-id=<새-run-id>')).toBeTruthy();
     expect(main().getAllByRole('button', { name: /복사/ })).toHaveLength(2);
     expect(main().queryByRole('table')).toBeNull();

@@ -15,20 +15,20 @@ export const EVALUATION_SCREENS = [
     id: 'overview',
     path: '/evaluation',
     label: '개요',
-    lead: '실행 하나의 번들 budget · 컨텍스트 · 평가를 서로 합치지 않고 독립 카드로 보여 준다.',
+    lead: '실행 하나의 번들 budget · 컨텍스트 · 평가를 서로 합치지 않고 독립 카드로 보여 줌.',
   },
   {
     id: 'bundles',
     path: '/evaluation/bundles',
     label: '번들',
-    lead: 'size-limit budget 과 esbuild tree-shaking 진단을 method · 압축 · 조정 조건과 함께 본다. 조건이 모두 같을 때만 baseline delta 를 낸다.',
+    lead: 'size-limit budget 과 esbuild tree-shaking 진단을 method · 압축 · 조정 조건과 함께 봄. 조건이 모두 같을 때만 baseline delta 를 냄.',
     group: '품질',
   },
   {
     id: 'ai',
     path: '/evaluation/ai',
     label: 'AI 평가',
-    lead: '평가 metric 을 원본 이름 · 분자 · 분모 · n 과 executor 출처와 함께 본다. 서로 다른 metric 을 합친 점수는 없다.',
+    lead: '평가 metric 을 원본 이름 · 분자 · 분모 · n 과 executor 출처와 함께 봄. 서로 다른 metric 을 합친 점수는 없음.',
     group: 'AI',
   },
 ] as const satisfies readonly EvaluationScreen[];

@@ -61,8 +61,8 @@ export const Routing = ({ evalRun, variant }: { evalRun: EvalRun; variant?: stri
   return (
     <Section title="Routing" anchor="routing">
       <p className="typo-body-small break-keep text-text-light">
-        행은 기대 platform, 열은 예측 platform 이다. 순서는 고정이고 both·unreported 를 숨기지
-        않는다. 칸의 0 은 관측한 0 이고, 결과 자체가 없는 matrix 는 표 대신 따로 알린다.
+        행은 기대 platform, 열은 예측 platform. 순서는 고정이고 both·unreported 를 숨기지 않음. 칸의
+        0 은 관측한 0 이고, 결과 자체가 없는 matrix 는 표 대신 따로 알림.
       </p>
       {resolver ? (
         <ConfusionTable caption="Routing — deterministic-resolver" matrix={resolver} />
@@ -93,7 +93,7 @@ export const Routing = ({ evalRun, variant }: { evalRun: EvalRun; variant?: stri
             state={notRunState({
               section: `${item.variant} 의 trace-grades routing`,
               runId: evalRun.sourceId,
-              reason: '이 variant 의 채점한 trace routing 결과가 없다',
+              reason: '이 variant 의 채점한 trace routing 결과가 없음',
               collectProfile: 'eval',
               alternatives: null,
             })}
@@ -102,7 +102,7 @@ export const Routing = ({ evalRun, variant }: { evalRun: EvalRun; variant?: stri
       })}
       {failures.length === 0 ? (
         <p className="typo-body-small text-text-light">
-          routing 이 틀리거나 미보고인 trace 가 없다.
+          routing 이 틀리거나 미보고인 trace 가 없음.
         </p>
       ) : (
         <DataTable

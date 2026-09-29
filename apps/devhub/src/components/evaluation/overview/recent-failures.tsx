@@ -14,11 +14,11 @@ export const RecentFailures = ({ summary }: { summary: RunSummary }) => {
   return (
     <Section title="최근 실패">
       <p className="typo-body-small break-keep text-text-light">
-        원본 판정이 fail 인 행만 모았다. 실행하지 않았거나 값이 없는 관측 {withoutValue.length}
-        개는 실패로 세지 않았다.
+        원본 판정이 fail 인 행만 모았음. 실행하지 않았거나 값이 없는 관측 {withoutValue.length}
+        개는 실패로 세지 않았음.
       </p>
       {summary.failures.length === 0 ? (
-        <p className="typo-body-small text-text-default">원본 판정이 fail 인 행이 없다.</p>
+        <p className="typo-body-small text-text-default">원본 판정이 fail 인 행이 없음.</p>
       ) : (
         <List className="flex flex-col gap-sm typo-body-small">
           {summary.failures.map((failure, index) => (

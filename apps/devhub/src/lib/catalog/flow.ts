@@ -1,9 +1,4 @@
-import type {
-  ConsumerJourney,
-  ExecutionContext,
-  JourneyStep,
-  StepStatus,
-} from '../../domain/model';
+import type { ExecutionContext, Journey, JourneyStep, StepStatus } from '../../domain/model';
 
 /**
  * 흐름 그림의 좌표. 카탈로그 흐름에서 매번 유도하고 저장하지 않는다.
@@ -72,10 +67,7 @@ const edgePath = (from: FlowNode, to: FlowNode, back: boolean) => {
   return `M ${sx} ${sy} C ${sx + bend} ${sy}, ${tx - bend} ${ty}, ${tx} ${ty}`;
 };
 
-export const flowModel = (
-  journey: ConsumerJourney,
-  contexts: readonly ExecutionContext[],
-): FlowModel => {
+export const flowModel = (journey: Journey, contexts: readonly ExecutionContext[]): FlowModel => {
   const { steps } = journey;
   const column = columnsOf(steps);
   const used = contexts.filter((context) => steps.some((step) => step.context === context.id));

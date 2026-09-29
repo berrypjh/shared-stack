@@ -37,7 +37,7 @@ describe('budgetBarOf — 같은 측정의 current·limit 만 그린다', () => 
   it('한도가 없는 진단 값에는 budget 막대가 없다', () => {
     expect(budgetBarOf(parse(treeshake('single: cx', '{ cx }', 'gzip', 10697)))).toEqual({
       kind: 'none',
-      reason: '한도가 없는 진단 값이다',
+      reason: '한도가 없는 진단 값',
     });
   });
 });
@@ -48,14 +48,14 @@ describe('baselineCellOf — 조건이 같을 때만 delta', () => {
   it('baseline 실행이 없으면 no-baseline 이다 — 0 delta 가 아니다', () => {
     expect(baselineCellOf(current, null)).toEqual({
       status: 'no-baseline',
-      reason: 'baseline 으로 비교할 실행을 고르지 않았다',
+      reason: 'baseline 으로 비교할 실행을 고르지 않았음',
     });
   });
 
   it('baseline 실행에 같은 case 가 없으면 missing 이다', () => {
     expect(baselineCellOf(current, { runId: 'run-base', bundles: [] })).toEqual({
       status: 'missing',
-      reason: 'run-base 에 이 case 가 없다',
+      reason: 'run-base 에 이 case 가 없음',
     });
   });
 

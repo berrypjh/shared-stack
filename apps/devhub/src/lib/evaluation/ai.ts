@@ -178,9 +178,9 @@ export const contextEmptyState = ({
   if (scope === 'agent-input') {
     return {
       ...notApplicableState(
-        'executor trace 가 있을 때만 의미가 있는 scope 라 아직 어느 수집기도 측정하지 않는다. 다시 수집해도 생기지 않는다.',
+        'executor trace 가 있을 때만 의미가 있는 scope 라 아직 어느 수집기도 측정하지 않음. 다시 수집해도 생기지 않음.',
       ),
-      title: `이 영역을 측정하는 수집기가 아직 없다 — ${section}`,
+      title: `이 영역을 측정하는 수집기가 아직 없음 — ${section}`,
     };
   }
   const failedImport = evals.find((item) => item.import.context.status !== 'parsed')?.import

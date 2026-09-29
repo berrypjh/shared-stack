@@ -19,22 +19,22 @@ const PANEL: Record<Panel, { scope: ContextScope; label: string; lead: string }>
   initial: {
     scope: 'variant-initial',
     label: 'variant-initial',
-    lead: 'variant 가 처음 받는 context 를 이어 붙여 센 token 수다. trial 의 medianInputTokens 와 다른 측정이다.',
+    lead: 'variant 가 처음 받는 context 를 이어 붙여 센 token 수. trial 의 medianInputTokens 와 다른 측정.',
   },
   routed: {
     scope: 'variant-routed',
     label: 'variant-routed',
-    lead: 'routing 뒤 platform 별로 받는 context 다. initial 과 감소량은 수집기가 계산하지 않아 두 panel 의 값을 따로 둔다.',
+    lead: 'routing 뒤 platform 별로 받는 context 다. initial 과 감소량은 수집기가 계산하지 않아 두 panel 의 값을 따로 둠.',
   },
   scenario: {
     scope: 'package-scenario',
     label: 'package-scenario',
-    lead: 'package 시나리오마다 파일을 읽어 센 token 수다. 평가 variant 와 다른 입력이다.',
+    lead: 'package 시나리오마다 파일을 읽어 센 token 수. 평가 variant 와 다른 입력.',
   },
   'agent-input': {
     scope: 'agent-input',
     label: 'agent-input (실제 입력)',
-    lead: 'live executor 가 보고한 실제 입력 token 이다.',
+    lead: 'live executor 가 보고한 실제 입력 token.',
   },
 };
 

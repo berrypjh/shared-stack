@@ -142,12 +142,12 @@ describe('filters', () => {
     const user = userEvent.setup();
     renderAt('/architecture?kind=application&platform=platform-neutral');
     expect(within(screen.getByRole('main')).getByRole('status').textContent).toContain(
-      '조건에 맞는 구성 요소가 없습니다',
+      '조건에 맞는 구성 요소가 없음',
     );
     expect(screen.queryByRole('group', { name: '아키텍처 그림' })).toBeNull();
     await showList(user);
     expect(within(screen.getByRole('main')).getByRole('status').textContent).toContain(
-      '조건에 맞는 구성 요소가 없습니다',
+      '조건에 맞는 구성 요소가 없음',
     );
     expect(screen.getByRole('link', { name: '필터 모두 해제' }).getAttribute('href')).toBe(
       '/architecture',

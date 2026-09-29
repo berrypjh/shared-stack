@@ -12,7 +12,7 @@ export const applications: Application[] = [
     nxManifest: { path: 'apps/demo-web/project.json' },
     platform: 'web',
     purpose:
-      'react-ui 를 실제 앱에 통합했을 때 살아 있는 것 — 테마 전환 · CSS 캐스케이드 · Tailwind preset · 패키지 경계 — 을 확인한다',
+      'react-ui 를 실제 앱에 통합했을 때 살아 있는 것 — 테마 전환 · CSS 캐스케이드 · Tailwind preset · 패키지 경계 — 을 확인함',
     docs: ['demo-web-agents', 'root-readme'],
     source: [{ path: 'apps/demo-web/src/main.tsx' }],
   },
@@ -32,7 +32,7 @@ export const applications: Application[] = [
     gaps: [
       {
         kind: 'no-test',
-        note: '테스트 파일도 test target 도 없다. 통합 결과는 기기에서 눈으로 확인한다',
+        note: '테스트 파일도 test target 도 없음. 통합 결과는 기기에서 눈으로 확인함',
         evidence: [
           { path: '.claude/rules/demo-mobile.md' },
           { path: 'apps/demo-mobile/project.json' },
@@ -48,7 +48,7 @@ export const applications: Application[] = [
     nxManifest: { path: 'apps/devhub-e2e/project.json' },
     platform: 'node',
     purpose:
-      'devhub 를 실제 브라우저에서 확인한다 — 셸 키보드 · 반응형 · 검색 · 딥링크 · dialog 포커스 · 평가 화면. 앱 소스를 import 하지 않고 평가 fixture 는 공개 계약으로만 만든다',
+      'devhub 를 실제 브라우저에서 확인함 — 셸 키보드 · 반응형 · 검색 · 딥링크 · dialog 포커스 · 평가 화면. 앱 소스를 import 하지 않고 평가 fixture 는 공개 계약으로만 만듦',
     docs: ['devhub-e2e-agents'],
     source: [
       { path: 'apps/devhub-e2e/src/support/keyboard.ts', symbol: 'tabTo' },
@@ -66,7 +66,7 @@ export const applications: Application[] = [
     nxManifest: { path: 'apps/devhub/project.json' },
     platform: 'web',
     purpose:
-      '저장소의 구조와 근거를 탐색하고, 수집 · export 된 품질 결과를 계약으로 검증한 뒤에만 평가 화면에서 보여 준다',
+      '저장소의 구조와 근거를 탐색하고, 수집 · export 된 품질 결과를 계약으로 검증한 뒤에만 평가 화면에서 보여 줌',
     docs: [
       'devhub-agents',
       'records-agents',

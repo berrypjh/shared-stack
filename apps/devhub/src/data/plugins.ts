@@ -24,7 +24,7 @@ export const plugins: Plugin[] = [
         whenToUse:
           'Use when the user wants to create commit messages for staged git changes, especially when multiple apps/libs scopes are staged together.',
         whenToUseKo:
-          '사용자가 staged 된 git 변경의 커밋 메시지를 만들려 할 때, 특히 여러 apps · libs scope 가 함께 staged 되어 있을 때 쓴다.',
+          '사용자가 staged 된 git 변경의 커밋 메시지를 만들려 할 때, 특히 여러 apps · libs scope 가 함께 staged 되어 있을 때 씀.',
         argumentHint: '[scope] [major]',
         userOnly: true,
         source: { path: 'plugins/berry-commit/skills/commit-scope/SKILL.md' },
@@ -70,7 +70,7 @@ export const plugins: Plugin[] = [
         whenToUse:
           'Use after adding or changing UI code (screens, components, styles) and before reporting it as done, or when deciding whether to reuse an existing component or add a new one.',
         whenToUseKo:
-          '화면 · 컴포넌트 · 스타일 같은 UI 코드를 추가하거나 바꾼 뒤 완료를 보고하기 전에, 또는 기존 컴포넌트를 재사용할지 새로 만들지 정할 때 쓴다.',
+          '화면 · 컴포넌트 · 스타일 같은 UI 코드를 추가하거나 바꾼 뒤 완료를 보고하기 전에, 또는 기존 컴포넌트를 재사용할지 새로 만들지 정할 때 씀.',
         argumentHint: '[files|dir] (생략하면 git 변경분의 UI 파일)',
         userOnly: false,
         source: { path: 'plugins/berry-dev/skills/frontend-quality/SKILL.md' },
@@ -85,7 +85,7 @@ export const plugins: Plugin[] = [
         whenToUse:
           'Use after changing code or config in a repository, before reporting the work as done, or when unsure which projects a change affects and how far to escalate lint, typecheck, test and build.',
         whenToUseKo:
-          '저장소의 코드나 설정을 바꾼 뒤 완료를 보고하기 전에, 또는 변경이 어떤 프로젝트에 영향을 주는지 · lint · typecheck · test · build 중 어디까지 올려야 할지 확실하지 않을 때 쓴다.',
+          '저장소의 코드나 설정을 바꾼 뒤 완료를 보고하기 전에, 또는 변경이 어떤 프로젝트에 영향을 주는지 · lint · typecheck · test · build 중 어디까지 올려야 할지 확실하지 않을 때 씀.',
         argumentHint: '[files|project] (생략하면 git 변경분)',
         userOnly: false,
         source: { path: 'plugins/berry-dev/skills/repo-verify/SKILL.md' },
@@ -107,7 +107,7 @@ export const plugins: Plugin[] = [
             symbol: 'findSecretReason',
           },
           decision:
-            'secret 경로와 우회 수단이 한 명령에 함께 있을 때만 deny 한다. 둘 중 하나만 있으면 통과시킨다',
+            'secret 경로와 우회 수단이 한 명령에 함께 있을 때만 deny 함. 둘 중 하나만 있으면 통과시킴',
           targets: ['.env', '.env.*', '*.key', '*.p8', '*.p12', '*.jks', '*.mobileprovision'],
           exceptions: ['*.example', '*.sample', '*.template'],
           bypasses: [
@@ -122,7 +122,7 @@ export const plugins: Plugin[] = [
             },
           ],
           limits:
-            '명령 문자열을 단순 토큰으로 볼 뿐 셸 parser 도 OS sandbox 도 아니라 우회할 수 있다. 입력이 깨지거나 hook 이 실패하면 통과시킨다 — 보조 장치이지 마지막 방어선이 아니다',
+            '명령 문자열을 단순 토큰으로 볼 뿐 셸 parser 도 OS sandbox 도 아니라 우회할 수 있음. 입력이 깨지거나 hook 이 실패하면 통과시킴 — 보조 장치이지 마지막 방어선이 아님',
           evidence: [
             { path: 'docs/claude-harness/contracts.md', symbol: '## 7. secret hook' },
             { path: 'tools/scripts/claude-harness/guard.test.ts' },

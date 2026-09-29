@@ -33,11 +33,11 @@ describe('catalog index', () => {
     ['릴리스 스크립트', 'tool:release-scripts', '/architecture/release-scripts'],
     ['styles.css', 'export:@berrypjh/react-ui/styles.css', '/packages/react-ui#inspector-exports'],
     [
-      'buildTokenOutputs',
-      'symbol:libs/design-tokens/src/lib/pipeline.ts#buildTokenOutputs',
-      '/sources/libs/design-tokens/src/lib/pipeline.ts#symbol-buildTokenOutputs',
+      'hasBreakingChangeSinceLastTag',
+      'symbol:tools/scripts/release/release-npm.ts#hasBreakingChangeSinceLastTag',
+      '/sources/tools/scripts/release/release-npm.ts#symbol-hasBreakingChangeSinceLastTag',
     ],
-    ['token-pipeline', 'journey:token-pipeline', '/journeys/token-pipeline'],
+    ['패키지 릴리스', 'journey:release', '/journeys/release'],
     ['작업 기본 원칙', 'document:standards-core', '/documents/standards-core'],
     ['bash-guard-hook', 'record:bash-guard-hook', '/records/bash-guard-hook'],
   ])('ranks "%s" first as %s', (query, key, href) => {

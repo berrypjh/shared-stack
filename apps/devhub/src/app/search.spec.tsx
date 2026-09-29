@@ -124,38 +124,36 @@ describe('navigation from a result', () => {
   it('lands on a symbol of a source file, and selects a journey step by URL', async () => {
     const user = userEvent.setup();
     renderAt('/');
-    await choose(user, 'buildTokenOutputs');
+    await choose(user, 'hasBreakingChangeSinceLastTag');
     expect(location).toBe(
-      '/sources/libs/design-tokens/src/lib/pipeline.ts#symbol-buildTokenOutputs',
+      '/sources/tools/scripts/release/release-npm.ts#symbol-hasBreakingChangeSinceLastTag',
     );
-    expect(document.activeElement?.id).toBe('symbol-buildTokenOutputs');
+    expect(document.activeElement?.id).toBe('symbol-hasBreakingChangeSinceLastTag');
 
-    await choose(user, '토큰 값을 바꾼다');
-    expect(location).toBe('/journeys/token-pipeline/steps/edit');
+    await choose(user, '버전을 정함');
+    expect(location).toBe('/journeys/release/steps/version');
     const inspector = screen.getByRole('complementary', { name: '상세 정보' });
-    expect(within(inspector).getByRole('heading', { level: 2 }).textContent).toBe(
-      '토큰 값을 바꾼다',
-    );
+    expect(within(inspector).getByRole('heading', { level: 2 }).textContent).toBe('버전을 정함');
   });
 });
 
 describe('deep links', () => {
   it('focus a symbol when the page opens with its hash', () => {
-    renderAt('/sources/libs/design-tokens/src/lib/pipeline.ts#symbol-buildTokenOutputs');
-    expect(document.activeElement?.id).toBe('symbol-buildTokenOutputs');
+    renderAt('/sources/tools/scripts/release/release-npm.ts#symbol-hasBreakingChangeSinceLastTag');
+    expect(document.activeElement?.id).toBe('symbol-hasBreakingChangeSinceLastTag');
     expect(screen.getByRole('heading', { level: 1 }).textContent).toBe(
-      'libs/design-tokens/src/lib/pipeline.ts',
+      'tools/scripts/release/release-npm.ts',
     );
   });
 
   it('list who cites a source file, and say when the catalog cites nothing there', () => {
-    const { unmount } = renderAt('/sources/libs/design-tokens/src/lib/pipeline.ts');
+    const { unmount } = renderAt('/sources/tools/scripts/release/release-npm.ts');
     const citing = screen.getByRole('region', { name: /^인용하는 곳/ });
     expect(
       within(citing)
-        .getByRole('link', { name: /토큰 산출물을 만든다/ })
+        .getByRole('link', { name: /버전을 정함/ })
         .getAttribute('href'),
-    ).toBe('/journeys/token-pipeline/steps/generate');
+    ).toBe('/journeys/release/steps/version');
     unmount();
     renderAt('/sources/no/such/file.ts');
     expect(screen.getByRole('heading', { level: 1 }).textContent).toBe(

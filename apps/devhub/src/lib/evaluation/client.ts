@@ -65,7 +65,7 @@ export const fetchJson = async (
   if (response.status === 404) {
     return {
       ok: false,
-      problem: { status: 'missing', target, message: `${path} 파일이 없다` },
+      problem: { status: 'missing', target, message: `${path} 파일이 없음` },
     };
   }
   if (!response.ok) {
@@ -79,7 +79,7 @@ export const fetchJson = async (
   } catch {
     return {
       ok: false,
-      problem: { status: 'invalid', target, message: `${path} 은 JSON 이 아니다` },
+      problem: { status: 'invalid', target, message: `${path} 은 JSON 이 아님` },
     };
   }
 };
@@ -110,14 +110,14 @@ export const createClient = (fetcher: Fetcher, expectedSha: string) => {
     const result = await index();
     if (result.status === 'empty') {
       return {
-        problem: { status: 'missing', target: 'index', message: '공개 index 에 실행이 없다' },
+        problem: { status: 'missing', target: 'index', message: '공개 index 에 실행이 없음' },
       } as const;
     }
     if (result.status !== 'ready') return { problem: result };
     const entry = result.value.runs.find((run) => run.id === runId);
     if (!entry) {
       return {
-        problem: { status: 'missing', target, message: `index 에 ${runId} 실행이 없다` },
+        problem: { status: 'missing', target, message: `index 에 ${runId} 실행이 없음` },
       } as const;
     }
     return { entry };
@@ -137,7 +137,7 @@ export const createClient = (fetcher: Fetcher, expectedSha: string) => {
         return {
           status: 'invalid',
           target: 'run',
-          message: `${found.entry.path} 는 ${runId} 가 아니라 ${parsed.data.metadata.runId} 실행의 결과다`,
+          message: `${found.entry.path} 는 ${runId} 가 아니라 ${parsed.data.metadata.runId} 실행의 결과`,
         };
       }
       return { status: 'ready', value: parsed.data };
@@ -153,7 +153,7 @@ export const createClient = (fetcher: Fetcher, expectedSha: string) => {
           return {
             status: 'missing',
             target: 'summary',
-            message: `${runId} 의 요약 파일이 index 에 없다 — 다시 export 한다`,
+            message: `${runId} 의 요약 파일이 index 에 없음 — 다시 export 필요`,
           };
         }
         const full = await run(runId);
@@ -171,7 +171,7 @@ export const createClient = (fetcher: Fetcher, expectedSha: string) => {
         return {
           status: 'invalid',
           target: 'summary',
-          message: `${found.entry.summary} 는 ${runId} 가 아니라 ${parsed.data.metadata.runId} 실행의 요약이다`,
+          message: `${found.entry.summary} 는 ${runId} 가 아니라 ${parsed.data.metadata.runId} 실행의 요약`,
         };
       }
       return { status: 'ready', source: 'summary', value: parsed.data };

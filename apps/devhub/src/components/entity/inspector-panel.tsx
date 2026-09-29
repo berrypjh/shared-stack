@@ -126,12 +126,12 @@ const VisibilitySection = ({ inspection }: { inspection: Inspection }) => {
       <p className="typo-body-small">
         {visibility.value === 'public' ? (
           <>
-            <strong>공개</strong> — package.json 에 private 이 없어 npm 에 배포된다
+            <strong>공개</strong> — package.json 에 private 이 없어 npm 에 배포됨
           </>
         ) : (
           <>
             <strong>Internal</strong> — package.json 의 private: true. 배포되지 않고 워크스페이스
-            안에서만 쓴다
+            안에서만 씀
           </>
         )}
       </p>
@@ -153,15 +153,15 @@ const ExportsSection = ({ inspection }: { inspection: Inspection }) => {
     <Section id="exports" count={exports.entries.length}>
       <p className="typo-caption-small text-text-light">
         {exports.visibility === 'public'
-          ? '소비자가 import 하는 specifier 다. dist 안의 다른 파일을 직접 import 하지 않는다.'
-          : 'Internal — 워크스페이스 안에서만 import 한다. 배포되지 않아 소비자 API 가 아니다.'}
+          ? '소비자가 import 하는 specifier 다. dist 안의 다른 파일을 직접 import 하지 않음.'
+          : 'Internal — 워크스페이스 안에서만 import 함. 배포되지 않아 소비자 API 가 아님.'}
       </p>
       <List className="flex flex-col gap-sm">
         {exports.entries.map((entry) => (
           <ListItem key={entry.specifier} className="flex flex-col gap-2xs">
             <code className="font-mono typo-body-small break-all">{entry.specifier}</code>
             <span className="typo-caption-small text-text-light">
-              {entry.origin === 'build-output' ? '빌드 산출물 — 커밋되지 않는다' : '커밋된 파일'} ·{' '}
+              {entry.origin === 'build-output' ? '빌드 산출물 — 커밋되지 않음' : '커밋된 파일'} ·{' '}
               <span className="devhub-code">{entry.target}</span>
             </span>
           </ListItem>

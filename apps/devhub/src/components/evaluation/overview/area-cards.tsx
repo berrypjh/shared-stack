@@ -139,7 +139,7 @@ export const EvalsCard = ({ summary, summaries }: CardProps) => (
       ))}
     </List>
     <p className="typo-caption-small text-text-light">
-      성공률은 원본 분자·분모와 함께 AI 평가 화면에서 보여 준다.
+      성공률은 원본 분자·분모와 함께 AI 평가 화면에서 보여 줌.
     </p>
     <Link
       className={LINK}

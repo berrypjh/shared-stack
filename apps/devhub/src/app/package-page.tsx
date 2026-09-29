@@ -16,9 +16,7 @@ const factsOf = (id: string): Fact[] | undefined => {
     ['종류', PACKAGE_KIND[pkg.kind]],
     [
       '공개 여부',
-      pkg.visibility === 'public'
-        ? '공개 — npm 에 배포된다'
-        : 'Internal — private, 배포되지 않는다',
+      pkg.visibility === 'public' ? '공개 — npm 에 배포됨' : 'Internal — private, 배포되지 않음',
     ],
     ['플랫폼', PLATFORM[pkg.platform]],
     ['패키지 이름', <Code key="name">{pkg.packageName}</Code>],

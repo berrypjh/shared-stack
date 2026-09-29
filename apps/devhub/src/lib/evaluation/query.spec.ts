@@ -25,7 +25,7 @@ describe('parseQuery — 허용 목록만 읽는다', () => {
     });
     expect(parse('package=x', { keys: ['run'] })).toEqual({
       ok: false,
-      issues: ['이 페이지는 package 를 받지 않는다'],
+      issues: ['이 페이지는 package 를 받지 않음'],
     });
   });
 
@@ -40,7 +40,7 @@ describe('parseQuery — 허용 목록만 읽는다', () => {
   });
 
   it('같은 key 가 둘이면 어느 쪽인지 추측하지 않는다', () => {
-    expect(parse('run=a&run=b', ALL)).toEqual({ ok: false, issues: ['run 이 두 번 있다'] });
+    expect(parse('run=a&run=b', ALL)).toEqual({ ok: false, issues: ['run 이 두 번 있음'] });
   });
 });
 
@@ -71,11 +71,11 @@ describe('parseQuery — 도메인 화면 key', () => {
   it('panel·platform 은 정해진 값만, base·variant 는 id 형식만 받는다', () => {
     expect(parse('panel=weird', DOMAIN)).toEqual({
       ok: false,
-      issues: ['panel 은 initial, routed 중 하나여야 한다'],
+      issues: ['panel 은 initial, routed 중 하나여야 함'],
     });
     expect(parse('platform=ios', DOMAIN)).toEqual({
       ok: false,
-      issues: ['platform 은 web, react-native 중 하나여야 한다'],
+      issues: ['platform 은 web, react-native 중 하나여야 함'],
     });
     expect(parse('base=..%2Fx', DOMAIN).ok).toBe(false);
     expect(parse('variant=Bad%20Name', DOMAIN).ok).toBe(false);

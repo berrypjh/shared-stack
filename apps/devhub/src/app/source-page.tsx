@@ -28,8 +28,8 @@ const NotCited = ({ path }: { path: string }) => {
       <WorkspaceFrame>
         <WorkspaceHeader eyebrow="소스" icon="document" title="카탈로그가 인용하지 않는 경로" />
         <p className="typo-body-small">
-          <span className="devhub-code">{path}</span> 는 카탈로그 어디에도 근거로 나오지 않습니다.
-          경로가 바뀌었거나 인용되지 않은 파일입니다.
+          <span className="devhub-code">{path}</span> 는 카탈로그 어디에도 근거로 나오지 않음.
+          경로가 바뀌었거나 인용되지 않은 파일.
         </p>
         <Link to="/" className={`typo-body-small ${LINK}`}>
           개요로 가기
@@ -93,7 +93,7 @@ export const SourcePage = () => {
             </List>
           ) : (
             <p className="typo-caption-small text-text-light">
-              없음 — 카탈로그가 이 경로의 코드 이름을 인용하지 않는다
+              없음 — 카탈로그가 이 경로의 코드 이름을 인용하지 않음
             </p>
           )}
           {usage.quotes.length > 0 && (

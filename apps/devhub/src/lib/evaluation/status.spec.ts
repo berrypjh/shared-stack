@@ -43,9 +43,9 @@ describe('공통 상태 모델', () => {
   it('미수집은 오류가 아니고 수집·export 명령을 준다', () => {
     expect(emptyState()).toEqual({
       kind: 'empty',
-      title: '아직 수집한 실행이 없다',
+      title: '아직 수집한 실행이 없음',
       cause:
-        '공개 index.json 이 없거나 비어 있다. 브라우저는 명령을 실행하지 않는다 — 아래 명령을 로컬에서 실행한다.',
+        '공개 index.json 이 없거나 비어 있음. 브라우저는 명령을 실행하지 않음 — 아래 명령을 로컬에서 실행 필요.',
       commands: [
         'pnpm quality:collect --profile=static --run-id=<새-run-id>',
         'pnpm quality:export --run-id=<새-run-id>',
@@ -70,21 +70,21 @@ describe('공통 상태 모델', () => {
 
   it('주소의 run 이 index 에 없으면 명시 오류이고 있는 run 을 알려준다', () => {
     const state = runNotFoundState('run-z', ['run-a', 'run-b']);
-    expect(state).toMatchObject({ kind: 'error', title: 'run-z 실행이 index 에 없다' });
+    expect(state).toMatchObject({ kind: 'error', title: 'run-z 실행이 index 에 없음' });
     expect(state.cause).toContain('run-a, run-b');
   });
 
   it('잘못된 query 는 오류이고 이유를 모두 적는다', () => {
-    const state = queryErrorState(['알 수 없는 query: foo', 'run 이 두 번 있습니다']);
+    const state = queryErrorState(['알 수 없는 query: foo', 'run 이 두 번 있음']);
     expect(state.kind).toBe('error');
     expect(state.cause).toContain('알 수 없는 query: foo');
-    expect(state.cause).toContain('run 이 두 번 있습니다');
+    expect(state.cause).toContain('run 이 두 번 있음');
   });
 
   it('partial·stale 은 성공으로 뭉개지 않고 새로 수집하는 명령을 준다', () => {
     expect(partialState('run-a')).toMatchObject({ kind: 'partial' });
     const stale = staleState(
-      { status: 'stale', reason: 'run source aaaaaaa 이 기준 bbbbbbb 과 다릅니다' },
+      { status: 'stale', reason: 'run source aaaaaaa 이 기준 bbbbbbb 과 다름' },
       'core',
     );
     expect(stale).toMatchObject({
@@ -93,8 +93,8 @@ describe('공통 상태 모델', () => {
     });
     expect(stale.cause).toContain('aaaaaaa');
     expect(
-      staleState({ status: 'unknown', reason: '비교할 기준 SHA 를 모릅니다' }, 'static').title,
-    ).toBe('source 를 기준과 비교할 수 없다');
+      staleState({ status: 'unknown', reason: '비교할 기준 SHA 를 모름' }, 'static').title,
+    ).toBe('source 를 기준과 비교할 수 없음');
   });
 
   it('이 run 에 없는 영역은 unsupported 이고 그 영역을 가진 다른 run 을 알려준다', () => {
@@ -107,7 +107,7 @@ describe('공통 상태 모델', () => {
     });
     expect(state).toMatchObject({
       kind: 'unsupported',
-      title: 'local-quality-01 에는 이 영역이 없다 — 패키지 표면',
+      title: 'local-quality-01 에는 이 영역이 없음 — 패키지 표면',
       commands: ['pnpm quality:collect --profile=static --run-id=<새-run-id>'],
     });
     expect(state.cause).toContain('local-design-02');
@@ -121,7 +121,7 @@ describe('공통 상태 모델', () => {
       collectProfile: 'eval',
       alternatives: null,
     });
-    expect(state.cause).toBe('eval profile 로 수집한 실행이라 이 영역을 담지 않았다.');
+    expect(state.cause).toBe('eval profile 로 수집한 실행이라 이 영역을 담지 않았음.');
   });
 
   it('수집기가 실행하지 않은 영역은 profile 탓이 아니라 not-run 이유를 준다', () => {
@@ -134,22 +134,22 @@ describe('공통 상태 모델', () => {
     });
     expect(state).toEqual({
       kind: 'unsupported',
-      title: 'local-quality-01 는 이 영역을 실행하지 않았다 — tree-shaking 측정',
+      title: 'local-quality-01 는 이 영역을 실행하지 않았음 — tree-shaking 측정',
       cause:
-        '수집기가 실행하지 않은 영역이다 (not-run) — --only-imports: import 한 report 가 없어 실행하지 않았다. 이 영역을 측정한 공개 실행이 없다.',
+        '수집기가 실행하지 않은 영역 (not-run) — --only-imports: import 한 report 가 없어 실행하지 않았다. 이 영역을 측정한 공개 실행이 없음.',
       commands: ['pnpm quality:collect --profile=core --run-id=<새-run-id>'],
     });
   });
 
   it('해당 없음·일치 없음도 이유를 가진다', () => {
-    expect(notApplicableState('baseline 이 아직 없습니다')).toMatchObject({
+    expect(notApplicableState('baseline 이 아직 없음')).toMatchObject({
       kind: 'not-applicable',
-      cause: 'baseline 이 아직 없습니다',
+      cause: 'baseline 이 아직 없음',
       commands: [],
     });
     expect(noMatchState('실패 · @berrypjh/react-ui')).toMatchObject({
       kind: 'no-match',
-      title: '필터와 일치하는 항목이 없다',
+      title: '필터와 일치하는 항목이 없음',
     });
   });
 });

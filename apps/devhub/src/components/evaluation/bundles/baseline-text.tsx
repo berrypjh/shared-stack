@@ -7,8 +7,8 @@ import { formatBytes } from '@/lib/evaluation/format';
 export const BASELINE_PENDING: Record<OtherRun['status'], string | null> = {
   idle: null,
   ready: null,
-  loading: 'baseline 실행을 불러오는 중이다',
-  error: 'baseline 실행을 읽지 못했다',
+  loading: 'baseline 실행을 불러오는 중',
+  error: 'baseline 실행을 읽지 못했음',
 };
 
 /** budget 행 하나의 baseline 칸. delta 는 `compareBundle` 조건이 모두 같을 때만 보인다. */

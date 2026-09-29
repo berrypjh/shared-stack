@@ -6,10 +6,10 @@ import { Link } from 'react-router-dom';
 import { catalog } from '@/data';
 import type { DocumentRef } from '@/domain/model';
 import { citationsOf } from '@/lib/catalog/document-citations';
+import { stepHref } from '@/lib/catalog/routes';
 import { titleText } from '@/lib/markdown/documents';
 
 import { SourceGroups } from '../entity/inspector-parts';
-import { stepHref } from '../flow/presentation';
 import { EntityLink, LINK } from '../ui/entity-link';
 
 const OVERVIEW = { id: 'document-overview', title: '개요', icon: 'overview' } as const;
@@ -49,7 +49,7 @@ export const DocumentInspector = ({ doc }: { doc: DocumentRef }) => {
               term: '인용한 항목',
               details: orNone(
                 entities.map((id) => <EntityLink key={id} id={id} hash={INSPECTOR_ID} />),
-                '앱 · 패키지 · 도구 중 이 문서를 근거로 드는 것이 없다',
+                '앱 · 패키지 · 도구 중 이 문서를 근거로 드는 것이 없음',
               ),
             },
             {
@@ -66,7 +66,7 @@ export const DocumentInspector = ({ doc }: { doc: DocumentRef }) => {
                     <span className="typo-caption-small text-text-light">{step.journeyTitle}</span>
                   </span>
                 )),
-                '어느 흐름 단계도 이 문서를 근거로 들지 않는다',
+                '어느 흐름 단계도 이 문서를 근거로 들지 않음',
               ),
             },
             {
@@ -78,7 +78,7 @@ export const DocumentInspector = ({ doc }: { doc: DocumentRef }) => {
                     <span className="typo-caption-small text-text-warning">{link.note}</span>
                   </span>
                 )),
-                '저장소 안 링크는 모두 대상이 있다(테스트가 확인한다)',
+                '저장소 안 링크는 모두 대상이 있음(테스트가 확인함)',
               ),
             },
           ]}
@@ -90,11 +90,11 @@ export const DocumentInspector = ({ doc }: { doc: DocumentRef }) => {
       </InspectorSection>
 
       <InspectorSection {...DOCS} count={0}>
-        <Empty reason="문서 자체다" />
+        <Empty reason="문서 자체" />
       </InspectorSection>
 
       <InspectorSection {...TESTS} count={0}>
-        <Empty reason="이 문서만 겨냥한 테스트 묶음이 없다. 저장소 안 링크는 카탈로그 테스트가 확인한다" />
+        <Empty reason="이 문서만 겨냥한 테스트 묶음이 없음. 저장소 안 링크는 카탈로그 테스트가 확인함" />
       </InspectorSection>
     </div>
   );

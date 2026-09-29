@@ -1,8 +1,8 @@
 import type {
   Catalog,
-  ConsumerJourney,
   DocumentRef,
   ExecutionContext,
+  Journey,
   JourneyStep,
   TestSuite,
 } from '../../domain/model';
@@ -12,7 +12,7 @@ import type {
  * 비는 섹션은 숨기지 않고 `empty` 에 이유를 둔다.
  */
 export type StepInspection = {
-  journey: ConsumerJourney;
+  journey: Journey;
   step: JourneyStep;
   order: number;
   context: ExecutionContext | undefined;
@@ -46,11 +46,11 @@ export const inspectStep = (
     empty: {
       source:
         step.status === 'documented-only'
-          ? '저장소 밖에서 일어나는 단계라 저장소 소스가 없다 — 문서만 말한다'
-          : '이 단계가 인용한 소스가 없다',
-      next: '흐름의 끝이다',
-      tests: '이 단계를 직접 확인하는 테스트 묶음이 카탈로그에 없다',
-      documents: '이 단계를 설명하는 문서가 카탈로그에 없다',
+          ? '저장소 밖에서 일어나는 단계라 저장소 소스가 없음 — 문서만 말함'
+          : '이 단계가 인용한 소스가 없음',
+      next: '흐름의 끝',
+      tests: '이 단계를 직접 확인하는 테스트 묶음이 카탈로그에 없음',
+      documents: '이 단계를 설명하는 문서가 카탈로그에 없음',
     },
   };
 };

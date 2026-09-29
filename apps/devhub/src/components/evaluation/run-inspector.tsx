@@ -18,10 +18,10 @@ const Row = ({ term, children }: { term: string; children: ReactNode }) => (
 
 /** 실행 정보가 없을 때의 이유. 불러오는 중 · 화면 상태 · 목록만 읽는 화면을 섞지 않는다. */
 const reasonOf = (data: RunData | undefined) => {
-  if (!data) return '이 화면은 실행 목록만 읽는다 — 실행을 고르면 여기에 실행 정보가 나온다';
-  if (data.loading) return '실행을 불러오는 중이다';
+  if (!data) return '이 화면은 실행 목록만 읽음 — 실행을 고르면 여기에 실행 정보가 나옴';
+  if (data.loading) return '실행을 불러오는 중';
   if (data.view) return data.view.title;
-  return '이 화면은 고른 실행의 요약을 읽지 않는다';
+  return '이 화면은 고른 실행의 요약을 읽지 않음';
 };
 
 /**

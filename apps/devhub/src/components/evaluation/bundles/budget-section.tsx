@@ -52,7 +52,7 @@ const FloorNote = () => (
     <span className="typo-caption-small text-text-light">과거 조사 기록</span>
     <span className="break-keep text-text-default">
       <Mono>.size-limit.cjs</Mono> 머리 주석의 floor 설명은 single-symbol case 가 같은 하한에 묶이는
-      원인을 과거에 조사한 기록이다. 현재 HEAD 의 원인을 확정한 측정이 아니다.
+      원인을 과거에 조사한 기록. 현재 HEAD 의 원인을 확정한 측정이 아님.
     </span>
   </aside>
 );
@@ -72,7 +72,7 @@ export const BudgetSection = ({
     <Section title="Budget (size-limit 조정값)" anchor="budget">
       <BarChart
         title="Budget 사용 — size-limit 조정값"
-        description={`막대는 case 마다 자기 한도(세로선) 기준이라 case 사이 길이를 비교하는 공통 축이 아니다. ${compressions} 압축 · size-limit 빈 프로젝트 차감값`}
+        description={`막대는 case 마다 자기 한도(세로선) 기준이라 case 사이 길이를 비교하는 공통 축이 아님. ${compressions} 압축 · size-limit 빈 프로젝트 차감값`}
         unit="bytes"
         groups={budgetGroups(groups)}
       />

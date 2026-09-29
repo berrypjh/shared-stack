@@ -344,16 +344,11 @@ export type JourneyStep = {
   readonly gaps?: readonly EvidenceGap[];
 };
 
-/**
- * 저장소가 증명하는 개발자 · 소비자 흐름. 들어오는 선이 없는 단계가 시작이다(여럿일 수 있다).
- * `platform` 은 한 렌더러의 흐름에만 붙는다.
- */
-export type ConsumerJourney = {
+/** 저장소가 증명하는 작업 흐름. 들어오는 선이 없는 단계가 시작이다(여럿일 수 있다). */
+export type Journey = {
   readonly id: string;
   readonly title: string;
   readonly goal: string;
-  readonly actor: 'consumer' | 'maintainer';
-  readonly platform?: 'web' | 'react-native';
   readonly steps: readonly JourneyStep[];
 };
 
@@ -385,5 +380,5 @@ export type Catalog = {
   readonly records: readonly RecordRef[];
   readonly tests: readonly TestSuite[];
   readonly contexts: readonly ExecutionContext[];
-  readonly journeys: readonly ConsumerJourney[];
+  readonly journeys: readonly Journey[];
 };

@@ -78,9 +78,9 @@ const problemOf = (page: Page, href: string, link: DocLink): string | null => {
       if (!onDisk(link.ref.path)) return `${at}: 저장소에 없는 경로`;
       return isDirectory(link.ref.path) === Boolean(link.ref.directory)
         ? null
-        : `${at}: 디렉터리 링크는 / 로 끝나야 한다`;
+        : `${at}: 디렉터리 링크는 / 로 끝나야 함`;
     case 'broken':
-      return onDisk(link.path) ? `${at}: 깨졌다고 기록됐지만 대상이 있다` : null;
+      return onDisk(link.path) ? `${at}: 깨졌다고 기록됐지만 대상이 있음` : null;
   }
 };
 

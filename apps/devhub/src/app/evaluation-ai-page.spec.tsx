@@ -111,10 +111,10 @@ describe('AI 평가', () => {
     await main().findByRole('table', { name: 'Context — variant-initial' });
     await user.click(main().getByRole('button', { name: 'agent-input (실제 입력)' }));
     const notice = main().getByRole('region', {
-      name: '이 영역을 측정하는 수집기가 아직 없다 — agent-input context 측정',
+      name: '이 영역을 측정하는 수집기가 아직 없음 — agent-input context 측정',
     });
     expect(notice.dataset.state).toBe('not-applicable');
-    expect(notice.textContent).toContain('아직 어느 수집기도 측정하지 않는다');
+    expect(notice.textContent).toContain('아직 어느 수집기도 측정하지 않음');
     expect(notice.textContent).not.toContain('profile');
     expect(within(notice).queryByRole('button')).toBeNull();
     expect(notice.textContent).not.toContain('pnpm quality:collect');
@@ -129,7 +129,7 @@ describe('AI 평가', () => {
       ]),
     );
     const notice = await main().findByText(
-      'run-no-context 는 이 영역을 실행하지 않았다 — variant-routed context 측정',
+      'run-no-context 는 이 영역을 실행하지 않았음 — variant-routed context 측정',
     );
     const section = notice.closest('section');
     expect(section?.textContent).toContain('context report import missing — context.json 이 없다');
@@ -213,7 +213,7 @@ describe('AI 평가', () => {
   it('검증을 보고만 한 variant 는 run 이 없다고 쓴다', async () => {
     renderEvaluation('/evaluation/ai?run=run-eval&variant=consumer-docs', files());
     expect(
-      await main().findByText('verification run 없음 — executor-reported, 검증을 실행하지 않았다'),
+      await main().findByText('verification run 없음 — executor-reported, 검증을 실행하지 않았음'),
     ).toBeTruthy();
   });
 
@@ -226,7 +226,7 @@ describe('AI 평가', () => {
     expect(bodyRows(SCORECARD)).toHaveLength(1);
     expect(
       main().getByText(
-        'variant 2개 중 필터와 일치 1개 — metric 은 variant 별 원본 값이고 다시 계산하지 않는다',
+        'variant 2개 중 필터와 일치 1개 — metric 은 variant 별 원본 값이고 다시 계산하지 않음',
       ),
     ).toBeTruthy();
   });
@@ -237,12 +237,12 @@ describe('AI 평가', () => {
     expect(
       await main().findByRole('table', { name: 'Routing — deterministic-resolver' }),
     ).toBeTruthy();
-    expect(main().queryByText('필터와 일치하는 항목이 없다')).toBeNull();
+    expect(main().queryByText('필터와 일치하는 항목이 없음')).toBeNull();
     expect(
-      main().getByText('eval:offline 는 이 영역을 실행하지 않았다 — variant metric'),
+      main().getByText('eval:offline 는 이 영역을 실행하지 않았음 — variant metric'),
     ).toBeTruthy();
     expect(main().getByRole('region', { name: '평가 출처' }).textContent).toContain(
-      'summary 를 읽지 못해 실행 조건을 모른다',
+      'summary 를 읽지 못해 실행 조건을 모름',
     );
   });
 
@@ -250,22 +250,22 @@ describe('AI 평가', () => {
     const base = offlineEvalRun();
     const evalRun = {
       ...base,
-      import: { ...base.import, traces: { status: 'missing', reason: 'traces.jsonl 이 없다' } },
+      import: { ...base.import, traces: { status: 'missing', reason: 'traces.jsonl 이 없음' } },
     };
     const offline = { ...evalArtifact('run-offline'), evals: [evalRun] };
     renderEvaluation('/evaluation/ai?run=run-offline', publicFiles([offline]));
     const region = await main().findByRole('region', { name: 'Verification' });
     expect(region.textContent).toContain(
-      'summary report import not-run — executor 를 돌리지 않은 offline 산출물이다',
+      'summary report import not-run — executor 를 돌리지 않은 offline 산출물',
     );
     expect(region.textContent).not.toContain('traces report import');
     expect(main().getByRole('region', { name: 'Retrieval' }).textContent).toContain(
-      'traces report import missing — traces.jsonl 이 없다',
+      'traces report import missing — traces.jsonl 이 없음',
     );
   });
 
   it('평가 결과가 없는 실행은 unsupported 다', async () => {
     renderEvaluation('/evaluation/ai?run=run-quality', files());
-    expect(await main().findByText('run-quality 에는 이 영역이 없다 — 평가 결과')).toBeTruthy();
+    expect(await main().findByText('run-quality 에는 이 영역이 없음 — 평가 결과')).toBeTruthy();
   });
 });

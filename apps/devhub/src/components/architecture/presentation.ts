@@ -24,7 +24,7 @@ export const boxOf = (node: ArchNode) =>
   node.visibility === 'public' ? BOX.public : node.kind === 'tool' ? BOX.tool : BOX.plain;
 
 export const LEGEND: LegendItem[] = [
-  { box: 'double', label: '공개 패키지 — 저장소 밖으로 배포된다' },
+  { box: 'double', label: '공개 패키지 — 저장소 밖으로 배포됨' },
   { box: 'solid', label: '앱 · 내부 패키지' },
   { box: 'dashed', label: '도구 (tools/ · plugins/)' },
   ...(Object.keys(DASH) as Relation['kind'][]).map((kind) => ({

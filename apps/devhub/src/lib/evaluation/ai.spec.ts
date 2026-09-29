@@ -174,24 +174,24 @@ describe('contextEmptyState — scope 에 행이 없을 때', () => {
     const state = of('agent-input', [noContext]);
     expect(state).toMatchObject({
       kind: 'not-applicable',
-      title: '이 영역을 측정하는 수집기가 아직 없다 — agent-input context 측정',
+      title: '이 영역을 측정하는 수집기가 아직 없음 — agent-input context 측정',
       commands: [],
     });
-    expect(state.cause).toContain('아직 어느 수집기도 측정하지 않는다');
+    expect(state.cause).toContain('아직 어느 수집기도 측정하지 않음');
     expect(state.cause).not.toContain('profile');
   });
 
   it('variant scope 는 context import 실패 이유를 쓴다', () => {
     expect(of('variant-routed', [noContext])).toMatchObject({
       kind: 'unsupported',
-      title: 'run-eval 는 이 영역을 실행하지 않았다 — variant-routed context 측정',
+      title: 'run-eval 는 이 영역을 실행하지 않았음 — variant-routed context 측정',
       cause: expect.stringContaining('context report import missing — context.json 이 없다'),
     });
   });
 
   it('package-scenario 는 core profile 수집 명령을 준다', () => {
     const state = of('package-scenario');
-    expect(state.title).toBe('run-eval 에는 이 영역이 없다 — package-scenario context 측정');
+    expect(state.title).toBe('run-eval 에는 이 영역이 없음 — package-scenario context 측정');
     expect(state.commands).toEqual(['pnpm quality:collect --profile=core --run-id=<새-run-id>']);
   });
 });

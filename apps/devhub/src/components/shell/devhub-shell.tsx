@@ -59,6 +59,9 @@ const EXPLORER_SECTIONS: ExplorerSection[] = SECTIONS.map((section) => ({
   groups: groupsOf(section),
 }));
 
+/** 평가는 작업 흐름 바로 뒤에 선다. */
+const [JOURNEYS_SECTION, ...REST_SECTIONS] = EXPLORER_SECTIONS;
+
 /**
  * 평가의 하위 화면. 개요는 섹션 제목이 가리키고, 나머지는 `screens.ts` 의 묶음 순서대로다.
  * 평가 안에서는 고른 실행(`?run=`)을 화면을 옮겨도 이어 간다 — 필터는 화면마다 뜻이 달라 가져가지 않는다.
@@ -106,7 +109,12 @@ export const DevHubShell = ({ children }: { children: ReactNode }) => {
           search={<GlobalSearch />}
         />
       }
-      explorer={<Explorer views={EXPLORER_VIEWS} sections={[evaluation, ...EXPLORER_SECTIONS]} />}
+      explorer={
+        <Explorer
+          views={EXPLORER_VIEWS}
+          sections={[JOURNEYS_SECTION, evaluation, ...REST_SECTIONS]}
+        />
+      }
     >
       {children}
     </Shell>
