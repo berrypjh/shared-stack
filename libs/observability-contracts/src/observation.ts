@@ -20,7 +20,7 @@ export const AVAILABILITIES = ['available', ...MISSING_AVAILABILITIES] as const;
 /** 실측값을 해석한 판정. availability 와 별개의 축이다. */
 export const OUTCOMES = ['pass', 'fail', 'warn', 'info'] as const;
 
-export const DOMAINS = ['bundle', 'context', 'eval', 'a11y'] as const;
+export const DOMAINS = ['bundle', 'context', 'eval'] as const;
 
 export const UNITS = [
   'count',
@@ -42,7 +42,6 @@ export const DOMAIN_UNITS = {
   bundle: ['bytes', 'bytes-delta'],
   context: ['tokens', 'tokens-delta', 'count'],
   eval: ['ratio', 'tokens', 'count', 'ms'],
-  a11y: ['count', 'ratio'],
 } as const satisfies Record<Domain, readonly Unit[]>;
 
 const INTEGER_UNITS: readonly Unit[] = ['count', 'bytes', 'bytes-delta', 'tokens', 'tokens-delta'];

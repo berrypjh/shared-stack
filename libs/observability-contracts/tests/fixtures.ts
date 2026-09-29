@@ -75,6 +75,5 @@ export const artifact = (overrides: Overrides = {}) => ({
   bundles: [],
   contexts: [],
   evals: [],
-  designSystem: null,
   ...overrides,
 });

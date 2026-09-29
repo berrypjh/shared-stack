@@ -12,7 +12,7 @@ import { type RunArtifact, runMetadataSchema } from './run.js';
  * fail 인 행만 옮긴다. not-run·unsupported 는 실패가 아니고 여기 오지 않는다.
  */
 
-export const FAILURE_DOMAINS = ['bundle', 'context', 'eval', 'a11y'] as const;
+export const FAILURE_DOMAINS = ['bundle', 'context', 'eval'] as const;
 
 const failureSchema = z.strictObject({
   domain: z.enum(FAILURE_DOMAINS),
@@ -30,9 +30,6 @@ export const runSummarySchema = z
       bundles: countSchema,
       contexts: countSchema,
       evals: countSchema,
-      designSystem: z.boolean(),
-      /** 요약 이전 export 에는 없다 — 접근성 결과가 없던 run 이다. */
-      accessibility: countSchema.default(0),
     }),
     failures: z.array(failureSchema),
     /** eval 은 executor 종류와 notice 만. 성공률은 run detail 에서 원본으로 읽는다. */
@@ -124,8 +121,6 @@ export const summarizeRun = (artifact: RunArtifact): RunSummary => ({
     bundles: artifact.bundles.length,
     contexts: artifact.contexts.length,
     evals: artifact.evals.length,
-    designSystem: artifact.designSystem !== null,
-    accessibility: artifact.accessibility.length,
   },
   failures: failuresOf(artifact),
   evals: artifact.evals.map((evalRun) => ({

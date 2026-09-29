@@ -1,9 +1,7 @@
 import { z } from 'zod';
 
-import { accessibilitySummarySchema } from './accessibility.js';
 import { bundleMeasurementSchema } from './bundle.js';
 import { contextMeasurementSchema } from './context.js';
-import { designSystemSchema } from './design-system.js';
 import { evalRunSchema } from './eval.js';
 import { isPublicEvidencePath } from './evidence.js';
 import { DOMAINS, observationSchema } from './observation.js';
@@ -22,11 +20,10 @@ import {
 
 export const RUN_STATES = ['running', 'complete', 'partial', 'failed', 'cancelled'] as const;
 /**
- * `static` 은 정의와 design system 근거를 읽는다. `core` 는 bundle·context 를 수집한다.
+ * `static` 은 등록된 정의를 읽는다. `core` 는 bundle·context 를 수집한다.
  * `eval` 은 이미 만든 consumer eval 산출물을 다시 실행하지 않고 가져온다.
- * `a11y` 는 DevHub 평가 화면 localhost audit 과 이미 만든 접근성 test·Storybook 결과를 가져온다.
  */
-export const PROFILES = ['static', 'core', 'eval', 'a11y'] as const;
+export const PROFILES = ['static', 'core', 'eval'] as const;
 export const SOURCE_KINDS = ['local', 'ci'] as const;
 export const CACHE_STATES = ['hit', 'miss', 'mixed', 'disabled'] as const;
 
@@ -118,23 +115,8 @@ export const runArtifactSchema = z
      * eval import 이전에 수집된 run 에는 key 가 없다 — import 한 eval 이 없다는 뜻이라 `[]` 로 읽는다.
      */
     evals: z.array(evalRunSchema).default([]),
-    /** 토큰·테마·상태 근거. 수집하지 않은 run (이전 run 포함) 은 null. */
-    designSystem: designSystemSchema.nullable().default(null),
-    /** 출처별 접근성 결과. 수집하지 않았으면 `[]`. */
-    accessibility: z.array(accessibilitySummarySchema).default([]),
   })
   .superRefine((artifact, ctx) => {
-    const summaries = new Set<string>();
-    artifact.accessibility.forEach((summary, index) => {
-      if (summaries.has(summary.id)) {
-        ctx.addIssue({
-          code: 'custom',
-          path: ['accessibility', index, 'id'],
-          message: `duplicate accessibility summary ${summary.id}`,
-        });
-      }
-      summaries.add(summary.id);
-    });
     const seen = new Set<string>();
     artifact.observations.forEach((observation, index) => {
       if (seen.has(observation.id)) {

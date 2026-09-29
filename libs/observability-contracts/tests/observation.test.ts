@@ -48,7 +48,7 @@ describe('숫자', () => {
   it('count·bytes·tokens 는 비음수 정수다', () => {
     expect(ok(available({ value: -1 }))).toBe(false);
     expect(ok(available({ value: 1.5 }))).toBe(false);
-    expect(ok(available({ domain: 'a11y', unit: 'count', value: 3 }))).toBe(true);
+    expect(ok(available({ domain: 'context', unit: 'count', value: 3 }))).toBe(true);
     expect(ok(available({ domain: 'context', unit: 'tokens', value: -3 }))).toBe(false);
   });
 
