@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 
 import { enterMain, tabTo } from './support/keyboard';
 
-const JOURNEY = { id: 'token-pipeline', title: '토큰 소스 → 웹 · RN 산출물' };
+const JOURNEY = { id: 'release', title: '패키지 릴리스' };
 
 test.use({ viewport: { width: 1280, height: 800 } });
 
@@ -51,28 +51,26 @@ test.describe('아키텍처', () => {
   });
 });
 
-test.describe('소비 흐름', () => {
+test.describe('작업 흐름', () => {
   test('단계를 고르면 주소와 단계 상세가 바뀌고 포커스는 그 단계에 남는다', async ({ page }) => {
     await page.goto(`/journeys/${JOURNEY.id}`);
     const steps = page
       .getByRole('group', { name: `${JOURNEY.title} 흐름 그림` })
       .getByRole('list', { name: '단계' });
-    const facade = steps.locator(`a[href="/journeys/${JOURNEY.id}/steps/facade"]`);
-    await expect(facade).toContainText('3. 두 렌더러가 쓸 토큰을 한 곳에서 넘긴다');
+    const version = steps.locator(`a[href="/journeys/${JOURNEY.id}/steps/version"]`);
+    await expect(version).toContainText('2. 버전을 정함');
 
     await enterMain(page);
-    await tabTo(page, facade);
+    await tabTo(page, version);
     await page.keyboard.press('Enter');
-    await expect(page).toHaveURL(`/journeys/${JOURNEY.id}/steps/facade`);
-    await expect(facade).toHaveAttribute('aria-current', 'page');
-    await expect(facade).toBeFocused();
+    await expect(page).toHaveURL(`/journeys/${JOURNEY.id}/steps/version`);
+    await expect(version).toHaveAttribute('aria-current', 'page');
+    await expect(version).toBeFocused();
     const inspector = page.getByRole('complementary', { name: '상세 정보' });
-    await expect(inspector.getByRole('heading', { level: 2 })).toHaveText(
-      '두 렌더러가 쓸 토큰을 한 곳에서 넘긴다',
-    );
+    await expect(inspector.getByRole('heading', { level: 2 })).toHaveText('버전을 정함');
 
     await inspector.getByRole('link', { name: /^다음 단계: / }).click();
-    await expect(page).toHaveURL(`/journeys/${JOURNEY.id}/steps/web#devhub-inspector`);
+    await expect(page).toHaveURL(`/journeys/${JOURNEY.id}/steps/changelog#devhub-inspector`);
     await expect(inspector).toBeFocused();
   });
 });

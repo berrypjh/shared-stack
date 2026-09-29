@@ -14,7 +14,7 @@ const SCREENS = [
   '/',
   '/architecture',
   '/architecture/react-ui',
-  '/journeys/component-export',
+  '/journeys/release',
   '/packages/react-ui',
   '/plugins/berry-commit',
   '/plugins/berry-dev',

@@ -69,13 +69,13 @@ test.describe('전역 검색', () => {
   test('해시가 있는 결과는 그 자리로 간다', async ({ page }) => {
     await page.goto('/');
     await focusSearch(page);
-    await page.keyboard.type('buildTokenOutputs');
+    await page.keyboard.type('hasBreakingChangeSinceLastTag');
     await page.keyboard.press('ArrowDown');
     await page.keyboard.press('Enter');
     await expect(page).toHaveURL(
-      /\/sources\/libs\/design-tokens\/src\/lib\/pipeline\.ts#symbol-buildTokenOutputs$/,
+      /\/sources\/tools\/scripts\/release\/release-npm\.ts#symbol-hasBreakingChangeSinceLastTag$/,
     );
-    await expect(page.locator('[id="symbol-buildTokenOutputs"]')).toBeFocused();
+    await expect(page.locator('[id="symbol-hasBreakingChangeSinceLastTag"]')).toBeFocused();
   });
 
   test('Escape 는 목록을 닫고 포커스와 글자를 남긴다', async ({ page }) => {

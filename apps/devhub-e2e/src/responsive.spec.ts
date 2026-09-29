@@ -4,13 +4,13 @@ import { horizontalOverflow, tabTo } from './support/keyboard';
 
 const PAGES = [
   '/',
-  '/journeys/token-pipeline/steps/facade',
+  '/journeys/release/steps/version',
   '/architecture/react-ui',
   '/packages/react-ui',
   '/documents',
   '/documents/root-readme',
   '/records/react-ui-cascade-layers',
-  '/sources/libs/design-tokens/src/lib/pipeline.ts',
+  '/sources/tools/scripts/release/release-npm.ts',
   '/evaluation',
   '/evaluation/bundles',
 ];

@@ -66,7 +66,7 @@ test.describe('데스크톱 셸', () => {
   test('마우스로 보기를 옮겨도 건너뛰기 링크가 드러나지 않는다', async ({ page }) => {
     await page.goto('/');
     const skip = page.getByRole('link', skipToMain);
-    for (const view of ['소비 흐름', '아키텍처', '문서', '개요']) {
+    for (const view of ['작업 흐름', '아키텍처', '문서', '개요']) {
       const link = page
         .getByRole('navigation', { name: '저장소 항목' })
         .getByRole('link', { name: view, exact: true });
@@ -100,8 +100,10 @@ test.describe('상세 정보 딥링크', () => {
   });
 
   test('symbol 해시는 본문의 그 symbol 로 간다', async ({ page }) => {
-    await page.goto('/sources/libs/design-tokens/src/lib/pipeline.ts#symbol-buildTokenOutputs');
-    const symbol = page.locator('[id="symbol-buildTokenOutputs"]');
+    await page.goto(
+      '/sources/tools/scripts/release/release-npm.ts#symbol-hasBreakingChangeSinceLastTag',
+    );
+    const symbol = page.locator('[id="symbol-hasBreakingChangeSinceLastTag"]');
     await expect(symbol).toBeFocused();
     await expect(symbol).toBeInViewport();
   });
@@ -122,7 +124,7 @@ test.describe('없는 주소', () => {
       '/packages',
     );
 
-    await page.goto('/journeys/token-pipeline/steps/no-such-step');
+    await page.goto('/journeys/release/steps/no-such-step');
     await expect(h1).toHaveText('카탈로그에 없는 항목');
   });
 });
