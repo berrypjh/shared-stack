@@ -22,7 +22,5 @@ export const failureHref = (failure: RunFailure, run: string): string => {
     }
     case 'eval':
       return `${screenPath('ai')}${queryString({ run })}`;
-    case 'a11y':
-      return `${screenPath('accessibility')}${queryString({ run })}`;
   }
 };

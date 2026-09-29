@@ -7,7 +7,8 @@ declare const __DEVHUB_SNAPSHOT__: import('./domain/model').RepositorySnapshot;
 /** 개발 서버로 띄웠을 때만 저장소의 절대 경로. 빌드 · 테스트에서는 `null` 이다("에디터에서 열기"). */
 declare const __DEVHUB_REPOSITORY_ROOT__: string | null;
 
-interface ImportMetaEnv {
-  /** `VITE_DEVHUB_EDITOR` — 에디터 이름 또는 `{path}` 를 품은 주소 형식. 없으면 vscode. */
-  readonly VITE_DEVHUB_EDITOR?: string;
-}
+/**
+ * 개발 서버로 띄웠을 때만 `DEVHUB_EDITOR` — 에디터 이름 또는 `{path}` 를 품은 주소 형식.
+ * 없거나 빌드 · 테스트면 `null` 이고, 그때 링크는 vscode 로 연다.
+ */
+declare const __DEVHUB_EDITOR__: string | null;

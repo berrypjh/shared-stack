@@ -153,7 +153,7 @@ describe('step inspector', () => {
     renderAt('/journeys/web-consumer/steps/install');
     const headings = within(inspector())
       .getAllByRole('heading', { level: 3 })
-      .map((h) => h.firstChild?.textContent);
+      .map((h) => [...h.childNodes].find((n) => n.nodeType === Node.TEXT_NODE)?.textContent);
     expect(headings).toEqual(['개요', '다음 단계', '소스', '테스트', '문서', '근거 공백']);
     expect(inspector().textContent).toContain(
       '없음 — 저장소 밖에서 일어나는 단계라 저장소 소스가 없다',

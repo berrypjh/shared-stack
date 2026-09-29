@@ -13,7 +13,7 @@ export const applications: Application[] = [
     platform: 'web',
     purpose:
       'react-ui 를 실제 앱에 통합했을 때 살아 있는 것 — 테마 전환 · CSS 캐스케이드 · Tailwind preset · 패키지 경계 — 을 확인한다',
-    docs: ['demo-web-agents', 'demo-web-readme'],
+    docs: ['demo-web-agents', 'root-readme'],
     source: [{ path: 'apps/demo-web/src/main.tsx' }],
   },
   {
@@ -27,7 +27,7 @@ export const applications: Application[] = [
     nxManifest: { path: 'apps/demo-mobile/project.json' },
     platform: 'react-native',
     purpose: 'react-native-ui 를 Expo 앱에 통합해 컴포넌트 상태를 눈으로 확인하는 유일한 자리',
-    docs: ['demo-mobile-agents', 'demo-mobile-readme'],
+    docs: ['demo-mobile-agents', 'root-readme'],
     source: [{ path: 'apps/demo-mobile/index.js' }, { path: 'apps/demo-mobile/src/app/App.tsx' }],
     gaps: [
       {
@@ -69,11 +69,10 @@ export const applications: Application[] = [
       '저장소의 구조와 근거를 탐색하고, 수집 · export 된 품질 결과를 계약으로 검증한 뒤에만 평가 화면에서 보여 준다',
     docs: [
       'devhub-agents',
+      'records-agents',
       'observability-usage',
       'observability-architecture',
       'observability-metrics',
-      'observability-verification',
-      'observability-limitations',
     ],
     source: [{ path: 'apps/devhub/src/main.tsx' }],
   },

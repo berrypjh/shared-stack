@@ -94,13 +94,13 @@ export const consumerEval: ConsumerJourney = {
         { path: 'tools/evals/consumer/runner/run.ts', symbol: 'unavailableExecutor' },
       ],
       tests: ['tools-vitest'],
-      docs: ['consumer-eval-readme', 'consumer-eval-baseline-readme'],
+      docs: ['consumer-eval-readme'],
       next: [],
       gaps: [
         {
           kind: 'unsupported',
           note: 'programmatic LLM executor 가 없다. replay 할 trace 가 없으면 채점하지 않는다',
-          evidence: [{ path: 'tools/evals/consumer/README.md' }],
+          evidence: [{ path: 'docs/tools/consumer-eval.md' }],
         },
       ],
     },

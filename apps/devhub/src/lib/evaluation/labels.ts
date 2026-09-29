@@ -4,7 +4,6 @@ export const DOMAIN_LABEL: Record<string, string> = {
   bundle: '번들',
   context: '컨텍스트',
   eval: '평가',
-  a11y: '접근성',
 };
 
 export const VERIFICATION_LABEL: Record<string, string> = {
@@ -84,9 +83,4 @@ export const REPAIR_LABEL: Record<string, string> = {
   'not-in-variant': 'not-in-variant — 이 variant 에 repair 단계가 없음',
   'no-repair-hook': 'no-repair-hook — repair hook 이 없어 시도하지 못함',
   unknown: 'unknown — 확인할 수 없음',
-};
-
-export const CONTRAST_BASIS_LABEL: Record<string, string> = {
-  'wcag-2.1-aa': 'WCAG 2.1 AA',
-  'project-visibility-guard': '프로젝트 가시성 가드 (WCAG 기준 아님)',
 };

@@ -72,6 +72,8 @@ const problemOf = (page: Page, href: string, link: DocLink): string | null => {
       return !link.anchor || anchorsOfPage.get(`${link.kind}:${link.id}`)?.has(link.anchor)
         ? null
         : `${at}: 대상 문서에 없는 앵커`;
+    case 'records':
+      return null;
     case 'source':
       if (!onDisk(link.ref.path)) return `${at}: 저장소에 없는 경로`;
       return isDirectory(link.ref.path) === Boolean(link.ref.directory)
@@ -110,7 +112,7 @@ describe('registered documents', () => {
       (doc.brokenLinks ?? []).map((link) => `${doc.id} ${link.href}`),
     );
     expect(actual.sort()).toEqual(recorded.sort());
-    expect(recorded).toEqual(['treeshake-readme ../../../docs/verification-guide.md']);
+    expect(recorded).toEqual(['treeshake-readme ../verification-guide.md']);
   });
 
   it('give every outline entry a unique anchor', () => {
@@ -156,6 +158,14 @@ describe('resolveDocLink', () => {
     expect(resolveDocLink(catalog, doc, 'https://example.com')).toEqual({
       kind: 'external',
       href: 'https://example.com',
+    });
+  });
+
+  it('sends the records folder to the records list', () => {
+    expect(resolveDocLink(catalog, doc, 'docs/records/')).toEqual({ kind: 'records' });
+    expect(resolveDocLink(catalog, doc, 'docs/')).toEqual({
+      kind: 'source',
+      ref: { path: 'docs', directory: true },
     });
   });
 

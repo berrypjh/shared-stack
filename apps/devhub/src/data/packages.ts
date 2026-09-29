@@ -28,7 +28,7 @@ const noTest = (root: string): EvidenceGap => ({
 const measureFailure: EvidenceGap = {
   kind: 'known-failure',
   note: '토큰 측정 시나리오가 dist/AGENTS.md 를 읽는데 이 패키지는 그 파일을 만들지 않아 측정이 실패한다',
-  evidence: [{ path: 'tools/scripts/measure-tokens/README.md' }],
+  evidence: [{ path: 'docs/tools/measure-tokens.md' }],
 };
 
 /** 설정 파일의 키 하나: 값의 원문과 그 뜻. */
@@ -162,7 +162,7 @@ export const packages: Package[] = [
       {
         kind: 'unsupported',
         note: 'consumer eval 의 검증 단계는 RN 컴포넌트 테스트를 돌리지 못한다(unsupported)',
-        evidence: [{ path: 'tools/evals/consumer/README.md' }],
+        evidence: [{ path: 'docs/tools/consumer-eval.md' }],
       },
     ],
   },

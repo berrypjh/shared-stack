@@ -136,6 +136,96 @@ export type Tool = {
   readonly gaps?: readonly EvidenceGap[];
 };
 
+/** 플러그인 skill 하나 — `skills/<이름>/SKILL.md` frontmatter 그대로. */
+export type PluginSkill = {
+  readonly name: string;
+  readonly description: string;
+  /** frontmatter `when_to_use` — 모델이 스스로 부를 때 보는 조건. */
+  readonly whenToUse?: string;
+  /** `whenToUse` 를 화면에 보이는 한국어로 옮긴 글. 원문(frontmatter)은 모델이 읽으므로 그대로 둔다. */
+  readonly whenToUseKo?: string;
+  readonly argumentHint?: string;
+  /** `disable-model-invocation: true` 면 사용자가 `/이름` 으로만 부른다. */
+  readonly userOnly: boolean;
+  readonly source: SourceRef;
+  /** 같은 skill 폴더의 참고 파일(examples · references). */
+  readonly resources: readonly SourceRef[];
+};
+
+/** MCP 서버 하나 — `.mcp.json` 의 선언과 서버가 등록하는 도구. */
+export type PluginMcpServer = {
+  readonly name: string;
+  /** 실행 명령과 인자를 그대로 이은 글. */
+  readonly command: string;
+  readonly config: SourceRef;
+  readonly implementation: SourceRef;
+  readonly tools: readonly { readonly name: string; readonly title: string }[];
+};
+
+/** hook 하나 — `hooks/hooks.json` 의 이벤트 · matcher · 명령. */
+export type PluginHook = {
+  readonly event: string;
+  readonly matcher?: string;
+  readonly command: string;
+  readonly timeoutSeconds?: number;
+  /** `hooks.json` 의 `description`. */
+  readonly summary: string;
+  readonly config: SourceRef;
+  /** hook 이 무엇을 막는지. `hooks.json` 에 없는 설명이라 정책 파일에서 옮겨 적는다. */
+  readonly policy?: PluginHookPolicy;
+};
+
+/** hook 의 판정 규칙 — 정규식은 옮기지 않고 사람이 읽을 판정 구조만 적는다. */
+export type PluginHookPolicy = {
+  /** 판정 함수가 있는 정책 파일. */
+  readonly source: SourceRef;
+  /** 언제 막는가. */
+  readonly decision: string;
+  readonly targets: readonly string[];
+  /** 대상처럼 보여도 막지 않는 것. */
+  readonly exceptions: readonly string[];
+  /** 막는 조건의 나머지 반쪽. `what` 은 정책 파일의 이름 그대로다. */
+  readonly bypasses: readonly { readonly what: string; readonly examples: string }[];
+  readonly limits: string;
+  /** 계약 문서 · 사례 테스트. */
+  readonly evidence: readonly SourceRef[];
+};
+
+/** 플러그인이 배포하는 작업 규칙 원본 하나 — `standards/manifest.json` 의 항목. */
+export type PluginRule = {
+  readonly id: string;
+  /** `core` 는 늘 켜지고 `optional` 은 소비 저장소가 고른다. */
+  readonly scope: 'core' | 'optional';
+  readonly source: SourceRef;
+};
+
+/**
+ * marketplace(`.claude-plugin/marketplace.json`)로 배포하는 Claude Code 플러그인. `id` 는 같은 폴더의 도구(`Tool.id`)와 같아
+ * 관계 · 근거는 그 도구에서 읽는다.
+ * 소비 저장소가 설치해 쓰는 표면(skill · MCP 서버 · hook · 규칙)을 파일에서 옮겨 적고, 테스트가 디스크와 대조한다.
+ */
+export type Plugin = {
+  /** marketplace 의 플러그인 이름. */
+  readonly id: string;
+  /** 플러그인을 싣는 marketplace 이름. 설치는 `<id>@<marketplace>` 다. */
+  readonly marketplace: string;
+  readonly root: string;
+  readonly version: string;
+  readonly description: string;
+  readonly category: string;
+  readonly keywords: readonly string[];
+  readonly manifest: SourceRef;
+  readonly skills: readonly PluginSkill[];
+  readonly mcpServers: readonly PluginMcpServer[];
+  readonly hooks: readonly PluginHook[];
+  readonly rules: readonly PluginRule[];
+  /** hook · CLI 가 실행하는 스크립트. */
+  readonly scripts: readonly SourceRef[];
+  /** 소비 저장소가 복사해 쓰는 설정 예시. */
+  readonly examples: readonly SourceRef[];
+  readonly docs: readonly string[];
+};
+
 /**
  * 관계는 네 종류를 섞지 않는다. `from` → `to` 의 뜻:
  * 의존은 "from 이 to 에 기댄다", 생성물은 "from 이 만든 파일을 to 가 싣는다",
@@ -179,7 +269,7 @@ export type BrokenLink = { readonly href: string; readonly note: string };
 export type DocumentRef = {
   readonly id: string;
   readonly path: string;
-  /** 문서를 여는 `#` 제목, 글자 그대로. `#` 제목으로 시작하지 않는 문서(CHANGELOG)는 파일 이름이다. */
+  /** 문서를 여는 `#` 제목, 글자 그대로. `#` 제목으로 시작하지 않는 문서는 파일 이름이다. */
   readonly title: string;
   /** 문서에 적힌 그대로의 href. 테스트가 실제 문서의 깨진 링크와 정확히 대조한다. */
   readonly brokenLinks?: readonly BrokenLink[];
@@ -206,6 +296,8 @@ export type RecordRef = {
   readonly docs: readonly string[];
   /** 기록이 정하거나 고친 것을 지키는 테스트 묶음 ID. */
   readonly tests: readonly string[];
+  /** 기록은 고쳐 쓰지 않으므로, 대상이 나중에 사라진 링크는 여기에 이유와 함께 적는다. */
+  readonly brokenLinks?: readonly BrokenLink[];
 };
 
 /** 테스트 묶음 하나: 러너 · 설정 파일 · 확인 대상. 개수 · 결과는 담지 않는다. */
@@ -287,6 +379,7 @@ export type Catalog = {
   readonly applications: readonly Application[];
   readonly packages: readonly Package[];
   readonly tools: readonly Tool[];
+  readonly plugins: readonly Plugin[];
   readonly relations: readonly Relation[];
   readonly documents: readonly DocumentRef[];
   readonly records: readonly RecordRef[];

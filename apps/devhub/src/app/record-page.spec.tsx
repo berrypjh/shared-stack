@@ -73,7 +73,10 @@ describe('record page', () => {
     expect(panel.getByRole('heading', { level: 2 }).textContent).toBe(record.title);
     const headings = panel
       .getAllByRole('heading', { level: 3 })
-      .map((heading) => heading.firstChild?.textContent);
+      .map(
+        (heading) =>
+          [...heading.childNodes].find((n) => n.nodeType === Node.TEXT_NODE)?.textContent,
+      );
     expect(headings).toEqual(['개요', '소스', '문서', '테스트']);
     for (const source of record.sources) {
       expect(panel.getByText(source.path.split('/').pop() as string)).toBeTruthy();

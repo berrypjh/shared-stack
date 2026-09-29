@@ -4,6 +4,7 @@ import type {
   EvidenceGap,
   PackageKind,
   Platform,
+  PluginRule,
   RecordRef,
   Relation,
   StepStatus,
@@ -23,6 +24,12 @@ export const PLATFORM: Record<Platform, string> = {
 export const VISIBILITY: Record<Visibility, string> = {
   public: '공개(배포)',
   internal: '내부(private)',
+};
+
+/** 플러그인 규칙의 적용 범위. */
+export const RULE_SCOPE: Record<PluginRule['scope'], string> = {
+  core: '늘 적용',
+  optional: '소비 저장소가 고름',
 };
 
 export const PACKAGE_KIND: Record<PackageKind, string> = {
@@ -72,15 +79,29 @@ export const ACTOR: Record<ConsumerJourney['actor'], string> = {
   maintainer: '유지보수 흐름',
 };
 
-/** 문서 묶음 — 루트 문서는 "저장소", 나머지는 경로 접두사로 고른다. 표의 순서가 화면 순서다. */
-export const ROOT_DOCUMENT_GROUP = '저장소';
-
-export const DOCUMENT_GROUP: [prefix: string, title: string][] = [
-  ['.claude/rules/', '프로젝트 지침'],
-  ['libs/', '패키지'],
-  ['docs/', '설계 · 사용법'],
-  ['tools/', '도구 · 플러그인'],
-  ['plugins/', '도구 · 플러그인'],
+/**
+ * 문서 묶음 — 먼저 독자(에이전트 · 소비자 · 개발)로 가르고, 같은 독자 안에서 주제로 가른다.
+ * 경로가 맞는 것 중 가장 긴 `prefix` 가 묶음을 정하고, 탐색기 이름은 경로에서 `base` 를 뗀 것이다.
+ * 제목이 처음 나오는 순서가 화면 순서다.
+ */
+export const DOCUMENT_GROUP: [prefix: string, title: string, base: string][] = [
+  ['README.md', '개발 · 저장소', ''],
+  ['libs/ui-core/', '개발 · 저장소', ''],
+  ['libs/design-tokens/', '개발 · 저장소', ''],
+  ['docs/tools/', '개발 · 도구', 'docs/tools/'],
+  ['docs/observability/', '개발 · 품질 관측', 'docs/observability/'],
+  ['docs/claude-harness/', '개발 · Claude harness', 'docs/claude-harness/'],
+  ['libs/', '소비자 · 패키지', 'libs/'],
+  ['plugins/', '소비자 · 플러그인', 'plugins/'],
+  ['AGENTS.md', '에이전트 · 저장소 지침', ''],
+  ['.claude/', '에이전트 · 저장소 지침', ''],
+  ['libs/react-ui/AGENTS.consumer.md', '에이전트 · 패키지 사용 규칙', 'libs/'],
+  ['libs/react-native-ui/AGENTS.consumer.md', '에이전트 · 패키지 사용 규칙', 'libs/'],
+  [
+    'plugins/berry-dev/standards/rules/',
+    '에이전트 · 공통 규칙 원본',
+    'plugins/berry-dev/standards/rules/',
+  ],
 ];
 
 /** 경로를 인용하는 자리의 종류. */

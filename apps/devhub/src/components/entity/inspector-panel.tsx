@@ -1,4 +1,12 @@
-import { Empty, INSPECTOR_ID, InspectorSection, Pager } from '@berrypjh/devhub-ui';
+import {
+  Empty,
+  Facts,
+  type IconName,
+  INSPECTOR_ID,
+  InspectorHeader,
+  InspectorSection,
+  Pager,
+} from '@berrypjh/devhub-ui';
 import { List, ListItem } from '@berrypjh/react-ui';
 
 import type { ReactNode } from 'react';
@@ -12,33 +20,43 @@ import { groupByOwner } from '@/lib/catalog/reference-groups';
 import { FileRow } from '../source/file-row';
 import { EntityLink } from '../ui/entity-link';
 
-import { DocumentRows, SourceGroups, TestRows } from './inspector-parts';
+import {
+  countByRunner,
+  DocumentRows,
+  SourceGroups,
+  sourceSummary,
+  TestRows,
+} from './inspector-parts';
 
 const SECTIONS = [
-  ['overview', '개요'],
-  ['visibility', '공개 여부 · 플랫폼'],
-  ['exports', '진입점'],
-  ['relations', '위 · 아래'],
-  ['artifacts', '생성물'],
-  ['source', '소스'],
-  ['documents', '문서'],
-  ['tests', '테스트'],
-  ['related', '관련 항목'],
-] as const;
+  ['overview', '개요', 'overview'],
+  ['visibility', '공개 여부 · 플랫폼', 'globe'],
+  ['exports', '진입점', 'outgoing'],
+  ['relations', '위 · 아래', 'architecture'],
+  ['artifacts', '생성물', 'package'],
+  ['source', '소스', 'source'],
+  ['documents', '문서', 'document'],
+  ['tests', '테스트', 'test'],
+  ['related', '관련 항목', 'related'],
+] as const satisfies readonly (readonly [string, string, IconName])[];
 
 type SectionKey = (typeof SECTIONS)[number][0];
-const TITLE = Object.fromEntries(SECTIONS) as Record<SectionKey, string>;
+const META = Object.fromEntries(
+  SECTIONS.map(([key, title, icon]) => [key, { id: `inspector-${key}`, title, icon }]),
+) as Record<SectionKey, { id: string; title: string; icon: IconName }>;
 
 const Section = ({
   id,
   count,
+  summary,
   children,
 }: {
   id: SectionKey;
   count?: number;
+  summary?: string;
   children: ReactNode;
 }) => (
-  <InspectorSection id={`inspector-${id}`} title={TITLE[id]} count={count}>
+  <InspectorSection {...META[id]} count={count} summary={summary}>
     {children}
   </InspectorSection>
 );
@@ -49,7 +67,8 @@ const RelationRows = ({ items, empty }: { items: RelationItem[]; empty: string }
     <List className="flex flex-col gap-sm">
       {items.map(({ relation, other }) => (
         <ListItem key={relation.id} className="flex flex-col gap-2xs typo-body-small">
-          <span>
+          {/* 링크 뒤에 글이 이어지므로 색만이 아니라 밑줄로도 링크임을 보인다(WCAG 1.4.1). */}
+          <span className="[&>a]:underline">
             <EntityLink id={other} hash={INSPECTOR_ID} />{' '}
             <span className="text-text-light">· {RELATION_KIND[relation.kind]}</span>
           </span>
@@ -71,16 +90,22 @@ const Overview = ({ inspection }: { inspection: Inspection }) => {
   const { overview } = inspection;
   return (
     <Section id="overview">
-      <p className="typo-body-small">{inspection.purpose}</p>
+      <Facts
+        facts={[
+          { term: '요약', detail: inspection.purpose },
+          {
+            term: 'Nx 프로젝트',
+            detail: <span className="devhub-code">{overview.nxProject}</span>,
+          },
+          {
+            term: '패키지 이름',
+            detail: <span className="devhub-code">{overview.packageName}</span>,
+          },
+        ]}
+      />
       <List className="flex flex-col gap-sm">
         <FileRow source={overview.root} label="위치" />
       </List>
-      <dl className="grid grid-cols-[6rem_minmax(0,1fr)] gap-x-md gap-y-xs typo-body-small">
-        <dt className="text-text-light">Nx 프로젝트</dt>
-        <dd className="devhub-code">{overview.nxProject}</dd>
-        <dt className="text-text-light">패키지 이름</dt>
-        <dd className="devhub-code">{overview.packageName}</dd>
-      </dl>
       {overview.gaps.length > 0 && (
         <List className="flex flex-col gap-xs">
           {overview.gaps.map((gap) => (
@@ -155,6 +180,7 @@ const SourceSection = ({ inspection }: { inspection: Inspection }) => (
   <Section
     id="source"
     count={groupByOwner(catalog, inspection.source).reduce((n, g) => n + g.refs.length, 0)}
+    summary={sourceSummary(inspection.source)}
   >
     <SourceGroups refs={inspection.source} />
   </Section>
@@ -174,33 +200,19 @@ export const InspectorPanel = ({
   unit: string;
 }) => (
   <div className="flex flex-col divide-y divide-stroke-light">
-    <header className="flex flex-col gap-sm pb-lg">
-      <div className="flex items-center justify-between gap-sm">
-        <p className="typo-caption-small text-text-light">패키지</p>
-        <Pager entities={siblings} current={inspection.id} unit={unit} />
-      </div>
-      <h2 className="typo-body-medium-strong break-all">{inspection.title}</h2>
+    <InspectorHeader
+      kind="패키지"
+      title={inspection.title}
+      pager={<Pager entities={siblings} current={inspection.id} unit={unit} />}
+      sections={Object.values(META)}
+    >
       <p className="flex flex-wrap gap-x-md typo-caption-small">
         <span className="rounded-sm border border-stroke-default px-xs">
           {inspection.visibility.value === 'public' ? '공개(배포)' : 'Internal'}
         </span>
         <span className="text-text-light">{PLATFORM[inspection.platform]}</span>
       </p>
-      <nav aria-label="상세 목차">
-        <ul className="flex flex-wrap gap-x-md gap-y-xs">
-          {SECTIONS.map(([id, title]) => (
-            <li key={id}>
-              <a
-                href={`#inspector-${id}`}
-                className="typo-caption-small text-text-link underline-offset-2 hover:underline"
-              >
-                {title}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </nav>
-    </header>
+    </InspectorHeader>
 
     <Overview inspection={inspection} />
     <VisibilitySection inspection={inspection} />
@@ -218,7 +230,7 @@ export const InspectorPanel = ({
     <Section id="documents" count={inspection.documents.length}>
       <DocumentRows items={inspection.documents} empty={inspection.empty.documents} />
     </Section>
-    <Section id="tests" count={inspection.tests.length}>
+    <Section id="tests" count={inspection.tests.length} summary={countByRunner(inspection.tests)}>
       <TestRows items={inspection.tests} empty={inspection.empty.tests} />
     </Section>
     <Section id="related" count={inspection.related.length}>

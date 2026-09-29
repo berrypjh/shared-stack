@@ -5,7 +5,7 @@ import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 
 import { catalog } from '@/data';
-import { documentHref, recordHref } from '@/lib/catalog/routes';
+import { documentHref, recordHref, RECORDS_HREF } from '@/lib/catalog/routes';
 import { type LinkSource, resolveDocLink } from '@/lib/markdown/doc-links';
 import { SNAPSHOT } from '@/lib/repository/current-snapshot';
 import { sourceLink } from '@/lib/repository/source-links';
@@ -34,7 +34,7 @@ const Note = ({ children }: { children: ReactNode }) => (
 );
 
 /**
- * 문서에 적힌 링크. 카탈로그 문서는 앱 안(`/documents/<id>`)으로, 저장소 파일은 스냅샷 커밋의 원격 저장소로 간다.
+ * 문서에 적힌 링크. 카탈로그 문서 · 기록 폴더는 앱 안(`/documents/<id>` · `/records`)으로, 저장소 파일은 스냅샷 커밋의 원격 저장소로 간다.
  * 둘은 모양이 다르다: 소스는 새 창 표시가 붙는다. 깨진 링크는 숨기지 않고 글과 이유를 그대로 보인다.
  */
 export const DocLink = ({
@@ -69,6 +69,12 @@ export const DocLink = ({
     case 'record':
       return (
         <Link to={`${recordHref(link.id)}${hashOf(link.anchor)}`} className={LINK}>
+          {children}
+        </Link>
+      );
+    case 'records':
+      return (
+        <Link to={RECORDS_HREF} className={LINK}>
           {children}
         </Link>
       );

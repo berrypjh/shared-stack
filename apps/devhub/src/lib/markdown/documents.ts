@@ -1,4 +1,4 @@
-import { type Block, parseMarkdown } from '@berrypjh/devhub-ui';
+import { type Block, inlineText, parseInline, parseMarkdown } from '@berrypjh/devhub-ui';
 
 import type { DocumentRef } from '../../domain/model';
 
@@ -6,6 +6,9 @@ import { loadRaw } from './sources';
 
 /** 문서 화면으로 그려지는 것. 저장소 문서와 기록이 같은 모양이다. */
 export type ReadableDoc = Pick<DocumentRef, 'path' | 'title' | 'brokenLinks'>;
+
+/** 문서 제목의 읽히는 글자. 카탈로그는 `#` 제목을 원문 그대로(`` ` `` 포함) 둔다. */
+export const titleText = (doc: Pick<DocumentRef, 'title'>) => inlineText(parseInline(doc.title));
 
 const cache = new Map<string, Promise<Block[]>>();
 

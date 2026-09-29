@@ -4,16 +4,14 @@ import type { DocumentRef } from '../domain/model';
 export const documents: DocumentRef[] = [
   { id: 'root-agents', path: 'AGENTS.md', title: 'shared-stack — 크로스 플랫폼 UI 시스템' },
   { id: 'root-readme', path: 'README.md', title: '@berrypjh/shared-stack' },
-  { id: 'changelog', path: 'CHANGELOG.md', title: 'CHANGELOG.md' },
+  { id: 'harness-profile', path: '.claude/harness.profile.md', title: 'Harness profile' },
 
   { id: 'demo-web-agents', path: '.claude/rules/demo-web.md', title: 'demo-web (`apps/demo-web`)' },
-  { id: 'demo-web-readme', path: 'docs/demo/web.md', title: '@berrypjh/demo-web' },
   {
     id: 'demo-mobile-agents',
     path: '.claude/rules/demo-mobile.md',
     title: 'demo-mobile (`apps/demo-mobile`)',
   },
-  { id: 'demo-mobile-readme', path: 'docs/demo/mobile.md', title: '@berrypjh/demo-mobile' },
   { id: 'observability-usage', path: 'docs/observability/usage.md', title: '품질 관측 사용법' },
   { id: 'devhub-agents', path: '.claude/rules/devhub.md', title: 'devhub (`apps/devhub`)' },
   {
@@ -62,6 +60,7 @@ export const documents: DocumentRef[] = [
     path: 'libs/react-native-ui/AGENTS.consumer.md',
     title: '@berrypjh/react-native-ui',
   },
+  { id: 'records-agents', path: '.claude/rules/records.md', title: '개발 기록 (`docs/records`)' },
   {
     id: 'observability-contracts-agents',
     path: '.claude/rules/observability-contracts.md',
@@ -90,24 +89,9 @@ export const documents: DocumentRef[] = [
     title: '품질 관측 아키텍처',
   },
   {
-    id: 'observability-collectors-guide',
-    path: 'docs/observability/collectors.md',
-    title: '품질 관측 수집기',
-  },
-  {
-    id: 'observability-limitations',
-    path: 'docs/observability/limitations.md',
-    title: '품질 관측 알려진 제약',
-  },
-  {
     id: 'observability-metrics',
     path: 'docs/observability/metrics.md',
     title: '품질 관측 metric 카탈로그',
-  },
-  {
-    id: 'observability-verification',
-    path: 'docs/observability/verification.md',
-    title: '품질 관측 검증',
   },
   {
     id: 'claude-harness-architecture',
@@ -137,36 +121,52 @@ export const documents: DocumentRef[] = [
 
   {
     id: 'consumer-retrieval-readme',
-    path: 'tools/consumer-retrieval/README.md',
+    path: 'docs/tools/consumer-retrieval.md',
     title: 'consumer-retrieval',
   },
-  { id: 'consumer-eval-readme', path: 'tools/evals/consumer/README.md', title: 'consumer eval' },
-  {
-    id: 'consumer-eval-baseline-readme',
-    path: 'tools/evals/consumer/baseline/README.md',
-    title: 'baseline',
-  },
-  {
-    id: 'consumer-eval-fixtures-readme',
-    path: 'tools/evals/consumer/fixtures/README.md',
-    title: 'fixtures',
-  },
+  { id: 'consumer-eval-readme', path: 'docs/tools/consumer-eval.md', title: 'consumer eval' },
   {
     id: 'measure-tokens-readme',
-    path: 'tools/scripts/measure-tokens/README.md',
+    path: 'docs/tools/measure-tokens.md',
     title: 'measure-tokens',
   },
   {
     id: 'treeshake-readme',
-    path: 'tools/scripts/treeshake/README.md',
+    path: 'docs/tools/treeshake.md',
     title: 'treeshake',
     brokenLinks: [
       {
-        href: '../../../docs/verification-guide.md',
+        href: '../verification-guide.md',
         note: 'docs/verification-guide.md 는 저장소 기록 어디에도 없다 — 처음부터 대상 없이 쓰인 링크다',
       },
     ],
   },
   { id: 'berry-commit-readme', path: 'plugins/berry-commit/README.md', title: 'berry-commit' },
   { id: 'berry-dev-readme', path: 'plugins/berry-dev/README.md', title: 'berry-dev' },
+
+  {
+    id: 'standards-core',
+    path: 'plugins/berry-dev/standards/rules/core.md',
+    title: '작업 기본 원칙',
+  },
+  {
+    id: 'standards-berry-consumer',
+    path: 'plugins/berry-dev/standards/rules/berry-consumer.md',
+    title: '`@berrypjh` UI 패키지 소비',
+  },
+  {
+    id: 'standards-cross-runtime-pure',
+    path: 'plugins/berry-dev/standards/rules/cross-runtime-pure.md',
+    title: '플랫폼 중립 계약 · 로직',
+  },
+  {
+    id: 'standards-docs-ko',
+    path: 'plugins/berry-dev/standards/rules/docs-ko.md',
+    title: '한국어 문서 문체',
+  },
+  {
+    id: 'standards-ko-ui',
+    path: 'plugins/berry-dev/standards/rules/ko-ui.md',
+    title: '한국어 사용자 화면 문구',
+  },
 ];

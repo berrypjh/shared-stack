@@ -34,17 +34,13 @@ export const tools: Tool[] = [
     platform: 'node',
     purpose:
       '같은 dataset · 같은 결정적 grader 로 "무엇을 읽혔을 때 소비자 작업이 맞는가"를 비교하는 평가 harness',
-    docs: [
-      'consumer-eval-readme',
-      'consumer-eval-baseline-readme',
-      'consumer-eval-fixtures-readme',
-    ],
+    docs: ['consumer-eval-readme'],
     source: [{ path: 'tools/evals/consumer/runner/run.ts' }],
     gaps: [
       {
         kind: 'unsupported',
         note: 'programmatic LLM executor 가 없다. dev · test split 은 수집된 trace 를 replay 할 때만 채점한다',
-        evidence: [{ path: 'tools/evals/consumer/README.md' }],
+        evidence: [{ path: 'docs/tools/consumer-eval.md' }],
       },
     ],
   },
@@ -56,7 +52,7 @@ export const tools: Tool[] = [
     platform: 'node',
     purpose:
       '품질 결과를 수집해 계약으로 검증한 JSON 을 DevHub 의 public 경로로 export 한다 — 평가 화면이 읽는다',
-    docs: ['observability-collectors-guide', 'observability-architecture'],
+    docs: ['observability-architecture'],
     source: [
       { path: 'tools/scripts/observability/cli.ts' },
       { path: 'tools/scripts/observability/export.ts', symbol: 'PUBLIC_ROOT' },
@@ -70,7 +66,7 @@ export const tools: Tool[] = [
     platform: 'node',
     purpose:
       'nx release 로 공개 패키지의 버전 · changelog · 배포를 한다(로컬 registry 또는 GitHub Packages)',
-    docs: ['changelog'],
+    docs: [],
     source: [
       { path: 'tools/scripts/release/release-npm.ts' },
       { path: 'tools/scripts/release/release-local.ts' },
@@ -130,6 +126,21 @@ export const tools: Tool[] = [
     ],
   },
   {
+    id: 'claude-harness',
+    name: 'Claude harness 검사',
+    root: 'tools/scripts/claude-harness',
+    rootKind: 'directory',
+    platform: 'node',
+    purpose:
+      'berry-dev 플러그인의 standards sync · check, secret guard hook, skill 구조를 실제 파일로 확인하는 테스트 묶음',
+    docs: ['claude-harness-verification'],
+    source: [
+      { path: 'tools/scripts/claude-harness/standards.test.ts' },
+      { path: 'tools/scripts/claude-harness/guard.test.ts' },
+      { path: 'tools/scripts/claude-harness/structure.test.ts' },
+    ],
+  },
+  {
     id: 'tools-lib',
     name: '도구 공용 헬퍼',
     root: 'tools/lib',
@@ -163,6 +174,34 @@ export const tools: Tool[] = [
         note: '테스트 파일이 없다. project.json 에는 build · typecheck 만 있다',
         evidence: [{ path: 'plugins/berry-commit/project.json' }],
       },
+    ],
+  },
+  {
+    id: 'berry-dev',
+    name: 'berry-dev',
+    root: 'plugins/berry-dev',
+    rootKind: 'directory',
+    platform: 'node',
+    purpose:
+      '여러 저장소가 같은 Claude Code 작업 규칙을 쓰도록 standards rule 원본 · sync · check CLI · 검증 · UI 검수 skill · secret guard hook 을 주는 플러그인',
+    docs: [
+      'berry-dev-readme',
+      'claude-harness-architecture',
+      'claude-harness-contracts',
+      'claude-harness-standards-sources',
+      'claude-harness-setup',
+      'harness-profile',
+      'standards-core',
+      'standards-berry-consumer',
+      'standards-cross-runtime-pure',
+      'standards-docs-ko',
+      'standards-ko-ui',
+    ],
+    source: [
+      { path: 'plugins/berry-dev/.claude-plugin/plugin.json' },
+      { path: 'plugins/berry-dev/scripts/standards.mjs' },
+      { path: 'plugins/berry-dev/hooks/hooks.json' },
+      { path: '.claude-plugin/marketplace.json' },
     ],
   },
 ];

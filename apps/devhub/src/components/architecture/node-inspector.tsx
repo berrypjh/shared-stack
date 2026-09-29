@@ -51,7 +51,8 @@ export const NodeInspector = ({
               const arrow = edge.source === node.id ? '→' : '←';
               return (
                 <ListItem key={edge.id} className="flex flex-col gap-2xs typo-body-small">
-                  <span>
+                  {/* 링크 앞뒤로 글이 이어지므로 색만이 아니라 밑줄로도 링크임을 보인다(WCAG 1.4.1). */}
+                  <span className="[&>a]:underline">
                     {arrow}{' '}
                     <Link to={`${nodeHref(other, query)}#devhub-inspector`} className={LINK}>
                       {labelOf(other)}

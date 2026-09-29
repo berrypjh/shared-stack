@@ -6,6 +6,36 @@ import type { RecordRef } from '../domain/model';
  */
 export const records: RecordRef[] = [
   {
+    id: 'devhub-editorial-theme-pair',
+    path: 'docs/records/2026-09-29-devhub-editorial-theme-pair.md',
+    title: 'editorial 테마 짝(ivory · charcoal)과 DevHub 의 ThemePair 추가',
+    kind: 'decision',
+    date: '2026-09-29',
+    summary:
+      'ivory · charcoal 을 정식 ThemeName 으로 추가하고 devhub-ui 의 논리 모드와 토큰 테마를 선택 설정 ThemePair 로 분리. 기본 짝 · shared-stack DevHub 는 light · dark, 저장값은 모드',
+    sources: [
+      { path: 'libs/design-tokens/src/themes.ts', symbol: 'themes' },
+      { path: 'libs/devhub-ui/src/theme/theme.ts', symbol: 'createThemeScript' },
+      { path: 'apps/devhub/index.html' },
+    ],
+    docs: [
+      'design-tokens-agents',
+      'design-tokens-readme',
+      'devhub-ui-agents',
+      'devhub-ui-readme',
+      'devhub-agents',
+    ],
+    tests: [
+      'design-tokens-vitest',
+      'ui-core-vitest',
+      'react-native-ui-jest',
+      'demo-web-vitest',
+      'devhub-ui-vitest',
+      'devhub-vitest',
+      'devhub-e2e-playwright',
+    ],
+  },
+  {
     id: 'project-docs-to-rules',
     path: 'docs/records/2026-09-26-project-docs-to-rules.md',
     title: '하위 프로젝트 지침을 path rule 로, 앱 설명을 docs 로 이동',
@@ -19,6 +49,16 @@ export const records: RecordRef[] = [
     ],
     docs: ['root-agents', 'devhub-agents', 'observability-usage', 'observability-architecture'],
     tests: ['devhub-vitest'],
+    brokenLinks: [
+      {
+        href: '../demo/web.md',
+        note: '2026-09-30 삭제 — 데모 실행 방법은 루트 README.md 로 옮겼다',
+      },
+      {
+        href: '../demo/mobile.md',
+        note: '2026-09-30 삭제 — 데모 실행 방법은 루트 README.md 로 옮겼다',
+      },
+    ],
   },
   {
     id: 'devhub-ui-package',
@@ -63,8 +103,9 @@ export const records: RecordRef[] = [
     sources: [
       { path: 'tools/scripts/release/release-bump.ts', symbol: 'hasReleaseFeature' },
       { path: 'tools/scripts/release/release-npm.ts', symbol: 'getLogSinceLastTag' },
+      { path: 'CHANGELOG.md' },
     ],
-    docs: ['changelog'],
+    docs: [],
     tests: ['tools-vitest'],
   },
   {
@@ -274,11 +315,6 @@ export const records: RecordRef[] = [
       { path: 'apps/devhub/src/lib/evaluation/client.ts', symbol: 'createClient' },
       { path: 'apps/devhub/src/components/shell/devhub-shell.tsx', symbol: 'useEvaluationSection' },
       { path: 'tools/scripts/observability/export.ts', symbol: 'PUBLIC_ROOT' },
-      { path: 'tools/scripts/observability/audit.ts', symbol: 'AUDIT_ROUTES' },
-      {
-        path: 'libs/observability-contracts/src/accessibility.ts',
-        symbol: 'ACCESSIBILITY_SOURCE_SCOPES',
-      },
     ],
     docs: ['devhub-agents', 'observability-architecture', 'observability-contracts-agents'],
     tests: [
@@ -301,7 +337,39 @@ export const records: RecordRef[] = [
       { path: 'libs/observability-contracts/src/observation.ts', symbol: 'DOMAINS' },
       { path: 'tools/scripts/observability/registry.ts', symbol: 'COMMANDS' },
     ],
-    docs: ['devhub-agents', 'observability-architecture', 'observability-collectors-guide'],
+    docs: ['devhub-agents', 'observability-architecture'],
+    tests: ['devhub-vitest', 'tools-vitest', 'observability-contracts-vitest'],
+  },
+  {
+    id: 'no-ui-mcp',
+    path: 'docs/records/2026-09-04-no-ui-mcp.md',
+    title: 'UI 조회를 MCP 도구가 아니라 CLI로 제공',
+    kind: 'decision',
+    date: '2026-09-04',
+    summary:
+      '효과를 잴 수 없고 이득은 초기 컨텍스트에서 나오므로 MCP · UI plugin 없이 패키지 동봉 CLI로. 에이전트가 full 카탈로그를 반복해 읽는 것이 관측되면 다시 검토',
+    sources: [
+      { path: 'tools/consumer-retrieval/package-cli.ts' },
+      { path: 'tools/consumer-retrieval/cli.ts' },
+    ],
+    docs: ['consumer-retrieval-readme'],
+    tests: ['tools-vitest'],
+  },
+  {
+    id: 'evaluation-bundle-ai-only',
+    path: 'docs/records/2026-09-30-evaluation-bundle-ai-only.md',
+    title: '평가에서 접근성 · 디자인 시스템을 제거하고 번들 · AI 평가만 남김',
+    kind: 'decision',
+    date: '2026-09-30',
+    summary:
+      '접근성은 Storybook test-runner · devhub-e2e 가, 대비는 design-tokens 테스트가 이미 강제하므로 평가는 번들 · AI 평가만. 수집기 · 계약까지 삭제',
+    sources: [
+      { path: 'apps/devhub/src/lib/evaluation/screens.ts', symbol: 'EVALUATION_SCREENS' },
+      { path: 'libs/observability-contracts/src/run.ts', symbol: 'PROFILES' },
+      { path: 'tools/scripts/observability/registry.ts', symbol: 'COMMANDS' },
+      { path: 'apps/devhub-e2e/src/a11y.spec.ts' },
+    ],
+    docs: ['devhub-agents', 'observability-architecture'],
     tests: ['devhub-vitest', 'tools-vitest', 'observability-contracts-vitest'],
   },
 ];

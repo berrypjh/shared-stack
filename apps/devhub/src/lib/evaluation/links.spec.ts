@@ -29,10 +29,4 @@ describe('failureHref — 도메인 실패는 그 도메인 화면의 근거 행
       '/evaluation/ai?run=run-a',
     );
   });
-
-  it('a11y 실패는 접근성 화면이다', () => {
-    expect(failureHref(failure('a11y', 'a11y:devhub'), 'run-a')).toBe(
-      '/evaluation/accessibility?run=run-a',
-    );
-  });
 });

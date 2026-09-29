@@ -1,6 +1,8 @@
 import { Suspense } from 'react';
 
 import {
+  DocumentColumn,
+  DocumentHead,
   Inspector,
   RecordMeta,
   useDocumentTitle,
@@ -13,6 +15,7 @@ import { useParams } from 'react-router-dom';
 import { DocumentBody } from '@/components/doc/document-body';
 import { EntityNotFound, placeOf } from '@/components/entity/entity-not-found';
 import { RecordInspector } from '@/components/entity/record-inspector';
+import { SourceActions } from '@/components/source/source-actions';
 import { SECTION_ICON } from '@/components/ui/view-icons';
 import { findEntity, findSection } from '@/lib/catalog/entities';
 import { RECORD_KIND } from '@/lib/catalog/labels';
@@ -31,22 +34,29 @@ export const RecordPage = () => {
   return (
     <>
       <WorkspaceFrame>
-        <WorkspaceHeader
-          eyebrow={section.title}
-          icon={SECTION_ICON[section.id]}
-          title={record.title}
-        />
-        <RecordMeta date={record.date} kind={RECORD_KIND[record.kind]} />
-        <Suspense
-          key={record.id}
-          fallback={
-            <p role="status" className="typo-body-small text-text-light">
-              기록을 불러오는 중입니다
-            </p>
-          }
-        >
-          <DocumentBody doc={record} />
-        </Suspense>
+        <DocumentColumn>
+          <WorkspaceHeader
+            eyebrow={section.title}
+            icon={SECTION_ICON[section.id]}
+            title={record.title}
+          />
+          <DocumentHead>
+            <SourceActions
+              source={{ path: record.path }}
+              lead={<RecordMeta date={record.date} kind={RECORD_KIND[record.kind]} />}
+            />
+          </DocumentHead>
+          <Suspense
+            key={record.id}
+            fallback={
+              <p role="status" className="typo-body-small text-text-light">
+                기록을 불러오는 중입니다
+              </p>
+            }
+          >
+            <DocumentBody doc={record} />
+          </Suspense>
+        </DocumentColumn>
       </WorkspaceFrame>
       <Inspector>
         <RecordInspector record={record} />

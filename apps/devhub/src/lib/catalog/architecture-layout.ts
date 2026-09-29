@@ -28,9 +28,11 @@ export const GRID: Record<string, readonly [column: number, row: number]> = {
   'commitlint-config': [3, 6],
   'release-scripts': [4, 6],
   'berry-commit': [5, 6],
+  'berry-dev': [6, 6],
   'token-measurement': [0, 7],
   'treeshake-check': [1, 7],
   'eas-build-post-install': [2, 7],
+  'claude-harness': [6, 7],
 };
 
 export const NODE = { width: 200, height: 96 } as const;

@@ -21,6 +21,8 @@ const captionOf = (entity: Entity) => {
         .join(' · ');
     case 'packages':
       return `${entity.record.packageName} · ${VISIBILITY[entity.record.visibility]} · ${PLATFORM[entity.record.platform]}`;
+    case 'plugins':
+      return `v${entity.record.version} · ${entity.record.description}`;
     case 'documents':
       return entity.record.title;
     case 'records':

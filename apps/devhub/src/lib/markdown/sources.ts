@@ -8,20 +8,24 @@ const RAW = import.meta.glob<string>(
     '../../../../../*.md',
     '../../../../../{apps,libs}/*/*.md',
     '../../../../../docs/**/*.md',
-    '../../../../../tools/**/README.md',
     '../../../../../plugins/*/README.md',
+    '../../../../../plugins/*/standards/rules/*.md',
     '!../../../../../**/CLAUDE.md',
+    '!../../../../../CHANGELOG.md',
     '!../../../../../**/node_modules/**',
   ],
   { query: '?raw', import: 'default' },
 );
 
-/** 프로젝트별 path rule. build 의 glob 은 `exhaustive` 없이는 숨김 폴더(`.claude`)를 건너뛴다. */
-const RULES = import.meta.glob<string>('../../../../../.claude/rules/*.md', {
-  query: '?raw',
-  import: 'default',
-  exhaustive: true,
-});
+/** 프로젝트별 path rule 과 harness profile. build 의 glob 은 `exhaustive` 없이는 숨김 폴더(`.claude`)를 건너뛴다. */
+const RULES = import.meta.glob<string>(
+  ['../../../../../.claude/rules/*.md', '../../../../../.claude/*.md'],
+  {
+    query: '?raw',
+    import: 'default',
+    exhaustive: true,
+  },
+);
 
 /** 이 파일의 저장소 경로. glob 키는 이 파일에서 본 상대 경로라 여기서 풀어 저장소 경로로 바꾼다. */
 const HERE = new URL('apps/devhub/src/lib/markdown/', 'file:///repo/');

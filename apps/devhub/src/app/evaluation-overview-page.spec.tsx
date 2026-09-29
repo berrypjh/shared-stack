@@ -5,12 +5,12 @@ import { type NavigateFunction, useNavigate } from 'react-router-dom';
 import { evalArtifact } from '@/test/evaluation/evals';
 import { OTHER_SHA } from '@/test/evaluation/fixtures';
 import { renderEvaluation } from '@/test/evaluation/render';
-import { designArtifact, publicFiles, qualityArtifact } from '@/test/evaluation/runs';
+import { publicFiles, qualityArtifact, staticArtifact } from '@/test/evaluation/runs';
 
 const EVAL_COLLECT =
   'pnpm quality:collect --profile=eval --from=tmp/llm-evals/<평가-폴더> --run-id=<새-run-id>';
 
-const files = () => publicFiles([designArtifact('run-design'), qualityArtifact('run-quality')]);
+const files = () => publicFiles([staticArtifact('run-static'), qualityArtifact('run-quality')]);
 const main = () => within(screen.getByRole('main'));
 const region = (name: string) => main().findByRole('region', { name });
 const picker = () => main().findByRole('combobox', { name: '실행' }) as Promise<HTMLSelectElement>;
@@ -46,7 +46,7 @@ describe('개요 — 실제 loader 결과', () => {
   });
 
   it('run 이 담지 않은 영역은 0 이 아니라 이 실행에 없음과 수집 명령이다', async () => {
-    renderEvaluation('/evaluation?run=run-design', files());
+    renderEvaluation('/evaluation?run=run-static', files());
     const bundles = await region('번들 budget');
     expect(await within(bundles).findByText('이 실행에 없음')).toBeTruthy();
     expect(bundles.textContent).toContain(
@@ -57,7 +57,7 @@ describe('개요 — 실제 loader 결과', () => {
   });
 
   it('평가 카드의 수집 명령은 평가 폴더를 받는 eval 명령 그대로다', async () => {
-    renderEvaluation('/evaluation?run=run-design', files());
+    renderEvaluation('/evaluation?run=run-static', files());
     const evals = await region('평가');
     expect(await within(evals).findByText(EVAL_COLLECT)).toBeTruthy();
     expect(evals.textContent).not.toContain('<dir>');
@@ -65,8 +65,8 @@ describe('개요 — 실제 loader 결과', () => {
 
   it('평가가 없는 실행의 평가 카드는 요약으로 확인한 평가 있는 실행을 말하고 AI 평가로 잇는다', async () => {
     renderEvaluation(
-      '/evaluation?run=run-design',
-      publicFiles([designArtifact('run-design'), evalArtifact('run-eval')]),
+      '/evaluation?run=run-static',
+      publicFiles([staticArtifact('run-static'), evalArtifact('run-eval')]),
     );
     const evals = await region('평가');
     const link = await within(evals).findByRole('link', { name: 'run-eval' });
@@ -76,7 +76,7 @@ describe('개요 — 실제 loader 결과', () => {
   });
 
   it('어느 공개 실행에도 평가가 없으면 그렇게 말한다', async () => {
-    const { calls } = renderEvaluation('/evaluation?run=run-design', files());
+    const { calls } = renderEvaluation('/evaluation?run=run-static', files());
     const evals = await region('평가');
     await waitFor(() =>
       expect(calls.map((call) => call.url)).toContain(
@@ -88,7 +88,7 @@ describe('개요 — 실제 loader 결과', () => {
   });
 
   it('번들 · 컨텍스트 카드도 그 영역이 있는 실행을 요약으로 말한다', async () => {
-    renderEvaluation('/evaluation?run=run-design', files());
+    renderEvaluation('/evaluation?run=run-static', files());
     const bundles = await region('번들 budget');
     const bundleRun = await within(bundles).findByRole('link', { name: 'run-quality' });
     expect(bundleRun.getAttribute('href')).toBe('/evaluation/bundles?run=run-quality');
@@ -162,8 +162,8 @@ describe('개요 — 근거까지 두 단계', () => {
     const { user, location } = renderEvaluation('/evaluation', files(), { wrap });
     const select = await picker();
     await waitFor(() => expect(select.value).toBe('run-quality'));
-    await user.selectOptions(select, 'run-design');
-    expect(location()).toBe('/evaluation?run=run-design');
+    await user.selectOptions(select, 'run-static');
+    expect(location()).toBe('/evaluation?run=run-static');
     expect(await within(await region('번들 budget')).findByText('이 실행에 없음')).toBeTruthy();
     expect(await picker()).toBe(select);
 

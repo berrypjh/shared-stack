@@ -18,6 +18,12 @@ export const stepHref = (journeyId: string, stepId: string) =>
   `/journeys/${journeyId}/steps/${stepId}`;
 export const documentHref = (id: string) => `/documents/${id}`;
 export const recordHref = (id: string) => `/records/${id}`;
+export const RECORDS_HREF = '/records';
+export const pluginHref = (id: string) => `/plugins/${id}`;
+
+/** 플러그인 화면 안의 skill · MCP 도구 자리. 검색 결과가 이 해시로 온다. */
+export const pluginSkillAnchor = (name: string) => `plugin-skill-${name}`;
+export const pluginToolAnchor = (name: string) => `plugin-mcp-tool-${name}`;
 
 /** 저장소 경로 하나의 화면. 경로의 `/` 는 그대로, 각 부분은 인코딩한다. */
 export const sourceHref = (path: string) =>

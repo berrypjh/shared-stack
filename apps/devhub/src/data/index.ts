@@ -4,6 +4,7 @@ import { applications } from './applications';
 import { documents } from './documents';
 import { contexts, journeys } from './journeys';
 import { packages } from './packages';
+import { plugins } from './plugins';
 import { records } from './records';
 import { relations } from './relations';
 import { repository } from './repository';
@@ -16,6 +17,7 @@ export const catalog: Catalog = {
   applications,
   packages,
   tools,
+  plugins,
   relations,
   documents,
   records,

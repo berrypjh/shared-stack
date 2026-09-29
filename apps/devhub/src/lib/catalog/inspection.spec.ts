@@ -1,7 +1,7 @@
 // @vitest-environment node
 import { catalog } from '../../data';
 import type { RepositorySnapshot } from '../../domain/model';
-import { isUncommitted, sourceLink } from '../repository/source-links';
+import { isUncommitted, latestLink, sourceLink } from '../repository/source-links';
 
 import { inspect } from './inspection';
 import { groupByOwner, REPOSITORY_GROUP } from './reference-groups';
@@ -114,6 +114,16 @@ describe('source links', () => {
     });
   });
 
+  it('adds the default-branch link only for paths the snapshot commit has', () => {
+    expect(latestLink(repository, snapshot, { path: 'docs/a b.md' })).toBe(
+      `${repository.webUrl}/blob/${repository.defaultBranch}/docs/a%20b.md`,
+    );
+    expect(latestLink(repository, snapshot, { path: 'libs/ui-core', directory: true })).toBe(
+      `${repository.webUrl}/tree/${repository.defaultBranch}/libs/ui-core`,
+    );
+    expect(latestLink(repository, snapshot, { path: 'docs/new.md' })).toBeNull();
+  });
+
   it('encodes each path segment', () => {
     expect(sourceLink(repository, snapshot, { path: 'docs/a b#c.md' }).href).toBe(
       `${repository.webUrl}/blob/${'a'.repeat(40)}/docs/a%20b%23c.md`,
@@ -130,9 +140,13 @@ describe('groupByOwner', () => {
       { path: 'libs/react-ui/src/index.ts' },
     ]);
     expect(groups).toEqual([
-      { owner: 'react-ui', refs: [{ path: 'libs/react-ui/src/index.ts' }] },
-      { owner: REPOSITORY_GROUP, refs: [{ path: 'README.md' }] },
-      { owner: 'tools-lib', refs: [{ path: 'tools/lib/package-boundary.test.ts' }] },
+      { owner: 'react-ui', root: 'libs/react-ui', refs: [{ path: 'libs/react-ui/src/index.ts' }] },
+      { owner: REPOSITORY_GROUP, root: undefined, refs: [{ path: 'README.md' }] },
+      {
+        owner: 'tools-lib',
+        root: 'tools/lib',
+        refs: [{ path: 'tools/lib/package-boundary.test.ts' }],
+      },
     ]);
   });
 });

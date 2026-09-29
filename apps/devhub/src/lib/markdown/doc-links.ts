@@ -5,6 +5,7 @@ export type LinkSource = Pick<DocumentRef, 'path' | 'brokenLinks'>;
 
 /**
  * 문서에 적힌 링크 하나가 가는 곳. 앱 안의 문서와 저장소 파일(소스)을 가른다.
+ * 기록이 모인 폴더는 앱 안의 기록 목록으로 간다.
  * 대상이 없는 링크는 `broken` 으로 남는다 — 카탈로그가 기록한 것만 그렇고, 테스트가 실제와 대조한다.
  */
 export type DocLink =
@@ -12,6 +13,7 @@ export type DocLink =
   | { kind: 'anchor'; anchor: string }
   | { kind: 'document'; id: string; anchor?: string }
   | { kind: 'record'; id: string; anchor?: string }
+  | { kind: 'records' }
   | { kind: 'source'; ref: SourceRef; anchor?: string }
   | { kind: 'broken'; path: string; note: string };
 
@@ -26,6 +28,8 @@ export const resolvePath = (from: string, target: string) => {
   const path = decodeURIComponent(url.pathname);
   return path.startsWith('/repo/') ? path.slice('/repo/'.length) : null;
 };
+
+const basename = (path: string) => path.slice(path.lastIndexOf('/') + 1);
 
 export const resolveDocLink = (catalog: Catalog, doc: LinkSource, href: string): DocLink => {
   if (SAFE_SCHEME.test(href)) return { kind: 'external', href };
@@ -50,6 +54,9 @@ export const resolveDocLink = (catalog: Catalog, doc: LinkSource, href: string):
   if (target) return { kind: 'document', id: target.id, anchor };
   const record = catalog.records.find((r) => r.path === clean);
   if (record) return { kind: 'record', id: record.id, anchor };
+  if (directory && catalog.records.some((r) => r.path === `${clean}/${basename(r.path)}`)) {
+    return { kind: 'records' };
+  }
   return {
     kind: 'source',
     ref: directory ? { path: clean, directory: true } : { path: clean },

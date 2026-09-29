@@ -19,6 +19,22 @@ export const isUncommitted = (uncommitted: readonly string[], path: string) =>
       : path === entry || path.startsWith(`${entry}/`),
   );
 
+const encode = (path: string) => path.split('/').map(encodeURIComponent).join('/');
+const kindOf = (ref: SourceRef) => (ref.directory ? 'tree' : 'blob');
+
+/**
+ * 보조 링크: 기본 브랜치의 같은 경로. 움직이는 브랜치라 DevHub 가 본 커밋과 다를 수 있다.
+ * 스냅샷 커밋에 없는 경로는 브랜치에 있는지도 알 수 없어 `null` 이다.
+ */
+export const latestLink = (
+  repository: Repository,
+  snapshot: RepositorySnapshot,
+  ref: SourceRef,
+): string | null =>
+  snapshot.uncommitted && isUncommitted(snapshot.uncommitted, ref.path)
+    ? null
+    : `${repository.webUrl}/${kindOf(ref)}/${repository.defaultBranch}/${encode(ref.path)}`;
+
 /**
  * 저장소 경로 하나의 링크. 스냅샷 커밋으로 고정한 링크가 정본이다.
  * - 커밋에 없는 경로: 링크를 만들지 않는다(404 를 보여 주지 않는다)
@@ -30,20 +46,11 @@ export const sourceLink = (
   snapshot: RepositorySnapshot,
   ref: SourceRef,
 ): SourceLink => {
-  const path = ref.path.split('/').map(encodeURIComponent).join('/');
-  const kind = ref.directory ? 'tree' : 'blob';
-  if (snapshot.uncommitted && isUncommitted(snapshot.uncommitted, ref.path)) {
-    return { href: null, pinned: false, gap: 'uncommitted' };
-  }
-  if (!snapshot.commit) {
-    return {
-      href: `${repository.webUrl}/${kind}/${repository.defaultBranch}/${path}`,
-      pinned: false,
-      gap: 'unknown-commit',
-    };
-  }
+  const latest = latestLink(repository, snapshot, ref);
+  if (!latest) return { href: null, pinned: false, gap: 'uncommitted' };
+  if (!snapshot.commit) return { href: latest, pinned: false, gap: 'unknown-commit' };
   return {
-    href: `${repository.webUrl}/${kind}/${snapshot.commit}/${path}`,
+    href: `${repository.webUrl}/${kindOf(ref)}/${snapshot.commit}/${encode(ref.path)}`,
     pinned: true,
     ...(snapshot.uncommitted === null ? { gap: 'unverified' as const } : {}),
   };

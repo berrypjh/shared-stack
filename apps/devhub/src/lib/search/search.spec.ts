@@ -38,7 +38,7 @@ describe('catalog index', () => {
       '/sources/libs/design-tokens/src/lib/pipeline.ts#symbol-buildTokenOutputs',
     ],
     ['token-pipeline', 'journey:token-pipeline', '/journeys/token-pipeline'],
-    ['CHANGELOG', 'document:changelog', '/documents/changelog'],
+    ['작업 기본 원칙', 'document:standards-core', '/documents/standards-core'],
     ['bash-guard-hook', 'record:bash-guard-hook', '/records/bash-guard-hook'],
   ])('ranks "%s" first as %s', (query, key, href) => {
     expect({ key: top(query)?.key, href: top(query)?.href }).toEqual({ key, href });

@@ -67,6 +67,7 @@ export const tests: TestSuite[] = [
     runner: 'vitest',
     config: { path: 'tools/vitest.tools.config.mts' },
     subjects: [
+      'claude-harness',
       'consumer-catalog-generator',
       'consumer-retrieval',
       'consumer-eval',

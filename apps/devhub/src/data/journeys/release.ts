@@ -46,9 +46,10 @@ export const release: ConsumerJourney = {
       source: [
         { path: 'tools/scripts/release/release-npm.ts', symbol: 'releaseChangelog' },
         { path: 'nx.json', symbol: 'createRelease' },
+        { path: 'CHANGELOG.md' },
       ],
       tests: [],
-      docs: ['changelog'],
+      docs: [],
       next: ['publish'],
     },
     {

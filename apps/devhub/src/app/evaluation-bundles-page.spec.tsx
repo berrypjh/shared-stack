@@ -3,13 +3,13 @@ import { screen, waitFor, within } from '@testing-library/react';
 import { bundleArtifact, cxOnly, TREESHAKE_ROWS } from '@/test/evaluation/bundles';
 import { bundle } from '@/test/evaluation/fixtures';
 import { renderEvaluation } from '@/test/evaluation/render';
-import { designArtifact, publicFiles } from '@/test/evaluation/runs';
+import { publicFiles, staticArtifact } from '@/test/evaluation/runs';
 
 const files = () =>
   publicFiles([
     bundleArtifact('run-base', [cxOnly(10474), bundle({ compression: 'gzip' })]),
     bundleArtifact('run-core', [cxOnly(10574)]),
-    designArtifact('run-design'),
+    staticArtifact('run-static'),
     bundleArtifact('run-bundle', [cxOnly(10574), bundle()], { treeshakeRows: TREESHAKE_ROWS }),
   ]);
 
@@ -121,8 +121,8 @@ describe('번들', () => {
   });
 
   it('bundle 측정이 없는 실행은 unsupported 다', async () => {
-    renderEvaluation('/evaluation/bundles?run=run-design', files());
-    expect(await main().findByText('run-design 에는 이 영역이 없다 — bundle 측정')).toBeTruthy();
+    renderEvaluation('/evaluation/bundles?run=run-static', files());
+    expect(await main().findByText('run-static 에는 이 영역이 없다 — bundle 측정')).toBeTruthy();
   });
 
   it('#bundle-<id> 로 오면 그 budget 행이 포커스를 받는다', async () => {

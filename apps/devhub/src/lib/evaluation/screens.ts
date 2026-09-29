@@ -31,20 +31,6 @@ export const EVALUATION_SCREENS = [
     lead: '평가 metric 을 원본 이름 · 분자 · 분모 · n 과 executor 출처와 함께 본다. 서로 다른 metric 을 합친 점수는 없다.',
     group: 'AI',
   },
-  {
-    id: 'design-system',
-    path: '/evaluation/design-system',
-    label: '디자인 시스템',
-    lead: '테마 · 산출물 · component state 근거를 source · test 위치와 잇는다. source 참조만으로 test 됨으로 보지 않는다.',
-    group: '디자인 · 접근성',
-  },
-  {
-    id: 'accessibility',
-    path: '/evaluation/accessibility',
-    label: '접근성',
-    lead: 'DevHub 평가 화면을 localhost 에서 axe 로 검사한 결과다. rule · node 수를 보이고 합친 점수는 없다.',
-    group: '디자인 · 접근성',
-  },
 ] as const satisfies readonly EvaluationScreen[];
 
 export type ScreenId = (typeof EVALUATION_SCREENS)[number]['id'];

@@ -113,7 +113,7 @@ export const relations: Relation[] = [
     from: 'observability-collectors',
     to: 'observability-contracts',
     declaredBy: 'source-import',
-    evidence: { path: 'tools/scripts/observability/quality.ts' },
+    evidence: { path: 'tools/scripts/observability/cli.ts' },
   },
 
   {
@@ -202,6 +202,14 @@ export const relations: Relation[] = [
     summary:
       'devhub 개발 서버를 띄워 실제 브라우저로 셸 키보드 · 반응형 · 검색 · 딥링크 · 평가 화면을 확인한다',
     evidence: { path: 'apps/devhub-e2e/playwright.config.ts' },
+  },
+  {
+    kind: 'verification',
+    id: 'claude-harness-verifies-berry-dev',
+    from: 'claude-harness',
+    to: 'berry-dev',
+    summary: 'standards sync · check 결과, secret guard hook, skill 구조를 실제 파일로 확인한다',
+    evidence: { path: 'tools/scripts/claude-harness/guard.test.ts' },
   },
   {
     kind: 'verification',

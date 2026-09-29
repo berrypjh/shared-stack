@@ -200,6 +200,11 @@ describe('theme switch', () => {
     expect(document.documentElement.dataset.theme).toBe('dark');
     expect(localStorage.getItem(THEME_KEY)).toBe('dark');
     expect(option('다크').getAttribute('aria-pressed')).toBe('true');
+
+    await user.click(option('라이트'));
+    expect(document.documentElement.dataset.theme).toBe('light');
+    expect(localStorage.getItem(THEME_KEY)).toBe('light');
+    expect(option('라이트').getAttribute('aria-pressed')).toBe('true');
   });
 
   it('still switches when storage is blocked', async () => {

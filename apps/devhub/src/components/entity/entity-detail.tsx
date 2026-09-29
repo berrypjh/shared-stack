@@ -30,7 +30,8 @@ export const Code = ({ children }: { children: string }) => (
 
 const Links = ({ ids }: { ids: string[] }) =>
   ids.length ? (
-    <span className="flex flex-wrap gap-x-md">
+    // 줄이 바뀌어도 링크 사이가 24px 이상 떨어지게 세로 간격을 둔다(WCAG 2.5.8 target size).
+    <span className="flex flex-wrap gap-x-md gap-y-xs">
       {[...new Set(ids)].map((id) => (
         <EntityLink key={id} id={id} />
       ))}
@@ -38,6 +39,40 @@ const Links = ({ ids }: { ids: string[] }) =>
   ) : (
     <span className="text-text-light">없음</span>
   );
+
+/** 항목의 사실 — 용어와 값 한 줄씩. */
+export const FactsSection = ({ rows }: { rows: Fact[] }) => (
+  <WorkspaceSection id="entity-facts" title="사실">
+    <dl className={ROWS}>
+      {rows.map(([term, detail]) => (
+        <div key={term} className="contents">
+          <dt className="text-text-light">{term}</dt>
+          <dd className="min-w-0">{detail}</dd>
+        </div>
+      ))}
+    </dl>
+  </WorkspaceSection>
+);
+
+/** 관계 요약 — 카탈로그 관계에서 유도한 위 · 아래 · 검증하는 쪽. */
+export const RelationsSection = ({ id }: { id: string }) => (
+  <WorkspaceSection id="entity-relations" title="관계">
+    <dl className={ROWS}>
+      <dt className="text-text-light">기대는 쪽</dt>
+      <dd>
+        <Links ids={upstreamIds(catalog, id)} />
+      </dd>
+      <dt className="text-text-light">기대오는 쪽</dt>
+      <dd>
+        <Links ids={downstreamIds(catalog, id)} />
+      </dd>
+      <dt className="text-text-light">검증하는 쪽</dt>
+      <dd>
+        <Links ids={verifiersOf(catalog, id).map((relation) => relation.from)} />
+      </dd>
+    </dl>
+  </WorkspaceSection>
+);
 
 /**
  * 패키지 항목 화면의 문법: 가운데는 이름 · 목적 · 사실 · (항목 고유 섹션) · 관계 요약,
@@ -70,33 +105,9 @@ export const EntityDetail = ({
           title={entity.label}
         />
         <p className="typo-body-small">{inspection.purpose}</p>
-        <WorkspaceSection id="entity-facts" title="사실">
-          <dl className={ROWS}>
-            {rows.map(([term, detail]) => (
-              <div key={term} className="contents">
-                <dt className="text-text-light">{term}</dt>
-                <dd className="min-w-0">{detail}</dd>
-              </div>
-            ))}
-          </dl>
-        </WorkspaceSection>
+        <FactsSection rows={rows} />
         {children}
-        <WorkspaceSection id="entity-relations" title="관계">
-          <dl className={ROWS}>
-            <dt className="text-text-light">기대는 쪽</dt>
-            <dd>
-              <Links ids={upstreamIds(catalog, id)} />
-            </dd>
-            <dt className="text-text-light">기대오는 쪽</dt>
-            <dd>
-              <Links ids={downstreamIds(catalog, id)} />
-            </dd>
-            <dt className="text-text-light">검증하는 쪽</dt>
-            <dd>
-              <Links ids={verifiersOf(catalog, id).map((relation) => relation.from)} />
-            </dd>
-          </dl>
-        </WorkspaceSection>
+        <RelationsSection id={id} />
       </WorkspaceFrame>
       <Inspector>
         <InspectorPanel inspection={inspection} siblings={section.entities} unit={section.title} />

@@ -21,7 +21,7 @@ export const qualityObservability: ConsumerJourney = {
         { path: 'tools/scripts/observability/store.ts', symbol: 'tmp/observability' },
       ],
       tests: ['tools-vitest'],
-      docs: ['observability-collectors-guide'],
+      docs: ['observability-architecture'],
       next: ['export'],
     },
     {

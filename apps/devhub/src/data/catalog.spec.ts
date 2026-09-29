@@ -39,7 +39,7 @@ const filesUnder = (path: string): string[] => {
 const childrenOf = (path: string) =>
   readdirSync(join(ROOT, path), { withFileTypes: true }).filter((entry) => !SKIP.has(entry.name));
 
-const { applications, packages, tools, relations, documents, records, tests } = catalog;
+const { applications, packages, tools, plugins, relations, documents, records, tests } = catalog;
 const projects = [...applications, ...packages];
 const entities = [...projects, ...tools];
 const entityIds = new Set(entities.map((entity) => entity.id));
@@ -85,6 +85,20 @@ const citedRefs = (): { ref: SourceRef; origin: string }[] => [
       .filter((entry) => entry.origin === 'committed')
       .map((entry) => ({ ref: { path: entry.target }, origin: `${pkg.id} entry` })),
   ]),
+  ...plugins.flatMap((plugin) =>
+    [
+      plugin.manifest,
+      ...plugin.skills.flatMap((skill) => [skill.source, ...skill.resources]),
+      ...plugin.mcpServers.flatMap((server) => [server.config, server.implementation]),
+      ...plugin.hooks.flatMap((hook) => [
+        hook.config,
+        ...(hook.policy ? [hook.policy.source, ...hook.policy.evidence] : []),
+      ]),
+      ...plugin.rules.map((rule) => rule.source),
+      ...plugin.scripts,
+      ...plugin.examples,
+    ].map((ref) => ({ ref, origin: `${plugin.id} plugin` })),
+  ),
   ...relations.map((relation) => ({ ref: relation.evidence, origin: relation.id })),
   ...documents.map((doc) => ({ ref: { path: doc.path }, origin: doc.id })),
   ...records.flatMap((record) => [
@@ -336,15 +350,20 @@ describe('completeness', () => {
   });
 
   it('registers every README · AGENTS · docs markdown, so a new document is not missed', () => {
-    const guide = /(^|\/)(README|AGENTS|AGENTS\.consumer|CHANGELOG)\.md$/;
+    // CHANGELOG.md 는 nx release 가 쓰는 생성물이라 문서로 싣지 않는다. 릴리스 흐름이 소스로 인용한다.
+    const guide = /(^|\/)(README|AGENTS|AGENTS\.consumer)\.md$/;
     const onDisk = [
-      ...['README.md', 'AGENTS.md', 'CHANGELOG.md'].filter(exists),
+      ...['README.md', 'AGENTS.md'].filter(exists),
       ...['apps', 'libs', 'tools', 'plugins', 'docs'].flatMap(filesUnder),
+      ...readdirSync(join(ROOT, '.claude')).map((name) => `.claude/${name}`),
       ...readdirSync(join(ROOT, '.claude/rules')).map((name) => `.claude/rules/${name}`),
     ].filter(
       (path) =>
         path.endsWith('.md') &&
-        (path.startsWith('docs/') || path.startsWith('.claude/rules/') || guide.test(path)),
+        (path.startsWith('docs/') ||
+          path.startsWith('.claude/') ||
+          path.includes('/standards/rules/') ||
+          guide.test(path)),
     );
     const registered = new Set([...documents, ...records].map((doc) => doc.path));
     expect(onDisk.filter((path) => !registered.has(path))).toEqual([]);
@@ -456,6 +475,227 @@ describe('evidence gaps', () => {
         const testFiles = filesUnder(tool?.root ?? '').filter((path) => /\.test\.ts$/.test(path));
         expect({ id, has: testFiles.length > 0 }).toEqual({ id, has: true });
       }
+    }
+  });
+});
+
+/** `SKILL.md` 맨 앞 frontmatter 의 `키: 값` 줄. 따옴표로 감싼 값은 벗긴다. */
+const frontmatterOf = (path: string): Record<string, string> => {
+  const head = /^---\n([\s\S]*?)\n---\n/.exec(read(path))?.[1] ?? '';
+  return Object.fromEntries(
+    head.split('\n').map((line) => {
+      const [key, ...rest] = line.split(':');
+      const value = rest.join(':').trim();
+      return [key.trim(), /^(['"]).*\1$/.test(value) ? value.slice(1, -1) : value];
+    }),
+  );
+};
+
+type Marketplace = {
+  name: string;
+  plugins: {
+    name: string;
+    source: string;
+    description: string;
+    category: string;
+    keywords: string[];
+  }[];
+};
+type HookConfig = {
+  description: string;
+  hooks: Record<
+    string,
+    { matcher?: string; hooks: { command: string; args?: string[]; timeout?: number }[] }[]
+  >;
+};
+
+/** 플러그인 폴더 맨 위에 올 수 있는 것. 새 구성 요소(예: agents · commands)가 생기면 여기서 걸려 카탈로그를 넓히게 한다. */
+const PLUGIN_ENTRIES = new Set([
+  '.claude-plugin',
+  'README.md',
+  'skills',
+  '.mcp.json',
+  'hooks',
+  'standards',
+  'scripts',
+  'examples',
+  'src',
+  'package.json',
+  'project.json',
+  'tsconfig.json',
+]);
+
+const filesIn = (path: string) =>
+  exists(path)
+    ? childrenOf(path)
+        .filter((entry) => entry.isFile())
+        .map((entry) => `${path}/${entry.name}`)
+        .sort()
+    : [];
+
+describe('plugins', () => {
+  const market = readJson<Marketplace>('.claude-plugin/marketplace.json');
+
+  it('list every marketplace plugin with its marketplace and manifest facts', () => {
+    expect(
+      plugins.map(({ id, root, description, category, keywords }) => ({
+        name: id,
+        source: `./${root}`,
+        description,
+        category,
+        keywords,
+      })),
+    ).toEqual(market.plugins);
+    for (const plugin of plugins) {
+      expect(plugin.marketplace).toBe(market.name);
+      expect(plugin.manifest.path).toBe(`${plugin.root}/.claude-plugin/plugin.json`);
+      expect(readJson<{ version: string }>(plugin.manifest.path).version).toBe(plugin.version);
+      // 관계 · 근거는 같은 id 의 도구에서 읽는다.
+      expect(byId.get(plugin.id)?.root).toBe(plugin.root);
+    }
+  });
+
+  it('model every component in the plugin folder', () => {
+    for (const plugin of plugins) {
+      const unknown = childrenOf(plugin.root)
+        .map((entry) => entry.name)
+        .filter((name) => !PLUGIN_ENTRIES.has(name));
+      expect({ id: plugin.id, unknown }).toEqual({ id: plugin.id, unknown: [] });
+    }
+  });
+
+  it('mirror every skill folder and its frontmatter', () => {
+    for (const plugin of plugins) {
+      const dirs = exists(`${plugin.root}/skills`)
+        ? childrenOf(`${plugin.root}/skills`)
+            .map((entry) => entry.name)
+            .sort()
+        : [];
+      expect(plugin.skills.map((skill) => skill.name)).toEqual(dirs);
+      for (const { whenToUseKo, ...skill } of plugin.skills) {
+        const dir = `${plugin.root}/skills/${skill.name}`;
+        const fm = frontmatterOf(`${dir}/SKILL.md`);
+        expect({ name: skill.name, translated: Boolean(whenToUseKo) }).toEqual({
+          name: skill.name,
+          translated: Boolean(skill.whenToUse),
+        });
+        expect(skill).toEqual({
+          name: fm['name'],
+          description: fm['description'],
+          ...(fm['when_to_use'] ? { whenToUse: fm['when_to_use'] } : {}),
+          ...(fm['argument-hint'] ? { argumentHint: fm['argument-hint'] } : {}),
+          userOnly: fm['disable-model-invocation'] === 'true',
+          source: { path: `${dir}/SKILL.md` },
+          resources: filesUnder(dir)
+            .filter((path) => path !== `${dir}/SKILL.md`)
+            .sort()
+            .map((path) => ({ path })),
+        });
+      }
+    }
+  });
+
+  it('mirror every MCP server and the tools its implementation registers', () => {
+    for (const plugin of plugins) {
+      const config = `${plugin.root}/.mcp.json`;
+      const declared = exists(config)
+        ? readJson<{ mcpServers: Record<string, { command: string; args?: string[] }> }>(config)
+            .mcpServers
+        : {};
+      expect(plugin.mcpServers.map((server) => server.name)).toEqual(Object.keys(declared));
+      for (const server of plugin.mcpServers) {
+        const spec = declared[server.name];
+        expect(server.command).toBe([spec.command, ...(spec.args ?? [])].join(' '));
+        expect(server.config.path).toBe(config);
+        const registered = [
+          ...read(server.implementation.path).matchAll(
+            /registerTool\(\s*'([a-z_]+)',\s*\{\s*title: '([^']+)'/g,
+          ),
+        ].map(([, name, title]) => ({ name, title }));
+        expect(registered.length).toBeGreaterThan(0);
+        expect(server.tools).toEqual(registered);
+      }
+    }
+  });
+
+  it('mirror every hook in hooks.json', () => {
+    for (const plugin of plugins) {
+      const path = `${plugin.root}/hooks/hooks.json`;
+      if (!exists(path)) {
+        expect(plugin.hooks).toEqual([]);
+        continue;
+      }
+      const config = readJson<HookConfig>(path);
+      const declared = Object.entries(config.hooks).flatMap(([event, groups]) =>
+        groups.flatMap((group) =>
+          group.hooks.map((hook) => ({
+            event,
+            ...(group.matcher ? { matcher: group.matcher } : {}),
+            command: [hook.command, ...(hook.args ?? [])].join(' '),
+            ...(hook.timeout ? { timeoutSeconds: hook.timeout } : {}),
+            summary: config.description,
+            config: { path },
+          })),
+        ),
+      );
+      expect(plugin.hooks.map(({ policy: _policy, ...hook }) => hook)).toEqual(declared);
+    }
+  });
+
+  it('mirror each hook policy from its policy file', () => {
+    for (const hook of plugins.flatMap((plugin) => plugin.hooks)) {
+      if (!hook.policy) {
+        continue;
+      }
+      const source = read(hook.policy.source.path);
+      const line = (name: string) => source.split('\n').find((text) => text.includes(`${name} =`));
+      const bypasses = [
+        ...new Set([...source.matchAll(/what: '([^']+)'/g)].map(([, what]) => what)),
+      ];
+      expect(hook.policy.bypasses.map((bypass) => bypass.what)).toEqual(bypasses);
+      const name = (glob: string) => glob.replace(/^\*?\./, '').replace(/\.\*$/, '');
+      for (const [constant, globs] of [
+        ['SECRET_BASENAME', hook.policy.targets],
+        ['SAFE_BASENAME', hook.policy.exceptions],
+      ] as const) {
+        expect(globs.filter((glob) => !line(constant)?.includes(name(glob)))).toEqual([]);
+      }
+    }
+  });
+
+  it('register every standards rule as a document, so the plugin screen links in the app', () => {
+    const registered = new Set(documents.map((doc) => doc.path));
+    const rules = plugins.flatMap((plugin) => plugin.rules.map((rule) => rule.source.path));
+    expect(rules.filter((path) => !registered.has(path))).toEqual([]);
+  });
+
+  it('mirror the standards manifest rules', () => {
+    for (const plugin of plugins) {
+      const path = `${plugin.root}/standards/manifest.json`;
+      const declared = exists(path)
+        ? readJson<{ rules: { id: string; source: string; scope: string }[] }>(path).rules.map(
+            (rule) => ({
+              id: rule.id,
+              scope: rule.scope,
+              source: { path: `${plugin.root}/standards/${rule.source}` },
+            }),
+          )
+        : [];
+      expect(plugin.rules).toEqual(declared);
+    }
+  });
+
+  it('list every script and example file', () => {
+    for (const plugin of plugins) {
+      expect(plugin.scripts.map((ref) => ref.path)).toEqual(filesIn(`${plugin.root}/scripts`));
+      expect(plugin.examples.map((ref) => ref.path)).toEqual(filesIn(`${plugin.root}/examples`));
+    }
+  });
+
+  it('cite registered documents', () => {
+    const ids = new Set(documents.map((doc) => doc.id));
+    for (const plugin of plugins) {
+      expect(plugin.docs.filter((id) => !ids.has(id))).toEqual([]);
     }
   });
 });

@@ -6,6 +6,9 @@ import {
   documentHref,
   entityHref,
   journeyHref,
+  pluginHref,
+  pluginSkillAnchor,
+  pluginToolAnchor,
   recordHref,
   sourceHref,
   stepHref,
@@ -20,6 +23,9 @@ export const SEARCH_KINDS = [
   'application',
   'package',
   'tool',
+  'plugin',
+  'skill',
+  'mcp-tool',
   'export',
   'document',
   'record',
@@ -98,6 +104,42 @@ const entityEntries = (catalog: Catalog): Draft[] => [
   })),
 ];
 
+/** 플러그인과 소비자가 부르는 이름(skill · MCP 도구). 둘 다 플러그인 화면의 그 자리로 간다. */
+const pluginEntries = (catalog: Catalog): Draft[] =>
+  catalog.plugins.flatMap((plugin) => [
+    {
+      key: `plugin:${plugin.id}`,
+      kind: 'plugin' as const,
+      label: plugin.id,
+      detail: `v${plugin.version} · ${plugin.marketplace}`,
+      href: pluginHref(plugin.id),
+      names: [plugin.id, plugin.root],
+      text: [plugin.description, ...plugin.keywords],
+    },
+    ...plugin.skills.map((skill) => ({
+      key: `skill:${plugin.id}:${skill.name}`,
+      kind: 'skill' as const,
+      label: `/${plugin.id}:${skill.name}`,
+      detail: `${plugin.id} skill`,
+      href: `${pluginHref(plugin.id)}#${pluginSkillAnchor(skill.name)}`,
+      names: [skill.name, `${plugin.id}:${skill.name}`],
+      text: [skill.description],
+      related: [plugin.id],
+    })),
+    ...plugin.mcpServers.flatMap((server) =>
+      server.tools.map((tool) => ({
+        key: `mcp-tool:${plugin.id}:${tool.name}`,
+        kind: 'mcp-tool' as const,
+        label: tool.name,
+        detail: `${server.name} MCP 도구`,
+        href: `${pluginHref(plugin.id)}#${pluginToolAnchor(tool.name)}`,
+        names: [tool.name],
+        text: [tool.title],
+        related: [plugin.id, server.name],
+      })),
+    ),
+  ]);
+
 /** 공개(배포) 패키지의 `exports` specifier. 내부 패키지의 진입점은 소비자 API 가 아니라 넣지 않는다. */
 const exportEntries = (catalog: Catalog): Draft[] =>
   catalog.packages
@@ -169,6 +211,7 @@ export const searchEntries = (catalog: Catalog): SearchEntry[] =>
   [
     ...journeyEntries(catalog),
     ...entityEntries(catalog),
+    ...pluginEntries(catalog),
     ...exportEntries(catalog),
     ...documentEntries(catalog),
     ...recordEntries(catalog),

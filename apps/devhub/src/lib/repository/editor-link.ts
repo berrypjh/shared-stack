@@ -20,7 +20,7 @@ export const isCanonicalPath = (path: string) =>
   path.split('/').every((segment) => segment !== '' && segment !== '.' && segment !== '..');
 
 /**
- * `VITE_DEVHUB_EDITOR` 설정을 주소 형식으로. 아는 에디터 이름이면 위 표를, `{path}` 가 들어 있으면
+ * `DEVHUB_EDITOR` 설정을 주소 형식으로. 아는 에디터 이름이면 위 표를, `{path}` 가 들어 있으면
  * 그 값을 그대로 쓴다. 둘 다 아니면 기본값으로 돌아간다.
  */
 export const templateOf = (setting: string | undefined): string =>
@@ -39,9 +39,9 @@ export const editorHref = (
   return templateOf(editor).replace('{path}', encodeURI(`${root}/${path}`));
 };
 
-/** 지금 뜬 서버 기준. `vite.config.mts` 가 넣은 저장소 루트와 `.env` 의 에디터 설정을 읽는다. */
+/** 지금 뜬 서버 기준. `vite.config.mts` 가 넣은 저장소 루트와 `DEVHUB_EDITOR` 를 읽는다. */
 export const currentEditorHref = (path: string) =>
   editorHref(path, {
     root: __DEVHUB_REPOSITORY_ROOT__,
-    editor: import.meta.env.VITE_DEVHUB_EDITOR,
+    editor: __DEVHUB_EDITOR__ ?? undefined,
   });

@@ -4,10 +4,11 @@ import type {
   DocumentRef,
   Package,
   PackageKind,
+  Plugin,
   RecordRef,
 } from '../../domain/model';
 
-import { ACTOR, DOCUMENT_GROUP, PACKAGE_KIND, RECORD_KIND, ROOT_DOCUMENT_GROUP } from './labels';
+import { ACTOR, DOCUMENT_GROUP, PACKAGE_KIND, RECORD_KIND } from './labels';
 import { entityHref } from './routes';
 
 /**
@@ -17,13 +18,21 @@ import { entityHref } from './routes';
 
 export const PRODUCT_NAME = 'Shared Stack DevHub';
 
-export type SectionId = 'journeys' | 'packages' | 'documents' | 'records';
+export type SectionId = 'journeys' | 'packages' | 'plugins' | 'documents' | 'records';
 
-type EntityBase = { id: string; label: string; href: string; group?: string };
+type EntityBase = {
+  id: string;
+  label: string;
+  href: string;
+  group?: string;
+  /** 탐색기에서만 쓰는 짧은 이름 — 묶음 제목이 이미 말하는 앞부분을 뗀다. 없으면 `label`. */
+  navLabel?: string;
+};
 
 export type Entity =
   | (EntityBase & { section: 'journeys'; record: ConsumerJourney })
   | (EntityBase & { section: 'packages'; record: Package })
+  | (EntityBase & { section: 'plugins'; record: Plugin })
   | (EntityBase & { section: 'documents'; record: DocumentRef })
   | (EntityBase & { section: 'records'; record: RecordRef });
 
@@ -38,16 +47,16 @@ const PACKAGE_ORDER: PackageKind[] = ['ui', 'foundation', 'contract', 'config'];
 
 const hrefOf = (section: SectionId, id: string) => `/${section}/${id}`;
 
-const DOCUMENT_GROUP_ORDER = [
-  ROOT_DOCUMENT_GROUP,
-  ...new Set(DOCUMENT_GROUP.map(([, title]) => title)),
-];
+const DOCUMENT_GROUP_ORDER = [...new Set(DOCUMENT_GROUP.map(([, title]) => title))];
+
+/** 문서가 속한 묶음 — 맞는 접두사 중 가장 긴 것. */
+const documentPlaceOf = (path: string) =>
+  DOCUMENT_GROUP.filter(([prefix]) => path.startsWith(prefix)).sort(
+    ([a], [b]) => b.length - a.length,
+  )[0];
 
 /** 문서의 묶음. 어느 접두사에도 맞지 않으면 `undefined` 라 목록에서 빠진다(테스트가 막는다). */
-export const documentGroupOf = (path: string) =>
-  path.includes('/')
-    ? DOCUMENT_GROUP.find(([prefix]) => path.startsWith(prefix))?.[1]
-    : ROOT_DOCUMENT_GROUP;
+export const documentGroupOf = (path: string) => documentPlaceOf(path)?.[1];
 
 /** 기록은 최신순으로 읽는다. 같은 날짜는 적힌 순서를 그대로 둔다. */
 export const RECORDS_NEWEST_FIRST: RecordRef[] = [...catalog.records].sort((a, b) =>
@@ -105,6 +114,18 @@ export const SECTIONS: Section[] = [
     ),
   },
   {
+    id: 'plugins',
+    title: '플러그인',
+    path: '/plugins',
+    entities: catalog.plugins.map((record) => ({
+      section: 'plugins' as const,
+      id: record.id,
+      label: record.id,
+      href: hrefOf('plugins', record.id),
+      record,
+    })),
+  },
+  {
     id: 'documents',
     title: '문서',
     path: '/documents',
@@ -115,6 +136,7 @@ export const SECTIONS: Section[] = [
           section: 'documents' as const,
           id: record.id,
           label: record.path,
+          navLabel: record.path.slice(documentPlaceOf(record.path)?.[2].length),
           href: hrefOf('documents', record.id),
           group: title,
           record,
@@ -142,11 +164,14 @@ export const findEntity = (section: SectionId, id: string): Entity | undefined =
 
 /**
  * ID 가 가리키는 화면과 이름. 관계의 양 끝이나 흐름 단계의 담당처럼 종류를 모를 때.
- * 패키지는 자기 화면으로, 앱 · 도구는 자기 화면이 없어 아키텍처 그림의 그 노드로 간다.
+ * 패키지 · 플러그인은 자기 화면으로, 앱 · 도구는 자기 화면이 없어 아키텍처 그림의 그 노드로 간다.
+ * 플러그인은 같은 id 의 도구보다 먼저 — 소비자가 쓰는 표면이 그 화면에 있다.
  */
 export const linkOf = (id: string): { href: string; label: string } | undefined => {
   const pkg = findEntity('packages', id);
   if (pkg) return pkg;
+  const plugin = findEntity('plugins', id);
+  if (plugin) return plugin;
   const app = catalog.applications.find((candidate) => candidate.id === id);
   if (app) return { href: entityHref('application', app.id), label: app.id };
   const tool = catalog.tools.find((candidate) => candidate.id === id);

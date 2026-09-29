@@ -13,7 +13,7 @@ export const qualityArtifact = (runId = 'run-quality', metadata: Overrides = {})
 });
 
 /** static profile run — bundle·eval 이 없는 실행. "이 영역이 없다" 대체 화면을 시험한다. */
-export const designArtifact = (runId = 'run-design') => publicArtifact(runId);
+export const staticArtifact = (runId = 'run-static') => publicArtifact(runId);
 
 /** 공개 export 한 벌. `summaries: false` 는 요약 이전에 export 한 index 다. */
 export const publicFiles = (

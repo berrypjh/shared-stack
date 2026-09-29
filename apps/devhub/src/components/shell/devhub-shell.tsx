@@ -36,7 +36,12 @@ const groupsOf = (section: Section): ExplorerGroup[] => {
   const code = section.id === 'documents';
   const collapsed = section.id === 'documents';
   const items = (entities: Section['entities']) =>
-    entities.map((entity) => ({ id: entity.id, label: entity.label, href: entity.href, code }));
+    entities.map((entity) => ({
+      id: entity.id,
+      label: entity.navLabel ?? entity.label,
+      href: entity.href,
+      code,
+    }));
   const groups = [...new Set(section.entities.map((entity) => entity.group))];
   if (groups.length === 1 && groups[0] === undefined) return [{ items: items(section.entities) }];
   return groups.map((title) => ({

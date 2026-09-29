@@ -58,8 +58,8 @@ describe('document body', () => {
     }
     for (const item of outline) expect(body.querySelector(`[id="${item.id}"]`)).not.toBeNull();
     // 한 번에 하나만 보인다: 좁으면 접힌 목차, 넓으면(작업 영역 container query) 옆 목차.
-    expect(folded.closest('details')?.classList.contains('@4xl:hidden')).toBe(true);
-    expect(['hidden', '@4xl:block'].every((c) => side.classList.contains(c))).toBe(true);
+    expect(folded.closest('details')?.classList.contains('@3xl:hidden')).toBe(true);
+    expect(['hidden', '@3xl:block'].every((c) => side.classList.contains(c))).toBe(true);
   });
 
   it('draws tables as named, scrollable tables', async () => {
@@ -98,6 +98,33 @@ describe('document links', () => {
     expect(link.textContent).toContain('저장소 파일 LICENSE, 새 창');
   });
 
+  it('gives each section heading a # link, and marks the heading an address arrives at', async () => {
+    await renderAt('/documents/design-tokens-agents#테마-추가');
+    const body = within(await article());
+    const heading = body.getByRole('heading', { name: '테마 추가', level: 2 });
+    expect(
+      within(heading).getByRole('link', { name: '테마 추가 절 링크' }).getAttribute('href'),
+    ).toBe('#테마-추가');
+    expect(heading.hasAttribute('data-anchor-flash')).toBe(true);
+  });
+
+  it('marks the first section as the one being read in "이 페이지에서"', async () => {
+    await renderAt('/documents/design-tokens-agents');
+    await article();
+    const [folded] = within(main()).getAllByRole('navigation', { name: '이 페이지에서' });
+    const current = within(folded)
+      .getAllByRole('link')
+      .filter((a) => a.getAttribute('aria-current') === 'location');
+    expect(current.map((a) => a.textContent)).toEqual(['규칙']);
+  });
+
+  it('open the records folder as the records list, not a new window', async () => {
+    await renderAt('/documents/root-agents');
+    const link = within(await article()).getByRole('link', { name: 'docs/records' });
+    expect(link.getAttribute('href')).toBe('/records');
+    expect(link.hasAttribute('target')).toBe(false);
+  });
+
   it('keep in-page anchors on the page', async () => {
     await renderAt('/documents/design-tokens-agents');
     const link = within(await article()).getByRole('link', { name: '테마 추가' });
@@ -109,22 +136,29 @@ describe('document links', () => {
     const body = await article();
     expect(within(body).queryByRole('link', { name: /verification-guide/ })).toBeNull();
     expect(body.textContent).toContain('깨진 링크: docs/verification-guide.md');
-    expect(inspector().textContent).toContain('../../../docs/verification-guide.md');
+    expect(inspector().textContent).toContain('../verification-guide.md');
   });
 });
 
 describe('document inspector', () => {
-  it('names who cites the document: entities and journey steps', async () => {
-    await renderAt('/documents/changelog');
+  it('shows the same four sections as every other item, in order', async () => {
+    await renderAt('/documents/consumer-retrieval-readme');
+    const headings = within(inspector())
+      .getAllByRole('heading', { level: 3 })
+      .map((h) => [...h.childNodes].find((n) => n.nodeType === Node.TEXT_NODE)?.textContent);
+    expect(headings).toEqual(['개요', '소스', '문서', '테스트']);
+  });
+
+  it('names who cites the document in the overview: entities and journey steps', async () => {
+    await renderAt('/documents/consumer-retrieval-readme');
     const panel = within(inspector());
-    const entities = within(panel.getByRole('region', { name: /^이 문서를 드는 항목/ }));
-    expect(entities.getByRole('link', { name: '릴리스 스크립트' }).getAttribute('href')).toBe(
-      `/architecture/release-scripts#${INSPECTOR_ID}`,
+    const overview = within(panel.getByRole('region', { name: /^개요/ }));
+    expect(overview.getByRole('link', { name: 'consumer-retrieval' }).getAttribute('href')).toBe(
+      `/architecture/consumer-retrieval#${INSPECTOR_ID}`,
     );
-    const steps = within(panel.getByRole('region', { name: /^이 문서를 드는 흐름 단계/ }));
-    expect(steps.getByRole('link', { name: '3. 변경 기록을 남긴다' }).getAttribute('href')).toBe(
-      `/journeys/release/steps/changelog#${INSPECTOR_ID}`,
-    );
+    expect(
+      overview.getByRole('link', { name: '1. 조회 도구를 패키지에 싣는다' }).getAttribute('href'),
+    ).toBe(`/journeys/retrieval-lookup/steps/bundle#${INSPECTOR_ID}`);
   });
 
   it('says why a document has no citations instead of leaving the section out', async () => {
@@ -136,9 +170,13 @@ describe('document inspector', () => {
 
   it('copies the repository path', async () => {
     const user = userEvent.setup();
-    await renderAt('/documents/changelog');
-    await user.click(within(inspector()).getByRole('button', { name: '경로 복사: CHANGELOG.md' }));
-    expect(await navigator.clipboard.readText()).toBe('CHANGELOG.md');
+    await renderAt('/documents/consumer-retrieval-readme');
+    await user.click(
+      within(inspector()).getByRole('button', {
+        name: '경로 복사: docs/tools/consumer-retrieval.md',
+      }),
+    );
+    expect(await navigator.clipboard.readText()).toBe('docs/tools/consumer-retrieval.md');
     expect(within(inspector()).getByRole('status').textContent).toBe('복사했습니다');
   });
 });

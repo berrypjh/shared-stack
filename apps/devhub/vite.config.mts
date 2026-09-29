@@ -3,7 +3,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import react from '@vitejs/plugin-react';
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 
 import { readSnapshot } from './src/lib/repository/snapshot';
 
@@ -28,6 +28,15 @@ export default defineConfig(({ command, mode }) => ({
     __DEVHUB_REPOSITORY_ROOT__: JSON.stringify(
       command === 'serve' && mode !== 'test' ? join(__dirname, '../..') : null,
     ),
+    /**
+     * 같은 조건으로 에디터 설정. snapdone DevHub 와 같은 이름(`DEVHUB_EDITOR`)이라 `VITE_` 접두가 없어
+     * `import.meta.env` 로는 오지 않는다 — 여기서 읽어 넣는다.
+     */
+    __DEVHUB_EDITOR__: JSON.stringify(
+      command === 'serve' && mode !== 'test'
+        ? (loadEnv(mode, __dirname, '')['DEVHUB_EDITOR'] ?? null)
+        : null,
+    ),
   },
   server: {
     port: 4400,
@@ -51,6 +60,7 @@ export default defineConfig(({ command, mode }) => ({
     globals: true,
     environment: 'jsdom',
     include: ['src/**/*.spec.{ts,tsx}'],
+    setupFiles: ['src/test/setup.ts'],
     reporters: ['default'],
     coverage: {
       reportsDirectory: '../../coverage/apps/devhub',
