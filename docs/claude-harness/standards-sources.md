@@ -56,17 +56,17 @@
 
 | 문장                                                   | shared-stack                                                                                                                                                    | snapdone                                                |
 | ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- |
-| 어미 · 형식은 적용 경로 전체에서 한 가지, 값은 profile | 없음(한국어 UI는 있으나 문체 정책 문서 없음)                                                                                                                    | `.claude/rules/ko-ui.md` 언어 절                        |
+| 어미 · 형식은 적용 경로 전체에서 한 가지, 값은 profile | [.claude/harness.profile.md](../../.claude/harness.profile.md) "locale 과 제품 정책"(devhub, 명사형)                                                            | `.claude/rules/ko-ui.md` 언어 절                        |
 | 내부 코드 · 용어를 화면에 그대로 내지 않음             | [.claude/rules/devhub.md](../../.claude/rules/devhub.md) 파일 절 "labels(어휘 → 글자)", [DevHub 평가 labels.ts](../../apps/devhub/src/lib/evaluation/labels.ts) | `ko-ui.md` "영어 AI 개발 용어를 화면에 노출하지 않는다" |
 | 글자 폭 · 줄 높이 때문에 줄바꿈 · 말줄임 확인          | [libs/devhub-ui/src/styles.css](../../libs/devhub-ui/src/styles.css) `word-break: keep-all`                                                                     | `ko-ui.md` 한국어 길이 절                               |
 
-- **적용** — 프로젝트가 고른 한국어 화면 경로. snapdone은 web · mobile 화면. shared-stack은 **채택하지 않음**(문서화된 UI 문체 정책이 없어 채택은 프로젝트 판단)
+- **적용** — 프로젝트가 고른 한국어 화면 경로. snapdone은 web · mobile 화면. shared-stack은 `apps/devhub/src`만([기록](../records/2026-09-30-devhub-ko-ui.md))
 - **제외** — 개발자용 식별자 · 로그 · 테스트 이름, 다른 locale
 - **profile에 남긴 것** — 어미 선택, 날짜 · 금액 · 전화번호 예시 형식, 최소 터치 타깃 · line-height · 최소 화면 폭 값, `keep-all` 같은 구현
 - **프로젝트에 남긴 것** — 완료 문장 정책 · 과정 보고 금지 · 되돌리기 규칙 · 네 가지 상태 설계 · 플랫폼별 접근성(제품 정책이거나 한 곳에만 있음), 어절 줄바꿈 방식과 좁은 화면 기준(한글은 음절 · 어절 줄바꿈이 둘 다 쓰임 — [W3C klreq](https://www.w3.org/TR/2020/NOTE-klreq-20200527))
 - **외부 기준 대조** — 어미 통일은 제품 전체 단위가 관행([토스 라이팅 원칙](https://toss.tech/article/8-writing-principles-of-toss))이라 "한 화면 · 한 흐름"에서 넓힘. 한국어는 영어보다 글자 수가 줄지만 글자 폭 · 줄 높이가 커짐([W3C Text size in translation](https://www.w3.org/International/articles/article-text-size.en.html)) — "영어보다 길다"는 전제를 고침. 숫자 날짜의 마침표는 국립국어원 문장 부호 규정(연월일 뒤 마침표, 마지막 마침표 생략 불가)이라 값이 아닌 규칙으로 rule 형식 절에 둠. 어절 보존 시 URL · 긴 영문이 넘칠 수 있음([MDN word-break](https://developer.mozilla.org/en-US/docs/Web/CSS/word-break))
 - **작성 방식** — 검증할 수 있게 구체적으로, 이유를 함께(예시는 값이 아닌 것만 — 어미 · 숫자 · 구현 이름은 `standards-rules.test.ts`가 막고 profile 몫이다, [Claude Code memory](https://code.claude.com/docs/en/memory) "Write effective instructions", [Claude 프롬프트 가이드](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-prompting-best-practices) "Add context" · "Use examples"). 검수 절차(상태 · 접근성)는 `frontend-quality` skill과 겹치지 않게 뺌
-- **채택 현황** — shared-stack은 채택하지 않음, snapdone은 아직 berry-dev standards로 전환하지 않아 자기 `.claude/rules/ko-ui.md`를 씀. 두 번째 사용처는 snapdone 전환 때 생김
+- **채택 현황** — shared-stack은 devhub만 채택, snapdone은 아직 berry-dev standards로 전환하지 않아 자기 `.claude/rules/ko-ui.md`를 씀. 두 번째 사용처는 snapdone 전환 때 생김
 
 ## docs-ko (선택)
 
@@ -77,7 +77,7 @@
 | 두 문체를 섞지 않음, 고쳐 쓰지 않는 문서는 유지 | devhub 기록 절 "나중에 고쳐 쓰지 않는다"                                                      | `docs.md` "한 문서 안에서 두 문체를 섞지 않는다" |
 | 코드 · 인용 · 링크 · 구조 보존                  | devhub "깨진 문서 링크는 숨기지 않는다"(링크를 테스트가 대조)                                 | `docs.md` 바꾸지 않는 것 절                      |
 
-- **적용** — 프로젝트가 고른 한국어 문서. shared-stack은 `docs/**/*.md`
+- **적용** — 프로젝트가 고른 한국어 문서. shared-stack은 `docs/**/*.md` · `plugins/*/README.md`
 - **제외** — 고르지 않은 문서(shared-stack의 README · AGENTS), 영어 문서, 코드 주석
 - **프로젝트에 남긴 것** — 기록 파일 이름 · 네 절 구성 · 등록 규칙(devhub), 나쁨 · 좋음 예문, 전환 진행 상태
 

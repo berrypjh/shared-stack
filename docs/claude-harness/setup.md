@@ -81,7 +81,7 @@ claude --plugin-dir <checkout>/plugins/berry-dev
 
 source가 저장소 안에 있으므로 `harness-source.json`이 없음. root scripts가 작업 트리의 CLI를 부름.
 
-- `.claude/standards.json` — core, `libs/ui-core/src/**`(cross-runtime-pure), 소비 앱 셋의 `src/**`(berry-consumer), `docs/**/*.md`(docs-ko). `ko-ui`는 채택 근거가 없어 고르지 않음([standards-sources.md](./standards-sources.md))
+- `.claude/standards.json` — core, `libs/ui-core/src/**`(cross-runtime-pure), 소비 앱 셋의 `src/**`(berry-consumer), `apps/devhub/src/**`(ko-ui), `docs/**/*.md` · `plugins/*/README.md`(docs-ko)
 - `.claude/harness.profile.md` — 검증 · UI 사실
 - `.claude/rules/_generated/` — 커밋 대상. `.gitignore`의 `**/_generated/` 예외와 `.prettierignore` 제외가 있음
 - **hook** — `.claude/settings.json`의 local `guard-bash.mjs`가 활성. secret 판정은 `plugins/berry-dev/scripts/secret-policy.mjs`를 import함. plugin은 marketplace에 등록만 했고 `enabledPlugins`에는 없음

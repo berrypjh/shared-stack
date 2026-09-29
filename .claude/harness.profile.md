@@ -71,7 +71,12 @@ berry-dev의 generic rule · skill(`repo-verify` · `frontend-quality`)이 읽�
 
 ### locale 과 제품 정책
 
-- 화면 문구 locale 정책이 없다(`ko-ui` rule 미채택). 어미 · 형식을 강제하지 않는다
+- `apps/devhub/src`는 한국어 화면이고 `ko-ui` rule을 따른다. devhub-ui와 demo 앱은 대상이 아니다
+  - 어미 — 명사형 · 개조식, `docs-ko`와 같다(`없음 — 이 단계를 확인하는 테스트 묶음 없음`, `문서를 불러오는 중`). 사용자가 할 일은 `~ 필요`로 쓴다. 매니페스트 · 수집기 원문을 그대로 보이는 값, 예외 메시지, devhub-ui 기본 문구는 바꾸지 않는다
+  - 날짜 — 카탈로그 · 수집 값 그대로(`YYYY-MM-DD`, ISO 시각). 따로 formatter를 두지 않는다
+  - 숫자 — 천 단위 쉼표(`lib/evaluation/format.ts`의 `formatInteger`). 금액 · 전화번호는 없다
+  - 줄바꿈 — 어절 단위(devhub-ui `styles.css`의 `word-break: keep-all` · `overflow-wrap: break-word`)
+- 다른 앱은 화면 문구 locale 정책이 없다. 어미 · 형식을 강제하지 않는다
 - 제품 셸 · 화면 폭 · 최소 터치 크기 · 완료 문구 정책이 없다. 기준이 필요하면 기준 없음으로 보고한다
 - 라이브러리 접근성 규칙은 패키지 문서가 정한다 — [.claude/rules/react-ui.md](rules/react-ui.md)의 accessibility · forced-colors, [libs/react-native-ui/AGENTS.consumer.md](../libs/react-native-ui/AGENTS.consumer.md)의 접근 가능한 이름 · 한계
 

@@ -21,7 +21,7 @@ package manager는 **pnpm**이고, target이 있으면 Nx target으로 실행한
 | `@berrypjh/{eslint,prettier,tsconfig,commitlint}-config` | `libs/*-config`                | —                   | 다른 저장소가 쓰는 공유 설정                                                          |
 | `@berrypjh/demo-web`                                     | `apps/demo-web`                | React · Vite        | 웹 데모                                                                               |
 | `@berrypjh/demo-mobile`                                  | `apps/demo-mobile`             | Expo · React Native | 모바일 데모                                                                           |
-| `@berrypjh/devhub`                                       | `apps/devhub`                  | React · Vite        | 개인용 저장소 탐색 앱 (아키텍처 · 소비 흐름 · 패키지 · 문서 · 기록 · 평가)            |
+| `@berrypjh/devhub`                                       | `apps/devhub`                  | React · Vite        | 개인용 저장소 탐색 앱 (아키텍처 · 작업 흐름 · 패키지 · 문서 · 기록 · 평가)            |
 | `@berrypjh/devhub-e2e`                                   | `apps/devhub-e2e`              | Playwright          | DevHub의 E2E                                                                          |
 | `commit-mcp`                                             | `plugins/berry-commit`         | Node · TypeScript   | Claude Code plugin `berry-commit` — staged 변경을 scope별로 커밋하는 skill · MCP 서버 |
 
