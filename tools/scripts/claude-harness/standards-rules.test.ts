@@ -127,6 +127,7 @@ describe('shared-stack 적용 설정', () => {
       'core.md',
       'cross-runtime-pure.md',
       'docs-ko.md',
+      'ko-ui.md',
       'manifest.json',
     ]);
   });
@@ -152,7 +153,9 @@ describe('shared-stack 적용 설정', () => {
   it('모든 경로의 glob 앞부분이 저장소에 디렉터리로 있다', () => {
     const entries = Object.keys(config.rules).flatMap(pathsOf);
     for (const entry of entries) {
-      const prefix = entry.split('/').filter((segment) => !/[*?{[]/.test(segment));
+      const segments = entry.split('/');
+      const firstGlob = segments.findIndex((segment) => /[*?{[]/.test(segment));
+      const prefix = firstGlob === -1 ? segments.slice(0, -1) : segments.slice(0, firstGlob);
       const dir = path.join(REPO_ROOT, ...prefix);
       expect(existsSync(dir) && statSync(dir).isDirectory(), entry).toBe(true);
     }
