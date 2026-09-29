@@ -5,7 +5,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { beforeAll, describe, expect, it } from 'vitest';
 
 /**
- * standards rule 본문과 shared-stack 적용 fixture 검사.
+ * standards rule 본문과 shared-stack 이 실제로 쓰는 적용 설정(`.claude/standards.json`) 검사.
  * 추출 근거는 docs/claude-harness/standards-sources.md.
  */
 
@@ -23,7 +23,7 @@ type StandardsCore = {
 
 const REPO_ROOT = fileURLToPath(new URL('../../../', import.meta.url));
 const CORE_MODULE = path.join(REPO_ROOT, 'plugins/berry-dev/scripts/standards-core.mjs');
-const FIXTURE = fileURLToPath(new URL('./fixtures/shared-stack.standards.json', import.meta.url));
+const CONFIG = path.join(REPO_ROOT, '.claude/standards.json');
 
 /** 다른 저장소의 제품 · 플랫폼 세부가 공용 본문에 새지 않았는지 보는 표지. 통과가 의미 검토를 대신하지 않는다. */
 const LEAK_MARKERS = [
@@ -55,11 +55,11 @@ const LEAK_MARKERS = [
 
 let core: StandardsCore;
 let source: Source;
-const fixture = JSON.parse(readFileSync(FIXTURE, 'utf8')) as {
+const config = JSON.parse(readFileSync(CONFIG, 'utf8')) as {
   rules: Record<string, true | { paths: string[] }>;
 };
 const pathsOf = (id: string) => {
-  const choice = fixture.rules[id];
+  const choice = config.rules[id];
   return choice === true ? [] : choice.paths;
 };
 
@@ -119,9 +119,9 @@ describe('source rule 본문', () => {
   });
 });
 
-describe('shared-stack 적용 fixture', () => {
+describe('shared-stack 적용 설정', () => {
   it('config 로 유효하고 core 외에는 고른 rule 만 생성한다', () => {
-    const files = core.buildExpectedFiles({ ...source, config: fixture });
+    const files = core.buildExpectedFiles({ ...source, config });
     expect(files.map((file) => file.path)).toEqual([
       'berry-consumer.md',
       'core.md',
@@ -150,7 +150,7 @@ describe('shared-stack 적용 fixture', () => {
   });
 
   it('모든 경로의 glob 앞부분이 저장소에 디렉터리로 있다', () => {
-    const entries = Object.keys(fixture.rules).flatMap(pathsOf);
+    const entries = Object.keys(config.rules).flatMap(pathsOf);
     for (const entry of entries) {
       const prefix = entry.split('/').filter((segment) => !/[*?{[]/.test(segment));
       const dir = path.join(REPO_ROOT, ...prefix);
@@ -159,8 +159,8 @@ describe('shared-stack 적용 fixture', () => {
   });
 
   it('생성 rule 은 frontmatter · comment 뒤에 source 본문을 byte 그대로 싣고, 두 번 만들어도 같다', () => {
-    const first = core.buildExpectedFiles({ ...source, config: fixture });
-    expect(core.buildExpectedFiles({ ...source, config: fixture })).toEqual(first);
+    const first = core.buildExpectedFiles({ ...source, config });
+    expect(core.buildExpectedFiles({ ...source, config })).toEqual(first);
     for (const file of first.filter((entry) => entry.path.endsWith('.md'))) {
       const id = file.path.replace(/\.md$/, '');
       const paths = pathsOf(id);

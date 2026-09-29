@@ -43,13 +43,6 @@ export const COMMANDS: readonly CommandSpec[] = [
     scope: 'tools/evals/consumer',
     argv: ['pnpm', 'eval:consumer:smoke'],
   },
-  {
-    id: 'a11y.storybook',
-    domain: 'a11y',
-    unit: 'count',
-    scope: '@berrypjh/react-ui',
-    argv: ['pnpm', 'storybook:a11y'],
-  },
 ];
 
 export class UnregisteredCommandError extends Error {}
@@ -63,12 +56,10 @@ export const commandById = (id: string): CommandSpec => {
 /**
  * profile 이 실행하는 명령 id. static 은 정의만 읽고 아무것도 실행하지 않는다.
  * core 는 bundle 명령을 실행한다 (context 는 명령 없이 in-process 로 센다).
- * eval·a11y 는 core 에 넣지 않는다. eval profile 은 이미 만든 eval 산출물을 읽기만 한다.
+ * eval 은 core 에 넣지 않는다. eval profile 은 이미 만든 eval 산출물을 읽기만 한다.
  */
 export const PROFILE_COMMANDS: Record<Profile, readonly string[]> = {
   static: [],
   core: COMMANDS.filter((command) => command.domain === 'bundle').map((command) => command.id),
   eval: [],
-  /** a11y 는 `pnpm quality --base-url=…` 가 모은다. 등록 명령을 실행하지 않는다. */
-  a11y: [],
 };

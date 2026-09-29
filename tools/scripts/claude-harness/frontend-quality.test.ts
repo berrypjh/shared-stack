@@ -16,10 +16,7 @@ const SKILL_FILE = path.join(SKILL_DIR, 'SKILL.md');
 const REFERENCE = path.join(SKILL_DIR, 'references/platform-checks.md');
 const PROFILE = path.join(REPO_ROOT, '.claude/harness.profile.md');
 const EXAMPLE_PROFILE = path.join(REPO_ROOT, 'plugins/berry-dev/examples/harness.profile.md');
-const FIXTURE = path.join(
-  REPO_ROOT,
-  'tools/scripts/claude-harness/fixtures/shared-stack.standards.json',
-);
+const CONFIG = path.join(REPO_ROOT, '.claude/standards.json');
 
 const skill = readFileSync(SKILL_FILE, 'utf8');
 const reference = readFileSync(REFERENCE, 'utf8');
@@ -156,7 +153,7 @@ describe('확인 방식 — 문구 검사, 모델 행동 검증 아님', () => {
   });
 });
 
-describe('shared-stack profile UI 절과 fixture', () => {
+describe('shared-stack profile UI 절과 적용 설정', () => {
   const ui = section(profile, '## UI');
   const roleRows = section(ui, '### 역할')
     .split('\n')
@@ -194,13 +191,13 @@ describe('shared-stack profile UI 절과 fixture', () => {
     expect(new Set(maintained)).toEqual(uiPackages);
   });
 
-  it('standards fixture 의 berry-consumer 경로는 profile 의 consumer 앱 안에만 있다', () => {
-    const fixture = JSON.parse(readFileSync(FIXTURE, 'utf8')) as {
+  it('적용 설정의 berry-consumer 경로는 profile 의 consumer 앱 안에만 있다', () => {
+    const config = JSON.parse(readFileSync(CONFIG, 'utf8')) as {
       rules: Record<string, { paths: string[] }>;
     };
     const consumers = pathsWithRole('consumer');
     const maintainers = pathsWithRole('maintainer');
-    for (const entry of fixture.rules['berry-consumer'].paths) {
+    for (const entry of config.rules['berry-consumer'].paths) {
       expect(
         consumers.some((app) => entry.startsWith(`${app}/`)),
         entry,

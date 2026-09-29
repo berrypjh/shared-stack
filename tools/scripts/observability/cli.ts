@@ -15,7 +15,6 @@ import {
   readTokenizerVersion,
 } from './collectors/context';
 import { collectCore } from './collectors/core';
-import { collectDesignSystem } from './collectors/design-system';
 import { collectEval, EVAL_DIR_PATTERN, EVALS_DIR } from './collectors/eval';
 import { readEvalBaselineFile } from './collectors/eval-baseline';
 import { runArgv } from './collectors/exec';
@@ -114,11 +113,6 @@ export const parseArgs = (argv: string[]): CliCommand => {
   const profile = PROFILES.find((candidate) => candidate === flags.get('profile'));
   if (!profile)
     throw new CliUsageError(`--profile must be one of ${PROFILES.join(', ')}\n${USAGE}`);
-  if (profile === 'a11y') {
-    throw new CliUsageError(
-      `--profile=a11y is collected by pnpm quality --base-url=http://localhost:4400\n${USAGE}`,
-    );
-  }
   const from = flags.get('from');
   if (profile === 'eval') {
     if (!from || !EVAL_DIR_PATTERN.test(from) || importSpecs.length > 0 || onlyImports) {
@@ -153,12 +147,7 @@ const collect = async (args: Extract<CliCommand, { command: 'collect' }>) => {
     });
   }
   if (args.profile === 'static') {
-    return collectStatic({
-      ...common,
-      collectDesign: async () => ({
-        designSystem: await collectDesignSystem({ workspaceRoot: REPO_ROOT }),
-      }),
-    });
+    return collectStatic(common);
   }
 
   const tokenizerVersion = readTokenizerVersion(REPO_ROOT);
