@@ -20,6 +20,12 @@ export const themes = [
     selector: '[data-theme="midnight"], .theme-midnight',
     sourceDirs: ['light', 'dark', 'midnight'],
   },
+  { name: 'ivory', selector: '[data-theme="ivory"], .theme-ivory', sourceDirs: ['light', 'ivory'] },
+  {
+    name: 'charcoal',
+    selector: '[data-theme="charcoal"], .theme-charcoal',
+    sourceDirs: ['light', 'dark', 'charcoal'],
+  },
 ] as const satisfies readonly ThemeDef[];
 
 export type ThemeName = (typeof themes)[number]['name'];

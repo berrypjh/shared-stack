@@ -1,0 +1,128 @@
+{
+  "primary": {
+    "pr100": {
+      "$value": "#F1EBE3",
+      "$type": "color"
+    },
+    "pr200": {
+      "$value": "#E2D6C8",
+      "$type": "color"
+    },
+    "pr300": {
+      "$value": "#CBB9A6",
+      "$type": "color"
+    },
+    "pr400": {
+      "$value": "#AD9782",
+      "$type": "color"
+    },
+    "pr500": {
+      "$value": "#8C7560",
+      "$type": "color"
+    },
+    "pr600": {
+      "$value": "#6F5B49",
+      "$type": "color"
+    },
+    "pr700": {
+      "$value": "#5A4839",
+      "$type": "color"
+    },
+    "pr800": {
+      "$value": "#47372B",
+      "$type": "color"
+    },
+    "pr900": {
+      "$value": "#33271E",
+      "$type": "color"
+    }
+  },
+  "secondary": {
+    "se100": {
+      "$value": "#EFECE7",
+      "$type": "color"
+    },
+    "se200": {
+      "$value": "#DDD7CF",
+      "$type": "color"
+    },
+    "se300": {
+      "$value": "#C7BFB5",
+      "$type": "color"
+    },
+    "se400": {
+      "$value": "#ADA297",
+      "$type": "color"
+    },
+    "se500": {
+      "$value": "#8E8378",
+      "$type": "color"
+    },
+    "se600": {
+      "$value": "#74695F",
+      "$type": "color"
+    },
+    "se700": {
+      "$value": "#5D554D",
+      "$type": "color"
+    },
+    "se800": {
+      "$value": "#4A433C",
+      "$type": "color"
+    },
+    "se900": {
+      "$value": "#342F2A",
+      "$type": "color"
+    }
+  },
+  "neutral": {
+    "ne100": {
+      "$value": "#F6F4EC",
+      "$type": "color"
+    },
+    "ne200": {
+      "$value": "#EDEAE1",
+      "$type": "color"
+    },
+    "ne300": {
+      "$value": "#E0DBD0",
+      "$type": "color"
+    },
+    "ne400": {
+      "$value": "#ADA79D",
+      "$type": "color"
+    },
+    "ne500": {
+      "$value": "#726C64",
+      "$type": "color"
+    },
+    "ne600": {
+      "$value": "#6A655D",
+      "$type": "color"
+    },
+    "ne700": {
+      "$value": "#3E3A35",
+      "$type": "color"
+    },
+    "ne800": {
+      "$value": "#262320",
+      "$type": "color"
+    },
+    "ne900": {
+      "$value": "#161616",
+      "$type": "color"
+    }
+  },
+  "background": {
+    "surface": {
+      "$value": "#FEFBF6",
+      "$type": "color"
+    }
+  },
+  "text": {
+    "placeholder": {
+      "$value": "{neutral.ne600}",
+      "$type": "color"
+    }
+  }
+}

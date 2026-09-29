@@ -1,0 +1,122 @@
+{
+  "primary": {
+    "pr100": {
+      "$value": "#F3EBE1",
+      "$type": "color"
+    },
+    "pr200": {
+      "$value": "#E6D6C3",
+      "$type": "color"
+    },
+    "pr300": {
+      "$value": "#D4BEA5",
+      "$type": "color"
+    },
+    "pr400": {
+      "$value": "#C2A688",
+      "$type": "color"
+    },
+    "pr500": {
+      "$value": "#A3876B",
+      "$type": "color"
+    },
+    "pr600": {
+      "$value": "#836A53",
+      "$type": "color"
+    },
+    "pr700": {
+      "$value": "#6B5442",
+      "$type": "color"
+    },
+    "pr800": {
+      "$value": "#574435",
+      "$type": "color"
+    },
+    "pr900": {
+      "$value": "#3B2F25",
+      "$type": "color"
+    }
+  },
+  "secondary": {
+    "se100": {
+      "$value": "#EEEAE4",
+      "$type": "color"
+    },
+    "se200": {
+      "$value": "#DCD5CB",
+      "$type": "color"
+    },
+    "se300": {
+      "$value": "#C6BCAF",
+      "$type": "color"
+    },
+    "se400": {
+      "$value": "#B2A698",
+      "$type": "color"
+    },
+    "se500": {
+      "$value": "#93887B",
+      "$type": "color"
+    },
+    "se600": {
+      "$value": "#766C61",
+      "$type": "color"
+    },
+    "se700": {
+      "$value": "#625A51",
+      "$type": "color"
+    },
+    "se800": {
+      "$value": "#4D4640",
+      "$type": "color"
+    },
+    "se900": {
+      "$value": "#35302B",
+      "$type": "color"
+    }
+  },
+  "neutral": {
+    "ne100": {
+      "$value": "#F1EEE7",
+      "$type": "color"
+    },
+    "ne200": {
+      "$value": "#DCD8CF",
+      "$type": "color"
+    },
+    "ne300": {
+      "$value": "#B8B2A7",
+      "$type": "color"
+    },
+    "ne400": {
+      "$value": "#A39E94",
+      "$type": "color"
+    },
+    "ne500": {
+      "$value": "#7C776E",
+      "$type": "color"
+    },
+    "ne600": {
+      "$value": "#5A554D",
+      "$type": "color"
+    },
+    "ne700": {
+      "$value": "#3D392F",
+      "$type": "color"
+    },
+    "ne800": {
+      "$value": "#262320",
+      "$type": "color"
+    },
+    "ne900": {
+      "$value": "#161616",
+      "$type": "color"
+    }
+  },
+  "text": {
+    "disable": {
+      "$value": "#908B81",
+      "$type": "color"
+    }
+  }
+}

@@ -80,7 +80,7 @@ describe('selection control family', () => {
 
   /**
    * base 램프 단계는 밝은 표면용이라 표면이 뒤집히는 dark 만 다시 잡는다.
-   * ember·midnight 는 dark 를 상속하고, 나머지는 base alias 로 대비를 통과한다.
+   * ember·midnight·charcoal 은 dark 를 상속하고, 나머지는 base alias 로 대비를 통과한다.
    */
   it('overrides the family only in dark', () => {
     const overriding = themes

@@ -64,10 +64,10 @@ preset은 값을 굽지 않고 CSS 변수를 가리키므로 테마가 바뀌면
 
 ## 테마
 
-| 테마                                              | 셀렉터                                   |
-| ------------------------------------------------- | ---------------------------------------- |
-| `light`                                           | `:root` (base)                           |
-| `dark` `sepia` `amber` `ember` `frost` `midnight` | `[data-theme="<name>"]`, `.theme-<name>` |
+| 테마                                                                 | 셀렉터                                   |
+| -------------------------------------------------------------------- | ---------------------------------------- |
+| `light`                                                              | `:root` (base)                           |
+| `dark` `sepia` `amber` `ember` `frost` `midnight` `ivory` `charcoal` | `[data-theme="<name>"]`, `.theme-<name>` |
 
 ```html
 <html data-theme="dark"></html>
