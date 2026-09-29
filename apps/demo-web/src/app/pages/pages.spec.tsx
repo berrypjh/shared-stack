@@ -513,3 +513,16 @@ describe('스케일', () => {
     expect(card).not.toContain('--ds-');
   });
 });
+
+/**
+ * 접근성 대비 표. jsdom 은 토큰 CSS 를 불러오지 않아 변수가 비어 있다 — 그 상태는 측정 불가이지 미달이 아니다.
+ * 한때 probe 키를 잘못 읽어 브라우저에서도 모든 줄이 값 없이 미달로 보였다.
+ */
+describe('Runtime 접근성 표', () => {
+  it('값을 읽지 못한 조합을 미달이 아니라 측정 불가로 보인다', async () => {
+    at('/verify');
+    const row = await screen.findByTestId('contrast-본문 텍스트');
+    expect(row.textContent).toContain('측정 불가');
+    expect(row.textContent).not.toContain('미달');
+  });
+});
