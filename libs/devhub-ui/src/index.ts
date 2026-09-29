@@ -23,8 +23,22 @@ export { type Bar, BarChart, type BarGroup } from './chart/bar-chart';
 export { CopyButton } from './doc/copy-button';
 export { DocContent, type RenderLink } from './doc/doc-content';
 export { DocToc } from './doc/doc-toc';
-export { DocumentLayout } from './doc/document-layout';
-export { Empty, InspectorSection } from './entity/inspector-section';
+export {
+  DocumentColumn,
+  DocumentHead,
+  DocumentLayout,
+  DocumentSection,
+} from './doc/document-layout';
+export { type RemoteView, SourceActions } from './doc/source-actions';
+export { type Fact, Facts } from './entity/facts';
+export { FileLine, FileList } from './entity/file-line';
+export { InspectorHeader } from './entity/inspector-header';
+export {
+  Empty,
+  InspectorContents,
+  InspectorSection,
+  type InspectorSectionMeta,
+} from './entity/inspector-section';
 export { Pager, type PagerItem } from './entity/pager';
 export { RecordMeta } from './entity/record-meta';
 export { type Inline, inlineText, parseInline } from './markdown/inline';
@@ -81,10 +95,13 @@ export {
 } from './shell/workspace';
 export {
   applyTheme,
+  createThemeScript,
   currentTheme,
+  DEFAULT_THEME_PAIR,
   subscribeTheme,
   THEME_KEY,
   type ThemeMode,
+  type ThemePair,
   themeScript,
 } from './theme/theme';
 export { ThemeSwitch } from './theme/theme-switch';

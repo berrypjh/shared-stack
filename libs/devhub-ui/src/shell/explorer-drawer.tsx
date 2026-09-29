@@ -128,7 +128,11 @@ export const ExplorerPane = ({ children }: { children: ReactNode }) => {
           'relative bg-background-surface lg:overflow-y-auto lg:border-r lg:border-stroke-light',
           'max-lg:fixed max-lg:inset-y-0 max-lg:left-0 max-lg:z-40 max-lg:w-[min(20rem,85vw)]',
           'max-lg:overflow-y-auto max-lg:shadow-4',
-          'max-lg:transition-[translate,visibility] max-lg:duration-200 motion-reduce:transition-none',
+          // 닫힐 때만 visibility 를 늦춰 미끄러져 나가는 동안 보이게 한다. 열 때 visibility 를 전환하면
+          // 시작 순간 hidden 이라 현재 항목으로 옮기는 focus() 가 실패한다. 움직임 줄이기에서는 전환이 없다.
+          'max-lg:motion-safe:duration-200 motion-reduce:transition-none',
+          'max-lg:motion-safe:data-[state=closed]:transition-[translate,visibility]',
+          'max-lg:motion-safe:data-[state=open]:transition-[translate]',
           'max-lg:data-[state=closed]:invisible max-lg:data-[state=closed]:-translate-x-full',
         ].join(' ')}
       >

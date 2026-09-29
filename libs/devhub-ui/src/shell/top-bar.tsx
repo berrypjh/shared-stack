@@ -23,7 +23,7 @@ export const TopBar = ({
   /** `GlobalSearch`. */
   search?: ReactNode;
 }) => {
-  const { productName } = useDevHub();
+  const { productName, themePair } = useDevHub();
   return (
     <header className="flex min-h-14 items-center gap-sm border-b max-lg:flex-wrap border-stroke-light bg-background-surface px-lg py-sm max-lg:sticky max-lg:top-0 max-lg:z-20 lg:gap-lg">
       <div className={`flex min-w-0 flex-1 items-center gap-sm ${summary ? 'xl:flex-none' : ''}`}>
@@ -39,7 +39,7 @@ export const TopBar = ({
         </p>
       )}
       {search}
-      <ThemeSwitch />
+      <ThemeSwitch themePair={themePair} />
     </header>
   );
 };

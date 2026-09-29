@@ -50,6 +50,21 @@ export const App = () => {
 
 Next.js에서는 `next/link`의 `href`로 `to`를 넘기고, `usePathname()` · `useRouter().push`를 쓴다.
 
-## 첫 paint 전 테마
+## 테마
 
-`themeScript`를 문서 `<head>`의 인라인 `<script>`로 넣는다. 저장 키는 `THEME_KEY`다.
+화면이 고르는 것은 논리 모드(`ThemeMode` — `light` · `dark`)이고, `ThemeSwitch`는 라이트 · 다크 두 버튼이다. 모드마다 `<html data-theme>`에 쓸 react-ui 토큰 테마는 `ThemePair`가 정한다. 기본은 `DEFAULT_THEME_PAIR`(`{ light: 'light', dark: 'dark' }`)라 짝을 넘기지 않으면 예전과 같다.
+
+```tsx
+import type { ThemePair } from '@berrypjh/devhub-ui';
+
+const THEME_PAIR = { light: 'ivory', dark: 'charcoal' } as const satisfies ThemePair;
+
+<DevHubProvider productName="My DevHub" router={router} themePair={THEME_PAIR}>
+  …
+</DevHubProvider>;
+```
+
+- 저장 키는 `THEME_KEY`(`devhub-theme`)이고 값은 늘 모드(`light` · `dark`)다. 테마 이름은 저장하지 않는다
+- 첫 paint 전 적용은 `<head>`의 인라인 `<script>`다. 기본 짝은 `themeScript`, 다른 짝은 `createThemeScript(pair)`의 결과를 넣는다. 저장값이 없거나 모르는 값이면 OS 설정을 따른다
+- `styles.css`의 `color-scheme`은 기본 짝(`dark`)만 안다. 다른 다크 테마를 쓰면 앱이 `:root[data-theme='<name>'] { color-scheme: dark; }`를 둔다
+- `ivory` · `charcoal`에서는 `styles.css`가 셸에 editorial 모양(캔버스 배경 · 작은 각 · 큰 페이지 제목 · 중립 선택)을 더한다. 다른 테마에서는 바뀌지 않는다

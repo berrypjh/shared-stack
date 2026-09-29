@@ -11,7 +11,7 @@ import { ExplorerPane } from './explorer-drawer';
 
 /** 탐색기 항목 한 줄. 현재 항목은 배경과 굵기로, `aria-current` 로 알린다. */
 const ITEM =
-  'flex min-h-8 items-center gap-sm rounded-md px-sm py-xs typo-body-small text-text-default hover:bg-background-default aria-[current=page]:bg-(--ds-background-selected) aria-[current=page]:typo-body-small-strong';
+  'devhub-explorer-item flex min-h-8 items-center gap-sm rounded-md px-sm py-xs typo-body-small text-text-default hover:bg-background-default aria-[current=page]:bg-(--ds-background-selected) aria-[current=page]:typo-body-small-strong';
 
 export type ExplorerItem = {
   id: string;

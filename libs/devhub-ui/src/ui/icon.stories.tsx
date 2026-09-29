@@ -14,6 +14,7 @@ const NAMES: IconName[] = Object.keys({
   application: 0,
   library: 0,
   package: 0,
+  plugin: 0,
   engineering: 0,
   document: 0,
   record: 0,

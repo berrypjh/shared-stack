@@ -41,7 +41,7 @@ const meta = {
     children: (
       <article className="flex max-w-[46rem] flex-col gap-md typo-body-small">
         <p>본문 내용은 여기 온다. 실제로는 DocContent 가 markdown 을 그린다.</p>
-        <p>컨테이너 폭이 `@4xl` 이상이면 오른쪽에 목차가 붙박이로 선다.</p>
+        <p>컨테이너 폭이 `@3xl` 이상이면 오른쪽에 목차가 붙박이로 선다.</p>
       </article>
     ),
   },

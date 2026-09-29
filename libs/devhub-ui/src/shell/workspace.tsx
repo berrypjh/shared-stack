@@ -8,7 +8,11 @@ export const INSPECTOR_ID = 'devhub-inspector';
 
 /** 가운데 칸. 첫 자식은 `WorkspaceHeader` 다. `lg` 부터 혼자 스크롤한다. */
 export const WorkspaceFrame = ({ children }: { children: ReactNode }) => (
-  <main id={MAIN_CONTENT_ID} tabIndex={-1} className="relative min-w-0 lg:overflow-y-auto">
+  <main
+    id={MAIN_CONTENT_ID}
+    tabIndex={-1}
+    className="devhub-workspace relative min-w-0 lg:overflow-y-auto"
+  >
     <div className="flex flex-col gap-xl px-lg pt-lg pb-4xl sm:px-2xl sm:pt-xl sm:pb-5xl">
       {children}
     </div>
@@ -29,9 +33,9 @@ export const WorkspaceSection = ({
     id={id}
     tabIndex={-1}
     aria-labelledby={`${id}-heading`}
-    className="flex flex-col gap-md rounded-lg border border-stroke-light bg-background-surface p-lg"
+    className="devhub-section flex flex-col gap-md rounded-lg border border-stroke-light bg-background-surface p-lg"
   >
-    <h2 id={`${id}-heading`} className="typo-body-small-strong">
+    <h2 id={`${id}-heading`} className="devhub-section-title typo-body-small-strong">
       {title}
     </h2>
     {children}
@@ -48,12 +52,12 @@ export const WorkspaceHeader = ({
   icon?: IconName;
   title: string;
 }) => (
-  <header className="flex flex-col gap-xs">
+  <header className="devhub-workspace-header flex flex-col gap-xs">
     <p className="flex items-center gap-sm typo-caption-small text-text-light">
       {icon && <Icon name={icon} />}
       {eyebrow}
     </p>
-    <h1 className="typo-heading-h5">{title}</h1>
+    <h1 className="devhub-page-title typo-heading-h5">{title}</h1>
     <a
       href={`#${INSPECTOR_ID}`}
       className="self-start typo-caption-small text-text-link underline-offset-2 hover:underline lg:hidden"

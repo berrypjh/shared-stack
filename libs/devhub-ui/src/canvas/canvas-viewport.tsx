@@ -191,7 +191,7 @@ const CanvasSurface = ({
           role="group"
           aria-label={label}
           aria-describedby={`${summaryId} ${helpId}`}
-          className="relative h-full cursor-grab touch-none overflow-hidden rounded-lg border border-stroke-light bg-background-default active:cursor-grabbing"
+          className="devhub-canvas relative h-full cursor-grab touch-none overflow-hidden rounded-lg border border-stroke-light bg-background-default active:cursor-grabbing"
           {...handlers}
         >
           <div

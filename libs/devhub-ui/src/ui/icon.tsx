@@ -17,6 +17,7 @@ const PATHS = {
   application: ['M4 5h16v14H4z', 'M4 9h16'],
   library: ['M5 4h4v16H5Z', 'M11 4h4v16h-4Z', 'm17 5.5 3 .8-3.6 14.2-3-.8'],
   package: ['M12 3l8 4v10l-8 4-8-4V7z', 'M4 7l8 4 8-4', 'M12 11v10'],
+  plugin: ['M9 3v5', 'M15 3v5', 'M6 8h12v3a6 6 0 0 1-12 0z', 'M12 17v4'],
   engineering: ['M4 5h16v14H4z', 'M8 10l3 2-3 2', 'M13 15h3'],
   document: ['M7 3h7l4 4v14H7z', 'M14 3v4h4', 'M10 12h5', 'M10 16h5'],
   record: ['M6 6h.01', 'M6 12h.01', 'M6 18h.01', 'M10 6h9', 'M10 12h9', 'M10 18h5'],

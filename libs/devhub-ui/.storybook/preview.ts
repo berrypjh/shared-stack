@@ -46,7 +46,8 @@ const preview: Preview = {
   globalTypes: {
     themeMode: {
       name: 'Theme',
-      description: 'light / dark (devhub-ui 는 이 둘만 쓴다)',
+      description:
+        'light / dark (기본 짝 DEFAULT_THEME_PAIR. 다른 짝은 ThemeSwitch 의 CustomThemePair)',
       defaultValue: 'light',
       toolbar: {
         icon: 'mirror',

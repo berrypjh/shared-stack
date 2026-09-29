@@ -8,6 +8,8 @@ import {
   useContext,
 } from 'react';
 
+import type { ThemePair } from '../theme/theme';
+
 /** 앱 안 링크. Next 는 `href`, react-router 는 `to` 로 받으므로 앱이 어댑터 하나를 넘긴다. */
 export type DevHubLinkProps = {
   to: string;
@@ -32,6 +34,8 @@ export type DevHubConfig = {
   /** 상단 바와 문서 제목(`<title>`)에 쓰는 제품 이름. */
   productName: string;
   router: DevHubRouter;
+  /** 라이트 · 다크 모드마다 쓸 디자인 토큰 테마. 없으면 `light` · `dark`(`DEFAULT_THEME_PAIR`). */
+  themePair?: ThemePair;
 };
 
 const DevHubContext = createContext<DevHubConfig | null>(null);

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-import { Empty, InspectorSection } from './inspector-section';
+import { Empty, InspectorContents, InspectorSection } from './inspector-section';
 
 const meta = {
   title: 'Entity/InspectorSection',
@@ -27,6 +27,11 @@ type Story = StoryObj<typeof meta>;
 /** `id` 는 목차 링크의 대상이라 포커스를 받는다 — `#sources` 로 오면 이 섹션이 포커스된다. */
 export const Playground: Story = {};
 
+/** 머리 아이콘과, 목록을 읽기 전에 무엇이 들었는지 알리는 요약 줄. */
+export const WithIconAndSummary: Story = {
+  args: { icon: 'source', count: 4, summary: '저장소 2 · mobile 1 · web 1' },
+};
+
 export const WithoutCount: Story = {
   args: { count: undefined },
 };
@@ -43,11 +48,17 @@ export const EmptySection: Story = {
 /** 여러 섹션이 이어질 때 — 상세 정보 칸(Inspector)에서 실제로 쓰이는 모양. */
 export const Stacked: Story = {
   render: () => (
-    <div>
-      <InspectorSection id="sources-2" title="소스" count={2}>
+    <div className="flex flex-col divide-y divide-stroke-light">
+      <InspectorContents
+        sections={[
+          { id: 'sources-2', title: '소스', icon: 'source' },
+          { id: 'tests-2', title: '테스트', icon: 'test' },
+        ]}
+      />
+      <InspectorSection id="sources-2" title="소스" icon="source" count={2}>
         <p className="typo-body-small">libs/devhub-ui/src/entity/inspector-section.tsx</p>
       </InspectorSection>
-      <InspectorSection id="tests-2" title="테스트">
+      <InspectorSection id="tests-2" title="테스트" icon="test" count={0}>
         <Empty reason="아직 실행되지 않았다" />
       </InspectorSection>
     </div>

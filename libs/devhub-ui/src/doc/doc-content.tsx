@@ -6,7 +6,9 @@ import { Table, TableScroll, VisuallyHidden } from '@berrypjh/react-ui';
 
 import type { Inline } from '../markdown/inline';
 import type { Block, ListItem } from '../markdown/parse';
+import { Icon } from '../ui/icon';
 
+import { markAnchor } from './anchor-flash';
 import { CopyButton } from './copy-button';
 
 /** 문서에 적힌 링크 하나를 그린다. 어디로 갈지(앱 안 문서 · 저장소 파일 · 밖)는 앱이 정한다. */
@@ -22,14 +24,7 @@ const Inlines = ({ nodes, renderLink }: { nodes: Inline[]; renderLink: RenderLin
       case 'image':
         return <Fragment key={index}>{node.alt}</Fragment>;
       case 'code':
-        return (
-          <code
-            key={index}
-            className="rounded-sm bg-background-default px-2xs font-mono text-[0.9em]"
-          >
-            {node.text}
-          </code>
-        );
+        return <code key={index}>{node.text}</code>;
       case 'strong':
         return (
           <strong key={index}>
@@ -52,12 +47,15 @@ const Inlines = ({ nodes, renderLink }: { nodes: Inline[]; renderLink: RenderLin
   });
 
 const HEADING = {
-  2: 'mt-xl border-t border-stroke-light pt-lg typo-heading-h5',
-  3: 'mt-lg typo-body-medium-strong',
-  4: 'mt-md typo-body-small-strong',
+  2: 'mt-2xl border-t border-stroke-light pt-xl typo-heading-h5',
+  3: 'mt-xl typo-body-medium-strong',
+  4: 'mt-lg typo-body-small-strong',
 } as const;
 
-/** 절 제목. `id` 는 GitHub 앵커와 같고, 주소의 `#…` 로 오면 포커스를 받는다. */
+/**
+ * 절 제목. `id` 는 GitHub 앵커와 같고, 주소의 `#…` 로 오면 포커스를 받는다.
+ * 위치를 공유할 `#` 링크가 붙는데, hover · 키보드 포커스일 때만 보인다.
+ */
 const Heading = ({
   block,
   renderLink,
@@ -68,19 +66,38 @@ const Heading = ({
   const level = block.level <= 2 ? 2 : block.level === 3 ? 3 : 4;
   const Tag = `h${level}` as const;
   return (
-    <Tag id={block.id} tabIndex={-1} className={`scroll-mt-lg ${HEADING[level]}`}>
-      <Inlines nodes={block.inline} renderLink={renderLink} />
+    <Tag
+      id={block.id}
+      tabIndex={-1}
+      aria-labelledby={`${block.id}:title`}
+      className={`group ${HEADING[level]}`}
+    >
+      {/* 글줄. 도착 표식은 제목 위 구분선 · 여백이 아니라 이 줄에만 칠한다. */}
+      <span className="devhub-heading-line flex items-baseline gap-sm">
+        {/* 제목의 이름은 이 글자뿐이다 — 옆 `#` 링크의 숨은 글이 섞이지 않게. slug 에는 `:` 가 없다. */}
+        <span id={`${block.id}:title`}>
+          <Inlines nodes={block.inline} renderLink={renderLink} />
+        </span>
+        <a
+          href={`#${block.id}`}
+          data-plain
+          className="text-text-light opacity-0 group-hover:opacity-100 focus-visible:opacity-100"
+        >
+          <Icon name="hash" />
+          <VisuallyHidden>{block.text} 절 링크</VisuallyHidden>
+        </a>
+      </span>
     </Tag>
   );
 };
 
 const CodeBlock = ({ lang, text }: { lang: string; text: string }) => (
   <div className="overflow-hidden rounded-md border border-stroke-light bg-background-default">
-    <div className="flex items-center justify-between border-b border-stroke-light px-sm">
+    <div className="flex items-center justify-between border-b border-stroke-light px-md py-xs">
       <span className="typo-caption-small text-text-light">{lang || '코드'}</span>
       <CopyButton text={text} label={`${lang || '코드'} 블록 복사`} />
     </div>
-    <pre className="overflow-x-auto p-sm font-mono text-xsm">
+    <pre className="devhub-code overflow-x-auto p-md">
       <code>{text}</code>
     </pre>
   </div>
@@ -122,11 +139,7 @@ const Blocks = ({ blocks, context }: { blocks: Block[]; context: Context }): Rea
       case 'list': {
         const List = block.ordered ? 'ol' : 'ul';
         return (
-          <List
-            key={index}
-            start={block.ordered ? block.start : undefined}
-            className={`flex flex-col gap-2xs pl-lg ${block.ordered ? 'list-decimal' : 'list-disc'}`}
-          >
+          <List key={index} start={block.ordered ? block.start : undefined}>
             {block.items.map((item, i) => (
               <li key={i} className={item.checked === undefined ? '' : 'list-none -ml-md'}>
                 <ItemBody item={item} context={{ ...context, caption }} />
@@ -173,7 +186,7 @@ const Blocks = ({ blocks, context }: { blocks: Block[]; context: Context }): Rea
         return (
           <blockquote
             key={index}
-            className="flex flex-col gap-sm rounded-md border-l-4 border-stroke-primary bg-background-default px-md py-sm"
+            className="rounded-md border-l-4 border-stroke-primary bg-(--ds-background-selected) px-lg py-md"
           >
             <Blocks blocks={block.blocks} context={{ ...context, caption }} />
           </blockquote>
@@ -187,6 +200,7 @@ const Blocks = ({ blocks, context }: { blocks: Block[]; context: Context }): Rea
 /**
  * 저장소 문서 한 편을 읽기 화면으로. HTML 을 주입하지 않는다 — 모든 글은 React 텍스트 노드다.
  * 불러온 뒤 `hash` 가 있으면 그 절로 간다(불러오기 전에는 그 제목이 아직 없다).
+ * `hash` 가 가리키는 제목은 도착할 때마다 잠깐 물들인다(`devhub-prose [data-anchor-flash]`).
  */
 export const DocContent = ({
   blocks,
@@ -209,8 +223,11 @@ export const DocContent = ({
     // 불러온 직후 한 번만. 같은 문서 안의 `#` 이동은 useRouteFocus 가 맡는다.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [blocks]);
+  useEffect(() => {
+    markAnchor(document, hash);
+  }, [blocks, hash]);
   return (
-    <article className="flex max-w-[46rem] min-w-0 flex-col gap-md typo-body-small">
+    <article className="devhub-prose max-w-[46rem] min-w-0">
       <Blocks blocks={blocks} context={{ renderLink, caption: title }} />
     </article>
   );
