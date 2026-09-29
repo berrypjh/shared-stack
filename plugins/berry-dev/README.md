@@ -2,20 +2,7 @@
 
 여러 저장소가 같은 Claude Code 작업 규칙을 쓰도록 **standards rule 원본과 sync · check CLI**를 배포한다. 책임은 standards 배포, 검증 절차, secret guard 셋으로 한정한다. 설계와 계약은 shared-stack 저장소의 `docs/claude-harness/`에 있다.
 
-## 지금 있는 것 · 아직 없는 것
-
-| 구성                                    | 상태         |
-| --------------------------------------- | ------------ |
-| `standards/` — rule 원본과 registry     | 있음         |
-| `scripts/standards.mjs` — sync · check  | 있음         |
-| `examples/` — 소비 저장소가 복사할 입력 | 있음         |
-| secret guard hook (`hooks/hooks.json`)  | 있음         |
-| `skills/repo-verify` — 검증 절차        | 있음         |
-| `skills/frontend-quality` — UI 검수     | 있음         |
-| marketplace 등록 (`berrypjh`)           | 있음         |
-| 프로젝트 `enabledPlugins` · hook 전환   | 활성 확인 뒤 |
-
-plugin을 켜면 더해지는 것은 secret guard와 `/berry-dev:repo-verify` · `/berry-dev:frontend-quality`다.
+plugin을 켜면 더해지는 것은 secret guard hook과 `/berry-dev:repo-verify` · `/berry-dev:frontend-quality`다. standards rule은 plugin이 직접 로드하지 않고 아래 CLI로 소비 저장소에 쓴다.
 
 ## repo-verify
 
