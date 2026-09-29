@@ -1,6 +1,6 @@
 ---
 paths:
-  - "docs/records/**/*.md"
+  - "docs/**/*.md"
 ---
 <!-- berry-dev/standards format 1 | Source: berry-dev/standards/rules/docs-ko.md | Plugin: berry-dev@0.1.0 | Do not edit. Run: pnpm harness:sync -->
 

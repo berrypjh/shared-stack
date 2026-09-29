@@ -1,14 +1,14 @@
 # Harness profile
 
-berry-dev의 generic rule · 절차(`repo-verify` 등)가 가리키는 shared-stack 사실이다. 명령을 실행하는 형식이 아니라 사람이 읽는 문서다. target 표는 두지 않는다 — target은 `nx show project <이름> --json`으로 확인한다.
+berry-dev의 generic rule · skill(`repo-verify` · `frontend-quality`)이 읽는 shared-stack 사실이다. target은 여기 적지 않고 `nx show project <이름> --json`으로 확인한다.
 
 ## 검증
 
 ### 영향 범위
 
 - Nx workspace다([nx.json](../nx.json)). 영향은 `nx show projects --affected --files=<파일>`로 묻는다
-- **affected는 거의 비지 않는다.** Nx 프로젝트 밖 파일(`tools/**` · `.claude/**` · `.claude-plugin/**` · `plugins/berry-dev/**` · `docs/**`)은 root 프로젝트 `@berrypjh/shared-stack`로 잡히고, devhub의 test · build가 저장소 전체를 입력으로 두어 `@berrypjh/devhub` · `@berrypjh/devhub-e2e`가 함께 나온다([.claude/rules/devhub.md](rules/devhub.md) Gotcha)
-- root 프로젝트의 target은 `local-registry` 하나다(포트를 연다). 그래서 위 경로의 실제 검사는 아래 "프로젝트 밖 경로"다
+- **affected에는 거의 늘 `@berrypjh/devhub` · `@berrypjh/devhub-e2e`가 나온다.** devhub의 test · build가 저장소 전체를 입력으로 두기 때문이다. devhub 코드를 건드렸다는 뜻이 아니다
+- Nx 프로젝트 밖 파일(`tools/**` · `.claude/**` · `plugins/berry-dev/**` · `docs/**`)은 root 프로젝트 `@berrypjh/shared-stack`로 잡힌다. root에는 검사 target이 없어 실제 검사는 아래 "프로젝트 밖 경로"다
 - `nx affected -t <target>`은 target이 없는 프로젝트를 건너뛴다. 예: `commit-mcp`에는 `test`가 없다
 
 ### 프로젝트 밖 경로
@@ -21,13 +21,12 @@ berry-dev의 generic rule · 절차(`repo-verify` 등)가 가리키는 shared-st
 | `plugins/berry-commit/src/**`                                  | `commit-mcp`의 lint · typecheck, `pnpm build:mcp:commit`로 `dist`를 다시 만들어 함께 커밋    |
 | `docs/**` · README · AGENTS · 새 폴더(`tools/*` · `plugins/*`) | devhub 카탈로그 테스트(`@berrypjh/devhub`의 test) — 문서 · 도구 등록과 링크를 디스크와 대조  |
 
-- `tools:check`의 tsc는 `tools/{lib,evals,scripts}`만 include한다. `tools/consumer-retrieval`은 import로 닿는 파일만 타입 검사된다([tools/tsconfig.json](../tools/tsconfig.json))
+- `tools/consumer-retrieval`은 `tools:check`의 tsc include 밖이라 import로 닿는 파일만 타입 검사된다
 - `.claude/hooks/guard-bash.mjs`는 `plugins/berry-dev/scripts/secret-policy.mjs`를 import한다. 둘 중 하나를 바꾸면 `tools/scripts/claude-harness/guard.test.ts`
-- `tools/`는 Nx 프로젝트가 아니다. PR에서는 `pr-check.yml`의 consumer-eval job이 `tools:check`를 돌린다([AGENTS.md](../AGENTS.md))
 
 ### 의존 순서
 
-- tools 테스트 일부(카탈로그 drift · 패키지 경계)는 빌드된 libs의 `dist`를 읽는다. 먼저 `pnpm build:libs` (CI 순서와 같다 — [pr-check.yml](../.github/workflows/pr-check.yml) consumer-eval job)
+- tools 테스트 일부(카탈로그 drift · 패키지 경계)는 빌드된 libs의 `dist`를 읽는다. 먼저 `pnpm build:libs`
 - 앱 · devhub는 libs의 `dist`를 읽는다(`^build`). lib를 고쳤으면 그 lib를 build 한 뒤 앱을 검사한다
 - lib 별 검증 순서는 각 lib의 path rule(`.claude/rules/<lib>.md`)이 적는다(예: [.claude/rules/ui-core.md](rules/ui-core.md))
 
@@ -35,14 +34,12 @@ berry-dev의 generic rule · 절차(`repo-verify` 등)가 가리키는 shared-st
 
 - `pnpm eval:consumer:smoke`는 내장 scripted executor로 도는 결정적 확인이다. 모델 호출이 없고 모델 성능이 아니다
 - `--replay=<traces.jsonl>`은 수집한 trace를 다시 채점한다
-- `pnpm eval:consumer:dev` · `pnpm eval:consumer:test`는 live executor가 필요하다. 이 저장소에는 없어서(`unavailableExecutor`가 throw) replay 없이 돌리면 실패한다 — unsupported로 보고한다([tools/evals/consumer/README.md](../tools/evals/consumer/README.md))
+- `pnpm eval:consumer:dev` · `pnpm eval:consumer:test`는 live executor가 없어(`unavailableExecutor`가 throw) replay 없이는 실패한다. unsupported로 보고한다
 
 ### build 종류
 
-실행 전에 `nx show project <이름> --json`으로 명령을 읽는다.
-
-- `@berrypjh/demo-mobile`의 `build`는 로컬 `expo export`다. `submit`(`eas submit`)은 permissions가 막는다
-- EAS 클라우드 빌드(`eas build`) · `pnpm release:npm*` · `nx release` · `npm publish`는 검증이 아니다. 실행하지 않는다 ([settings.json](./settings.json)의 deny · ask)
+- `@berrypjh/demo-mobile`의 `build`는 로컬 `expo export`라 검증으로 쓸 수 있다
+- EAS 빌드 · 제출, 릴리스 · publish는 검증이 아니다. 실행하지 않는다([settings.json](./settings.json)의 deny · ask)
 
 ### AI 세션에서 실행할 수 없는 것
 
@@ -50,19 +47,19 @@ berry-dev의 generic rule · 절차(`repo-verify` 등)가 가리키는 shared-st
 
 - dev 서버 · preview · Storybook · local registry — `serve` · `dev` · `start` · `preview` · `storybook` target, `pnpm start` · `pnpm dev:devhub` · `pnpm storybook` · `pnpm local-registry`
 - Playwright e2e — `@berrypjh/devhub-e2e`의 `e2e`, `pnpm storybook:a11y`
-- 판정 목록은 [hooks/guard-bash.mjs](./hooks/guard-bash.mjs)의 `PORT_BOUND`다. `pnpm dev:devhub`는 그 목록에 없지만 `nx serve` 별칭이다
+- 판정 목록은 [hooks/guard-bash.mjs](./hooks/guard-bash.mjs)의 `PORT_BOUND`다
 
 ## UI
 
-`frontend-quality`가 이 절을 읽는다. 컴포넌트 · prop · 토큰 목록은 두지 않는다 — 패키지 카탈로그가 정답이다.
+`frontend-quality`가 이 절을 읽는다. 컴포넌트 · prop · 토큰 목록은 패키지 카탈로그가 정답이다.
 
 ### 역할
 
-| 경로                                                        | 역할       | 따를 문서                                                       |
-| ----------------------------------------------------------- | ---------- | --------------------------------------------------------------- |
-| `libs/react-ui` · `libs/react-native-ui` · `libs/devhub-ui` | maintainer | 각 패키지 `AGENTS.md`                                           |
-| `libs/ui-core`                                              | UI 아님    | 플랫폼 중립 계약 — [.claude/rules/ui-core.md](rules/ui-core.md) |
-| `apps/demo-web` · `apps/demo-mobile` · `apps/devhub`        | consumer   | 각 앱 `AGENTS.md`의 "소비자처럼 쓴다"                           |
+| 경로                                                        | 역할       | 따를 문서                                                              |
+| ----------------------------------------------------------- | ---------- | ---------------------------------------------------------------------- |
+| `libs/react-ui` · `libs/react-native-ui` · `libs/devhub-ui` | maintainer | `.claude/rules/<패키지>.md`                                            |
+| `libs/ui-core`                                              | UI 아님    | 플랫폼 중립 계약 — [.claude/rules/ui-core.md](rules/ui-core.md)        |
+| `apps/demo-web` · `apps/demo-mobile` · `apps/devhub`        | consumer   | `.claude/rules/_generated/berry-consumer.md`와 `.claude/rules/<앱>.md` |
 
 - 한 작업이 lib와 앱을 함께 고치면 파일마다 역할을 따로 판정한다. lib 수정은 maintainer로, 앱 수정은 consumer로 본다
 
@@ -74,8 +71,8 @@ berry-dev의 generic rule · 절차(`repo-verify` 등)가 가리키는 shared-st
 
 ### locale 과 제품 정책
 
-- 화면 문구 locale 정책 문서가 없다. `ko-ui` rule을 채택하지 않았다([standards-sources.md](../docs/claude-harness/standards-sources.md)) — 어미 · 형식을 강제하지 않는다
-- 제품 셸 · 화면 폭 · 최소 터치 크기 · 완료 문구 정책이 없다. demo 앱은 패키지 통합을 확인하는 도구다. 기준이 필요하면 기준 없음으로 보고한다
+- 화면 문구 locale 정책이 없다(`ko-ui` rule 미채택). 어미 · 형식을 강제하지 않는다
+- 제품 셸 · 화면 폭 · 최소 터치 크기 · 완료 문구 정책이 없다. 기준이 필요하면 기준 없음으로 보고한다
 - 라이브러리 접근성 규칙은 패키지 문서가 정한다 — [.claude/rules/react-ui.md](rules/react-ui.md)의 accessibility · forced-colors, [libs/react-native-ui/AGENTS.consumer.md](../libs/react-native-ui/AGENTS.consumer.md)의 접근 가능한 이름 · 한계
 
 ### 확인 수단

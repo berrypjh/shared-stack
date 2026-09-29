@@ -6,6 +6,8 @@
     "berry-consumer": {
       "paths": ["apps/demo-web/src/**", "apps/demo-mobile/src/**", "apps/devhub/src/**"]
     },
-    "docs-ko": { "paths": ["docs/records/**/*.md"] }
+    "docs-ko": {
+      "paths": ["docs/**/*.md"]
+    }
   }
 }

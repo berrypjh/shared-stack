@@ -79,21 +79,23 @@ claude plugin install berry-commit@berrypjh
 
 ## 구조
 
-| 위치                                                | 스택                    | 역할                                                       |
-| --------------------------------------------------- | ----------------------- | ---------------------------------------------------------- |
-| `libs/design-tokens`                                | TypeScript              | 토큰 원본 · 변환 · 생성물 (CSS 변수 · Tailwind · RN). 내부 |
-| `libs/ui-core`                                      | TypeScript              | 플랫폼 중립 계약 · 공통 로직. 내부                         |
-| `libs/react-ui`                                     | React · Vite · Tailwind | 웹 컴포넌트 라이브러리                                     |
-| `libs/react-native-ui`                              | React Native            | 모바일 컴포넌트 라이브러리                                 |
-| `libs/devhub-ui`                                    | React                   | DevHub 셸 · 그림 · 차트 · 표 · markdown · 검색             |
-| `libs/{eslint,prettier,tsconfig,commitlint}-config` | —                       | 공유 설정                                                  |
-| `libs/observability-contracts`                      | zod                     | 품질 관측 수집기 · DevHub 평가 화면의 계약. 내부           |
-| `apps/demo-web`                                     | React · Vite            | 웹 라이브러리 데모                                         |
-| `apps/demo-mobile`                                  | Expo                    | 모바일 라이브러리 데모                                     |
-| `apps/devhub`                                       | Vite                    | 저장소 구조 · 근거 탐색기 · 품질 평가 화면                 |
-| `apps/devhub-e2e`                                   | Playwright              | DevHub E2E                                                 |
-| `plugins/`                                          | Node                    | Claude Code plugin (`berry-commit` · `berry-dev`)          |
-| `tools/`                                            | TypeScript              | 측정 · 릴리스 · 카탈로그 생성 · 조회 · 평가 · 품질 수집    |
+| 위치                                                | 스택                    | 역할                                                                                              |
+| --------------------------------------------------- | ----------------------- | ------------------------------------------------------------------------------------------------- |
+| `libs/design-tokens`                                | TypeScript              | 토큰 원본 · 변환 · 생성물 (CSS 변수 · Tailwind · RN). 내부                                        |
+| `libs/ui-core`                                      | TypeScript              | 플랫폼 중립 prop 계약 · 토큰 facade. 내부                                                         |
+| `libs/react-ui`                                     | React · Vite · Tailwind | 웹 컴포넌트 라이브러리                                                                            |
+| `libs/react-native-ui`                              | React Native            | 모바일 컴포넌트 라이브러리                                                                        |
+| `libs/devhub-ui`                                    | React                   | DevHub 셸 · 그림 · 차트 · 표 · markdown · 검색                                                    |
+| `libs/{eslint,prettier,tsconfig,commitlint}-config` | —                       | 공유 설정                                                                                         |
+| `libs/observability-contracts`                      | zod                     | 품질 관측 수집기 · DevHub 평가 화면의 계약. 내부                                                  |
+| `apps/demo-web`                                     | React · Vite            | 웹 라이브러리 데모                                                                                |
+| `apps/demo-mobile`                                  | Expo                    | 모바일 라이브러리 데모                                                                            |
+| `apps/devhub`                                       | Vite                    | 저장소 구조 · 근거 탐색기 · 품질 평가 화면                                                        |
+| `apps/devhub-e2e`                                   | Playwright              | DevHub E2E                                                                                        |
+| `plugins/berry-dev`                                 | Node                    | Claude Code plugin — 공통 rule 원본 · sync · check CLI · 검증 · UI 검수 skill · secret guard hook |
+| `plugins/berry-commit`                              | Node · TypeScript       | Claude Code plugin — staged 변경을 scope별로 커밋하는 skill · MCP 서버                            |
+| `tools/`                                            | TypeScript              | 측정 · 릴리스 · 카탈로그 생성 · 조회 · 평가 · 품질 수집                                           |
+| `docs/`                                             | Markdown                | 개발 문서 — 도구 사용법 · 품질 관측 · Claude harness 설계 · 개발 기록                             |
 
 Nx가 작업 orchestration을 담당한다. 테스트는 Vitest · Jest · Playwright, 문서는 Storybook · Chromatic, CI는 GitHub Actions다.
 
@@ -106,6 +108,15 @@ pnpm start:mobile   # 모바일 데모 (Expo)
 pnpm storybook      # Storybook
 pnpm dev:devhub     # DevHub (평가 화면 포함)
 ```
+
+### 데모 앱
+
+두 데모는 라이브러리를 **실제 앱으로 통합했을 때** 무엇이 살아 있는지 확인한다. 컴포넌트 상태 탐색과 시각 회귀는 Storybook이 맡는다.
+
+- **demo-web** — `pnpm start` → http://localhost:4200. 테마 전환 · CSS 캐스케이드 · Tailwind preset을 본다
+- **demo-mobile** — `pnpm start:mobile` 후 QR로 기기를 연결하거나 `i` · `a`로 시뮬레이터를 연다. RN에는 Storybook이 없어 컴포넌트 상태를 눈으로 보는 곳이기도 하다. test target은 없다
+
+작업 규칙은 [.claude/rules/demo-web.md](.claude/rules/demo-web.md) · [.claude/rules/demo-mobile.md](.claude/rules/demo-mobile.md).
 
 ## 검증
 

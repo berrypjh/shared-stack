@@ -5,45 +5,27 @@ paths:
 
 # observability-contracts (`libs/observability-contracts`)
 
-zod. 품질 관측 수집기(Node)와 DevHub 평가 화면(브라우저)이 **같은 schema 한 벌**로 artifact를 검증하게 하는 계약 패키지다.
+품질 관측 수집기(Node · `tools/scripts/observability`)와 DevHub 평가 화면(브라우저)이 같은 zod schema로 artifact를 검증하게 하는 계약 패키지. private이고 release하지 않는다. 공개 schema 목록은 `src/index.ts`가 원본이다.
 
-**private이고 release 대상이 아니다.**
+## 규칙
 
-## 원칙
-
-- **의존은 `zod` 하나다.** React · Node · DOM · Style Dictionary · metric grader를 import하지 않는다 (`tsconfig.lib.json`의 `lib: es2022`, `types: []`가 막는다)
-- **타입은 schema에서 도출한다.** 손으로 쓴 중복 타입을 두지 않는다
-- **값이 없으면 `null` + 이유다.** 0 · pass로 바꾸는 기본값을 넣지 않는다
-- **출처를 모르면 `null`이 아니라 `'unknown'`이다**
-
-## 파일
-
-```
-src/
-  primitives.ts    schema 버전·unknown·ID·안전한 상대 경로·이유
-  evidence.ts      evidence 출처·URL allowlist·발췌 정제·공개 경로 판정·safeText
-  observation.ts   availability/outcome·domain(bundle·context·eval·a11y)/unit
-  eval.ts          consumer eval summary·trace (trace 검증 kind·5상태 포함)
-  bundle.ts        size-limit budget·treeshake 진단과 비교 조건
-  context.ts       token 측정 scope·tokenizer·missing-input 과 비교 조건
-  run.ts           metadata·inventory·artifact·index·manifest
-  freshness.ts     source SHA 비교
-  accessibility.ts DevHub 평가 화면을 axe 로 검사한 결과. rule/node 수·incomplete 분리, 점수 없음
-  metrics.ts       stableJson — key 순서에 상관없이 같은 값을 같은 문자열로 만드는 안정 직렬화
-tests/             test 전용 fixture 와 schema test
-```
-
-- **비교는 보고 전용이다.** 통과 · 실패 threshold · 통계 검정을 만들지 않는다. 모르는 조건(eval model 설정 · timeout · task 부분집합)은 unknown이고, evaluator의 원래 비교(`originalComparison`)는 대시보드 판정과 따로 둔다
+- **의존은 `zod` 하나만 둔다.** 양쪽 런타임이 같은 코드를 읽기 때문이다. `tsconfig.lib.json`의 `lib: es2022` · `types: []`가 DOM · Node 타입을 막는다
+- **타입은 `z.infer`로 schema에서 만든다.** 손으로 쓴 타입은 schema와 어긋난다
+- **값이 없으면 `null`과 이유를 함께 둔다.** 0 · pass 같은 기본값은 "측정 안 됨"을 "통과"로 보이게 한다
+- **출처를 모르면 `'unknown'`을 쓴다.** `null`(값 없음)과 구분하기 위해서다
+- **비교는 보고만 한다.** 통과 · 실패 threshold나 통계 검정을 넣지 않는다. 모르는 조건(eval model 설정 · timeout · task 부분집합)은 unknown으로 두고, evaluator의 원래 비교(`originalComparison`)는 대시보드 판정과 따로 둔다
 
 ## 검증
 
 ```bash
 pnpm nx test @berrypjh/observability-contracts
 pnpm nx typecheck @berrypjh/observability-contracts
-pnpm nx build @berrypjh/observability-contracts   # tools·DevHub 가 dist 를 읽는다
+pnpm nx build @berrypjh/observability-contracts
 ```
+
+schema를 바꾸면 build까지 돌린다. tools와 DevHub는 `src`가 아니라 `dist`를 읽는다.
 
 ## Gotcha
 
-- **exports에 `default` 조건이 있다.** tools는 `tsx`에서 CommonJS로 로드되어 `import` 조건만으로는 해석되지 않는다. dist는 ESM이고 Node의 `require(esm)`로 읽힌다
-- schema를 바꾸면 `dist`를 다시 build해야 tools · DevHub가 새 schema를 본다
+- **`exports`의 `default` 조건을 지우지 않는다.** 루트 `package.json`에 `"type"`이 없어 tools는 `tsx`에서 CommonJS로 로드되고, `import` 조건만으로는 해석되지 않는다. dist는 ESM이고 Node의 `require(esm)`로 읽힌다
+- **테스트는 `tests/` 아래 `*.test.ts`로 만든다.** vitest가 `tests/**/*.test.ts`만 모아서, 다른 lib처럼 `*.spec.ts`로 쓰면 조용히 돌지 않는다

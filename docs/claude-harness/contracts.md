@@ -1,8 +1,8 @@
 # Claude Harness 계약
 
-[architecture.md](./architecture.md)의 결정을 입력 · 기대 결과로 고정한다. 구현보다 먼저 쓰고, 테스트는 이 문서의 사례 id(`S-01` 등)를 이름에 쓴다. 문서와 테스트가 다르면 둘 중 하나가 틀린 것이다.
+[architecture.md](./architecture.md)의 결정을 입력 · 기대 결과로 고정한 문서. 구현보다 먼저 씀. 테스트는 이 문서의 사례 id(`S-01` 등)를 이름에 씀. 문서와 테스트가 다르면 둘 중 하나가 틀린 것임.
 
-상태: 구현 전. 경로는 shared-stack 기준 `plugins/berry-dev/` 아래, 소비 저장소 기준 `<root>/` 아래다.
+상태: 구현됨. 경로는 shared-stack 기준 `plugins/berry-dev/` 아래, 소비 저장소 기준 `<root>/` 아래.
 
 ## 1. CLI
 
@@ -10,19 +10,19 @@
 node <berry-dev-root>/scripts/standards.mjs <sync|check> --project <root>
 ```
 
-| exit | 뜻                                                                               |
-| ---- | -------------------------------------------------------------------------------- |
-| 0    | sync: 끝남(바꾼 것이 없어도 0) · check: 디스크가 expected와 같음                 |
-| 1    | check 전용: drift — sync하면 고쳐지는 차이                                       |
-| 2    | 사용법 · 설정 · source · IO · 소유(ownership) 오류 — sync는 아무것도 쓰지 않았다 |
+| exit | 뜻                                                                             |
+| ---- | ------------------------------------------------------------------------------ |
+| 0    | sync: 끝남(바꾼 것이 없어도 0) · check: 디스크가 expected와 같음               |
+| 1    | check 전용: drift — sync하면 고쳐지는 차이                                     |
+| 2    | 사용법 · 설정 · source · IO · 소유(ownership) 오류 — sync는 아무것도 쓰지 않음 |
 
-- sync는 1을 내지 않는다
-- 여러 문제가 함께 있으면 가장 큰 값을 낸다(2 > 1 > 0)
-- check의 exit는 "지금 sync 하면"과 같다: sync할 일 없음 → 0, sync가 성공하며 바꿈 → 1, sync가 거부 → 2
-- 결과 목록은 stdout, 오류 사유는 stderr. 경로는 `<root>` 기준 상대 경로로 쓰고 절대 경로를 찍지 않는다
-- `--project`는 필수. 없는 디렉터리 · 모르는 subcommand · 모르는 옵션은 2
-- source 위치는 `new URL('../standards/', import.meta.url)` 하나. 환경 변수 · 캐시 탐색 · network가 없다
-- import는 `node:` 내장 모듈만
+- **sync의 exit** — 1을 내지 않음
+- **여러 문제** — 가장 큰 값을 냄(2 > 1 > 0)
+- **check의 exit** — "지금 sync 하면"과 같음: sync할 일 없음 → 0, sync가 성공하며 바꿈 → 1, sync가 거부 → 2
+- **출력** — 결과 목록은 stdout, 오류 사유는 stderr. 경로는 `<root>` 기준 상대 경로로 쓰고 절대 경로를 찍지 않음
+- **`--project`** — 필수. 없는 디렉터리 · 모르는 subcommand · 모르는 옵션은 2
+- **source 위치** — `new URL('../standards/', import.meta.url)` 하나. 환경 변수 · 캐시 탐색 · network 없음
+- **import** — `node:` 내장 모듈만
 
 ## 2. source (plugin 안)
 
@@ -37,17 +37,17 @@ node <berry-dev-root>/scripts/standards.mjs <sync|check> --project <root>
 }
 ```
 
-- id: `^[a-z0-9]+(?:-[a-z0-9]+)*$`. 본문은 정확히 `standards/rules/<id>.md` — 파일 경로를 manifest에 적지 않는다
+- **id** — `^[a-z0-9]+(?:-[a-z0-9]+)*$`. 본문은 정확히 `standards/rules/<id>.md`. 파일 경로를 manifest에 적지 않음
 - `core`는 boolean, `description`은 빈 문자열이 아닌 문자열. 다른 필드는 오류
-- `standards/rules/`의 `.md` 파일과 manifest의 id는 1:1이다. 등록 안 된 파일 · 파일 없는 id는 오류
-- rule 본문에는 frontmatter가 없다. frontmatter는 생성 단계가 쓴다
+- `standards/rules/`의 `.md` 파일과 manifest의 id는 1:1. 등록 안 된 파일 · 파일 없는 id는 오류
+- rule 본문에는 frontmatter 없음. frontmatter는 생성 단계가 씀
 - source의 어느 경로든 symlink면 오류
 - source 오류는 exit 2 (sync · check 모두)
 
 ### 버전
 
-- `pluginVersion`은 `.claude-plugin/plugin.json`의 `version` 한 곳에서 읽는다. 시작 값 `0.1.0`
-- `plugins/berry-dev`에 `package.json`이 없다. marketplace 항목에 `version`을 쓰지 않는다
+- `pluginVersion`은 `.claude-plugin/plugin.json`의 `version` 한 곳에서 읽음. 시작 값 `0.1.0`
+- `plugins/berry-dev`에 `package.json` 없음. marketplace 항목에 `version`을 쓰지 않음
 
 ## 3. 설정 (`<root>/.claude/standards.json`)
 
@@ -61,26 +61,26 @@ node <berry-dev-root>/scripts/standards.mjs <sync|check> --project <root>
 }
 ```
 
-| 입력                                       | 결과                              |
-| ------------------------------------------ | --------------------------------- |
-| 파일 없음 · symlink · JSON 아님            | 2                                 |
-| `schemaVersion`이 1이 아님                 | 2                                 |
-| 최상위에 `schemaVersion` · `rules` 외 필드 | 2                                 |
-| manifest에 없는 id                         | 2 (`unknown rule id`)             |
-| core id에 `true`가 아닌 값                 | 2 — core는 경로를 좁히지 않는다   |
-| optional id에 `true`                       | 2 — optional은 `paths`로만 고른다 |
-| `paths`가 없음 · 빈 배열 · 빈 문자열 포함  | 2                                 |
-| `paths` 외 필드(`body` · `content` 등)     | 2 — 본문 override 금지            |
-| core id가 config에 없음                    | 정상 — core는 항상 생성된다       |
-| optional id가 config에 없음                | 정상 — 생성하지 않는다            |
+| 입력                                       | 결과                            |
+| ------------------------------------------ | ------------------------------- |
+| 파일 없음 · symlink · JSON 아님            | 2                               |
+| `schemaVersion`이 1이 아님                 | 2                               |
+| 최상위에 `schemaVersion` · `rules` 외 필드 | 2                               |
+| manifest에 없는 id                         | 2 (`unknown rule id`)           |
+| core id에 `true`가 아닌 값                 | 2 — core는 경로를 좁히지 않음   |
+| optional id에 `true`                       | 2 — optional은 `paths`로만 고름 |
+| `paths`가 없음 · 빈 배열 · 빈 문자열 포함  | 2                               |
+| `paths` 외 필드(`body` · `content` 등)     | 2 — 본문 override 금지          |
+| core id가 config에 없음                    | 정상 — core는 항상 생성됨       |
+| optional id가 config에 없음                | 정상 — 생성하지 않음            |
 
-- config digest는 파싱한 값을 키 정렬 · 공백 없는 JSON으로 바꾼 뒤의 sha256이다. 들여쓰기 · 키 순서만 바뀌면 drift가 아니다
+- config digest는 파싱한 값을 키 정렬 · 공백 없는 JSON으로 바꾼 뒤의 sha256. 들여쓰기 · 키 순서만 바뀌면 drift 아님
 
 ## 4. 생성물 (`<root>/.claude/rules/_generated/`)
 
 ### 파일
 
-- rule 하나에 `<id>.md` 하나. 그 밖에는 `manifest.json`만 있다
+- rule 하나에 `<id>.md` 하나. 그 밖에는 `manifest.json`만 있음
 - optional rule:
 
   ```markdown
@@ -94,9 +94,9 @@ node <berry-dev-root>/scripts/standards.mjs <sync|check> --project <root>
   <본문>
   ```
 
-- core rule은 frontmatter 없이 주석 줄부터 시작한다
-- 본문에 plugin version을 넣지 않는다 — version만 바뀐 경우 drift는 manifest 한 파일에서만 난다
-- 줄바꿈 LF, 파일 끝 개행 하나. 같은 입력이면 byte 단위로 같다
+- core rule은 frontmatter 없이 주석 줄부터 시작
+- 본문에 plugin version을 넣지 않음 — version만 바뀐 경우 drift는 manifest 한 파일에서만 남
+- 줄바꿈 LF, 파일 끝 개행 하나. 같은 입력이면 byte 단위로 같음
 
 ### `manifest.json` (생성 manifest)
 
@@ -115,44 +115,44 @@ node <berry-dev-root>/scripts/standards.mjs <sync|check> --project <root>
 
 - `sourceDigest` — `standards/manifest.json`과 모든 `standards/rules/<id>.md`의 (상대 경로, 내용 sha256) 쌍을 경로 순으로 정렬해 한 줄씩 이은 문자열의 sha256
 - `files` — 생성한 `.md`의 내용 sha256. 키는 `^[a-z0-9]+(?:-[a-z0-9]+)*\.md$`만 허용
-- 시각 · 호스트 · 절대 경로를 넣지 않는다. 키 정렬, 2칸 들여쓰기, 끝 개행
-- check는 expected를 이 파일에서 읽지 않는다. 이 파일은 "sync가 무엇을 썼는가"(소유 판정)에만 쓴다
+- 시각 · 호스트 · 절대 경로를 넣지 않음. 키 정렬, 2칸 들여쓰기, 끝 개행
+- check는 expected를 이 파일에서 읽지 않음. 이 파일은 "sync가 무엇을 썼는가"(소유 판정)에만 씀
 
 ## 5. 소유 판정
 
-sync는 먼저 전부 판정하고, 거부 사유가 하나라도 있으면 **아무것도 쓰지 않고** 2로 끝난다. 용어: `recorded` = 기존 생성 manifest의 `files`, `expected` = source + config로 계산한 결과.
+sync는 먼저 전부 판정함. 거부 사유가 하나라도 있으면 **아무것도 쓰지 않고** 2로 끝남. 용어: `recorded` = 기존 생성 manifest의 `files`, `expected` = source + config로 계산한 결과.
 
 | 디스크 상태                                                               | 이름     | sync               | check |
 | ------------------------------------------------------------------------- | -------- | ------------------ | ----- |
 | 파일이 expected와 같음                                                    | 일치     | 그대로 (쓰지 않음) | 0     |
-| expected에 있는데 디스크에 없음                                           | missing  | 만든다             | 1     |
-| recorded와 hash가 같고 expected와 다름 (source · config가 바뀜)           | outdated | 새 내용으로 바꾼다 | 1     |
-| recorded와 hash가 같고 expected에 없음                                    | stale    | 지운다             | 1     |
+| expected에 있는데 디스크에 없음                                           | missing  | 만듦               | 1     |
+| recorded와 hash가 같고 expected와 다름 (source · config가 바뀜)           | outdated | 새 내용으로 바꿈   | 1     |
+| recorded와 hash가 같고 expected에 없음                                    | stale    | 지움               | 1     |
 | recorded에 있지만 hash가 다르고 expected 와도 다름                        | modified | 거부               | 2     |
 | recorded에 없는 파일 · 디렉터리 (expected와 이름이 겹쳐도)                | unknown  | 거부               | 2     |
 | `_generated`나 그 조상(`.claude` · `.claude/rules`) · 안의 항목이 symlink | symlink  | 거부               | 2     |
 | 생성 manifest가 JSON 아님 · schema 위반 · 허용 안 된 키                   | manifest | 거부               | 2     |
-| 생성 manifest만 expected와 다름 (예: plugin version만 바뀜)               | outdated | manifest를 바꾼다  | 1     |
-| `_generated`가 없음                                                       | 처음     | 만든다             | 1     |
+| 생성 manifest만 expected와 다름 (예: plugin version만 바뀜)               | outdated | manifest를 바꿈    | 1     |
+| `_generated`가 없음                                                       | 처음     | 만듦               | 1     |
 | `_generated`에 파일이 있는데 생성 manifest가 없음                         | unknown  | 거부               | 2     |
 
-- modified의 hash가 우연히 expected와 같으면 "일치"로 본다(내용이 맞으면 누가 썼는지 묻지 않는다)
-- 생성 manifest를 조작해 hash를 바꾸면 해당 파일은 modified가 된다 → 2. sync는 조작된 manifest를 근거로 지우지 않는다
-- 쓰기는 같은 디렉터리의 임시 파일 → rename. 생성 manifest는 마지막에 쓴다
-- 중간에 멈춘 흔적(임시 파일 · 반쯤 바뀐 파일)은 다음 실행에서 unknown · modified로 2가 된다. 복구는 `_generated/` 삭제 후 sync
-- `_generated` 밖의 경로는 읽지도 지우지도 않는다(config 한 파일만 읽는다)
+- modified의 hash가 우연히 expected와 같으면 "일치"로 봄(내용이 맞으면 누가 썼는지 묻지 않음)
+- 생성 manifest를 조작해 hash를 바꾸면 해당 파일은 modified가 됨 → 2. sync는 조작된 manifest를 근거로 지우지 않음
+- 쓰기는 같은 디렉터리의 임시 파일 → rename. 생성 manifest는 마지막에 씀
+- 중간에 멈춘 흔적(임시 파일 · 반쯤 바뀐 파일)은 다음 실행에서 unknown · modified로 2가 됨. 복구는 `_generated/` 삭제 후 sync
+- `_generated` 밖의 경로는 읽지도 지우지도 않음(config 한 파일만 읽음)
 
 ### 경로
 
-- 쓰는 경로는 `<realpath(root)>/.claude/rules/_generated/<id>.md`와 `.../manifest.json` 뿐이다
-- id · 파일 키 정규식이 `/` · `..` · `\` · 절대 경로를 막는다. 정규식을 통과하지 못한 값은 경로로 만들지 않고 2
-- `.claude` · `.claude/rules`가 없으면 sync가 만든다(`_generated` 조상 디렉터리만). check는 만들지 않는다
+- 쓰는 경로는 `<realpath(root)>/.claude/rules/_generated/<id>.md`와 `.../manifest.json` 뿐
+- id · 파일 키 정규식이 `/` · `..` · `\` · 절대 경로를 막음. 정규식을 통과하지 못한 값은 경로로 만들지 않고 2
+- `.claude` · `.claude/rules`가 없으면 sync가 만듦(`_generated` 조상 디렉터리만). check는 만들지 않음
 
 ### idempotency
 
 - sync 직후 check는 0
-- sync를 두 번 하면 두 번째는 아무 파일도 쓰지 않는다 — 내용 · mtime이 그대로다
-- check는 몇 번을 해도 디스크가 바뀌지 않는다 — 파일 · 디렉터리 · 임시 파일 · lock을 만들지 않는다
+- sync를 두 번 하면 두 번째는 아무 파일도 쓰지 않음 — 내용 · mtime 그대로
+- check는 몇 번을 해도 디스크가 바뀌지 않음 — 파일 · 디렉터리 · 임시 파일 · lock을 만들지 않음
 
 ## 6. provenance (`<root>/.claude/harness-source.json`)
 
@@ -166,21 +166,21 @@ sync는 먼저 전부 판정하고, 거부 사유가 하나라도 있으면 **�
 }
 ```
 
-- 소비 저장소가 소유한다. `standards.mjs`는 이 파일을 읽지 않는다
-- 소비 저장소의 setup · CI가 확인한다: `commit`이 `^[0-9a-f]{40}$` · checkout 한 source의 `git rev-parse HEAD`와 같음 · 그 source의 `plugin.json` `version`과 같음. 짧은 SHA · branch · tag는 거부
-- 순서: provenance 확인 → `check`. 둘은 따로 실패한다
+- **소유** — 소비 저장소. `standards.mjs`는 이 파일을 읽지 않음
+- **확인** — 소비 저장소의 setup · CI가 확인: `commit`이 `^[0-9a-f]{40}$` · checkout 한 source의 `git rev-parse HEAD`와 같음 · 그 source의 `plugin.json` `version`과 같음. 짧은 SHA · branch · tag는 거부
+- **순서** — provenance 확인 → `check`. 둘은 따로 실패함
 
 ## 7. secret hook
 
 ### 정책 (`scripts/secret-policy.mjs`, 순수 함수)
 
-- 공개 이름: `BYPASS` · `SECRET_BASENAME` · `SAFE_BASENAME` · `tokenize` · `findSecretPath` · `findSecretReason(command)` (사유 또는 null)
-- 이 정의는 한 벌이다. shared-stack의 local hook은 import만 하고 사본을 두지 않는다
+- **공개 이름** — `BYPASS` · `SECRET_BASENAME` · `SAFE_BASENAME` · `tokenize` · `findSecretPath` · `findSecretReason(command)` (사유 또는 null)
+- **정의는 한 벌** — shared-stack의 local hook은 import만 하고 사본을 두지 않음
 
-- `tokenize(command)` — ``/[\s;|&<>()'"`,=]+/``로 나눈다(현재 shared-stack 판 그대로)
-- secret basename `^\.env(\.|$)` 또는 `\.(key|p8|p12|jks|mobileprovision)$`, 단 `\.(example|sample|template)$`은 제외
-- 우회 수단(`BYPASS`): 셸 리다이렉트(fd 숫자 뒤 · `>&` 제외) · `node|bun|deno -e|--eval` · `python|ruby|perl -c|-e` · `xxd base64 od strings dd tee cp mv grep rg awk`
-- 판정: secret 경로와 우회 수단이 **함께** 있을 때만 deny. 원본 명령을 본다(따옴표를 지우지 않는다)
+- `tokenize(command)` — ``/[\s;|&<>()'"`,=]+/``로 나눔(현재 shared-stack 판 그대로)
+- **secret basename** — `^\.env(\.|$)` 또는 `\.(key|p8|p12|jks|mobileprovision)$`, 단 `\.(example|sample|template)$`은 제외
+- **우회 수단(`BYPASS`)** — 셸 리다이렉트(fd 숫자 뒤 · `>&` 제외) · `node|bun|deno -e|--eval` · `python|ruby|perl -c|-e` · `xxd base64 od strings dd tee cp mv grep rg awk`
+- **판정** — secret 경로와 우회 수단이 **함께** 있을 때만 deny. 원본 명령을 봄(따옴표를 지우지 않음)
 
 ### adapter (`scripts/guard-secrets.mjs`) 와 local hook 의 공통 계약
 
@@ -191,8 +191,8 @@ sync는 먼저 전부 판정하고, 거부 사유가 하나라도 있으면 **�
 | JSON 아님 · `command` 없음 · 문자열 아님      | 비어 있음       | 0    |
 | adapter만: `tool_name`이 `Bash`가 아님 · 없음 | 비어 있음       | 0    |
 
-- 통과에 `allow`를 내지 않는다. 빈 출력이어야 다른 권한 판정이 그대로 돈다
-- 사례표와 결과는 `tools/scripts/claude-harness/guard.test.ts`. local hook 판정은 통합 전 동작을 고정한 것이다
+- 통과에 `allow`를 내지 않음. 빈 출력이어야 다른 권한 판정이 그대로 돎
+- 사례표와 결과는 `tools/scripts/claude-harness/guard.test.ts`. local hook 판정은 통합 전 동작을 고정한 것
 
 ```json
 {
@@ -204,23 +204,23 @@ sync는 먼저 전부 판정하고, 거부 사유가 하나라도 있으면 **�
 }
 ```
 
-- hook 자체 오류는 통과(exit 0). exit 2로 막지 않는다
-- local `.claude/hooks/guard-bash.mjs`는 `PORT_BOUND`를 먼저 보고, secret은 정책 함수를 import 해 판정한다(전환 1단계)
-- `PORT_BOUND`는 따옴표 안 문자열을 지운 뒤 본다 — local 계약이고 plugin에 없다
+- hook 자체 오류는 통과(exit 0). exit 2로 막지 않음
+- local `.claude/hooks/guard-bash.mjs`는 `PORT_BOUND`를 먼저 보고, secret은 정책 함수를 import 해 판정(전환 1단계)
+- `PORT_BOUND`는 따옴표 안 문자열을 지운 뒤 봄 — local 계약이고 plugin에 없음
 
 ## 8. plugin 구조
 
-- `.claude-plugin/plugin.json`: `name`은 `berry-dev`, `version`은 semver
-- `.claude-plugin/marketplace.json`에 `berry-dev` 항목이 있고 `source`는 `./plugins/berry-dev`, `version` 필드 없음
-- `hooks/hooks.json`: `PreToolUse` · matcher `Bash` · exec form `command: "node"`, `args: ["${CLAUDE_PLUGIN_ROOT}/scripts/guard-secrets.mjs"]` · `timeout: 10`(초)
-- `skills/<name>/SKILL.md`가 정확히 2개, frontmatter `name`이 폴더 이름과 같고 `description`이 있다
-- skill 본문은 저장소 사실(경로 · 명령 · 프로젝트 이름)을 적지 않고 `.claude/harness.profile.md`를 가리킨다. profile이 없으면 없다고 보고하고 추측하지 않는다
-- 없어야 하는 것: `package.json` · `node_modules` · `dist` · `.mcp.json` · `project.json` · `settings.json`의 permissions
-- 모든 `.mjs`의 import가 `node:` 또는 plugin 안 상대 경로
+- **`.claude-plugin/plugin.json`** — `name`은 `berry-dev`, `version`은 semver
+- **`.claude-plugin/marketplace.json`** — `berry-dev` 항목 있음. `source`는 `./plugins/berry-dev`, `version` 필드 없음
+- **`hooks/hooks.json`** — `PreToolUse` · matcher `Bash` · exec form `command: "node"`, `args: ["${CLAUDE_PLUGIN_ROOT}/scripts/guard-secrets.mjs"]` · `timeout: 10`(초)
+- **`skills/<name>/SKILL.md`** — 정확히 2개. frontmatter `name`이 폴더 이름과 같고 `description` 있음
+- **skill 본문** — 저장소 사실(경로 · 명령 · 프로젝트 이름)을 적지 않고 `.claude/harness.profile.md`를 가리킴. profile이 없으면 없다고 보고하고 추측하지 않음
+- **없어야 하는 것** — `package.json` · `node_modules` · `dist` · `.mcp.json` · `project.json` · `settings.json`의 permissions
+- **import** — 모든 `.mjs`의 import가 `node:` 또는 plugin 안 상대 경로
 
 ## 9. 테스트 사례
 
-테스트는 `node --test`로 돈다. 소비 저장소 fixture는 테스트가 `os.tmpdir()` 아래에 만들고 지운다 — 저장소에 제품 코드 fixture를 커밋하지 않는다. source도 필요하면 임시 디렉터리에 만든 가짜 `standards/`를 쓴다.
+테스트 실행은 `pnpm harness:test`(`tools/scripts/claude-harness`의 vitest). 소비 저장소 fixture는 테스트가 `os.tmpdir()` 아래에 만들고 지움 — 저장소에 제품 코드 fixture를 커밋하지 않음. source도 필요하면 임시 디렉터리에 만든 가짜 `standards/`를 씀.
 
 ### sync · check
 
@@ -260,11 +260,11 @@ sync는 먼저 전부 판정하고, 거부 사유가 하나라도 있으면 **�
 | H-05 | 같은 사례표를 plugin adapter와 local hook 둘 다에 실행 | secret 판정이 같음                                                      |
 | H-06 | local hook의 정책 import가 해석됨                      | local hook을 실제로 실행해 secret 사례가 deny                           |
 
-H-06이 필요한 이유: 정적 import가 실패하면 hook은 오류로 끝나고 Claude Code는 통과시킨다 — 보호가 조용히 빠진다.
+H-06이 필요한 이유: 정적 import가 실패하면 hook은 오류로 끝나고 Claude Code는 통과시킴 — 보호가 조용히 빠짐.
 
 ### tokenizer · 정책 회귀
 
-현재 shared-stack hook을 실제로 실행해 확인한 판정(2026-09-24). `<env>`는 `.env`를 뜻한다.
+현재 shared-stack hook을 실제로 실행해 확인한 판정(2026-09-24). `<env>`는 `.env`를 뜻함.
 
 | id   | 명령                                                      | 기대                                                             |
 | ---- | --------------------------------------------------------- | ---------------------------------------------------------------- |
@@ -284,7 +284,7 @@ H-06이 필요한 이유: 정적 import가 실패하면 hook은 오류로 끝나
 | T-14 | `grep x server.pem`                                       | 통과 — `.pem`은 현재 목록에 없음(현 동작 고정, 확장은 별도 결정) |
 | T-15 | `ls <env>` · `echo hi > /tmp/out`                         | 통과 — 한 조건만 있음                                            |
 
-`PORT_BOUND`(local) 회귀는 local hook 테스트에 둔다: `pnpm nx serve @berrypjh/devhub` · `npx playwright test`는 deny, `echo "pnpm nx serve x"` · `grep -r "nx e2e" docs`는 통과.
+`PORT_BOUND`(local) 회귀는 local hook 테스트에 둠: `pnpm nx serve @berrypjh/devhub` · `npx playwright test`는 deny, `echo "pnpm nx serve x"` · `grep -r "nx e2e" docs`는 통과.
 
 ### plugin 구조
 
@@ -298,4 +298,4 @@ H-06이 필요한 이유: 정적 import가 실패하면 hook은 오류로 끝나
 | P-06 | 금지 파일 없음(`package.json` · `.mcp.json` · `dist` · `project.json`) |
 | P-07 | `.mjs` import가 `node:` 또는 plugin 안 상대 경로                       |
 
-`claude plugin validate ./plugins/berry-dev`는 사람이 실행한다(CI에 Claude Code CLI가 있다고 가정하지 않는다).
+`claude plugin validate ./plugins/berry-dev`는 사람이 실행함(CI에 Claude Code CLI가 있다고 가정하지 않음).

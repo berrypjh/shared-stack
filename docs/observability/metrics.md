@@ -1,21 +1,24 @@
 # 품질 관측 metric 카탈로그
 
-모든 값은 `@berrypjh/observability-contracts` (schemaVersion **1**)로 검증된다. 이 문서는 계약의 의미를 사람이 읽는 형태로 옮긴 것이고, 어긋나면 계약(`libs/observability-contracts/src`)이 우선이다.
+> **한 줄 요약** — 수집 결과의 bundle · context · eval metric이 무엇을 · 어떤 단위와 분모로 · 어떤 조건에서 비교하는지를 사람이 읽는 형태로 옮긴 목록. 어긋나면 계약(`libs/observability-contracts/src`)이 우선.
+
+- **검증** — 모든 값은 `@berrypjh/observability-contracts` (schemaVersion **1**)로 검증
+- **구조 · 수집 방식** — [architecture.md](architecture.md)
 
 ## 공통 규칙
 
-| 축           | 값                                                                                                                              | 규칙                                                                               |
-| ------------ | ------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| availability | `available` · `not-run` · `unsupported` · `unavailable` · `permission-required` · `not-measured` · `not-applicable` · `invalid` | `available`만 값을 갖는다. 나머지는 `value: null` + 이유. 0 · pass로 바꾸지 않는다 |
-| outcome      | `pass` · `fail` · `warn` · `info` · `null`                                                                                      | availability와 별개의 축. 판정 근거가 없으면 `null`                                |
-| domain       | `bundle` · `context` · `eval` · `a11y`                                                                                          |                                                                                    |
-| unit         | `count` · `bytes` · `bytes-delta` · `tokens` · `tokens-delta` · `ms` · `ratio`                                                  | ratio는 0–1                                                                        |
-| 출처 모름    | `'unknown'`                                                                                                                     | `null`(비어 있음)과 구분한다                                                       |
-| run state    | `running` · `complete` · `partial` · `failed` · `cancelled`                                                                     | 값 하나라도 빠지면 `partial`                                                       |
-| profile      | `static` · `core` · `eval` · `a11y`                                                                                             |                                                                                    |
-| freshness    | `fresh` · `stale` · `unknown`                                                                                                   | run의 source SHA ↔ DevHub build · serve 시점 `git rev-parse HEAD`                 |
+| 축           | 값                                                                                                                              | 규칙                                                                           |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| availability | `available` · `not-run` · `unsupported` · `unavailable` · `permission-required` · `not-measured` · `not-applicable` · `invalid` | `available`만 값을 가짐. 나머지는 `value: null` + 이유. 0 · pass로 바꾸지 않음 |
+| outcome      | `pass` · `fail` · `warn` · `info` · `null`                                                                                      | availability와 별개의 축. 판정 근거가 없으면 `null`                            |
+| domain       | `bundle` · `context` · `eval`                                                                                                   |                                                                                |
+| unit         | `count` · `bytes` · `bytes-delta` · `tokens` · `tokens-delta` · `ms` · `ratio`                                                  | ratio는 0–1                                                                    |
+| 출처 모름    | `'unknown'`                                                                                                                     | `null`(비어 있음)과 구분                                                       |
+| run state    | `running` · `complete` · `partial` · `failed` · `cancelled`                                                                     | 값 하나라도 빠지면 `partial`                                                   |
+| profile      | `static` · `core` · `eval`                                                                                                      |                                                                                |
+| freshness    | `fresh` · `stale` · `unknown`                                                                                                   | run의 source SHA ↔ DevHub build · serve 시점 `git rev-parse HEAD`             |
 
-provenance는 두 SHA로 나뉜다: `metadata.source.sha`(측정 대상 코드)와 `metadata.collection.sha`(수집기). eval은 여기에 원본 run의 `origin.gitSha`가 따로 있다.
+- **provenance** — `metadata.source.sha`(측정 대상 코드)와 `metadata.collection.sha`(수집기)를 구분. eval은 원본 run의 `origin.gitSha`가 따로 있음
 
 ## bundle — `bundles[]` (core)
 
@@ -23,12 +26,13 @@ provenance는 두 SHA로 나뉜다: `metadata.source.sha`(측정 대상 코드)�
 | --------- | ----------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
 | ID        | `bundle.size-limit.<package>.<case>`                                                                                    | `bundle.treeshake.<target>.<scenario>.<raw\|gzip>` |
 | source    | `pnpm size --json` + `.size-limit.cjs`                                                                                  | `pnpm treeshake react-ui … --json` (esbuild)       |
-| 값        | bytes, 기본 brotli, esbuild 빈 프로젝트 상수 차감 (`adjustment`)                                                        | raw · gzip을 따로                                  |
+| 값        | bytes, 기본 brotli, esbuild 빈 프로젝트 상수 차감 (`adjustment`)                                                        | raw · gzip을 따로. brotli 미측정                   |
 | 한도      | `.size-limit.cjs`의 limit, `KB` = 1000 B (`bytes-iec`)                                                                  | 없음 (보고 전용)                                   |
 | 판정      | headroom = limit − current, 같으면 pass, 초과는 음수 headroom과 `fail`. `toolPassed`는 size-limit 원본                  | 없음                                               |
 | 비교 조건 | package · method · compression · adjustment · entry · importSpec · target · configHash · tool(name@version) · externals | 〃                                                 |
 
-`.size-limit.cjs` 주석 · README의 과거 숫자는 observation이 아니다.
+- **size-limit `passed`** — 원본 `passed`는 `budget.toolPassed`로 보존. 화면은 headroom 규칙(`limit − current ≥ 0`)으로 정한 `budget.outcome`만 표시
+- **과거 숫자** — `.size-limit.cjs` 주석 · README의 과거 숫자는 observation이 아님
 
 ## context — `contexts[]` (core)
 
@@ -36,7 +40,7 @@ provenance는 두 SHA로 나뉜다: `metadata.source.sha`(측정 대상 코드)�
 | ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
 | ID               | `context.<scope>.<subject>.<provider>`                                                                                                    |
 | scope            | `package-scenario` (measure-tokens 등록부) · `variant-initial` · `variant-routed` (consumer eval variant) · `agent-input` (수집 안 함)    |
-| provider · model | `openai-tiktoken-local` · `gpt-4o`, tokenizer 버전은 설치된 `tiktoken` package.json                                                       |
+| provider · model | 수집기는 `openai-tiktoken-local` · 기본 `gpt-4o`. tokenizer 버전은 설치된 `tiktoken` package.json                                         |
 | 구성             | `measure-tokens-read-files` · `eval-variant-context-join` · `executor-reported`                                                           |
 | 없음             | `missing-input`(파일 하나라도 없으면 부분 합계 없이 null + `missingPaths`) · `provider-not-selected` · `provider-error` · `not-collected` |
 | 비교 조건        | scope · provider · tokenModel · tokenizerVersion · contentConstruction                                                                    |
@@ -53,51 +57,24 @@ provenance는 두 SHA로 나뉜다: `metadata.source.sha`(측정 대상 코드)�
 | rate               | value = numerator ÷ denominator. 분모 0 → `null` + `zero-denominator`                                                                                               |
 | aggregate          | value + n. n 0 → `null` + `no-samples`, 원본 null → `source-null`                                                                                                   |
 | false success      | 분모 = 명시적 true · false 주장만 (unknown · null 제외)                                                                                                             |
-| retrieval          | required evidence 없는 task는 recall · RR이 N/A이고 평균의 n에서 빠진다. evidence 중복과 tool call 중복은 따로                                                      |
-| routing            | expected(web · react-native · both · none) × predicted(+ `unreported`) 4×5. `trace-grades`(variant 별)와 `deterministic-resolver`를 섞지 않는다                     |
+| retrieval          | required evidence 없는 task는 recall · RR이 N/A이고 평균의 n에서 빠짐. evidence 중복과 tool call 중복은 따로                                                        |
+| routing            | expected(web · react-native · both · none) × predicted(+ `unreported`) 4×5. `trace-grades`(variant 별)와 `deterministic-resolver`를 섞지 않음                       |
 | verification       | `verificationAuthority`: `executor-reported` / `harness-executed` (D4 · D5 variant). repair: `not-in-variant` · `no-repair-hook` · `unknown`                        |
 | notice             | `harness-smoke` · `no-live-executor` · `no-baseline` · `baseline-not-requested` · `unsupported-required-check` · `replay-without-repair-hook` · `partial-import`    |
 | 만들지 않는 metric | `wrongPlatformRate` · `hitRate` · `stddev` · `confidenceInterval` · `passAt1`                                                                                       |
 | 원래 비교          | `originalComparison`: `source` summary/baseline-file, `status` `no-baseline` · `corrupt-baseline`(이유) · `compared`(comparable · warnings)                         |
 
-held-out(`test` split) trace의 gold evidence · 발췌와 변경 파일 내용은 공개하지 않는다.
-
-## accessibility — `accessibility[]` (a11y)
-
-| 출처 id       | source           | 무엇                                           |
-| ------------- | ---------------- | ---------------------------------------------- |
-| `a11y:devhub` | `axe-playwright` | localhost DevHub 평가 route × theme × viewport |
-
-- target id는 `devhub:<route>:<theme>:<viewport>`이고 theme은 브라우저 color scheme으로 고른다.
-- audit outcome: `completed` · `partial` · `scan-failed` · `not-run` — 검사 실행의 결과이지 접근성 판정이 아니다
-- axe: rule 수와 node 수를 나누고 `incomplete`를 violation과 섞지 않는다. node는 최대 20개만 싣는다. 합친 점수는 없다
-
-## design system — `designSystem` (static)
-
-- 관측 종류 `declared` · `consumed` · `tested` · `unknown` · `not-applicable`, state 어휘 `pressed` · `focus-visible` · `size-sm` · `size-md` · `reduced-motion`
-- test 근거는 `behavior-assertion`과 `source-assertion`을 나눈다. source 참조만으로 tested가 아니다
+- **비공개** — held-out(`test` split) trace의 gold evidence · 발췌와 변경 파일 내용
 
 ## 비교
 
-DevHub 화면마다 고른 baseline 실행(`?base=`)과의 report-only diff다. 실행 목록·baseline 포인터·추세 화면은 없다 — 최신 실행을 자동 baseline으로 삼지 않고, 비교는 그 화면이 다루는 조건이 같을 때만 delta를 낸다(위 각 domain의 "비교 조건").
+- **방식** — 번들 화면에서 고른 baseline 실행(`?base=`)과의 report-only diff
+- **없는 것** — 실행 목록 · baseline 포인터 · 추세 화면. 최신 실행을 자동 baseline으로 삼지 않음
+- **delta 조건** — 각 domain의 "비교 조건"이 모두 같을 때만 delta. 다르면 이유만
 
-## 호환·migration
+## 호환
 
-schemaVersion은 1 그대로다. 아래는 모두 **이전 artifact를 계속 읽는** 추가 필드이고, 기본값은 "없음/모름"이다.
-
-| 필드                             | 이전 artifact에서 | 뜻                                         |
-| -------------------------------- | ----------------- | ------------------------------------------ |
-| `run.accessibility`              | `[]`              | 접근성 결과를 수집하지 않은 run            |
-| `summary.sections.accessibility` | `0`               | 〃                                         |
-| `evals[].originalComparison`     | `null`            | evaluator 비교를 가져오지 않음 → 다시 수집 |
-| profile `a11y`                   | —                 | 새 profile                                 |
-
-제거한 것 — test 결과(`run.tests`, `summary.sections.tests` · `testCases`), domain `test` · `verification` · `browser`, failure domain `test` · `verification` · `browser`. test와 lint · typecheck · build 결과는 CI가 보고하고, 브라우저 세션은 저장소 측정이 아니다.
-package 표면(`run.packageSurfaces`, `summary.sections.packageSurfaces`, failure domain `package-surface`), 실행 비교·추세(`summary.series`, `compareRuns`·`baseline.json`·`/evaluation/runs`)도 뺐다 — package 표면은 dist를 직접 보고, 비교는 화면마다 고른 `?base=` report-only diff만 남았다.
-이 필드를 가진 이전 artifact · 요약은 계약을 통과하지 않으므로 다시 수집 · export한다.
-
-원본 도구와 의미가 달라진 곳:
-
-- evaluator `readBaseline`은 없는 파일 · 깨진 파일을 모두 `null`로 돌린다. importer는 먼저 둘을 나눈다
-- size-limit의 원본 `passed`는 artifact의 `budget.toolPassed`로 보존한다. 화면은 headroom 규칙 (`limit − current ≥ 0`)으로 정한 `budget.outcome`을 보여주고 `toolPassed`는 표시하지 않는다
-- treeshake는 brotli를 재지 않는다 (raw · gzip만)
+- **schemaVersion** — 1 그대로
+- **`evals[].originalComparison`** — 이전 artifact에서는 `null`(evaluator 비교를 가져오지 않음). 다시 수집하면 채워짐
+- **`evals`** — eval import 이전 artifact에는 key가 없음. `[]`로 읽음
+- **제거한 필드** — 지금 계약에 없는 필드(이전 test 결과 · package 표면 · 실행 추세 등)를 가진 이전 artifact는 계약을 통과하지 않음. 다시 수집 · export
