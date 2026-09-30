@@ -8,7 +8,7 @@ import type {
   RecordRef,
 } from '../../domain/model';
 
-import { DOCUMENT_GROUP, PACKAGE_KIND, RECORD_KIND } from './labels';
+import { DOCUMENT_GROUP, JOURNEY_KIND, PACKAGE_KIND, PLUGIN_KIND, RECORD_KIND } from './labels';
 import { entityHref } from './routes';
 
 /**
@@ -68,13 +68,19 @@ export const SECTIONS: Section[] = [
     id: 'journeys',
     title: '작업 흐름',
     path: '/journeys',
-    entities: catalog.journeys.map((record) => ({
-      section: 'journeys' as const,
-      id: record.id,
-      label: record.title,
-      href: hrefOf('journeys', record.id),
-      record,
-    })),
+    entities: (Object.keys(JOURNEY_KIND) as Journey['kind'][]).flatMap((kind) =>
+      catalog.journeys
+        .filter((record) => record.kind === kind)
+        .map((record) => ({
+          section: 'journeys' as const,
+          id: record.id,
+          label: record.title,
+          navLabel: record.title.replace(`${JOURNEY_KIND[kind]} · `, ''),
+          href: hrefOf('journeys', record.id),
+          group: JOURNEY_KIND[kind],
+          record,
+        })),
+    ),
   },
   {
     id: 'records',
@@ -112,13 +118,18 @@ export const SECTIONS: Section[] = [
     id: 'plugins',
     title: '플러그인',
     path: '/plugins',
-    entities: catalog.plugins.map((record) => ({
-      section: 'plugins' as const,
-      id: record.id,
-      label: record.id,
-      href: hrefOf('plugins', record.id),
-      record,
-    })),
+    entities: (Object.keys(PLUGIN_KIND) as Plugin['kind'][]).flatMap((kind) =>
+      catalog.plugins
+        .filter((record) => record.kind === kind)
+        .map((record) => ({
+          section: 'plugins' as const,
+          id: record.id,
+          label: record.id,
+          href: hrefOf('plugins', record.id),
+          group: PLUGIN_KIND[kind],
+          record,
+        })),
+    ),
   },
   {
     id: 'documents',
@@ -163,6 +174,8 @@ export const findEntity = (section: SectionId, id: string): Entity | undefined =
  * 플러그인은 같은 id 의 도구보다 먼저 — 소비자가 쓰는 표면이 그 화면에 있다.
  */
 export const linkOf = (id: string): { href: string; label: string } | undefined => {
+  if (id === catalog.repository.id)
+    return { href: '/', label: `${catalog.repository.name} 저장소` };
   const pkg = findEntity('packages', id);
   if (pkg) return pkg;
   const plugin = findEntity('plugins', id);

@@ -1,8 +1,10 @@
 import type {
   Application,
   EvidenceGap,
+  Journey,
   PackageKind,
   Platform,
+  Plugin,
   PluginRule,
   RecordRef,
   Relation,
@@ -63,7 +65,21 @@ export const GAP_KIND: Record<EvidenceGap['kind'], string> = {
 export const STEP_STATUS: Record<StepStatus, { label: string; glyph: string }> = {
   implemented: { label: '구현됨', glyph: '●' },
   partial: { label: '일부 구현', glyph: '◐' },
-  'documented-only': { label: '문서에만 있음', glyph: '○' },
+  'documented-only': { label: '저장소 밖', glyph: '○' },
+};
+
+/** 작업 흐름의 묶음. 이 순서가 탐색기 순서다. */
+export const JOURNEY_KIND: Record<Journey['kind'], string> = {
+  dev: '개발',
+  package: '패키지',
+  measure: '측정',
+  eval: '소비자 평가',
+};
+
+/** 플러그인의 묶음. 이 순서가 탐색기 순서다. */
+export const PLUGIN_KIND: Record<Plugin['kind'], string> = {
+  commit: '커밋',
+  standards: '작업 규칙',
 };
 
 /** 기록의 종류. 그 항목이 무엇에 대한 것인지 나타낸다. */
@@ -82,9 +98,8 @@ export const DOCUMENT_GROUP: [prefix: string, title: string, base: string][] = [
   ['README.md', '개발 · 저장소', ''],
   ['libs/ui-core/', '개발 · 저장소', ''],
   ['libs/design-tokens/', '개발 · 저장소', ''],
-  ['docs/tools/', '개발 · 도구', 'docs/tools/'],
+  ['tools/', '개발 · 도구', ''],
   ['docs/observability/', '개발 · 품질 관측', 'docs/observability/'],
-  ['docs/claude-harness/', '개발 · Claude harness', 'docs/claude-harness/'],
   ['libs/', '소비자 · 패키지', 'libs/'],
   ['plugins/', '소비자 · 플러그인', 'plugins/'],
   ['AGENTS.md', '에이전트 · 저장소 지침', ''],

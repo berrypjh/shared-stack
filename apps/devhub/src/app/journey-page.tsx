@@ -81,8 +81,8 @@ const JourneyView = ({ journey, stepId }: { journey: Journey; stepId?: string })
         </dl>
         <WorkspaceSection id="journey-flow" title="흐름">
           <p className="typo-caption-small text-text-light">
-            가로 줄은 실행 위치, 화살표는 다음 단계. 점선 상자는 저장소 밖에서 일어나 문서만 말하는
-            단계. 목록 보기에 같은 흐름이 글로 있음.
+            가로 줄은 실행 위치, 화살표는 다음 단계. 점선 상자는 저장소 밖에서 에이전트 · 사람이
+            하는 단계. 목록 보기에 같은 흐름이 글로 있음.
           </p>
           <ViewSwitch
             label={journey.title}

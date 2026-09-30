@@ -94,6 +94,17 @@ describe('번들', () => {
     expect(row.textContent).toContain('N/A — esbuild 번들 실패');
   });
 
+  it('tree-shake 컬럼 읽기는 표의 컬럼을 같은 순서로 설명하고 비율 컬럼은 없다', async () => {
+    renderEvaluation('/evaluation/bundles?run=run-bundle', files());
+    const guide = await main().findByRole('group', { name: 'tree-shaking 컬럼' });
+    const table = main().getByRole('table', { name: 'tree-shaking 행 — @berrypjh/react-ui' });
+    const headers = within(table)
+      .getAllByRole('columnheader')
+      .map((cell) => cell.textContent);
+    expect([...guide.querySelectorAll('dt')].map((term) => term.textContent)).toEqual(headers);
+    expect(headers).not.toContain('vs all');
+  });
+
   it('tree-shake 가 실행되지 않았으면 이유·명령을 주고, floor 주석은 과거 조사로 표시한다', async () => {
     renderEvaluation('/evaluation/bundles?run=run-core', files());
     expect(

@@ -12,7 +12,7 @@ import { useLocation } from 'react-router-dom';
 import { catalog } from '@/data';
 import { type Section, SECTIONS, VIEWS } from '@/lib/catalog/entities';
 import { queryString } from '@/lib/evaluation/query';
-import { EVALUATION_SCREENS, screenPath } from '@/lib/evaluation/screens';
+import { EVALUATION_GROUP, EVALUATION_SCREENS, screenPath } from '@/lib/evaluation/screens';
 import { SNAPSHOT } from '@/lib/repository/current-snapshot';
 
 import { SnapshotSummary } from '../overview/snapshot-summary';
@@ -63,7 +63,7 @@ const EXPLORER_SECTIONS: ExplorerSection[] = SECTIONS.map((section) => ({
 const [JOURNEYS_SECTION, ...REST_SECTIONS] = EXPLORER_SECTIONS;
 
 /**
- * 평가의 하위 화면. 개요는 섹션 제목이 가리키고, 나머지는 `screens.ts` 의 묶음 순서대로다.
+ * 평가의 하위 화면. 개요는 섹션 제목이 가리키고, 나머지는 접히는 묶음 하나에 `screens.ts` 순서대로 선다.
  * 평가 안에서는 고른 실행(`?run=`)을 화면을 옮겨도 이어 간다 — 필터는 화면마다 뜻이 달라 가져가지 않는다.
  */
 const useEvaluationSection = (): ExplorerSection => {
@@ -73,18 +73,21 @@ const useEvaluationSection = (): ExplorerSection => {
     : undefined;
   const suffix = queryString({ run });
   const screens = EVALUATION_SCREENS.filter((screen) => screen.id !== 'overview');
-  const titles = [...new Set(screens.map((screen) => screen.group))];
   return {
     id: 'evaluation',
     title: '평가',
     href: `${screenPath('overview')}${suffix}`,
     icon: VIEW_ICON.evaluation,
-    groups: titles.map((title) => ({
-      title,
-      items: screens
-        .filter((screen) => screen.group === title)
-        .map((screen) => ({ id: screen.id, label: screen.label, href: `${screen.path}${suffix}` })),
-    })),
+    groups: [
+      {
+        title: EVALUATION_GROUP,
+        items: screens.map((screen) => ({
+          id: screen.id,
+          label: screen.label,
+          href: `${screen.path}${suffix}`,
+        })),
+      },
+    ],
   };
 };
 

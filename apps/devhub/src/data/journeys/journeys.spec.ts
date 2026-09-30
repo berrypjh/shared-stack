@@ -2,6 +2,7 @@
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
+import { EVALUATION_SCREENS } from '../../lib/evaluation/screens';
 import { catalog } from '../index';
 
 /** 카탈로그가 설명하는 저장소. 읽기만 한다. */
@@ -10,9 +11,11 @@ const ROOT = join(import.meta.dirname, '../../../../..');
 const { journeys, contexts } = catalog;
 const entities = [...catalog.applications, ...catalog.packages, ...catalog.tools];
 const entityIds = new Set(entities.map((entity) => entity.id));
+const ownerIds = new Set([...entityIds, catalog.repository.id]);
 const contextIds = new Set(contexts.map((context) => context.id));
 const testIds = new Set(catalog.tests.map((suite) => suite.id));
 const documentIds = new Set(catalog.documents.map((doc) => doc.id));
+const screenIds = new Set<string>(EVALUATION_SCREENS.map((screen) => screen.id));
 const steps = journeys.flatMap((journey) => journey.steps.map((step) => ({ journey, step })));
 const where = (journeyId: string, stepId: string) => `${journeyId}/${stepId}`;
 const duplicates = (ids: string[]) => ids.filter((id, index) => ids.indexOf(id) !== index);
@@ -71,14 +74,17 @@ describe('journey graph', () => {
 });
 
 describe('journey references', () => {
-  it('resolve owners, contexts, tests, and documents', () => {
+  it('resolve owners, contexts, tests, documents, and evaluation screens', () => {
     const broken = steps.flatMap(({ journey, step }) => {
       const at = where(journey.id, step.id);
       return [
-        ...(entityIds.has(step.owner) ? [] : [`${at} owner ${step.owner}`]),
+        ...(ownerIds.has(step.owner) ? [] : [`${at} owner ${step.owner}`]),
         ...(contextIds.has(step.context) ? [] : [`${at} context ${step.context}`]),
         ...step.tests.filter((id) => !testIds.has(id)).map((id) => `${at} test ${id}`),
         ...step.docs.filter((id) => !documentIds.has(id)).map((id) => `${at} doc ${id}`),
+        ...(step.evaluation === undefined || screenIds.has(step.evaluation)
+          ? []
+          : [`${at} evaluation ${step.evaluation}`]),
       ];
     });
     expect(broken).toEqual([]);
@@ -103,6 +109,43 @@ describe('journey references', () => {
       return [];
     });
     expect(problems).toEqual([]);
+  });
+});
+
+describe('journey options', () => {
+  it('name only flags that the cited source reads', () => {
+    const missing = steps.flatMap(({ journey, step }) => {
+      const texts = step.source
+        .filter((ref) => !ref.directory)
+        .map((ref) => readFileSync(join(ROOT, ref.path), 'utf8'));
+      return (step.options ?? [])
+        .flatMap((option) => option.flag.split(' · ').map((flag) => flag.replace(/^--/, '')))
+        .filter(
+          (name) =>
+            !texts.some(
+              (text) =>
+                text.includes(`'${name}'`) ||
+                text.includes(`args.${name}`) ||
+                text.includes(`--${name}`),
+            ),
+        )
+        .map((name) => `${where(journey.id, step.id)}: --${name}`);
+    });
+    expect(missing).toEqual([]);
+  });
+});
+
+describe('journey outputs', () => {
+  it('name only columns that the cited source writes', () => {
+    const missing = steps.flatMap(({ journey, step }) => {
+      const texts = step.source
+        .filter((ref) => !ref.directory)
+        .map((ref) => readFileSync(join(ROOT, ref.path), 'utf8'));
+      return (step.outputs ?? [])
+        .filter((output) => !texts.some((text) => text.includes(`'${output.name}'`)))
+        .map((output) => `${where(journey.id, step.id)}: ${output.name}`);
+    });
+    expect(missing).toEqual([]);
   });
 });
 

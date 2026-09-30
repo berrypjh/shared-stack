@@ -3,7 +3,7 @@ import { MemoryRouter } from 'react-router-dom';
 
 import { RunInspector } from '@/components/evaluation/run-inspector';
 import type { RunData } from '@/components/evaluation/use-run-data';
-import { EVALUATION_SCREENS } from '@/lib/evaluation/screens';
+import { EVALUATION_GROUP, EVALUATION_SCREENS } from '@/lib/evaluation/screens';
 import { publicArtifact, SHA } from '@/test/evaluation/fixtures';
 import { renderEvaluation } from '@/test/evaluation/render';
 
@@ -14,7 +14,7 @@ const explorer = () => within(screen.getByRole('navigation', { name: '저장소 
 const evaluation = () => within(explorer().getByRole('region', { name: /^평가/ }) as HTMLElement);
 
 describe('evaluation in the shell', () => {
-  it('lists every screen under the evaluation section, grouped, with the overview as its title', async () => {
+  it('lists every screen under the evaluation section in one collapsible group, with the overview as its title', async () => {
     renderEvaluation('/evaluation', {});
     await settled();
     const section = evaluation();
@@ -24,10 +24,12 @@ describe('evaluation in the shell', () => {
         screen.path,
       );
     }
-    const groups = section.getAllByText(/^(품질|AI)$/, {
-      selector: 'summary span',
-    });
-    expect(groups.map((group) => group.textContent)).toEqual(['품질', 'AI']);
+    const groups = [
+      ...explorer().getByRole('region', { name: /^평가/ }).querySelectorAll('details'),
+    ];
+    expect(groups.map((group) => group.querySelector('summary span')?.textContent)).toEqual([
+      EVALUATION_GROUP,
+    ]);
   });
 
   it('carries the chosen run between screens and marks the current one by its path', async () => {

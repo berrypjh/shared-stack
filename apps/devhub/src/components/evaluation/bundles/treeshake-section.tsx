@@ -1,4 +1,4 @@
-import { BarChart, DataTable } from '@berrypjh/devhub-ui';
+import { BarChart, DataTable, TermList } from '@berrypjh/devhub-ui';
 import type { RunArtifact } from '@berrypjh/observability-contracts';
 
 import { Mono } from '@/components/evaluation/mono';
@@ -14,6 +14,19 @@ import { formatBytes } from '@/lib/evaluation/format';
 import { noMatchState, notRunState, unsupportedState } from '@/lib/evaluation/status';
 
 const COMPRESSION_TITLE = { none: 'raw (압축 없음)', gzip: 'gzip' } as const;
+
+/** 아래 표의 컬럼. CLI 의 `vs all` 같은 비율은 만들지 않는다 — 비교는 같은 축의 막대로 한다. */
+const COLUMNS = [
+  { term: 'scenario', meaning: 'single: X · multi: X+Y · all-exports (baseline)' },
+  { term: '종류', meaning: 'scenario 이름 앞부분으로 가른 single · multi · all-exports' },
+  { term: 'import', meaning: '가짜 entry 가 import 한 심볼. all-exports 는 *' },
+  { term: 'raw (none)', meaning: 'minify 후 byte, 압축 없음' },
+  { term: 'gzip', meaning: 'gzip 압축 후 byte' },
+  {
+    term: 'method · target · 조정',
+    meaning: 'treeshake-esbuild · esbuild 기본 target · 조정 없음(standalone)',
+  },
+];
 
 /** package 하나의 raw · gzip 차트 두 개와 scenario 표. 축은 한 압축 안의 최댓값이다. */
 const TreeshakePackage = ({ group }: { group: TreeshakeGroup }) => (
@@ -92,7 +105,15 @@ export const TreeshakeSection = ({
   return (
     <Section title="Tree-shaking (esbuild standalone)" anchor="treeshake">
       {groups.length > 0 ? (
-        groups.map((group) => <TreeshakePackage key={group.package} group={group} />)
+        <>
+          <div className="flex flex-col gap-xs">
+            <p className="typo-caption-small text-text-light">컬럼 읽기</p>
+            <TermList items={COLUMNS} label="tree-shaking 컬럼" />
+          </div>
+          {groups.map((group) => (
+            <TreeshakePackage key={group.package} group={group} />
+          ))}
+        </>
       ) : hasRows ? (
         <StatusNotice level={3} state={noMatchState(`package ${filtered}`)} />
       ) : observation && observation.availability !== 'available' ? (

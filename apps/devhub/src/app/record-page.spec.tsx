@@ -67,6 +67,13 @@ describe('record page', () => {
     expect(link.getAttribute('target')).toBeNull();
   });
 
+  it('shows a broken link as text with its reason, never as a link', async () => {
+    await renderAt('/records/project-docs-to-rules');
+    const body = await article();
+    expect(within(body).queryByRole('link', { name: /demo\/web/ })).toBeNull();
+    expect(body.textContent).toContain('깨진 링크: docs/demo/web.md');
+  });
+
   it('shows the evidence in the inspector: sources, documents, tests, always in order', async () => {
     await renderAt(`/records/${record.id}`);
     const panel = within(inspector());

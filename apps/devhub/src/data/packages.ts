@@ -24,11 +24,17 @@ const noTest = (root: string): EvidenceGap => ({
   evidence: [{ path: `${root}/package.json` }, { path: `${root}/project.json` }],
 });
 
-/** 두 private 패키지는 소비자 문서(dist/AGENTS.md)가 없어 토큰 측정 시나리오가 실패한다고 적혀 있다. */
+/** 두 private 패키지는 소비자 문서(dist/AGENTS.md)가 없는데 토큰 측정 시나리오가 그 파일을 읽어 실패한다. */
 const measureFailure: EvidenceGap = {
   kind: 'known-failure',
   note: '토큰 측정 시나리오가 dist/AGENTS.md 를 읽는데 이 패키지는 그 파일을 만들지 않아 측정이 실패함',
-  evidence: [{ path: 'docs/tools/measure-tokens.md' }],
+  evidence: [
+    {
+      path: 'tools/scripts/measure-tokens/registry.ts',
+      symbol: "'agents-only': ['dist/AGENTS.md']",
+    },
+    { path: 'tools/scripts/measure-tokens/registry.ts', symbol: 'missing file' },
+  ],
 };
 
 /** 설정 파일의 키 하나: 값의 원문과 그 뜻. */
@@ -161,7 +167,12 @@ export const packages: Package[] = [
       {
         kind: 'unsupported',
         note: 'consumer eval 의 검증 단계는 RN 컴포넌트 테스트를 돌리지 못함(unsupported)',
-        evidence: [{ path: 'docs/tools/consumer-eval.md' }],
+        evidence: [
+          {
+            path: 'tools/evals/consumer/verification/policy.ts',
+            symbol: 'react-native components cannot render in the jsdom fixture harness',
+          },
+        ],
       },
     ],
   },

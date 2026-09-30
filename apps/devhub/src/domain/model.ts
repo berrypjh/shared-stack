@@ -213,6 +213,8 @@ export type Plugin = {
   readonly version: string;
   readonly description: string;
   readonly category: string;
+  /** 탐색기 묶음. manifest 의 `category` 와 별개이고, 이름과 순서는 `PLUGIN_KIND`. */
+  readonly kind: 'commit' | 'standards';
   readonly keywords: readonly string[];
   readonly manifest: SourceRef;
   readonly skills: readonly PluginSkill[];
@@ -321,7 +323,7 @@ export type ExecutionContext = {
  * 단계의 근거 상태. 다른 상태 어휘와 섞지 않는다.
  * - `implemented`: 저장소 코드가 그 일을 한다(소스가 반드시 있다)
  * - `partial`: 코드는 있지만 빠진 것이 있다(근거 공백이 반드시 있다)
- * - `documented-only`: 저장소 밖에서 일어나 문서만 말한다(소스 없이 문서가 반드시 있다)
+ * - `documented-only`: 저장소 밖에서 에이전트 · 사람이 한다. 구현 여부와 상관없고 문서가 안내한다(소스 없이 문서가 반드시 있다)
  */
 export type StepStatus = 'implemented' | 'partial' | 'documented-only';
 
@@ -333,20 +335,32 @@ export type JourneyStep = {
   /** 그에 따라 저장소 · 도구가 하는 것. */
   readonly behavior: string;
   readonly context: string;
-  /** 이 단계를 책임지는 앱 · 패키지 · 도구. */
+  /** 이 단계를 책임지는 앱 · 패키지 · 도구. 어느 하나가 아니라 저장소 전체면 저장소 ID. */
   readonly owner: string;
   readonly status: StepStatus;
+  /** 이 단계를 쓰는 사람 · 도구. */
+  readonly actor?: string;
+  /** 이 단계를 실행하는 예시 명령. 화면은 복사만 한다. */
+  readonly commands?: readonly string[];
+  /** 명령 옵션. `flag` 의 이름은 이 단계가 인용한 소스에 있어야 한다(` · ` 로 여럿). */
+  readonly options?: readonly { readonly flag: string; readonly meaning: string }[];
+  /** 출력 컬럼 · 필드. `name` 은 이 단계가 인용한 소스에 문자열로 있어야 한다. */
+  readonly outputs?: readonly { readonly name: string; readonly meaning: string }[];
   readonly source: readonly SourceRef[];
   readonly tests: readonly string[];
   readonly docs: readonly string[];
   /** 이어질 수 있는 단계 ID. 끝이면 비어 있다. */
   readonly next: readonly string[];
+  /** 이 단계의 결과를 보이는 평가 화면 ID(`lib/evaluation/screens.ts`). */
+  readonly evaluation?: string;
   readonly gaps?: readonly EvidenceGap[];
 };
 
 /** 저장소가 증명하는 작업 흐름. 들어오는 선이 없는 단계가 시작이다(여럿일 수 있다). */
 export type Journey = {
   readonly id: string;
+  /** 탐색기 묶음. 이름과 순서는 `lib/catalog/labels.ts` 의 `JOURNEY_KIND`. */
+  readonly kind: 'dev' | 'package' | 'measure' | 'eval';
   readonly title: string;
   readonly goal: string;
   readonly steps: readonly JourneyStep[];

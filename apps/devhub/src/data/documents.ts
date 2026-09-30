@@ -93,54 +93,7 @@ export const documents: DocumentRef[] = [
     path: 'docs/observability/metrics.md',
     title: '품질 관측 metric 카탈로그',
   },
-  {
-    id: 'claude-harness-architecture',
-    path: 'docs/claude-harness/architecture.md',
-    title: 'Claude Harness 아키텍처',
-  },
-  {
-    id: 'claude-harness-contracts',
-    path: 'docs/claude-harness/contracts.md',
-    title: 'Claude Harness 계약',
-  },
-  {
-    id: 'claude-harness-standards-sources',
-    path: 'docs/claude-harness/standards-sources.md',
-    title: 'Claude Harness standards 추출 근거',
-  },
-  {
-    id: 'claude-harness-setup',
-    path: 'docs/claude-harness/setup.md',
-    title: 'Claude Harness 도입',
-  },
-  {
-    id: 'claude-harness-verification',
-    path: 'docs/claude-harness/verification.md',
-    title: 'Claude Harness 검증',
-  },
-
-  {
-    id: 'consumer-retrieval-readme',
-    path: 'docs/tools/consumer-retrieval.md',
-    title: 'consumer-retrieval',
-  },
-  { id: 'consumer-eval-readme', path: 'docs/tools/consumer-eval.md', title: 'consumer eval' },
-  {
-    id: 'measure-tokens-readme',
-    path: 'docs/tools/measure-tokens.md',
-    title: 'measure-tokens',
-  },
-  {
-    id: 'treeshake-readme',
-    path: 'docs/tools/treeshake.md',
-    title: 'treeshake',
-    brokenLinks: [
-      {
-        href: '../verification-guide.md',
-        note: 'docs/verification-guide.md 는 저장소 기록 어디에도 없음 — 처음부터 대상 없이 쓰인 링크',
-      },
-    ],
-  },
+  { id: 'tools-readme', path: 'tools/README.md', title: 'tools' },
   { id: 'berry-commit-readme', path: 'plugins/berry-commit/README.md', title: 'berry-commit' },
   { id: 'berry-dev-readme', path: 'plugins/berry-dev/README.md', title: 'berry-dev' },
 

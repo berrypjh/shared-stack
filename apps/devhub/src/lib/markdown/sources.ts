@@ -9,6 +9,7 @@ const RAW = import.meta.glob<string>(
     '../../../../../{apps,libs}/*/*.md',
     '../../../../../docs/**/*.md',
     '../../../../../plugins/*/README.md',
+    '../../../../../tools/README.md',
     '../../../../../plugins/*/standards/rules/*.md',
     '!../../../../../**/CLAUDE.md',
     '!../../../../../CHANGELOG.md',

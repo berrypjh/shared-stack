@@ -3,8 +3,9 @@ import type { Journey } from '../../domain/model';
 /** 공개 패키지 릴리스. main 은 정식, pre-release 는 베타다. */
 export const release: Journey = {
   id: 'release',
+  kind: 'package',
   title: '패키지 릴리스',
-  goal: 'main 에 push 하면 CI 가 fixed 그룹의 버전을 올리고 changelog 를 쓴 뒤 GitHub Packages 로 배포함',
+  goal: 'main 에 push 하면 CI 가 fixed 그룹의 버전을 올리고 changelog 를 쓴 뒤 GitHub Packages 로 배포함. 로컬 레지스트리로 미리 배포해 볼 수 있음',
   steps: [
     {
       id: 'push',
@@ -21,8 +22,7 @@ export const release: Journey = {
     {
       id: 'version',
       intent: '버전을 정함',
-      behavior:
-        '직전 tag 이후 BREAKING CHANGE 면 major, 릴리스 scope 의 feat 면 minor, 아니면 nx 의 conventional commits 계산을 따름. 그룹은 fixed 다',
+      behavior: '직전 tag 이후 BREAKING CHANGE 면 major, feat 면 minor, 아니면 nx 계산을 따름',
       context: 'ci',
       owner: 'release-scripts',
       status: 'implemented',
@@ -75,6 +75,41 @@ export const release: Journey = {
           ],
         },
       ],
+    },
+    {
+      id: 'local-registry',
+      intent: '로컬 레지스트리를 띄움',
+      behavior:
+        'verdaccio 가 localhost:4873 에 레지스트리를 띄움. 포트가 필요해 AI 세션에서는 못 띄움',
+      context: 'workspace',
+      owner: 'release-scripts',
+      status: 'implemented',
+      actor: '이 저장소의 개발자',
+      commands: ['pnpm local-registry'],
+      source: [
+        { path: 'package.json', symbol: '"executor": "@nx/js:verdaccio"' },
+        { path: '.verdaccio/config.yml' },
+      ],
+      tests: [],
+      docs: [],
+      next: ['local-publish'],
+    },
+    {
+      id: 'local-publish',
+      intent: '로컬로 배포해 봄',
+      behavior:
+        'release:local 이 0.0.0-e2e 버전 · e2e 태그로 배포하고 commit · tag 는 만들지 않음. 끝나면 올린 버전을 되돌리고 작업자의 manifest 변경은 복원',
+      context: 'workspace',
+      owner: 'release-scripts',
+      status: 'implemented',
+      commands: ['pnpm release:local'],
+      source: [
+        { path: 'tools/scripts/release/release-local.ts', symbol: "specifier: '0.0.0-e2e'" },
+        { path: 'tools/scripts/release/release-local.ts', symbol: 'restorePackageJsonFiles' },
+      ],
+      tests: [],
+      docs: [],
+      next: [],
     },
   ],
 };

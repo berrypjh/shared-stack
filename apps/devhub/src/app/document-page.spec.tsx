@@ -130,19 +130,11 @@ describe('document links', () => {
     const link = within(await article()).getByRole('link', { name: '테마 추가' });
     expect(link.getAttribute('href')).toBe('#테마-추가');
   });
-
-  it('show a broken link as text with its reason, never as a link', async () => {
-    await renderAt('/documents/treeshake-readme');
-    const body = await article();
-    expect(within(body).queryByRole('link', { name: /verification-guide/ })).toBeNull();
-    expect(body.textContent).toContain('깨진 링크: docs/verification-guide.md');
-    expect(inspector().textContent).toContain('../verification-guide.md');
-  });
 });
 
 describe('document inspector', () => {
   it('shows the same four sections as every other item, in order', async () => {
-    await renderAt('/documents/consumer-retrieval-readme');
+    await renderAt('/documents/tools-readme');
     const headings = within(inspector())
       .getAllByRole('heading', { level: 3 })
       .map((h) => [...h.childNodes].find((n) => n.nodeType === Node.TEXT_NODE)?.textContent);
@@ -150,11 +142,11 @@ describe('document inspector', () => {
   });
 
   it('names who cites the document in the overview', async () => {
-    await renderAt('/documents/consumer-retrieval-readme');
+    await renderAt('/documents/tools-readme');
     const panel = within(inspector());
     const overview = within(panel.getByRole('region', { name: /^개요/ }));
-    expect(overview.getByRole('link', { name: 'consumer-retrieval' }).getAttribute('href')).toBe(
-      `/architecture/consumer-retrieval#${INSPECTOR_ID}`,
+    expect(overview.getByRole('link', { name: 'treeshake' }).getAttribute('href')).toBe(
+      `/architecture/treeshake-check#${INSPECTOR_ID}`,
     );
   });
 
@@ -167,13 +159,13 @@ describe('document inspector', () => {
 
   it('copies the repository path', async () => {
     const user = userEvent.setup();
-    await renderAt('/documents/consumer-retrieval-readme');
+    await renderAt('/documents/tools-readme');
     await user.click(
       within(inspector()).getByRole('button', {
-        name: '경로 복사: docs/tools/consumer-retrieval.md',
+        name: '경로 복사: tools/README.md',
       }),
     );
-    expect(await navigator.clipboard.readText()).toBe('docs/tools/consumer-retrieval.md');
+    expect(await navigator.clipboard.readText()).toBe('tools/README.md');
     expect(within(inspector()).getByRole('status').textContent).toBe('복사했습니다');
   });
 });

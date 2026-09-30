@@ -117,7 +117,7 @@ export const records: RecordRef[] = [
     summary:
       '저장소 밖 entry 는 pnpm shim 경로로만 패키지를 찾음. 번들 실행 환경에 NODE_PATH 를 넘김',
     sources: [{ path: 'tools/scripts/treeshake/measure.ts', symbol: 'NODE_PATH' }],
-    docs: ['treeshake-readme'],
+    docs: ['tools-readme'],
     tests: [],
   },
   {
@@ -168,7 +168,7 @@ export const records: RecordRef[] = [
       { path: 'tools/scripts/treeshake/check.ts', symbol: '진단 전용이다' },
       { path: '.size-limit.cjs' },
     ],
-    docs: ['treeshake-readme'],
+    docs: ['tools-readme'],
     tests: [],
   },
   {
@@ -352,7 +352,7 @@ export const records: RecordRef[] = [
       { path: 'tools/consumer-retrieval/package-cli.ts' },
       { path: 'tools/consumer-retrieval/cli.ts' },
     ],
-    docs: ['consumer-retrieval-readme'],
+    docs: [],
     tests: ['tools-vitest'],
   },
   {
@@ -384,7 +384,50 @@ export const records: RecordRef[] = [
       { path: '.claude/standards.json', symbol: 'ko-ui' },
       { path: '.claude/harness.profile.md', symbol: 'locale 과 제품 정책' },
     ],
-    docs: ['harness-profile', 'standards-ko-ui', 'claude-harness-standards-sources'],
+    docs: ['harness-profile', 'standards-ko-ui'],
     tests: ['tools-vitest', 'devhub-vitest'],
+    brokenLinks: [
+      {
+        href: '../claude-harness/standards-sources.md',
+        note: '2026-09-30 삭제 — 추출 근거는 기록 2026-09-26-standards-sources.md 로 옮겼음',
+      },
+    ],
+  },
+  {
+    id: 'berry-dev-harness',
+    path: 'docs/records/2026-09-26-berry-dev-harness.md',
+    title: 'Claude harness를 berry-dev plugin 한 곳에서 배포',
+    kind: 'decision',
+    date: '2026-09-26',
+    summary:
+      '갈라진 guard 와 복사된 규칙을 plugin 하나로. rules 는 CLI 가 _generated 에만 쓰고, 설정은 선택만, check 는 다시 계산만. secret 보호는 비는 순간 없이 전환',
+    sources: [
+      { path: 'plugins/berry-dev/scripts/standards.mjs' },
+      { path: 'plugins/berry-dev/scripts/secret-policy.mjs', symbol: 'findSecretReason' },
+      { path: '.claude/hooks/guard-bash.mjs', symbol: 'PORT_BOUND' },
+    ],
+    docs: ['berry-dev-readme', 'harness-profile'],
+    tests: ['tools-vitest'],
+  },
+  {
+    id: 'standards-sources',
+    path: 'docs/records/2026-09-26-standards-sources.md',
+    title: '공용 standards rule은 두 저장소 이상이 쓰는 문장만',
+    kind: 'decision',
+    date: '2026-09-26',
+    summary:
+      'shared-stack · snapdone 원문을 문장마다 대조해 둘 다 쓰는 문장만 공용 rule 로. 한 곳에만 있는 값 · 제품 정책은 프로젝트와 profile 에 남김',
+    sources: [
+      { path: 'plugins/berry-dev/standards/manifest.json' },
+      { path: '.claude/standards.json' },
+    ],
+    docs: [
+      'standards-core',
+      'standards-cross-runtime-pure',
+      'standards-berry-consumer',
+      'standards-ko-ui',
+      'standards-docs-ko',
+    ],
+    tests: ['tools-vitest'],
   },
 ];

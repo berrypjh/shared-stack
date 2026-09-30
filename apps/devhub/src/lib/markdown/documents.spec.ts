@@ -112,7 +112,6 @@ describe('registered documents', () => {
       (doc.brokenLinks ?? []).map((link) => `${doc.id} ${link.href}`),
     );
     expect(actual.sort()).toEqual(recorded.sort());
-    expect(recorded).toEqual(['treeshake-readme ../verification-guide.md']);
   });
 
   it('give every outline entry a unique anchor', () => {

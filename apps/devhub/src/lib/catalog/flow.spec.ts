@@ -27,6 +27,7 @@ const step = (id: string, over: Partial<JourneyStep> = {}): JourneyStep => ({
 /** 한 단계에서 두 레인으로 갈라지고, 저장소 밖 단계를 하나 가진 흐름. */
 const branching: Journey = {
   id: 'branching',
+  kind: 'package',
   title: '분기',
   goal: '분기',
   steps: [
@@ -94,7 +95,7 @@ describe('inspectStep', () => {
   it('explains a documented-only step that has no repository source', () => {
     const inspection = inspectStep({ ...catalog, journeys: [branching] }, 'branching', 'outside');
     expect(inspection?.step.source).toEqual([]);
-    expect(inspection?.empty.source).toContain('문서만 말함');
+    expect(inspection?.empty.source).toContain('문서가 안내함');
   });
 
   it('returns nothing for an unknown journey or step', () => {

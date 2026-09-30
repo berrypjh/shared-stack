@@ -20,7 +20,7 @@ export const tools: Tool[] = [
     platform: 'node',
     purpose:
       '플랫폼 → 패키지 → 심볼 → 토큰으로 좁히는 결정적 resolver. 배포 패키지의 dist/cli.mjs 로도 번들됨',
-    docs: ['consumer-retrieval-readme'],
+    docs: [],
     source: [
       { path: 'tools/consumer-retrieval/cli.ts' },
       { path: 'tools/consumer-retrieval/package-cli.ts' },
@@ -34,13 +34,15 @@ export const tools: Tool[] = [
     platform: 'node',
     purpose:
       '같은 dataset · 같은 결정적 grader 로 "무엇을 읽혔을 때 소비자 작업이 맞는가"를 비교하는 평가 harness',
-    docs: ['consumer-eval-readme'],
+    docs: ['tools-readme'],
     source: [{ path: 'tools/evals/consumer/runner/run.ts' }],
     gaps: [
       {
         kind: 'unsupported',
         note: 'programmatic LLM executor 가 없음. dev · test split 은 수집된 trace 를 replay 할 때만 채점함',
-        evidence: [{ path: 'docs/tools/consumer-eval.md' }],
+        evidence: [
+          { path: 'tools/evals/consumer/runner/executor.ts', symbol: 'unavailableExecutor' },
+        ],
       },
     ],
   },
@@ -79,7 +81,7 @@ export const tools: Tool[] = [
     rootKind: 'directory',
     platform: 'node',
     purpose: '에이전트가 패키지를 분석할 때 읽는 입력 토큰 수를 시나리오별로 잼',
-    docs: ['measure-tokens-readme'],
+    docs: ['tools-readme'],
     source: [{ path: 'tools/scripts/measure-tokens/all.ts' }],
     gaps: [
       {
@@ -99,7 +101,7 @@ export const tools: Tool[] = [
     rootKind: 'directory',
     platform: 'node',
     purpose: '심볼 하나만 import 한 entry 를 번들해 트리셰이킹 효과를 byte 로 잼',
-    docs: ['treeshake-readme'],
+    docs: ['tools-readme'],
     source: [{ path: 'tools/scripts/treeshake/check.ts' }],
   },
   {
@@ -133,7 +135,7 @@ export const tools: Tool[] = [
     platform: 'node',
     purpose:
       'berry-dev 플러그인의 standards sync · check, secret guard hook, skill 구조를 실제 파일로 확인하는 테스트 묶음',
-    docs: ['claude-harness-verification'],
+    docs: ['berry-dev-readme'],
     source: [
       { path: 'tools/scripts/claude-harness/standards.test.ts' },
       { path: 'tools/scripts/claude-harness/guard.test.ts' },
@@ -186,10 +188,6 @@ export const tools: Tool[] = [
       '여러 저장소가 같은 Claude Code 작업 규칙을 쓰도록 standards rule 원본 · sync · check CLI · 검증 · UI 검수 skill · secret guard hook 을 주는 플러그인',
     docs: [
       'berry-dev-readme',
-      'claude-harness-architecture',
-      'claude-harness-contracts',
-      'claude-harness-standards-sources',
-      'claude-harness-setup',
       'harness-profile',
       'standards-core',
       'standards-berry-consumer',

@@ -6,6 +6,7 @@ import { MemoryRouter } from 'react-router-dom';
 
 import { catalog } from '@/data';
 import { flowModel } from '@/lib/catalog/flow';
+import { JOURNEY_KIND } from '@/lib/catalog/labels';
 
 import App from './app';
 
@@ -36,13 +37,17 @@ beforeEach(() => {
 afterEach(() => scrollTo.mockRestore());
 
 describe('journey list', () => {
-  it('lists every journey without groups, like plugins', () => {
+  it('lists every journey under its kind, in label order', () => {
     renderAt('/journeys');
     const main = screen.getByRole('main');
     expect(hrefs(within(main).getAllByRole('link'))).toEqual(
       expect.arrayContaining(catalog.journeys.map((j) => `/journeys/${j.id}`)),
     );
-    expect(within(main).queryAllByRole('heading', { level: 3 })).toEqual([]);
+    expect(
+      within(main)
+        .getAllByRole('heading', { level: 3 })
+        .map((heading) => heading.textContent),
+    ).toEqual(Object.values(JOURNEY_KIND));
   });
 });
 
@@ -150,6 +155,25 @@ describe('step inspector', () => {
     expect(
       within(pager).getByRole('link', { name: `다음 단계: 3. ${journey.steps[2].intent}` }),
     ).toBeTruthy();
+  });
+
+  it('shows who uses a step and its example commands to copy', () => {
+    const step = journeyOf('lookup').steps.find((s) => s.id === 'repo-cli');
+    renderAt('/journeys/lookup/steps/repo-cli');
+    const overview = within(inspector()).getByRole('region', { name: /^개요/ });
+    expect(overview.textContent).toContain(`사용 주체${step?.actor}`);
+    expect(
+      within(within(overview).getByRole('list', { name: '예시 명령' }))
+        .getAllByRole('button', { name: /^명령 복사: / })
+        .map((button) => button.getAttribute('aria-label')),
+    ).toEqual(step?.commands?.map((command) => `명령 복사: ${command}`));
+  });
+
+  it('continues the last eval step into its evaluation screen', () => {
+    renderAt('/journeys/eval-run/steps/collect');
+    const next = within(inspector()).getByRole('region', { name: /^다음 단계/ });
+    expect(hrefs(within(next).getAllByRole('link'))).toEqual(['/evaluation/ai']);
+    expect(next.textContent).toContain('평가 · AI 평가');
   });
 
   it('lists the recorded gap of a step', () => {

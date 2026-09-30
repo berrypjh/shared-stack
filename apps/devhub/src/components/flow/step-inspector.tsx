@@ -1,10 +1,12 @@
 import {
+  CommandList,
   Empty,
   Facts,
   INSPECTOR_ID,
   InspectorHeader,
   InspectorSection,
   Pager,
+  TermList,
 } from '@berrypjh/devhub-ui';
 import { List, ListItem } from '@berrypjh/react-ui';
 
@@ -37,7 +39,7 @@ const GAPS = { id: 'step-gaps', title: '근거 공백', icon: 'warning' } as con
  * 섹션은 늘 같은 순서로 보이고 비면 이유를 쓴다. 단계 링크는 `#devhub-inspector` 로 이 칸에 머문다.
  */
 export const StepInspector = ({ inspection }: { inspection: StepInspection }) => {
-  const { journey, step, context, empty } = inspection;
+  const { journey, step, context, evaluation, empty } = inspection;
   const siblings = journey.steps.map((s, index) => ({
     id: s.id,
     label: `${index + 1}. ${s.intent}`,
@@ -74,12 +76,41 @@ export const StepInspector = ({ inspection }: { inspection: StepInspection }) =>
               ),
             },
             { term: '담당', detail: <EntityLink id={step.owner} hash={INSPECTOR_ID} /> },
+            ...(step.actor ? [{ term: '사용 주체', detail: step.actor }] : []),
           ]}
         />
+        {step.commands?.length ? (
+          <div className="mt-md flex flex-col gap-xs">
+            <p className="typo-caption-small text-text-light">예시 명령</p>
+            <CommandList
+              commands={step.commands}
+              label="예시 명령"
+              copyLabel={(command) => `명령 복사: ${command}`}
+            />
+          </div>
+        ) : null}
+        {step.options?.length ? (
+          <div className="mt-md flex flex-col gap-xs">
+            <p className="typo-caption-small text-text-light">옵션</p>
+            <TermList
+              items={step.options.map(({ flag, meaning }) => ({ term: flag, meaning }))}
+              label="옵션"
+            />
+          </div>
+        ) : null}
+        {step.outputs?.length ? (
+          <div className="mt-md flex flex-col gap-xs">
+            <p className="typo-caption-small text-text-light">출력 컬럼</p>
+            <TermList
+              items={step.outputs.map(({ name, meaning }) => ({ term: name, meaning }))}
+              label="출력 컬럼"
+            />
+          </div>
+        ) : null}
       </InspectorSection>
 
-      <InspectorSection {...NEXT} count={inspection.next.length}>
-        {inspection.next.length ? (
+      <InspectorSection {...NEXT} count={inspection.next.length + (evaluation ? 1 : 0)}>
+        {inspection.next.length || evaluation ? (
           <List className="flex flex-col gap-xs typo-body-small">
             {inspection.next.map((next) => (
               <ListItem key={next.id}>
@@ -89,6 +120,14 @@ export const StepInspector = ({ inspection }: { inspection: StepInspection }) =>
                 </Link>
               </ListItem>
             ))}
+            {evaluation && (
+              <ListItem>
+                →{' '}
+                <Link to={evaluation.path} className={LINK}>
+                  평가 · {evaluation.label}
+                </Link>
+              </ListItem>
+            )}
           </List>
         ) : (
           <Empty reason={empty.next} />

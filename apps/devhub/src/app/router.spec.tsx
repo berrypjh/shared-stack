@@ -122,7 +122,6 @@ describe('navigation data', () => {
       '개발 · 저장소',
       '개발 · 도구',
       '개발 · 품질 관측',
-      '개발 · Claude harness',
       '소비자 · 패키지',
       '소비자 · 플러그인',
       '에이전트 · 저장소 지침',
@@ -160,10 +159,10 @@ describe('navigation data', () => {
     expect(openGroups()).toContain('소비자 · 패키지');
   });
 
-  it('offers one open-all or close-all toggle in every section with more than one group', () => {
+  it('offers one open-all or close-all toggle in every section with titled groups, even a single one', () => {
     renderAt('/');
     const nav = within(explorerNav());
-    for (const title of ['평가', '기록', '패키지', '문서']) {
+    for (const title of ['작업 흐름', '평가', '기록', '패키지', '플러그인', '문서']) {
       const toggle = new RegExp(`^${title} 묶음 모두 (열기|닫기)$`);
       expect(nav.getAllByRole('button', { name: toggle })).toHaveLength(1);
     }

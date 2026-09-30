@@ -1,0 +1,131 @@
+import type { Journey } from '../../domain/model';
+
+/** 에이전트가 패키지를 파악하려고 파일을 통째로 읽을 때 드는 정적 입력 토큰 측정. */
+export const measureTokens: Journey = {
+  id: 'measure-tokens',
+  kind: 'measure',
+  title: '토큰 측정',
+  goal: '에이전트가 README · 타입 선언 · AGENTS.md · 카탈로그를 읽을 때 드는 input 토큰을 읽는 파일 조합(시나리오)별로 세어 baseline 과 비교함. task 단위 컨텍스트와는 목적이 달라 직접 비교하지 않음',
+  steps: [
+    {
+      id: 'build',
+      intent: '대상 패키지를 빌드함',
+      behavior: 'build:libs 가 시나리오가 읽을 dist 를 만듦',
+      context: 'workspace',
+      owner: 'token-measurement',
+      status: 'implemented',
+      commands: ['pnpm build:libs'],
+      source: [{ path: 'package.json', symbol: 'build:libs' }],
+      tests: [],
+      docs: [],
+      next: ['run', 'collect'],
+    },
+    {
+      id: 'run',
+      intent: '측정을 돌림',
+      behavior: '*:measure 스크립트가 MEASURE_TARGET 으로 target 을 골라 all.ts 를 실행',
+      context: 'workspace',
+      owner: 'token-measurement',
+      status: 'implemented',
+      actor: '이 저장소의 개발자 · 에이전트',
+      commands: [
+        'pnpm react-ui:measure',
+        'pnpm react-native-ui:measure',
+        'pnpm ui-core:measure',
+        'pnpm tokens:measure',
+      ],
+      source: [
+        { path: 'package.json', symbol: 'react-ui:measure' },
+        { path: 'tools/scripts/measure-tokens/shared.ts', symbol: 'MEASURE_TARGET' },
+        { path: 'tools/scripts/measure-tokens/all.ts' },
+      ],
+      tests: [],
+      docs: [],
+      next: ['scenario'],
+    },
+    {
+      id: 'scenario',
+      intent: '시나리오 파일을 이어 붙임',
+      behavior: 'MEASURE_TARGETS 의 시나리오마다 파일을 경로 머리와 함께 이어 붙임',
+      context: 'workspace',
+      owner: 'token-measurement',
+      status: 'partial',
+      source: [
+        { path: 'tools/scripts/measure-tokens/registry.ts', symbol: 'MEASURE_TARGETS' },
+        { path: 'tools/scripts/measure-tokens/registry.ts', symbol: 'readScenarioFiles' },
+      ],
+      tests: ['tools-vitest'],
+      docs: [],
+      next: ['count'],
+      gaps: [
+        {
+          kind: 'known-failure',
+          note: 'design-tokens · ui-core target 은 실패. 시나리오가 dist/AGENTS.md 를 읽지만 두 패키지 build 는 그 파일을 만들지 않고, 파일 하나라도 없으면 target 전체가 종료됨',
+          evidence: [
+            { path: 'tools/scripts/measure-tokens/registry.ts', symbol: 'missing file' },
+            { path: 'libs/react-ui/project.json', symbol: 'AGENTS.consumer.md' },
+          ],
+        },
+      ],
+    },
+    {
+      id: 'count',
+      intent: '토큰을 셈',
+      behavior: 'OpenAI 는 tiktoken 으로 로컬에서, Anthropic 은 count_tokens API 로 셈',
+      context: 'workspace',
+      owner: 'token-measurement',
+      status: 'implemented',
+      commands: [
+        'MEASURE_TARGET=react-ui npx tsx tools/scripts/measure-tokens/openai.ts',
+        'MEASURE_TARGET=react-ui npx tsx --env-file-if-exists=.env tools/scripts/measure-tokens/claude.ts',
+      ],
+      source: [
+        { path: 'tools/lib/token-count.ts', symbol: 'countOpenAITokens' },
+        { path: 'tools/lib/token-count.ts', symbol: 'countAnthropicTokens' },
+        { path: 'tools/scripts/measure-tokens/all.ts', symbol: 'ANTHROPIC_API_KEY' },
+      ],
+      tests: [],
+      docs: [],
+      next: ['table'],
+    },
+    {
+      id: 'table',
+      intent: '표로 비교함',
+      behavior: '두 provider 칸과 첫 시나리오 대비 Δ 를 한 표로 출력. 키가 없으면 Anthropic 칸은 —',
+      context: 'workspace',
+      owner: 'token-measurement',
+      status: 'implemented',
+      source: [
+        { path: 'tools/scripts/measure-tokens/shared.ts', symbol: 'printTable' },
+        { path: 'tools/scripts/measure-tokens/shared.ts', symbol: 'delta' },
+      ],
+      tests: [],
+      docs: [],
+      next: [],
+    },
+    {
+      id: 'collect',
+      intent: '평가 화면으로 가져옴',
+      behavior:
+        'quality:collect 가 같은 등록부의 시나리오를 in-process 로 세어 저장하고 DevHub 로 내보냄',
+      context: 'workspace',
+      owner: 'observability-collectors',
+      status: 'implemented',
+      commands: [
+        'pnpm quality:collect --profile=core --run-id=<id>',
+        'pnpm quality:export --run-id=<id>',
+      ],
+      source: [
+        { path: 'tools/scripts/observability/cli.ts', symbol: 'MEASURE_TARGETS' },
+        {
+          path: 'tools/scripts/observability/collectors/context.ts',
+          symbol: 'collectPackageScenarios',
+        },
+      ],
+      tests: ['tools-vitest'],
+      docs: ['observability-usage'],
+      next: [],
+      evaluation: 'ai',
+    },
+  ],
+};

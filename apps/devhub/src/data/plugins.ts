@@ -14,6 +14,7 @@ export const plugins: Plugin[] = [
     description:
       'staged 변경을 scope별로 분석해 한국어 Conventional Commits 메시지를 제안하고 승인 후 커밋한다. commit-mcp MCP 서버를 함께 제공한다.',
     category: 'workflow',
+    kind: 'commit',
     keywords: ['commit', 'conventional-commits', 'mcp', 'korean'],
     manifest: { path: 'plugins/berry-commit/.claude-plugin/plugin.json' },
     skills: [
@@ -60,6 +61,7 @@ export const plugins: Plugin[] = [
     description:
       '여러 저장소가 같은 작업 규칙을 쓰도록 standards rule 원본과 sync · check CLI, 검증 · UI 검수 skill, secret guard hook을 제공한다.',
     category: 'workflow',
+    kind: 'standards',
     keywords: ['standards', 'rules', 'harness', 'korean'],
     manifest: { path: 'plugins/berry-dev/.claude-plugin/plugin.json' },
     skills: [
@@ -124,7 +126,7 @@ export const plugins: Plugin[] = [
           limits:
             '명령 문자열을 단순 토큰으로 볼 뿐 셸 parser 도 OS sandbox 도 아니라 우회할 수 있음. 입력이 깨지거나 hook 이 실패하면 통과시킴 — 보조 장치이지 마지막 방어선이 아님',
           evidence: [
-            { path: 'docs/claude-harness/contracts.md', symbol: '## 7. secret hook' },
+            { path: 'plugins/berry-dev/README.md', symbol: '## secret guard' },
             { path: 'tools/scripts/claude-harness/guard.test.ts' },
           ],
         },
@@ -166,13 +168,6 @@ export const plugins: Plugin[] = [
       { path: 'plugins/berry-dev/examples/permissions.review.json' },
       { path: 'plugins/berry-dev/examples/standards.consumer.json' },
     ],
-    docs: [
-      'berry-dev-readme',
-      'claude-harness-architecture',
-      'claude-harness-contracts',
-      'claude-harness-standards-sources',
-      'claude-harness-setup',
-      'claude-harness-verification',
-    ],
+    docs: ['berry-dev-readme'],
   },
 ];
