@@ -3,7 +3,7 @@
  *
  * 순수 경계: validatePlugin · validateManifest · validateConfig · renderRule · buildExpectedFiles 는
  * 값만 받고 값만 돌려준다. 파일을 읽는 것은 plugin 자신의 source 를 읽는 loadSource 하나이고,
- * 소비 저장소의 파일을 읽거나 쓰는 API 는 없다. 계약은 docs/claude-harness/contracts.md.
+ * 소비 저장소의 파일을 읽거나 쓰는 API 는 없다. 계약은 tools/scripts/claude-harness/standards.test.ts 가 고정한다.
  */
 import { createHash } from 'node:crypto';
 import { lstat, readdir, readFile } from 'node:fs/promises';

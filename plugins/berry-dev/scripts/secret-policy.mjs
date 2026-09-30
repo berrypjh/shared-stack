@@ -3,7 +3,7 @@
  *
  * secret 경로와 우회 수단(`BYPASS`)이 **함께** 있을 때만 사유를 돌려준다. 애매하면 막지 않는다.
  * 셸 parser 도 OS sandbox 도 아니다 — 명령 문자열을 단순 토큰으로 볼 뿐이라 우회할 수 있다.
- * 계약은 docs/claude-harness/contracts.md §7.
+ * 계약은 tools/scripts/claude-harness/guard.test.ts 가 고정한다.
  */
 
 /** Read deny 를 우회해서 파일 내용을 읽을 수 있는 수단. */

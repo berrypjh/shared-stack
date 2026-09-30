@@ -5,7 +5,6 @@
 - **책임** — standards 배포, 검증 절차, secret guard 셋뿐
 - **plugin을 켜면 더해지는 것** — secret guard hook, `/berry-dev:repo-verify` · `/berry-dev:frontend-quality`
 - **standards rule** — plugin이 직접 로드하지 않음. 아래 CLI로 소비 저장소에 씀
-- **설계 · 계약** — shared-stack 저장소의 `docs/claude-harness/`
 
 ## repo-verify
 
@@ -59,8 +58,18 @@ node <shared-stack>/plugins/berry-dev/scripts/standards.mjs check --project <con
 | `permissions.review.json`     | `.claude/settings.json`의 `permissions` | 최소 deny · ask 후보. 그대로 붙이지 않는다                      |
 | `harness-source.example.json` | `.claude/harness-source.json`           | 고정한 shared-stack full SHA · version. 추측한 값을 적지 않는다 |
 
-- **도입 순서 · CI** — shared-stack 저장소의 `docs/claude-harness/setup.md`(source 고정 → local 파일 → sync · check → `--plugin-dir` 로드 → hook 전환)
 - **permissions** — plugin이 주입할 수 없음(plugin `settings.json`은 permissions를 받지 않음). 프로젝트가 고름
+
+## 도입
+
+1. **source 고정** — shared-stack 커밋의 full SHA(40자)와 그 checkout의 `plugin.json` `version`을 확인해 `.claude/harness-source.json`에 기록
+2. **local 파일** — 위 예시를 복사해 검토. `.claude/rules/` 빈 디렉터리, `harness:sync` · `harness:check` script(checkout의 CLI), `_generated`의 `.gitignore` 예외 · `.prettierignore` 제외
+3. **sync · check** — `harness:sync` → 생성 rule을 `git diff`로 검토 → `harness:check`가 0. 생성 rule · config · profile · `harness-source.json`을 함께 커밋
+4. **plugin 로드** — `claude --plugin-dir <checkout>/plugins/berry-dev`. skill 목록과 `/hooks`로 확인하고, 차단은 **존재하지 않는** secret 경로로만 확인
+5. **hook 전환** — 4에서 차단까지 확인된 뒤에만 local hook의 secret 판정을 뺌. `PORT_BOUND` 같은 실행 제약은 local에 남김
+
+- **CI** — 고정 SHA로 checkout → `git rev-parse HEAD` · version이 `harness-source.json`과 같은지 확인 → `check`만 실행. CI에서 sync하지 않음
+- **marketplace 설치** — 설치 시점의 내용을 받아 version이 같아도 SHA가 같다는 보장이 없음. rule 생성과 CI는 고정한 checkout을 씀
 
 ## 개발
 

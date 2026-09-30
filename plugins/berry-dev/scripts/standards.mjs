@@ -7,7 +7,7 @@
  * expected 는 매번 plugin source 와 `.claude/standards.json` 으로 다시 만든다. 이전 manifest 는
  * "무엇을 썼는가"(소유)를 판정할 때만 쓴다. check 는 아무것도 쓰지 않는다.
  * 여러 파일 쓰기는 transaction 이 아니다 — 파일 하나씩 temp → rename 이고 manifest 가 마지막이다.
- * 계약은 docs/claude-harness/contracts.md.
+ * 계약은 tools/scripts/claude-harness/standards-cli.test.ts 가 고정한다.
  */
 import { createHash } from 'node:crypto';
 import { parseArgs } from 'node:util';
