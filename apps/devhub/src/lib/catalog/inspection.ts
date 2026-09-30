@@ -13,7 +13,7 @@ import type {
 
 /**
  * 패키지 화면의 상세 정보 칸 모델. 카탈로그에서만 만들고 화면은 그리기만 한다.
- * 섹션은 늘 같은 순서로 모두 있다 — 비면 숨기지 않고 `empty` 에 이유를 둔다.
+ * 상세 정보 칸의 섹션은 늘 모두 있어 비면 `empty` 에 이유를 둔다. 관계 묶음은 빈 배열이면 화면이 그리지 않는다.
  */
 
 export type RelationItem = {
@@ -51,12 +51,8 @@ export type Inspection = {
   related: RelationItem[];
   /** 빈 섹션마다의 이유. 섹션이 비었을 때만 쓴다. */
   empty: {
-    upstream: string;
-    downstream: string;
-    artifacts: string;
     documents: string;
     tests: string;
-    related: string;
   };
 };
 
@@ -75,7 +71,6 @@ export const inspect = (catalog: Catalog, id: string): Inspection | undefined =>
   const upstream = upstreamOf(catalog, id);
   const downstream = downstreamOf(catalog, id);
   const root: SourceRef = { path: record.root, directory: true };
-  const noTest = record.gaps?.find((gap) => gap.kind === 'no-test');
 
   return {
     id,
@@ -109,12 +104,8 @@ export const inspect = (catalog: Catalog, id: string): Inspection | undefined =>
       ...flows(catalog.relations.filter((r) => r.kind === 'verification' && r.from === id)),
     ],
     empty: {
-      upstream: '이 항목이 기대는 의존 관계가 카탈로그에 없음',
-      downstream: '이 항목에 기대는 의존 관계가 카탈로그에 없음',
-      artifacts: '이 항목이 만들거나 싣는 생성물 관계가 카탈로그에 없음',
       documents: '이 항목을 설명하는 문서가 카탈로그에 없음',
-      tests: noTest ? noTest.note : '이 항목을 확인하는 테스트 묶음이 카탈로그에 없음',
-      related: '이 항목을 검증하거나 이 항목이 검증하는 관계가 없음',
+      tests: '이 패키지를 직접 대상으로 하는 테스트 묶음이 없음',
     },
   };
 };

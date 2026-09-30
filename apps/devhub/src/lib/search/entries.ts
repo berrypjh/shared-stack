@@ -150,7 +150,7 @@ const exportEntries = (catalog: Catalog): Draft[] =>
         kind: 'export' as const,
         label: entry.specifier,
         detail: `${pkg.id} 진입점`,
-        href: `${entityHref('package', pkg.id)}#inspector-exports`,
+        href: `${entityHref('package', pkg.id)}#package-entries`,
         names: [entry.specifier],
         text: [],
         related: [pkg.id, pkg.packageName],

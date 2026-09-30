@@ -35,7 +35,7 @@ export const RULE_SCOPE: Record<PluginRule['scope'], string> = {
 
 export const PACKAGE_KIND: Record<PackageKind, string> = {
   ui: 'UI 라이브러리',
-  foundation: '기반(토큰 · 계약)',
+  foundation: '토큰 · UI 계약',
   contract: '데이터 계약',
   config: '공유 설정',
 };

@@ -31,7 +31,7 @@ describe('catalog index', () => {
   it.each([
     ['react-ui', 'package:react-ui', '/packages/react-ui'],
     ['릴리스 스크립트', 'tool:release-scripts', '/architecture/release-scripts'],
-    ['styles.css', 'export:@berrypjh/react-ui/styles.css', '/packages/react-ui#inspector-exports'],
+    ['styles.css', 'export:@berrypjh/react-ui/styles.css', '/packages/react-ui#package-entries'],
     [
       'hasBreakingChangeSinceLastTag',
       'symbol:tools/scripts/release/release-npm.ts#hasBreakingChangeSinceLastTag',

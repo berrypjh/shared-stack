@@ -1,5 +1,3 @@
-import { INSPECTOR_ID } from '@berrypjh/devhub-ui';
-
 import { act, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, useLocation } from 'react-router-dom';
@@ -112,13 +110,13 @@ describe('navigation from a result', () => {
     expect(screen.getByRole('heading', { level: 2, name: '릴리스 스크립트' })).toBeTruthy();
   });
 
-  it('lands on the exports section of the inspector for a public export', async () => {
+  it('lands on the entry point section of the package page for a public export', async () => {
     const user = userEvent.setup();
     renderAt('/');
     await choose(user, 'styles.css');
-    expect(location).toBe('/packages/react-ui#inspector-exports');
-    expect(document.activeElement?.id).toBe('inspector-exports');
-    expect(document.getElementById(INSPECTOR_ID)?.contains(document.activeElement)).toBe(true);
+    expect(location).toBe('/packages/react-ui#package-entries');
+    expect(document.activeElement?.id).toBe('package-entries');
+    expect(screen.getByRole('main').contains(document.activeElement)).toBe(true);
   });
 
   it('lands on a symbol of a source file, and selects a journey step by URL', async () => {
@@ -163,9 +161,9 @@ describe('deep links', () => {
 
   it('focus an inspector section when the page opens with its hash', async () => {
     await act(async () => {
-      renderAt('/packages/react-ui#inspector-exports');
+      renderAt('/packages/react-ui#inspector-tests');
     });
-    expect(document.activeElement?.id).toBe('inspector-exports');
+    expect(document.activeElement?.id).toBe('inspector-tests');
   });
 });
 

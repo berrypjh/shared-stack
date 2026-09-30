@@ -55,7 +55,7 @@ describe('inspect', () => {
   it('gives the reason when a section is empty', () => {
     const config = must('eslint-config');
     expect(config.tests).toEqual([]);
-    expect(config.empty.tests).toContain('테스트 파일도 test target 도 없음');
+    expect(config.empty.tests).toBe('이 패키지를 직접 대상으로 하는 테스트 묶음이 없음');
     expect(config.upstream).toEqual([]);
   });
 

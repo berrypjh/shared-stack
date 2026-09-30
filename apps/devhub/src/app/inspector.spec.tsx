@@ -33,34 +33,29 @@ beforeEach(() => {
 });
 afterEach(() => scrollTo.mockRestore());
 
+const main = () => within(screen.getByRole('main'));
+const mainSection = (title: string) => within(main().getByRole('region', { name: title }));
+
 describe('package inspector', () => {
-  it('marks an internal package as Internal, from its manifest', () => {
-    renderAt('/packages/ui-core');
-    // 머리의 배지와 공개 여부 문장, 두 곳이다.
-    expect(inspector().getAllByText('Internal')).toHaveLength(2);
-    const visibility = section('공개 여부');
-    expect(visibility.getByText(/private: true/)).toBeTruthy();
-    expect(visibility.getByText('package.json')).toBeTruthy();
-    expect(section('진입점').getByText(/소비자 API 가 아님/)).toBeTruthy();
+  it('uses the same four sections as the other inspectors', () => {
+    renderAt('/packages/react-ui');
+    for (const title of ['개요', '소스', '문서', '테스트']) expect(section(title)).toBeTruthy();
+    expect(inspector().queryByRole('region', { name: /^진입점/ })).toBeNull();
   });
 
-  it('lists exactly the manifest entry points, and never links a build output as an import', () => {
-    renderAt('/packages/react-ui');
-    const pkg = catalog.packages.find((p) => p.id === 'react-ui');
-    const exports = section('진입점');
-    for (const entry of pkg?.entries ?? []) expect(exports.getByText(entry.specifier)).toBeTruthy();
-    expect(exports.getByText(/dist 안의 다른 파일을 직접 import 하지 않음/)).toBeTruthy();
-    const links = exports.getAllByRole('link').map((link) => link.getAttribute('href') ?? '');
-    expect(links.some((href) => href.includes('/dist/'))).toBe(false);
+  it('marks an internal package as 내부(private), from its manifest', () => {
+    renderAt('/packages/ui-core');
     expect(
-      links.some((href) => /\/(blob|tree)\/[^/]+\/libs\/react-ui\/src\/index\.ts$/.test(href)),
-    ).toBe(true);
+      section('개요').getByText(/내부\(private\) — package.json 의 private: true/),
+    ).toBeTruthy();
+    expect(mainSection('진입점').getByText(/소비자 API 가 아님/)).toBeTruthy();
   });
 
   it('shows the reason instead of an empty list', () => {
     renderAt('/packages/eslint-config');
-    expect(section('테스트').getByText(/테스트 파일도 test target 도 없음/)).toBeTruthy();
-    expect(section('위 · 아래').getAllByText(/카탈로그에 없음/)).toHaveLength(2);
+    expect(
+      section('테스트').getByText(/이 패키지를 직접 대상으로 하는 테스트 묶음이 없음/),
+    ).toBeTruthy();
   });
 
   it('groups source files by the project that owns them', () => {
@@ -71,17 +66,41 @@ describe('package inspector', () => {
   });
 });
 
-describe('links inside the inspector', () => {
-  it('open a related entry and stay in the details', async () => {
-    const user = userEvent.setup();
+describe('package page', () => {
+  it('lists exactly the manifest entry points, and never links a build output as an import', () => {
     renderAt('/packages/react-ui');
-    await user.click(section('위 · 아래').getByRole('link', { name: 'ui-core' }));
-
-    expect(location).toBe(`/packages/ui-core#${INSPECTOR_ID}`);
-    expect(document.activeElement).toBe(document.getElementById(INSPECTOR_ID));
-    expect(inspector().getByRole('heading', { level: 2 }).textContent).toBe('ui-core');
+    const pkg = catalog.packages.find((p) => p.id === 'react-ui');
+    const entries = mainSection('진입점');
+    for (const entry of pkg?.entries ?? []) expect(entries.getByText(entry.specifier)).toBeTruthy();
+    expect(entries.getByText(/dist 안의 다른 파일을 직접 import 하지 않음/)).toBeTruthy();
+    const links = entries.getAllByRole('link').map((link) => link.getAttribute('href') ?? '');
+    expect(links.some((href) => href.includes('/dist/'))).toBe(false);
+    expect(
+      links.some((href) => /\/(blob|tree)\/[^/]+\/libs\/react-ui\/src\/index\.ts$/.test(href)),
+    ).toBe(true);
   });
 
+  it('draws only the relation groups that have entries, and no section without any', () => {
+    renderAt('/packages/eslint-config');
+    expect(main().queryByRole('region', { name: '관계' })).toBeNull();
+    renderAt('/packages/observability-contracts');
+    const headings = within(screen.getAllByRole('region', { name: '관계' })[0])
+      .getAllByRole('heading', { level: 3 })
+      .map((heading) => heading.textContent);
+    expect(headings.length).toBeGreaterThan(0);
+    expect(headings.length).toBeLessThan(4);
+  });
+
+  it('links a related entry to its own page', async () => {
+    const user = userEvent.setup();
+    renderAt('/packages/react-ui');
+    await user.click(mainSection('관계').getAllByRole('link', { name: 'ui-core' })[0]);
+    expect(location).toBe('/packages/ui-core');
+    expect(main().getByRole('heading', { level: 1 }).textContent).toBe('ui-core');
+  });
+});
+
+describe('links inside the inspector', () => {
   it('page to the neighbours in the section order, with the missing side disabled', async () => {
     const user = userEvent.setup();
     const [first, second] = catalog.packages.filter((p) => p.kind === 'ui').map((p) => p.id);

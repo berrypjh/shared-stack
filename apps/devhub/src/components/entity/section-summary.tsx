@@ -4,7 +4,7 @@ import { List, ListItem } from '@berrypjh/react-ui';
 import { Link } from 'react-router-dom';
 
 import type { Entity, Section } from '@/lib/catalog/entities';
-import { PLATFORM, VISIBILITY } from '@/lib/catalog/labels';
+import { VISIBILITY } from '@/lib/catalog/labels';
 
 import { LINK } from '../ui/entity-link';
 
@@ -14,7 +14,7 @@ const captionOf = (entity: Entity) => {
     case 'journeys':
       return `단계 ${entity.record.steps.length}개 · ${entity.record.goal}`;
     case 'packages':
-      return `${entity.record.packageName} · ${VISIBILITY[entity.record.visibility]} · ${PLATFORM[entity.record.platform]}`;
+      return `${VISIBILITY[entity.record.visibility]} · ${entity.record.purpose}`;
     case 'plugins':
       return `v${entity.record.version} · ${entity.record.description}`;
     case 'documents':

@@ -1,4 +1,4 @@
-import type { EvidenceGap, Package, PackageEntry, Setting } from '../domain/model';
+import type { Package, PackageEntry, Setting } from '../domain/model';
 
 /** `exports` 의 subpath 를 소비자 specifier 로. `.` 은 패키지 이름이다. */
 const specifierOf = (packageName: string, subpath: string) =>
@@ -17,25 +17,6 @@ const committed = (root: string, specifier: string, file: string): PackageEntry 
   target: `${root}/${file}`,
   origin: 'committed',
 });
-
-const noTest = (root: string): EvidenceGap => ({
-  kind: 'no-test',
-  note: '테스트 파일도 test target 도 없음. 설정 파일만 배포함',
-  evidence: [{ path: `${root}/package.json` }, { path: `${root}/project.json` }],
-});
-
-/** 두 private 패키지는 소비자 문서(dist/AGENTS.md)가 없는데 토큰 측정 시나리오가 그 파일을 읽어 실패한다. */
-const measureFailure: EvidenceGap = {
-  kind: 'known-failure',
-  note: '토큰 측정 시나리오가 dist/AGENTS.md 를 읽는데 이 패키지는 그 파일을 만들지 않아 측정이 실패함',
-  evidence: [
-    {
-      path: 'tools/scripts/measure-tokens/registry.ts',
-      symbol: "'agents-only': ['dist/AGENTS.md']",
-    },
-    { path: 'tools/scripts/measure-tokens/registry.ts', symbol: 'missing file' },
-  ],
-};
 
 /** 설정 파일의 키 하나: 값의 원문과 그 뜻. */
 const setting = (path: string, symbol: string, value: string, note: string): Setting => ({
@@ -87,7 +68,6 @@ export const packages: Package[] = [
       { path: `${DT}/src/index.ts` },
       { path: `${DT}/tokens`, directory: true },
     ],
-    gaps: [measureFailure],
   },
   {
     id: 'ui-core',
@@ -110,7 +90,6 @@ export const packages: Package[] = [
     surfaceGuard: { path: `${UC}/src/packageSurface.test.ts` },
     docs: ['ui-core-agents', 'ui-core-readme'],
     source: [{ path: `${UC}/src/index.ts` }, { path: `${UC}/src/contracts`, directory: true }],
-    gaps: [measureFailure],
   },
   {
     id: 'react-ui',
@@ -158,23 +137,6 @@ export const packages: Package[] = [
     surfaceGuard: { path: 'tools/lib/package-boundary.test.ts' },
     docs: ['react-native-ui-agents', 'react-native-ui-readme', 'react-native-ui-consumer-agents'],
     source: [{ path: `${RN}/src/index.ts` }],
-    gaps: [
-      {
-        kind: 'doc-code-mismatch',
-        note: '패키지 경계 테스트의 주석은 이 패키지에 test target 이 없다고 하지만 project.json 에는 jest test target 이 있음',
-        evidence: [{ path: 'tools/lib/package-boundary.test.ts' }, { path: `${RN}/project.json` }],
-      },
-      {
-        kind: 'unsupported',
-        note: 'consumer eval 의 검증 단계는 RN 컴포넌트 테스트를 돌리지 못함(unsupported)',
-        evidence: [
-          {
-            path: 'tools/evals/consumer/verification/policy.ts',
-            symbol: 'react-native components cannot render in the jsdom fixture harness',
-          },
-        ],
-      },
-    ],
   },
   {
     id: 'devhub-ui',
@@ -226,7 +188,7 @@ export const packages: Package[] = [
     nxProject: '@berrypjh/eslint-config',
     nxManifest: { path: 'libs/eslint-config/project.json' },
     platform: 'node',
-    purpose: '공유 ESLint flat config (base · nx · react)',
+    purpose: '다른 저장소가 쓰는 ESLint flat config. base · nx · react 세 진입점으로 나눔',
     entries: [
       committed('libs/eslint-config', '@berrypjh/eslint-config/base', 'base.mjs'),
       committed('libs/eslint-config', '@berrypjh/eslint-config/nx', 'nx.mjs'),
@@ -308,7 +270,6 @@ export const packages: Package[] = [
         'jsx-a11y 권장 규칙 전부를 .jsx · .tsx 에 켬. Nx 기본보다 강함',
       ),
     ],
-    gaps: [noTest(ES)],
   },
   {
     id: 'prettier-config',
@@ -320,7 +281,7 @@ export const packages: Package[] = [
     nxProject: '@berrypjh/prettier-config',
     nxManifest: { path: 'libs/prettier-config/project.json' },
     platform: 'node',
-    purpose: '공유 Prettier 설정',
+    purpose: '다른 저장소가 쓰는 Prettier 설정. markdown · YAML 만 따로 덮어씀',
     entries: [committed('libs/prettier-config', '@berrypjh/prettier-config', 'index.js')],
     docs: ['prettier-config-readme'],
     source: [{ path: PR }],
@@ -372,7 +333,6 @@ export const packages: Package[] = [
         'YAML 은 큰따옴표. 위의 singleQuote 를 YAML 에서만 되돌림',
       ),
     ],
-    gaps: [noTest('libs/prettier-config')],
   },
   {
     id: 'tsconfig',
@@ -384,7 +344,7 @@ export const packages: Package[] = [
     nxProject: '@berrypjh/tsconfig',
     nxManifest: { path: 'libs/tsconfig/project.json' },
     platform: 'node',
-    purpose: '공유 TypeScript 설정 (base · library · next)',
+    purpose: '다른 저장소가 쓰는 TypeScript 설정. base 위에 library · next 를 더함',
     entries: [
       committed('libs/tsconfig', '@berrypjh/tsconfig/base.json', 'base.json'),
       committed('libs/tsconfig', '@berrypjh/tsconfig/next.json', 'next.json'),
@@ -496,7 +456,6 @@ export const packages: Package[] = [
       ),
       setting(`${TS}/next.json`, 'noEmitOnError', 'true', '타입 오류가 있으면 아무것도 내지 않음'),
     ],
-    gaps: [noTest(TS)],
   },
   {
     id: 'commitlint-config',
@@ -508,7 +467,8 @@ export const packages: Package[] = [
     nxProject: '@berrypjh/commitlint-config',
     nxManifest: { path: 'libs/commitlint-config/project.json' },
     platform: 'node',
-    purpose: '공유 commitlint 설정 (Conventional Commits)',
+    purpose:
+      '다른 저장소가 쓰는 commitlint 설정. Conventional Commits 에서 type 목록과 헤더 규칙을 바꿈',
     entries: [committed('libs/commitlint-config', '@berrypjh/commitlint-config', 'index.js')],
     docs: ['commitlint-config-readme'],
     source: [{ path: CL }],
@@ -544,6 +504,5 @@ export const packages: Package[] = [
         '레벨 0 이라 검사하지 않음. 200 은 꺼진 규칙의 값이라 효과가 없음. 기본은 본문 한 줄 100자 초과를 오류로 막음',
       ),
     ],
-    gaps: [noTest('libs/commitlint-config')],
   },
 ];
