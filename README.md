@@ -50,10 +50,10 @@ pnpm add -D @berrypjh/tsconfig @berrypjh/commitlint-config
 
 `.claude-plugin/marketplace.json`이 이 저장소를 마켓플레이스 `berrypjh`로 노출한다.
 
-| plugin         | 내용                                                                       | 문서                                                                         |
-| -------------- | -------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| `berry-commit` | `/berry-commit:commit-scope` skill + `commit-mcp` MCP 서버                 | [README](plugins/berry-commit/README.md)                                     |
-| `berry-dev`    | 공통 rule 원본과 `sync` · `check` CLI, 검증 · 화면 검수 skill, secret hook | [README](plugins/berry-dev/README.md) · [도입](docs/claude-harness/setup.md) |
+| plugin         | 내용                                                                       | 문서                                     |
+| -------------- | -------------------------------------------------------------------------- | ---------------------------------------- |
+| `berry-commit` | `/berry-commit:commit-scope` skill + `commit-mcp` MCP 서버                 | [README](plugins/berry-commit/README.md) |
+| `berry-dev`    | 공통 rule 원본과 `sync` · `check` CLI, 검증 · 화면 검수 skill, secret hook | [README](plugins/berry-dev/README.md)    |
 
 팀 전체가 쓰려면 소비 저장소의 `.claude/settings.json`에 두 키를 넣는다.
 
@@ -94,8 +94,8 @@ claude plugin install berry-commit@berrypjh
 | `apps/devhub-e2e`                                   | Playwright              | DevHub E2E                                                                                        |
 | `plugins/berry-dev`                                 | Node                    | Claude Code plugin — 공통 rule 원본 · sync · check CLI · 검증 · UI 검수 skill · secret guard hook |
 | `plugins/berry-commit`                              | Node · TypeScript       | Claude Code plugin — staged 변경을 scope별로 커밋하는 skill · MCP 서버                            |
-| `tools/`                                            | TypeScript              | 측정 · 릴리스 · 카탈로그 생성 · 조회 · 평가 · 품질 수집                                           |
-| `docs/`                                             | Markdown                | 개발 문서 — 도구 사용법 · 품질 관측 · Claude harness 설계 · 개발 기록                             |
+| [`tools/`](tools/README.md)                         | TypeScript              | 측정 · 릴리스 · 카탈로그 생성 · 조회 · 평가 · 품질 수집                                           |
+| `docs/`                                             | Markdown                | 개발 문서 — 품질 관측 · 개발 기록                                                                 |
 
 Nx가 작업 orchestration을 담당한다. 테스트는 Vitest · Jest · Playwright, 문서는 Storybook · Chromatic, CI는 GitHub Actions다.
 
@@ -133,12 +133,10 @@ pnpm build
 | `pnpm tokens:build`  | 디자인 토큰 빌드                                                                 |
 | `pnpm tools:check`   | `tools/` 타입 검사 + 테스트. **Nx affected가 닿지 않는 영역**                    |
 | `pnpm harness:check` | 커밋된 생성 rule이 원본과 같은지                                                 |
-| `pnpm catalog:gen`   | 소비자 API 카탈로그(`dist/llm-catalog.json`) 생성. 두 UI lib build가 자동 호출   |
-| `pnpm ui:lookup`     | 플랫폼 · 심볼 · 토큰 조회 CLI                                                    |
 | `pnpm size`          | 번들 크기 검사 (size-limit). `build:libs`가 먼저 필요                            |
 | `pnpm release:local` | 로컬 레지스트리로 릴리스                                                         |
 
-PR에서 무엇이 도는지와 AI 세션에서 실행할 수 없는 것은 [.claude/harness.profile.md](.claude/harness.profile.md).
+조회 · 측정 · 평가 · 품질 수집 같은 도구 명령은 [tools/README.md](tools/README.md). PR에서 무엇이 도는지와 AI 세션에서 실행할 수 없는 것은 [.claude/harness.profile.md](.claude/harness.profile.md).
 
 ## 라이선스
 

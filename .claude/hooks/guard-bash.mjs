@@ -7,7 +7,7 @@
  * 애매한 경우에는 막지 않는다.
  *
  * secret 판정은 berry-dev plugin 의 정책 하나를 import 한다. plugin hook 이 활성인지 확인하기 전까지
- * 이 hook 이 같은 보호를 유지한다(docs/claude-harness/architecture.md 전환 순서).
+ * 이 hook 이 같은 보호를 유지한다.
  */
 import { findSecretReason } from '../../plugins/berry-dev/scripts/secret-policy.mjs';
 

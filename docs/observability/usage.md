@@ -41,7 +41,7 @@ pnpm build:libs     # design-tokens · ui-core · react-ui · react-native-ui di
 | `pnpm eval:consumer:routing` | routing만                                      |
 | `pnpm eval:consumer:context` | context만                                      |
 
-자세한 옵션은 [consumer-eval](../tools/consumer-eval.md).
+자세한 옵션은 DevHub 작업 흐름 "소비자 평가"와 [tools](../../tools/README.md).
 
 ## report 가져오기
 

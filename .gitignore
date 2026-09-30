@@ -159,7 +159,7 @@ storybook-static
 # design token
 **/.generated/
 **/_generated/
-# berry-dev standards 생성 rule 은 커밋한다 (docs/claude-harness/setup.md)
+# berry-dev standards 생성 rule 은 커밋한다
 !.claude/rules/_generated/
 
 # log

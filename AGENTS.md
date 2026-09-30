@@ -29,19 +29,20 @@ Nx 프로젝트가 아닌 곳도 있다.
 
 | 위치                       | 내용                                                                                                                                                                   |
 | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `plugins/berry-dev`        | Claude Code plugin — 공통 rule 원본과 `sync` · `check` CLI, `repo-verify` · `frontend-quality` skill, secret guard hook. 설계는 `docs/claude-harness`                  |
+| `plugins/berry-dev`        | Claude Code plugin — 공통 rule 원본과 `sync` · `check` CLI, `repo-verify` · `frontend-quality` skill, secret guard hook. 설계 근거는 `docs/records`                    |
 | `.claude/rules/_generated` | `pnpm harness:sync`가 `plugins/berry-dev/standards`에서 만든 rule. **손으로 고치지 않는다** — `.claude/standards.json`이나 원본을 고친다                               |
 | `tools/lib`                | 도구 공용 헬퍼(토큰 수 계산 · package `exports` specifier 추출)와 게시 패키지 `exports` ↔ dist 대조 테스트                                                            |
 | `tools/scripts`            | 토큰 측정 · tree-shaking 검사 · 릴리스 · 소비자 카탈로그 생성 · 품질 관측 수집기(`observability`) · react-ui CSS build · EAS 후처리 · harness 테스트(`claude-harness`) |
 | `tools/consumer-retrieval` | 플랫폼 → 패키지 → 심볼 → 토큰으로 조회를 좁히는 결정적 resolver (`pnpm ui:lookup`)                                                                                     |
 | `tools/evals/consumer`     | 소비자 평가 harness — dataset · variant · grader · 검증 · 보고                                                                                                         |
-| `docs/`                    | 도구 사용법(`docs/tools`), 품질 관측 설계 · 사용법(`docs/observability`), harness 설계(`docs/claude-harness`), 개발 기록(`docs/records`). 모두 `docs-ko` 문체          |
+| `docs/`                    | 품질 관측 설계 · 사용법(`docs/observability`), 개발 기록(`docs/records`). 모두 `docs-ko` 문체                                                                          |
 
 품질 관측은 별도 흐름이다 — `observability-contracts → tools/scripts/observability (collect · export) → apps/devhub` "평가" 섹션.
 
 **프로젝트별 지침은 `.claude/rules/<프로젝트>.md`(기록은 `records.md`)에 있다.** Read로 파일을 열 때만 로드되고 Write · Bash로는 로드되지 않으니, 프로젝트를 고치기 전에 그 rule을 먼저 Read한다. 문서 자리는 이렇게 나눈다.
 
 - 저장소 밖으로 배포되는 문서는 원본 옆에 둔다 — lib `README.md`(npm · 토큰 측정 baseline), `AGENTS.consumer.md`(`dist/AGENTS.md`), `plugins/*`
+- 도구 구성 · 명령은 `tools/README.md` 하나에 둔다. 단계별 동작 · 옵션 · 제약은 DevHub 작업 흐름(`apps/devhub/src/data/journeys`)이 갖는다
 - 이 저장소 안에서만 쓰는 지침은 `.claude/rules/`, 설명은 `docs/`에 둔다. 앱에는 `README.md` · `AGENTS.md`를 두지 않고, 앱 실행 방법은 루트 `README.md`에 둔다
 
 **`tools/`에는 전용 Nx 프로젝트가 없어 affected로는 검사가 돌지 않는다.** `pnpm tools:check`로 돌린다. PR에서는 `pr-check.yml`의 consumer-eval job이 실행한다.
@@ -96,10 +97,9 @@ architecture를 auto memory에만 두지 않는다. **secret과 credential은 �
 
 ## 문서
 
-| 문서                                                       | 내용                                                            |
-| ---------------------------------------------------------- | --------------------------------------------------------------- |
-| [README.md](README.md)                                     | 패키지 · 설치 · 명령                                            |
-| [.claude/harness.profile.md](.claude/harness.profile.md)   | 검증 명령 · 영향 범위 · AI 세션 제약 · UI 역할                  |
-| [docs/observability](docs/observability/architecture.md)   | 품질 관측 구조 · 수집기 · 검증 · 제약, metric · 사용법          |
-| [docs/claude-harness](docs/claude-harness/architecture.md) | berry-dev plugin 설계 · 계약 · 도입 · 검증                      |
-| [docs/records](docs/records/)                              | 날짜별 개발 기록(결정 · 수정 · 구현). devhub "기록" 화면에 등록 |
+| 문서                                                     | 내용                                                            |
+| -------------------------------------------------------- | --------------------------------------------------------------- |
+| [README.md](README.md)                                   | 패키지 · 설치 · 명령                                            |
+| [.claude/harness.profile.md](.claude/harness.profile.md) | 검증 명령 · 영향 범위 · AI 세션 제약 · UI 역할                  |
+| [docs/observability](docs/observability/architecture.md) | 품질 관측 구조 · 수집기 · 검증 · 제약, metric · 사용법          |
+| [docs/records](docs/records/)                            | 날짜별 개발 기록(결정 · 수정 · 구현). devhub "기록" 화면에 등록 |
