@@ -2,7 +2,6 @@
  * 게시되는 두 패키지(`react-ui`, `react-native-ui`)의 exports map ↔ 빌드 산출물 대조.
  *
  * ui-core는 `libs/ui-core/src/packageSurface.test.ts`가 자기 패키지 안에서 같은 검사를 한다.
- * 렌더러 두 개를 여기 두는 이유는 `react-native-ui`에 test target이 없기 때문이다 —
  * 이 파일은 `pnpm tools:check`로 돌고 CI의 consumer-eval job이 실행한다.
  *
  * dist가 없으면 통과가 아니라 실패다. 산출물을 검사하는 것이 목적이기 때문.
