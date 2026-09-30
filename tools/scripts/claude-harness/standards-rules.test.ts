@@ -5,8 +5,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { beforeAll, describe, expect, it } from 'vitest';
 
 /**
- * standards rule 본문과 shared-stack 이 실제로 쓰는 적용 설정(`.claude/standards.json`) 검사.
- * 추출 근거는 docs/claude-harness/standards-sources.md.
+ * standards rule 본문과 이 저장소가 실제로 쓰는 적용 설정 검사.
  */
 
 type Rule = { id: string; source: string; scope: 'core' | 'optional' };

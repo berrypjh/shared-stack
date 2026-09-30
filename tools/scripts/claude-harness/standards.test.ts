@@ -8,7 +8,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { beforeAll, describe, expect, it } from 'vitest';
 
 /**
- * plugins/berry-dev/scripts/standards-core.mjs 계약 테스트 (docs/claude-harness/contracts.md).
+ * standards 순수 함수(core) 계약 테스트.
  *
  * 대상은 plugin 안의 순수 Node ESM 이다. tools tsconfig 에 allowJs 를 켜지 않으려고
  * 동적 import 로 불러오고, 여기 적은 타입으로만 본다.

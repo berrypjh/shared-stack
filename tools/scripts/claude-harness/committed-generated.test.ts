@@ -6,12 +6,10 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
 /**
- * shared-stack 에 커밋된 `.claude/rules/_generated` 가 source(`plugins/berry-dev/standards`)와
- * `.claude/standards.json` 에서 다시 만든 결과와 같은지 CLI check 로 본다. 읽기만 한다.
+ * 커밋된 생성 rule 이 source 와 config 로 다시 만든 결과와 같은지 CLI check 로 본다. 읽기만 한다.
  *
- * source 나 config 를 바꾸고 `pnpm harness:sync` 를 잊으면 여기서 실패한다. `tools:check` 가 이 파일을
- * 수집하므로 PR 의 consumer-eval job 에서 돈다. 이것은 content check 다 — source pin(어느 커밋의
- * shared-stack 인가)은 소비 저장소의 setup · CI 가 따로 확인한다.
+ * source 나 config 를 바꾸고 sync 를 잊으면 여기서 실패한다. 이것은 content check 다 — source pin
+ * (어느 커밋에서 왔는가)은 소비 저장소가 따로 확인한다.
  */
 
 const REPO_ROOT = fileURLToPath(new URL('../../../', import.meta.url));

@@ -22,7 +22,7 @@ import { fileURLToPath } from 'node:url';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 /**
- * plugins/berry-dev/scripts/standards.mjs 의 sync · check 계약 (docs/claude-harness/contracts.md).
+ * standards CLI 의 sync · check 계약.
  *
  * 실제 소비 저장소 대신 임시 consumer 를 만든다. plugin 도 임시 디렉터리에 복사해서 쓴다 —
  * CLI 는 자기 위치에서 source 를 찾으므로, 복사본의 source 를 바꿔 upstream 변경을 흉내 낸다.

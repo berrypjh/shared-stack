@@ -7,10 +7,10 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 
 /**
- * Bash guard 계약 (docs/claude-harness/contracts.md §7).
+ * Bash guard 계약.
  *
  * hook 을 실제 프로세스로 실행하고 명령 문자열은 stdin JSON 으로만 넘긴다 — 어떤 명령도 실행하지 않는다.
- * local hook(`.claude/hooks/guard-bash.mjs`)의 판정은 통합 전 동작을 그대로 고정한 것이다.
+ * local hook 의 판정은 통합 전 동작을 그대로 고정한 것이다.
  */
 
 const REPO_ROOT = fileURLToPath(new URL('../../../', import.meta.url));
@@ -124,7 +124,7 @@ const PORT_ALLOWED = [
   'git log --grep="npx playwright test"',
   'pnpm nx build @berrypjh/devhub',
   'pnpm nx test @berrypjh/devhub',
-  // 알려진 공백: root script `devhub` 는 `nx serve` 별칭이지만 PORT_BOUND 에 없다. 범위 변경은 별도 결정이다.
+  // 알려진 공백: 목록에 없는 script 이름은 포트를 쓰더라도 막지 않는다. 범위 변경은 별도 결정이다.
   'pnpm devhub',
 ];
 

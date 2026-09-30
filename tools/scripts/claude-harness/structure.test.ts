@@ -5,7 +5,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { beforeAll, describe, expect, it } from 'vitest';
 
 /**
- * plugins/berry-dev 배포 디렉터리 구조 검사.
+ * berry-dev plugin 배포 디렉터리 구조 검사.
  *
  * marketplace 설치는 plugin 디렉터리만 cache 로 복사한다. 그래서 plugin 은 자기 안의 파일과
  * Node 내장만으로 돌아야 하고, 아직 없는 hook · skill 을 등록하지 않는다.
