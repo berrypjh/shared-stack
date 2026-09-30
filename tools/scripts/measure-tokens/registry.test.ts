@@ -34,10 +34,13 @@ describe('MEASURE_TARGETS', () => {
       'agents+api-catalog': ['dist/AGENTS.md', 'dist/llm-catalog.json'],
       'api-catalog-only': ['dist/llm-catalog.json'],
     });
-    expect(MEASURE_TARGETS['design-tokens'].scenarios['agents+catalog']).toEqual([
-      'dist/AGENTS.md',
-      'dist/tokens.json',
-    ]);
+  });
+
+  it('private 패키지는 만들지 않는 dist/AGENTS.md 를 읽지 않는다', () => {
+    for (const name of ['design-tokens', 'ui-core'] as const) {
+      const files = Object.values(MEASURE_TARGETS[name].scenarios).flat();
+      expect(files).not.toContain('dist/AGENTS.md');
+    }
   });
 });
 

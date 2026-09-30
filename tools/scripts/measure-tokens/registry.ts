@@ -25,7 +25,6 @@ export const MEASURE_TARGETS = {
       ],
       'with-catalog': ['package.json', 'dist/tokens.json'],
       'catalog-only': ['dist/tokens.json'],
-      'agents+catalog': ['dist/AGENTS.md', 'dist/tokens.json'],
 
       // TSV 변형은 미채택 — 재평가 시 design-tokens lib에 `writeTokensTsv` 부활 후 주석 해제.
       // 'with-tsv': ['package.json', 'dist/tokens.tsv'],
@@ -36,9 +35,6 @@ export const MEASURE_TARGETS = {
     dir: 'libs/ui-core',
     scenarios: {
       baseline: ['package.json', 'README.md', 'dist/index.d.ts'],
-      'with-agents': ['package.json', 'dist/AGENTS.md'],
-      'agents-only': ['dist/AGENTS.md'],
-      'agents+tokens': ['dist/AGENTS.md', 'dist/tokens.json'],
       'tokens-only': ['dist/tokens.json'],
     } as Record<string, string[]>,
   },
