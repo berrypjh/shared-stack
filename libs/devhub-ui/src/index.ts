@@ -20,6 +20,7 @@ export {
   zoomAt,
 } from './canvas/viewport';
 export { type Bar, BarChart, type BarGroup } from './chart/bar-chart';
+export { CommandList } from './doc/command-list';
 export { CopyButton } from './doc/copy-button';
 export { DocContent, type RenderLink } from './doc/doc-content';
 export { DocToc } from './doc/doc-toc';
@@ -30,6 +31,7 @@ export {
   DocumentSection,
 } from './doc/document-layout';
 export { type RemoteView, SourceActions } from './doc/source-actions';
+export { type TermItem, TermList } from './doc/term-list';
 export { type Fact, Facts } from './entity/facts';
 export { FileLine, FileList } from './entity/file-line';
 export { InspectorHeader } from './entity/inspector-header';

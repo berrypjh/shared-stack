@@ -95,7 +95,7 @@ type Story = StoryObj<typeof meta>;
 
 /**
  * 왼쪽 칸: 섹션 없는 보기, 그 아래 카탈로그 섹션과 항목. 현재 주소(`/packages/react-ui`)가
- * `react-ui` 항목과 그 섹션을 `aria-current` 로 표시한다. 여러 묶음이 있는 섹션(패키지)에는
+ * `react-ui` 항목과 그 섹션을 `aria-current` 로 표시한다. 이름 붙은 묶음이 있는 섹션에는 묶음 수와 상관없이
  * 모두 열기 · 닫기 토글이 붙는다.
  */
 export const Playground: Story = {};

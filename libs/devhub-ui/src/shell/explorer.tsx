@@ -162,7 +162,7 @@ const Section = ({ section }: { section: ExplorerSection }) => {
           </Link>
           <span className="typo-caption-small text-text-light">{count}</span>
         </h2>
-        {titled.length > 1 && (
+        {titled.length > 0 && (
           <GroupsToggle title={section.title} allOpen={allOpen} onToggle={() => setAll(!allOpen)} />
         )}
       </div>
