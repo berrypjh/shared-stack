@@ -2,7 +2,8 @@ import { type Inline, inlineText, parseInline } from './inline';
 import { slug } from './slug';
 
 /**
- * 저장소 문서가 실제로 쓰는 블록 문법: ATX 제목, 문단, 목록(중첩 · 번호 · 체크), 표, 코드 펜스, 인용, 구분선.
+ * 저장소 문서가 실제로 쓰는 블록 문법: ATX 제목, 문단, 목록(중첩 · 번호 · 체크), 표, 코드 펜스, 인용, 구분선,
+ * 한 줄을 혼자 차지한 그림.
  * setext 제목 · 들여쓰기 코드 · HTML 블록은 문서에 없어 지원하지 않는다 — 글자로 남는다.
  */
 export type ListItem = { checked?: boolean; blocks: Block[] };
@@ -14,6 +15,7 @@ export type Block =
   | { kind: 'table'; head: Inline[][]; rows: Inline[][][] }
   | { kind: 'code'; lang: string; text: string }
   | { kind: 'quote'; blocks: Block[] }
+  | { kind: 'image'; alt: string; src: string }
   | { kind: 'rule' };
 
 const FENCE = /^\s*```(\S*)\s*$/;
@@ -22,6 +24,7 @@ const HEADING = /^(#{1,6})\s+(.*?)\s*#*\s*$/;
 const RULE = /^\s*(-{3,}|\*{3,})\s*$/;
 const LIST = /^(\s*)([-*]|(\d+)\.)\s+(.*)$/;
 const TASK = /^\[([ xX])\]\s+(.*)$/;
+const IMAGE = /^\s*!\[([^\]]*)\]\(([^()\s]+)\)\s*$/;
 const TABLE_SEPARATOR = /^\s*\|?\s*:?-+:?\s*(\|\s*:?-+:?\s*)*\|?\s*$/;
 
 const isBlank = (line: string | undefined) => line === undefined || line.trim() === '';
@@ -115,6 +118,13 @@ const parseLines = (lines: string[], ids: Map<string, number>): Block[] => {
       continue;
     }
 
+    const image = IMAGE.exec(line);
+    if (image) {
+      blocks.push({ kind: 'image', alt: image[1], src: image[2] });
+      i += 1;
+      continue;
+    }
+
     if (RULE.test(line)) {
       blocks.push({ kind: 'rule' });
       i += 1;
@@ -165,6 +175,7 @@ const parseLines = (lines: string[], ids: Map<string, number>): Block[] => {
       i < lines.length &&
       !isBlank(lines[i]) &&
       !FENCE.test(lines[i]) &&
+      !IMAGE.test(lines[i]) &&
       !HEADING.test(lines[i]) &&
       !LIST.test(lines[i]) &&
       !isQuote(lines[i]) &&

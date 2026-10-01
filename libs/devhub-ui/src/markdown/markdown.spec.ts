@@ -86,6 +86,24 @@ describe('parseMarkdown', () => {
     expect(table.rows[0].map(inlineText)).toEqual(['x | y', 'z']);
   });
 
+  it('reads an image on its own line as a block, and keeps an inline one as alt text', () => {
+    const blocks = parseMarkdown(
+      '앞 문단\n\n![그림 설명](../images/a.svg)\n\n글 ![배지](b.svg) 끝',
+    );
+    expect(blocks).toEqual([
+      { kind: 'paragraph', inline: [{ kind: 'text', text: '앞 문단' }] },
+      { kind: 'image', alt: '그림 설명', src: '../images/a.svg' },
+      {
+        kind: 'paragraph',
+        inline: [
+          { kind: 'text', text: '글 ' },
+          { kind: 'image', alt: '배지' },
+          { kind: 'text', text: ' 끝' },
+        ],
+      },
+    ]);
+  });
+
   it('keeps fenced code verbatim, quotes, and rules', () => {
     const blocks = parseMarkdown(
       '```bash\n# not a heading\n  pnpm i\n```\n\n> **주의**\n> 끝\n\n---',

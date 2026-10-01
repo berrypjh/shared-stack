@@ -14,7 +14,10 @@ import { CopyButton } from './copy-button';
 /** 문서에 적힌 링크 하나를 그린다. 어디로 갈지(앱 안 문서 · 저장소 파일 · 밖)는 앱이 정한다. */
 export type RenderLink = (href: string, children: ReactNode) => ReactNode;
 
-type Context = { renderLink: RenderLink; caption: string };
+/** 문서에 적힌 그림 경로를 브라우저가 불러올 주소로. 모르는 경로면 `undefined` — 그림 대신 설명만 남는다. */
+export type ResolveImage = (src: string) => string | undefined;
+
+type Context = { renderLink: RenderLink; caption: string; resolveImage?: ResolveImage };
 
 const Inlines = ({ nodes, renderLink }: { nodes: Inline[]; renderLink: RenderLink }) =>
   nodes.map((node, index) => {
@@ -103,6 +106,28 @@ const CodeBlock = ({ lang, text }: { lang: string; text: string }) => (
   </div>
 );
 
+/** 문서가 참조하는 그림. 설명(alt)은 캡션으로도 보인다 — 그림만 있는 자리를 만들지 않는다. */
+const DocImage = ({
+  block,
+  resolveImage,
+}: {
+  block: Extract<Block, { kind: 'image' }>;
+  resolveImage?: ResolveImage;
+}) => {
+  const url = resolveImage?.(block.src);
+  if (!url) return <p>{block.alt}</p>;
+  return (
+    <figure className="flex flex-col items-center gap-sm">
+      <img
+        src={url}
+        alt={block.alt}
+        className="h-auto w-full max-w-[36rem] rounded-md border border-stroke-light"
+      />
+      <figcaption className="typo-caption-small text-text-light">{block.alt}</figcaption>
+    </figure>
+  );
+};
+
 /** 체크 목록의 칸은 글리프와 숨은 글로 — 입력처럼 보이지만 조작할 수 없는 것을 만들지 않는다. */
 const ItemBody = ({ item, context }: { item: ListItem; context: Context }) => {
   const [first] = item.blocks;
@@ -180,6 +205,8 @@ const Blocks = ({ blocks, context }: { blocks: Block[]; context: Context }): Rea
             </Table>
           </TableScroll>
         );
+      case 'image':
+        return <DocImage key={index} block={block} resolveImage={context.resolveImage} />;
       case 'code':
         return <CodeBlock key={index} lang={block.lang} text={block.text} />;
       case 'quote':
@@ -206,12 +233,15 @@ export const DocContent = ({
   blocks,
   title,
   renderLink,
+  resolveImage,
   hash = '',
 }: {
   blocks: Block[];
   /** 표 캡션의 기본값. 절 제목이 나오면 그 제목으로 바뀐다. */
   title: string;
   renderLink: RenderLink;
+  /** 그림 경로를 주소로. 없으면 그림은 설명 글로만 보인다. */
+  resolveImage?: ResolveImage;
   /** 주소의 `#…`. 앱의 라우터에서 읽어 넘긴다. */
   hash?: string;
 }) => {
@@ -228,7 +258,7 @@ export const DocContent = ({
   }, [blocks, hash]);
   return (
     <article className="devhub-prose max-w-[46rem] min-w-0">
-      <Blocks blocks={blocks} context={{ renderLink, caption: title }} />
+      <Blocks blocks={blocks} context={{ renderLink, caption: title, resolveImage }} />
     </article>
   );
 };

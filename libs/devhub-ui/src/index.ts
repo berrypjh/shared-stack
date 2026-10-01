@@ -22,7 +22,7 @@ export {
 export { type Bar, BarChart, type BarGroup } from './chart/bar-chart';
 export { CommandList } from './doc/command-list';
 export { CopyButton } from './doc/copy-button';
-export { DocContent, type RenderLink } from './doc/doc-content';
+export { DocContent, type RenderLink, type ResolveImage } from './doc/doc-content';
 export { DocToc } from './doc/doc-toc';
 export {
   DocumentColumn,
