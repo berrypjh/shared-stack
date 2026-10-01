@@ -3,7 +3,7 @@ import { MemoryRouter } from 'react-router-dom';
 
 import { catalog } from '@/data';
 
-import App from './app';
+import App from '../app';
 
 const renderAt = (path: string) =>
   render(

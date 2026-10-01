@@ -11,7 +11,6 @@ export const VIEW_STATE_KINDS = [
   'error',
   'partial',
   'unsupported',
-  'not-applicable',
   'stale',
   'no-match',
 ] as const;
@@ -26,30 +25,29 @@ export const VIEW_STATE_LABEL: Record<ViewStateKind, string> = {
   error: '오류',
   partial: '일부만 수집',
   unsupported: '이 실행에 없음',
-  'not-applicable': '해당 없음',
   stale: '기준과 다른 source',
   'no-match': '일치 없음',
 };
 
-const NEW_RUN = '<새-run-id>';
+/** 평가 묶음을 채우는 수집 profile. 평가 항목(`data/evaluations.ts`)의 `collectProfile` 이다. */
+export type CollectProfile = 'core' | 'eval';
 
 /**
- * 수집 명령. eval profile 은 harness 가 쓴 폴더를 `--from` 으로 받아야 한다 — 없으면 CLI 가 거부한다.
- * 그 폴더는 실행마다 달라 자리표시로 둔다.
+ * 수집 명령. profile 마다 한 줄로 수집 · DevHub 로 내보내기까지 하고 run id 는 시각으로 만든다
+ * (`tools/scripts/observability/cli.ts` 의 `run`).
  */
-export const collectCommand = (profile: string, runId = NEW_RUN) =>
-  profile === 'eval'
-    ? `pnpm quality:collect --profile=eval --from=tmp/llm-evals/<평가-폴더> --run-id=${runId}`
-    : `pnpm quality:collect --profile=${profile} --run-id=${runId}`;
-export const exportCommand = (runId = NEW_RUN) => `pnpm quality:export --run-id=${runId}`;
+export const collectCommand = (profile: CollectProfile) => `pnpm quality:${profile}`;
+/** 이미 수집한 실행을 DevHub 로 다시 내보낸다. */
+export const exportCommand = (runId: string) => `pnpm quality:export --run-id=${runId}`;
 export const SERVE_COMMAND = 'pnpm dev:devhub';
 
-export const emptyState = (): ViewState => ({
+/** 수집한 실행이 없음. 명령은 보고 있는 항목의 영역을 담는 `collectProfile` 로 준다. */
+export const emptyState = (collectProfile: CollectProfile): ViewState => ({
   kind: 'empty',
   title: '아직 수집한 실행이 없음',
   cause:
     '공개 index.json 이 없거나 비어 있음. 브라우저는 명령을 실행하지 않음 — 아래 명령을 로컬에서 실행 필요.',
-  commands: [collectCommand('static'), exportCommand()],
+  commands: [collectCommand(collectProfile)],
 });
 
 export const loadingState = (what: string): ViewState => ({
@@ -77,7 +75,15 @@ const PROBLEM_TEXT = {
   },
 } as const;
 
-export const loadErrorState = (problem: LoadProblem, runId?: string): ViewState => ({
+/**
+ * 공개 파일을 읽지 못함. 실행이 정해졌으면 그 실행을 다시 export 하고, index 부터 못 읽었으면
+ * `collectProfile` 로 새로 수집하는 명령을 준다.
+ */
+export const loadErrorState = (
+  problem: LoadProblem,
+  runId?: string,
+  collectProfile?: CollectProfile,
+): ViewState => ({
   kind: 'error',
   title: PROBLEM_TEXT[problem.status].title,
   cause: `${PROBLEM_TEXT[problem.status].cause} — ${problem.message}`,
@@ -86,7 +92,9 @@ export const loadErrorState = (problem: LoadProblem, runId?: string): ViewState 
       ? [SERVE_COMMAND]
       : runId
         ? [exportCommand(runId)]
-        : [collectCommand('static'), exportCommand()],
+        : collectProfile
+          ? [collectCommand(collectProfile)]
+          : [],
 });
 
 export const queryErrorState = (issues: string[]): ViewState => ({
@@ -103,6 +111,26 @@ export const runNotFoundState = (runId: string, runIds: string[]): ViewState => 
   commands: [],
 });
 
+/**
+ * 공개 실행 중 이 영역을 담은 것이 없음. 요약을 읽지 못한 실행은 영역을 모르므로 따로 말한다.
+ */
+export const noAreaRunState = ({
+  section,
+  collectProfile,
+  unreadable,
+}: {
+  section: string;
+  collectProfile: CollectProfile;
+  unreadable: string[];
+}): ViewState => ({
+  kind: 'unsupported',
+  title: `이 영역이 있는 공개 실행이 없음 — ${section}`,
+  cause:
+    `${collectProfile} profile 로 수집한 실행이 있어야 함.` +
+    (unreadable.length > 0 ? ` 요약을 읽지 못한 실행: ${unreadable.join(', ')}` : ''),
+  commands: [collectCommand(collectProfile)],
+});
+
 export const partialState = (runId: string): ViewState => ({
   kind: 'partial',
   title: '일부만 수집된 실행',
@@ -110,12 +138,12 @@ export const partialState = (runId: string): ViewState => ({
   commands: [],
 });
 
-export const staleState = (freshness: Freshness, profile: string): ViewState => ({
+export const staleState = (freshness: Freshness, collectProfile: CollectProfile): ViewState => ({
   kind: 'stale',
   title:
     freshness.status === 'stale' ? '기준 source 와 다른 실행' : 'source 를 기준과 비교할 수 없음',
   cause: freshness.reason,
-  commands: [collectCommand(profile)],
+  commands: [collectCommand(collectProfile)],
 });
 
 export const unsupportedState = ({
@@ -128,7 +156,7 @@ export const unsupportedState = ({
   section: string;
   runId: string;
   profile: string;
-  collectProfile: string;
+  collectProfile: CollectProfile;
   /** null 이면 요약으로 다른 실행을 알 수 없어 말하지 않는다. */
   alternatives: string[] | null;
 }): ViewState => ({
@@ -158,7 +186,7 @@ export const notRunState = ({
   section: string;
   runId: string;
   reason: string;
-  collectProfile: string;
+  collectProfile: CollectProfile;
   alternatives: string[] | null;
 }): ViewState => ({
   kind: 'unsupported',
@@ -171,13 +199,6 @@ export const notRunState = ({
         ? ` 이 영역을 측정한 실행: ${alternatives.join(', ')}`
         : ' 이 영역을 측정한 공개 실행이 없음.'),
   commands: [collectCommand(collectProfile)],
-});
-
-export const notApplicableState = (reason: string): ViewState => ({
-  kind: 'not-applicable',
-  title: '보여 줄 값이 없는 영역',
-  cause: reason,
-  commands: [],
 });
 
 export const noMatchState = (description: string): ViewState => ({

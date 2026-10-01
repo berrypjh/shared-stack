@@ -5,7 +5,7 @@ import { catalog } from '@/data';
 import { RECORDS_NEWEST_FIRST } from '@/lib/catalog/entities';
 import { RECORD_KIND } from '@/lib/catalog/labels';
 
-import App from './app';
+import App from '../app';
 
 /** 기록 본문은 문서처럼 `use()` 로 원문을 기다린다 — `await act` 로 렌더한다. */
 const renderAt = (path: string) =>

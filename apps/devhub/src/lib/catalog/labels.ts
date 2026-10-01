@@ -1,5 +1,6 @@
 import type {
   Application,
+  Evaluation,
   EvidenceGap,
   Journey,
   PackageKind,
@@ -75,6 +76,13 @@ export const JOURNEY_KIND: Record<Journey['kind'], string> = {
   measure: '측정',
   eval: '소비자 평가',
   dev: '개발',
+};
+
+/** 평가 항목의 묶음. 이 순서가 탐색기 순서다. */
+export const EVALUATION_KIND: Record<Evaluation['kind'], string> = {
+  bundle: '번들',
+  context: '컨텍스트',
+  eval: '소비자 평가',
 };
 
 /** 플러그인의 묶음. 이 순서가 탐색기 순서다. */

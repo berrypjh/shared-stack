@@ -34,7 +34,7 @@ export const Entries = ({ inspection }: { inspection: Inspection }) => {
           ? '소비자가 import 하는 경로. dist 안의 다른 파일을 직접 import 하지 않음'
           : '워크스페이스 안에서만 import 함. 배포되지 않아 소비자 API 가 아님'}
       </p>
-      <DataTable caption="진입점" headers={['import 경로', '파일', '출처']} hiddenCaption>
+      <DataTable caption="진입점" headers={['import 경로', '파일', '출처']}>
         {exports.entries.map((entry) => (
           <tr key={entry.specifier}>
             <th scope="row">
@@ -62,7 +62,7 @@ const SettingsTable = ({ specifier, items }: { specifier: string; items: readonl
     <h3 id={`settings-${specifier}`} className="typo-body-medium-strong font-mono">
       {specifier}
     </h3>
-    <DataTable caption={`${specifier} 설정`} headers={['규칙', '값', '설명']} hiddenCaption>
+    <DataTable caption={`${specifier} 설정`} headers={['규칙', '값', '설명']}>
       {items.map((item) => (
         <tr key={item.evidence.symbol}>
           <th scope="row" className="whitespace-nowrap">
@@ -100,7 +100,7 @@ export const Settings = ({ pkg }: { pkg: Package }) => {
 const RelationTable = ({ title, items }: { title: string; items: RelationItem[] }) => (
   <div className="flex flex-col gap-sm">
     <h3 className="typo-body-medium-strong">{title}</h3>
-    <DataTable caption={title} headers={['항목', '관계', '근거']} hiddenCaption>
+    <DataTable caption={title} headers={['항목', '관계', '근거']}>
       {items.map(({ relation, other }) => (
         <tr key={relation.id}>
           <th scope="row">

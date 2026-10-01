@@ -54,6 +54,7 @@ describe('primary metric — 원본 이름·분자·분모·n 그대로', () => 
     const { primary } = byVariant('consumer-docs');
     expect(metricText(primary.medianInputTokens, 'tokens')).toBe('1,000 tokens (n=4)');
     expect(metricText(primary.requiredEvidenceRecallAtK, 'mean')).toBe('0.83 (n=3)');
+    expect(metricText(primary.requiredEvidenceRecallAtK, 'percent')).toBe('83.3% (n=3)');
   });
 
   it('값이 없으면 0 이 아니라 N/A 와 원본 이유다', () => {
@@ -115,23 +116,21 @@ describe('confusionGrid — expected 4행 × predicted 5열 고정', () => {
 });
 
 describe('retrieval', () => {
-  it('required evidence 가 없으면 recall·RR 은 N/A 다', () => {
+  it('필요한 근거가 없는 과제는 찾은 수 · 순서가 N/A 다', () => {
     const noUi = run.traces.find((trace) => trace.taskId === 'no-ui-date-format');
     expect(noUi && retrievalText(noUi.retrieval)).toEqual({
-      recall: 'N/A — required evidence 없음',
-      reciprocalRank: 'N/A — required evidence 없음',
-      firstHitRank: 'N/A — required evidence 없음',
+      hits: 'N/A — 필요한 근거 없음',
+      firstHitRank: 'N/A',
     });
   });
 
-  it('값이 있으면 소수와 순위를 그대로 쓴다', () => {
+  it('찾은 수 / 필요한 수와 원본 recall, 처음 찾은 순서를 그대로 쓴다', () => {
     const helper = run.traces.find(
       (trace) => trace.id === 'consumer-docs::web-textfield-helper::1',
     );
     expect(helper && retrievalText(helper.retrieval)).toEqual({
-      recall: '0.50',
-      reciprocalRank: '0.50',
-      firstHitRank: '2',
+      hits: '2 / 4 (50.0%)',
+      firstHitRank: '2번째',
     });
   });
 });
@@ -170,15 +169,14 @@ describe('contextEmptyState — scope 에 행이 없을 때', () => {
   const of = (scope: Parameters<typeof contextEmptyState>[0]['scope'], evals = [run]) =>
     contextEmptyState({ scope, runId: 'run-eval', profile: 'eval', evals });
 
-  it('agent-input 은 측정하는 수집기가 없다고 쓰고 수집 명령을 주지 않는다', () => {
+  it('agent-input 은 live 평가에서만 생긴다고 쓰고 live 명령을 준다', () => {
     const state = of('agent-input', [noContext]);
     expect(state).toMatchObject({
-      kind: 'not-applicable',
-      title: '이 영역을 측정하는 수집기가 아직 없음 — agent-input context 측정',
-      commands: [],
+      kind: 'unsupported',
+      title: 'run-eval 에는 실제 입력이 없음 — agent-input context 측정',
+      commands: ['pnpm quality:eval:live --provider=<제공자> --model=<모델>'],
     });
-    expect(state.cause).toContain('아직 어느 수집기도 측정하지 않음');
-    expect(state.cause).not.toContain('profile');
+    expect(state.cause).toContain('모델을 실제로 호출한 live 평가에서만 생김');
   });
 
   it('variant scope 는 context import 실패 이유를 쓴다', () => {
@@ -192,6 +190,6 @@ describe('contextEmptyState — scope 에 행이 없을 때', () => {
   it('package-scenario 는 core profile 수집 명령을 준다', () => {
     const state = of('package-scenario');
     expect(state.title).toBe('run-eval 에는 이 영역이 없음 — package-scenario context 측정');
-    expect(state.commands).toEqual(['pnpm quality:collect --profile=core --run-id=<새-run-id>']);
+    expect(state.commands).toEqual(['pnpm quality:core']);
   });
 });

@@ -69,8 +69,25 @@ export const sizeLimitRows = (
       baseline: baselineCellOf(measurement, baseline),
     }));
 
-export const TREESHAKE_KINDS = ['single', 'multi', 'all-exports', 'other'] as const;
-export type TreeshakeKind = (typeof TREESHAKE_KINDS)[number];
+/** package 소제목 아래에서 쓰는 case 이름. 수집기가 앞에 붙인 `<package> — ` 를 뗀다. */
+export const caseLabel = (measurement: BundleMeasurement) => {
+  const prefix = `${measurement.package} — `;
+  return measurement.caseName.startsWith(prefix)
+    ? measurement.caseName.slice(prefix.length)
+    : measurement.caseName;
+};
+
+/** budget 행들의 측정 조건(method · 압축 · 조정 · target · 도구). 모든 행이 같으면 하나다. */
+export const sizeLimitConditions = (rows: SizeLimitRow[]) => [
+  ...new Set(
+    rows.map(
+      ({ measurement: m }) =>
+        `${m.method} · ${m.compression} · ${m.adjustment} · ${m.target} · ${m.tool.name} ${m.tool.version}`,
+    ),
+  ),
+];
+
+export type TreeshakeKind = 'single' | 'multi' | 'all-exports' | 'other';
 
 /** 수집기(`normalizers/bundle.ts`)가 붙인 scenario 이름 접두어로 종류를 읽는다. */
 export const treeshakeKindOf = (caseName: string): TreeshakeKind => {
@@ -114,32 +131,39 @@ export const treeshakeGroups = (bundles: BundleMeasurement[]): TreeshakeGroup[] 
   }));
 };
 
-export type TreeshakeCompression = 'none' | 'gzip';
+export type GzipBar = { caseName: string; value: number | null; reason: string | null };
 
-export type GroupedBar = {
-  caseName: string;
-  kind: TreeshakeKind;
-  value: number | null;
-  reason: string | null;
-};
-
-/** 한 압축 안에서만 축을 잡는다. 값이 없는 막대는 value null 과 이유로 남는다. */
-export const groupedBars = (
+/**
+ * gzip 막대. all-exports 는 막대가 아니라 기준 값으로 떼어 낸다 — 축에 넣으면 심볼 하나짜리 막대가
+ * 보이지 않을 만큼 짧아진다. 축은 남은 막대의 최댓값이고, 값이 없는 막대는 value null 과 이유로 남는다.
+ */
+export const gzipBars = (
   group: TreeshakeGroup,
-  compression: TreeshakeCompression,
-): { max: number | null; bars: GroupedBar[] } => {
-  const bars = group.scenarios.map((scenario) => {
-    const row = compression === 'none' ? scenario.raw : scenario.gzip;
-    return {
-      caseName: scenario.caseName,
-      kind: scenario.kind,
-      value: row?.value ?? null,
-      reason: row ? row.reason : '이 압축으로 측정한 행이 없음',
-    };
+): { baseline: GzipBar | null; max: number | null; bars: GzipBar[] } => {
+  const toBar = (scenario: TreeshakeScenario): GzipBar => ({
+    caseName: scenario.caseName,
+    value: scenario.gzip?.value ?? null,
+    reason: scenario.gzip ? scenario.gzip.reason : 'gzip 으로 측정한 행이 없음',
   });
+  const baseline = group.scenarios.find((scenario) => scenario.kind === 'all-exports');
+  const bars = group.scenarios.filter((scenario) => scenario !== baseline).map(toBar);
   const values = bars.flatMap((bar) => (bar.value === null ? [] : [bar.value]));
-  return { max: values.length === 0 ? null : Math.max(...values), bars };
+  return {
+    baseline: baseline ? toBar(baseline) : null,
+    max: values.length === 0 ? null : Math.max(...values),
+    bars,
+  };
 };
+
+/** 표 행들의 측정 조건(method · target · 조정). 모든 행이 같으면 하나다. */
+export const treeshakeConditions = (group: TreeshakeGroup) => [
+  ...new Set(
+    group.scenarios.flatMap((scenario) => {
+      const sample = scenario.raw ?? scenario.gzip;
+      return sample ? [`${sample.method} · ${sample.target} · ${sample.adjustment}`] : [];
+    }),
+  ),
+];
 
 /** 측정값 글. 값이 없으면 N/A 와 수집기의 이유다. */
 export const valueText = (measurement: BundleMeasurement) =>
@@ -163,6 +187,3 @@ export const byPackage = <T>(items: T[], packageOf: (item: T) => string): [strin
     groups.set(packageOf(item), [...(groups.get(packageOf(item)) ?? []), item]);
   return [...groups];
 };
-
-/** 번들 화면이 받는 query. */
-export const BUNDLES_QUERY = { keys: ['run', 'base', 'package'] } as const;

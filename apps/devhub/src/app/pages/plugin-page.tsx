@@ -1,4 +1,5 @@
 import {
+  CopyCommand,
   DocumentColumn,
   Inspector,
   useDocumentTitle,
@@ -10,7 +11,6 @@ import { useParams } from 'react-router-dom';
 
 import { Code } from '@/components/entity/entity-detail';
 import { EntityNotFound, placeOf } from '@/components/entity/entity-not-found';
-import { CopyCommand } from '@/components/evaluation/copy-command';
 import { PluginInspector } from '@/components/plugin/plugin-inspector';
 import { PluginContents, PluginSurfaces } from '@/components/plugin/plugin-surfaces';
 import { SECTION_ICON } from '@/components/ui/view-icons';

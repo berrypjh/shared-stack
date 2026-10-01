@@ -2,7 +2,6 @@
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { EVALUATION_SCREENS } from '../../lib/evaluation/screens';
 import { catalog } from '../index';
 
 /** 카탈로그가 설명하는 저장소. 읽기만 한다. */
@@ -15,7 +14,7 @@ const ownerIds = new Set([...entityIds, catalog.repository.id]);
 const contextIds = new Set(contexts.map((context) => context.id));
 const testIds = new Set(catalog.tests.map((suite) => suite.id));
 const documentIds = new Set(catalog.documents.map((doc) => doc.id));
-const screenIds = new Set<string>(EVALUATION_SCREENS.map((screen) => screen.id));
+const evaluationIds = new Set(catalog.evaluations.map((item) => item.id));
 const steps = journeys.flatMap((journey) => journey.steps.map((step) => ({ journey, step })));
 const where = (journeyId: string, stepId: string) => `${journeyId}/${stepId}`;
 const duplicates = (ids: string[]) => ids.filter((id, index) => ids.indexOf(id) !== index);
@@ -74,7 +73,7 @@ describe('journey graph', () => {
 });
 
 describe('journey references', () => {
-  it('resolve owners, contexts, tests, documents, and evaluation screens', () => {
+  it('resolve owners, contexts, tests, documents, and evaluation items', () => {
     const broken = steps.flatMap(({ journey, step }) => {
       const at = where(journey.id, step.id);
       return [
@@ -82,7 +81,7 @@ describe('journey references', () => {
         ...(contextIds.has(step.context) ? [] : [`${at} context ${step.context}`]),
         ...step.tests.filter((id) => !testIds.has(id)).map((id) => `${at} test ${id}`),
         ...step.docs.filter((id) => !documentIds.has(id)).map((id) => `${at} doc ${id}`),
-        ...(step.evaluation === undefined || screenIds.has(step.evaluation)
+        ...(step.evaluation === undefined || evaluationIds.has(step.evaluation)
           ? []
           : [`${at} evaluation ${step.evaluation}`]),
       ];

@@ -1,8 +1,8 @@
+import { LabeledSelect } from '@berrypjh/devhub-ui';
 import { Button } from '@berrypjh/react-ui';
 
 import { VIEW_STATE_LABEL } from '@/lib/evaluation/status';
 
-import { LabeledSelect } from './labeled-select';
 import type { RunData } from './use-run-data';
 
 /**

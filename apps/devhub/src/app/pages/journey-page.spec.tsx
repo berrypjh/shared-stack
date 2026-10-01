@@ -8,7 +8,7 @@ import { catalog } from '@/data';
 import { flowModel } from '@/lib/catalog/flow';
 import { JOURNEY_KIND } from '@/lib/catalog/labels';
 
-import App from './app';
+import App from '../app';
 
 const renderAt = (path: string) =>
   render(
@@ -169,11 +169,11 @@ describe('step inspector', () => {
     ).toEqual(step?.commands?.map((command) => `명령 복사: ${command}`));
   });
 
-  it('continues the last eval step into its evaluation screen', () => {
+  it('continues the last eval step into its evaluation item', () => {
     renderAt('/journeys/eval-run/steps/collect');
     const next = within(inspector()).getByRole('region', { name: /^다음 단계/ });
-    expect(hrefs(within(next).getAllByRole('link'))).toEqual(['/evaluation/ai']);
-    expect(next.textContent).toContain('평가 · AI 평가');
+    expect(hrefs(within(next).getAllByRole('link'))).toEqual(['/evaluation/eval-scorecard']);
+    expect(next.textContent).toContain('평가 · 성적표');
   });
 
   it('lists the recorded gap of a step', () => {

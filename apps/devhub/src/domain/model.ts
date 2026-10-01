@@ -364,7 +364,7 @@ export type JourneyStep = {
   readonly docs: readonly string[];
   /** 이어질 수 있는 단계 ID. 끝이면 비어 있다. */
   readonly next: readonly string[];
-  /** 이 단계의 결과를 보이는 평가 화면 ID(`lib/evaluation/screens.ts`). */
+  /** 이 단계의 결과를 보이는 평가 항목 ID(`data/evaluations.ts`). */
   readonly evaluation?: string;
   readonly gaps?: readonly EvidenceGap[];
 };
@@ -396,6 +396,24 @@ export type RepositorySnapshot = {
   readonly uncommitted: readonly string[] | null;
 };
 
+/** 평가 항목의 묶음. 수집 영역(`observability-contracts` 의 domain)과 같다. */
+export type EvaluationKind = 'bundle' | 'context' | 'eval';
+
+/**
+ * 평가 섹션의 항목 하나 — 무엇을 재는가. 값은 build 에 묶지 않고, 화면이 고른 실행의
+ * 공개 JSON(`public/observability`)에서 읽는다.
+ */
+export type Evaluation = {
+  readonly id: string;
+  readonly kind: EvaluationKind;
+  readonly title: string;
+  readonly summary: string;
+  /** 이 값을 모으는 수집 profile. 고른 실행에 값이 없을 때 안내 명령에 쓴다. */
+  readonly collectProfile: 'core' | 'eval';
+  /** 측정을 정의하는 저장소 파일. */
+  readonly sources: readonly SourceRef[];
+};
+
 export type Catalog = {
   readonly repository: Repository;
   readonly applications: readonly Application[];
@@ -408,4 +426,5 @@ export type Catalog = {
   readonly tests: readonly TestSuite[];
   readonly contexts: readonly ExecutionContext[];
   readonly journeys: readonly Journey[];
+  readonly evaluations: readonly Evaluation[];
 };

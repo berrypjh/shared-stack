@@ -111,21 +111,18 @@ export const treeshake: Journey = {
       id: 'collect',
       intent: '평가 화면으로 가져옴',
       behavior:
-        'quality:collect 가 react-ui 의 정해진 심볼로 --json 진단을 돌려 저장하고 DevHub 로 내보냄',
+        'quality:core 가 react-ui 의 정해진 심볼로 --json 진단을 돌려 저장하고 DevHub 로 내보냄',
       context: 'workspace',
       owner: 'observability-collectors',
       status: 'implemented',
-      commands: [
-        'pnpm quality:collect --profile=core --run-id=<id>',
-        'pnpm quality:export --run-id=<id>',
-      ],
+      commands: ['pnpm quality:core'],
       source: [
         { path: 'tools/scripts/observability/registry.ts', symbol: 'bundle.treeshake.react-ui' },
       ],
       tests: ['tools-vitest'],
       docs: ['observability-usage'],
       next: [],
-      evaluation: 'bundles',
+      evaluation: 'treeshake',
     },
   ],
 };

@@ -4,7 +4,7 @@ import { MemoryRouter } from 'react-router-dom';
 import { catalog } from '@/data';
 import { titleText } from '@/lib/markdown/documents';
 
-import App from './app';
+import App from '../app';
 
 let scrollTo: ReturnType<typeof vi.spyOn>;
 beforeEach(() => {

@@ -19,6 +19,7 @@ export const stepHref = (journeyId: string, stepId: string) =>
 export const documentHref = (id: string) => `/documents/${id}`;
 export const recordHref = (id: string) => `/records/${id}`;
 export const RECORDS_HREF = '/records';
+export const evaluationHref = (id: string) => `/evaluation/${id}`;
 export const pluginHref = (id: string) => `/plugins/${id}`;
 
 /** 플러그인 화면 안의 skill · MCP 도구 자리. 검색 결과가 이 해시로 온다. */

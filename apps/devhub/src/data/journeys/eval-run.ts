@@ -80,7 +80,8 @@ export const evalRun: Journey = {
     {
       id: 'variant',
       intent: '에이전트에게 읽힐 컨텍스트를 고름',
-      behavior: 'A · B · C 에서 D1~D5 로 컨텍스트를 한 번에 하나씩 더함',
+      behavior:
+        '기준 셋(Full Source · Consumer Docs · Current Discovery)에서 시작해, 카탈로그 → 라우팅 → 표적 조회 → 검증 → 수정을 한 번에 하나씩 더함',
       context: 'workspace',
       owner: 'consumer-eval',
       status: 'implemented',

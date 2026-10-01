@@ -13,6 +13,8 @@ const captionOf = (entity: Entity) => {
   switch (entity.section) {
     case 'journeys':
       return `단계 ${entity.record.steps.length}개 · ${entity.record.goal}`;
+    case 'evaluation':
+      return entity.record.summary;
     case 'packages':
       return `${VISIBILITY[entity.record.visibility]} · ${entity.record.purpose}`;
     case 'plugins':

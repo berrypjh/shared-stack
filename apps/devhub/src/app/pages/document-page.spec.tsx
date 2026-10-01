@@ -8,7 +8,7 @@ import { catalog } from '@/data';
 import { loadDocument } from '@/lib/markdown/documents';
 import { SNAPSHOT } from '@/lib/repository/current-snapshot';
 
-import App from './app';
+import App from '../app';
 
 /**
  * 문서 본문은 `use()` 로 불러온 원문을 기다린다. React 19 는 동기 `act` 안에서 멈춘 컴포넌트를

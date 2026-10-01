@@ -8,6 +8,7 @@ import {
 } from '@berrypjh/observability-contracts';
 
 import { importReason, verificationCounts } from '@/lib/evaluation/ai';
+import { attemptName, failureTerm, VERIFICATION_KIND_LABEL } from '@/lib/evaluation/glossary';
 import { AUTHORITY_LABEL, REPAIR_LABEL, VERIFICATION_LABEL } from '@/lib/evaluation/labels';
 import { notRunState } from '@/lib/evaluation/status';
 
@@ -15,58 +16,77 @@ import { Section } from '../section';
 import { StatusNotice } from '../status-notice';
 
 const claimText = (claim: EvalTrace['claimedSuccess']) =>
-  claim === null ? '없음' : claim === 'unknown' ? '모름' : claim ? '성공 주장' : '주장 안 함';
+  claim === null
+    ? '보고 안 함'
+    : claim === 'unknown'
+      ? '모른다고 함'
+      : claim
+        ? '해냈다고 함'
+        : '못 했다고 함';
 
-const listText = (kinds: string[]) => kinds.join(', ') || '없음';
+const kindText = (kind: string) => VERIFICATION_KIND_LABEL[kind] ?? kind;
+const kindsText = (kinds: string[]) => kinds.map(kindText).join(', ') || '없음';
 
-const TraceRow = ({ trace }: { trace: EvalTrace }) => {
+/** 검증 내역 — 필수 검증과 실제로 돌린 검증. 기본은 접고, 펼치면 실패 출력 일부까지 본다. */
+const Runs = ({ trace }: { trace: EvalTrace }) => {
+  const { verification } = trace;
+  return (
+    <details>
+      <summary className="whitespace-nowrap">{`필수 ${verification.requiredKinds.length} · 돌림 ${verification.runs.length}`}</summary>
+      <p className="mt-xs typo-caption-small text-text-light">{`필수: ${kindsText(verification.requiredKinds)}`}</p>
+      {verification.runs.length === 0 ? (
+        <p className="typo-caption-small text-text-light">돌린 검증 없음</p>
+      ) : (
+        verification.runs.map((run, index) => (
+          <div key={`${run.kind}.${index}`} className="typo-caption-small">
+            {`${kindText(run.kind)} ${VERIFICATION_LABEL[run.status]}${run.required ? '' : ' (선택)'}${
+              run.attempt > 0 ? ` · ${run.attempt}번째 수정 뒤` : ''
+            }`}
+            {run.excerpt && (
+              <details>
+                <summary>출력 일부</summary>
+                <pre className="devhub-code break-all whitespace-pre-wrap">{run.excerpt}</pre>
+              </details>
+            )}
+          </div>
+        ))
+      )}
+    </details>
+  );
+};
+
+const TraceRow = ({ trace, repairColumn }: { trace: EvalTrace; repairColumn: boolean }) => {
   const { verification, success, repair } = trace;
   return (
     <tr>
-      <th scope="row">{trace.id}</th>
-      <td>{claimText(trace.claimedSuccess)}</td>
-      <td>{listText(verification.requiredKinds)}</td>
-      <td>
-        {verification.runs.length === 0
-          ? '실행한 run 없음'
-          : verification.runs.map((run, index) => (
-              <div key={`${run.kind}.${index}`}>
-                {`${run.kind} ${VERIFICATION_LABEL[run.status]} · ${run.required ? '필수' : '선택'} · attempt ${run.attempt}${
-                  run.exitCode === null ? '' : ` · exit ${run.exitCode}`
-                }`}
-                {run.excerpt && (
-                  <details>
-                    <summary>발췌</summary>
-                    <pre className="devhub-code break-all whitespace-pre-wrap">{run.excerpt}</pre>
-                  </details>
-                )}
-              </div>
-            ))}
-      </td>
-      <td>
-        {`누락 ${listText(verification.missingRequired)} · 실패 ${listText(
-          verification.failedRequired,
-        )} · 미지원 ${listText(verification.unsupportedRequired)}`}
-      </td>
-      <td>
+      <th scope="row" className="whitespace-nowrap">
+        {attemptName(trace)}
+      </th>
+      <td className="whitespace-nowrap">{claimText(trace.claimedSuccess)}</td>
+      <td className="whitespace-nowrap">
         {verification.passed === null ? '판정 없음' : verification.passed ? '통과' : '통과 못함'}
       </td>
-      <td>
-        {success.falseSuccess
-          ? 'false success'
-          : success.claimCounted
-            ? 'false success 아님'
-            : '분모 밖 (명시적 주장 없음)'}
+      <td className="break-keep">
+        {success.failureCategory ? failureTerm(success.failureCategory).label : '성공'}
       </td>
-      <td>{success.failureCategory ?? '없음'}</td>
+      <td className="whitespace-nowrap">
+        {success.falseSuccess ? '거짓 성공' : success.claimCounted ? '아님' : '셈에서 빠짐'}
+      </td>
+      {repairColumn && (
+        <td className="whitespace-nowrap">
+          {repair.attempts === 0
+            ? '없음'
+            : `${repair.attempts}번 · ${repair.succeeded ? '통과' : '통과 못함'}`}
+        </td>
+      )}
       <td>
-        {`attempts ${repair.attempts} · 성공 ${
-          repair.succeeded === null ? '없음' : repair.succeeded ? '예' : '아니오'
-        } · 반복 실패 ${repair.repeatedFailures ?? '없음'}`}
+        <Runs trace={trace} />
       </td>
     </tr>
   );
 };
+
+const STATUS_HEADERS = VERIFICATION_STATUSES.map((status) => VERIFICATION_LABEL[status] ?? status);
 
 const VariantVerification = ({
   variant,
@@ -77,27 +97,21 @@ const VariantVerification = ({
 }) => {
   const runCount = traces.reduce((sum, trace) => sum + trace.verification.runs.length, 0);
   const counts = verificationCounts(traces);
+  const repairColumn = variant.repair !== 'not-in-variant';
   return (
-    <Section title={variant.variant} level={3}>
-      <p className="typo-body-small text-text-default">
-        {`authority: ${AUTHORITY_LABEL[variant.verificationAuthority]}`}
-        <span className="block">{`repair: ${REPAIR_LABEL[variant.repair]}`}</span>
+    <Section title={variant.label} level={3}>
+      <p className="typo-body-small break-keep text-text-default">
+        {AUTHORITY_LABEL[variant.verificationAuthority]}
+        <span className="block">{REPAIR_LABEL[variant.repair]}</span>
       </p>
-      {runCount === 0 ? (
-        <p className="typo-body-small text-text-default">
-          {`verification run 없음 — ${variant.verificationAuthority}, 검증을 실행하지 않았음`}
-        </p>
-      ) : (
+      {runCount > 0 && (
         <DataTable
-          caption={`Verification run — kind × status · ${variant.variant}`}
-          headers={[
-            'kind',
-            ...VERIFICATION_STATUSES.map((status) => `${VERIFICATION_LABEL[status]} (${status})`),
-          ]}
+          caption={`검증 결과 수 — ${variant.label}`}
+          headers={['검증', ...STATUS_HEADERS]}
         >
           {VERIFICATION_KINDS.map((kind) => (
             <tr key={kind}>
-              <th scope="row">{kind}</th>
+              <th scope="row">{kindText(kind)}</th>
               {VERIFICATION_STATUSES.map((status) => {
                 const count = counts[kind][status];
                 return (
@@ -114,21 +128,19 @@ const VariantVerification = ({
         </DataTable>
       )}
       <DataTable
-        caption={`Verification — trace 별 · ${variant.variant}`}
+        caption={`시도 별 검증 — ${variant.label}`}
         headers={[
-          'trace',
-          'claimed',
-          'required kinds',
-          'runs',
-          '필수 누락 · 실패 · 미지원',
-          'verification',
-          'false success',
-          'failure category',
-          'repair',
+          '시도',
+          '에이전트의 말',
+          '결과',
+          '실패 원인',
+          '거짓 성공',
+          ...(repairColumn ? ['수정'] : []),
+          '검증 내역',
         ]}
       >
         {traces.map((trace) => (
-          <TraceRow key={trace.id} trace={trace} />
+          <TraceRow key={trace.id} trace={trace} repairColumn={repairColumn} />
         ))}
       </DataTable>
     </Section>
@@ -136,20 +148,21 @@ const VariantVerification = ({
 };
 
 /**
- * variant 마다 verification run 의 kind × status 수와 trace 별 판정. variant 는 summary 에서 오므로,
- * variant 가 없으면 summary import 상태가 이유다.
+ * variant 마다 검증을 누가 돌렸는지, 검증 종류 × 결과 수(돌렸을 때만), 시도 별 판정.
+ * variant 는 summary 에서 오므로, variant 가 없으면 summary import 상태가 이유다.
  */
 export const Verification = ({ evalRun, variant }: { evalRun: EvalRun; variant?: string }) => (
-  <Section title="Verification" anchor="verification">
+  <Section title="variant 별 검증" anchor="verification">
     <p className="typo-body-small break-keep text-text-light">
-      kind × status 의 단위는 verification run 수 (trace 수가 아님). unsupported·not-run 은 통과가
-      아님. 검증 대상 범위(targetScope)는 trace 계약에 없어 이 화면에 없음.
+      검증 결과 수의 단위는 검증 실행 횟수다 (시도 수가 아님 — 수정 뒤 다시 돌리면 또 센다). "지원
+      안 함" · "실행 안 함" 은 통과가 아니다. "셈에서 빠짐" 은 해냈는지 분명히 말하지 않아 거짓 성공
+      비율의 분모에 넣지 않은 시도다.
     </p>
     {evalRun.variants.length === 0 && (
       <StatusNotice
         level={3}
         state={notRunState({
-          section: 'verification',
+          section: '검증',
           runId: evalRun.sourceId,
           reason: importReason('summary', evalRun.import.summary),
           collectProfile: 'eval',

@@ -105,6 +105,9 @@ const citedRefs = (): { ref: SourceRef; origin: string }[] => [
     { ref: { path: record.path }, origin: record.id },
     ...record.sources.map((ref) => ({ ref, origin: `${record.id} source` })),
   ]),
+  ...catalog.evaluations.flatMap((item) =>
+    item.sources.map((ref) => ({ ref, origin: `${item.id} evaluation source` })),
+  ),
   ...tests.flatMap((suite) => [
     { ref: suite.config, origin: suite.id },
     ...(suite.files ?? []).map((ref) => ({ ref, origin: suite.id })),

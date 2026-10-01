@@ -8,8 +8,9 @@ import {
   budgetBarOf,
   byPackage,
   deltaText,
-  groupedBars,
+  gzipBars,
   sizeLimitRows,
+  treeshakeConditions,
   treeshakeGroups,
   treeshakeKindOf,
   valueText,
@@ -116,22 +117,27 @@ describe('treeshake', () => {
     ]);
   });
 
-  it('grouped bar 의 축은 한 압축 안에서만 잡고 값 없는 막대는 gap 으로 남긴다', () => {
+  it('gzip 막대는 all-exports 를 기준 값으로 떼고 남은 막대로 축을 잡으며 값 없는 막대는 gap 이다', () => {
     const [group] = treeshakeGroups(TREESHAKE_ROWS.map(parse));
-    expect(groupedBars(group, 'gzip')).toEqual({
-      max: 41200,
+    expect(gzipBars(group)).toEqual({
+      baseline: { caseName: 'all-exports (baseline)', value: 41200, reason: null },
+      max: 10697,
       bars: [
-        { caseName: 'single: cx', kind: 'single', value: 10697, reason: null },
+        { caseName: 'single: cx', value: 10697, reason: null },
         {
           caseName: 'multi: Box+Button',
-          kind: 'multi',
           value: null,
           reason: 'esbuild 번들 실패: No matching export "Missing"',
         },
-        { caseName: 'all-exports (baseline)', kind: 'all-exports', value: 41200, reason: null },
       ],
     });
-    expect(groupedBars(group, 'none').max).toBe(152300);
+  });
+
+  it('측정 조건은 행마다 반복하지 않고 서로 다른 것만 남긴다', () => {
+    const [group] = treeshakeGroups(TREESHAKE_ROWS.map(parse));
+    const conditions = treeshakeConditions(group);
+    expect(conditions).toHaveLength(1);
+    expect(conditions[0]).toContain('treeshake-esbuild');
   });
 });
 

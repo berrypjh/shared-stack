@@ -8,6 +8,7 @@ import type { SectionId, ViewId } from '@/lib/catalog/entities';
  */
 export const SECTION_ICON: Record<SectionId, IconName> = {
   journeys: 'flow',
+  evaluation: 'test',
   packages: 'package',
   plugins: 'plugin',
   documents: 'document',
@@ -17,6 +18,5 @@ export const SECTION_ICON: Record<SectionId, IconName> = {
 export const VIEW_ICON: Record<ViewId, IconName> = {
   overview: 'home',
   architecture: 'architecture',
-  evaluation: 'test',
   ...SECTION_ICON,
 };

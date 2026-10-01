@@ -58,19 +58,16 @@ export const bundleBudget: Journey = {
     {
       id: 'collect',
       intent: '평가 화면으로 가져옴',
-      behavior: 'quality:collect 가 size --json 을 돌려 budget 행을 저장하고 DevHub 로 내보냄',
+      behavior: 'quality:core 가 size --json 을 돌려 budget 행을 저장하고 DevHub 로 내보냄',
       context: 'workspace',
       owner: 'observability-collectors',
       status: 'implemented',
-      commands: [
-        'pnpm quality:collect --profile=core --run-id=<id>',
-        'pnpm quality:export --run-id=<id>',
-      ],
+      commands: ['pnpm quality:core'],
       source: [{ path: 'tools/scripts/observability/registry.ts', symbol: 'bundle.size-limit' }],
       tests: ['tools-vitest'],
       docs: ['observability-usage'],
       next: [],
-      evaluation: 'bundles',
+      evaluation: 'bundle-budget',
     },
   ],
 };

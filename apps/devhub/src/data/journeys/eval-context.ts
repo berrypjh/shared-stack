@@ -34,7 +34,8 @@ export const evalContext: Journey = {
     {
       id: 'measure',
       intent: 'variant 컨텍스트를 잼',
-      behavior: 'variant 가 읽히는 파일의 토큰을 세고, D2 이후는 플랫폼별로 따로 잼',
+      behavior:
+        'variant 가 읽히는 파일의 토큰을 세고, 라우팅이 있는 Catalog + Routing 부터는 플랫폼별로 따로 잼',
       context: 'workspace',
       owner: 'consumer-eval',
       status: 'implemented',

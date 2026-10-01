@@ -1,4 +1,10 @@
-import { CanvasEdges, CanvasViewport, INSPECTOR_ID, type Rect } from '@berrypjh/devhub-ui';
+import {
+  CanvasEdges,
+  CanvasViewport,
+  FilterEmpty,
+  INSPECTOR_ID,
+  type Rect,
+} from '@berrypjh/devhub-ui';
 import { SkipLink } from '@berrypjh/react-ui';
 
 import { Link } from 'react-router-dom';
@@ -11,15 +17,7 @@ import { boxOf, DASH, kindLine, LEGEND, nodeHref, platformLine } from './present
 
 /** 필터가 아무것도 남기지 않았을 때. 그림과 목록이 같은 글을 쓴다. */
 export const NoMatch = ({ clearHref }: { clearHref: string }) => (
-  <div
-    role="status"
-    className="flex flex-col gap-sm rounded-lg border border-dashed border-stroke-default p-xl typo-body-small"
-  >
-    <p>조건에 맞는 구성 요소가 없음.</p>
-    <Link to={clearHref} className="self-start text-text-link underline-offset-2 hover:underline">
-      필터 모두 해제
-    </Link>
-  </div>
+  <FilterEmpty message="조건에 맞는 구성 요소가 없음." clearHref={clearHref} />
 );
 
 const rectOf = (node: ArchNode): Rect => ({ x: node.x, y: node.y, ...NODE });

@@ -16,7 +16,8 @@ import {
   VERIFICATION_STATUSES,
 } from '@berrypjh/observability-contracts';
 
-import { notApplicableState, notRunState, unsupportedState, type ViewState } from './status';
+import { liveCommand } from './live';
+import { notRunState, unsupportedState, type ViewState } from './status';
 
 export type MetricGroup = keyof typeof EVAL_METRICS;
 export type PrimaryKey = keyof typeof EVAL_METRICS.primary;
@@ -25,10 +26,12 @@ export const PRIMARY_KEYS = Object.keys(EVAL_METRICS.primary) as PrimaryKey[];
 
 export const metricKeys = (group: MetricGroup) => Object.keys(EVAL_METRICS[group]);
 
-export type MetricFormat = 'rate' | 'mean' | 'tokens' | 'ms' | 'count';
+export type MetricFormat = 'rate' | 'mean' | 'percent' | 'tokens' | 'ms' | 'count';
 
 /** aggregate 의 단위. registry 에 없는 key 는 단위 없는 평균값으로 읽는다. */
 const AGGREGATE_FORMAT: Record<string, MetricFormat> = {
+  requiredEvidenceRecallAtK: 'percent',
+  verificationInvocationRate: 'percent',
   medianInputTokens: 'tokens',
   tokensPerSuccessfulTask: 'tokens',
   medianRetrievedTokens: 'tokens',
@@ -75,19 +78,22 @@ export const metricText = (metric: EvalRate | EvalAggregate, format: MetricForma
       return `${integer.format(metric.value)} ms ${n}`;
     case 'count':
       return `${integer.format(metric.value)} ${n}`;
+    case 'percent':
+      return `${(metric.value * 100).toFixed(1)}% ${n}`;
     default:
       return `${metric.value.toFixed(2)} ${n}`;
   }
 };
 
 /**
- * caption 에 붙는 출처 이름. variant metric 은 parsed summary 에서만 오고, 계약이 그때 origin 을
- * 함께 두게 한다 — scorecard 가 그려질 때 origin 이 없으면 계약 위반이라 이름을 지어내지 않고 던진다.
+ * caption 에 붙는 출처 이름 — 모델을 부른 실행은 모델 이름, 아니면 실행기 이름. variant metric 은
+ * parsed summary 에서만 오고, 계약이 그때 origin 을 함께 두게 한다 — scorecard 가 그려질 때 origin 이
+ * 없으면 계약 위반이라 이름을 지어내지 않고 던진다.
  */
 export const executorTag = (run: EvalRun) => {
   if (!run.origin)
     throw new Error(`${run.sourceId} 에 origin 이 없다 — variant 는 parsed summary 에서만 온다`);
-  return run.origin.executor;
+  return run.origin.model ?? run.origin.executor;
 };
 
 /** eval report import 상태를 not-run 이유 글로. */
@@ -126,16 +132,19 @@ export const confusionGrid = (matrix: ConfusionMatrix) =>
     return { expected, rowTotal: cells.reduce((sum, cell) => sum + cell.count, 0), cells };
   });
 
-const NO_EVIDENCE = 'N/A — required evidence 없음';
-
+/**
+ * 시도 하나의 근거 찾기 글. 찾은 수는 `hitsAtK / 필요 수 (recall)` 로 원본 값을 함께 쓰고, 필요한 근거가
+ * 없는 과제는 N/A 다.
+ */
 export const retrievalText = (retrieval: EvalTrace['retrieval']) => {
   if (retrieval.nullReason === 'no-required-evidence') {
-    return { recall: NO_EVIDENCE, reciprocalRank: NO_EVIDENCE, firstHitRank: NO_EVIDENCE };
+    return { hits: 'N/A — 필요한 근거 없음', firstHitRank: 'N/A' };
   }
+  const recall =
+    retrieval.recallAtK === null ? '' : ` (${(retrieval.recallAtK * 100).toFixed(1)}%)`;
   return {
-    recall: retrieval.recallAtK === null ? 'N/A' : retrieval.recallAtK.toFixed(2),
-    reciprocalRank: retrieval.reciprocalRank === null ? 'N/A' : retrieval.reciprocalRank.toFixed(2),
-    firstHitRank: retrieval.firstHitRank === null ? 'hit 없음' : String(retrieval.firstHitRank),
+    hits: `${retrieval.hitsAtK} / ${retrieval.requiredCount}${recall}`,
+    firstHitRank: retrieval.firstHitRank === null ? '못 찾음' : `${retrieval.firstHitRank}번째`,
   };
 };
 
@@ -161,7 +170,7 @@ export type ContextScope = ContextMeasurement['scope'];
 
 /**
  * 실행에 그 scope 의 context 행이 하나도 없을 때의 상태. 요약에는 context scope 가 없어 다른 실행에
- * 이 scope 가 있는지 말하지 않는다. `agent-input` 은 측정하는 수집기가 아직 없어 복사할 명령이 없다.
+ * 이 scope 가 있는지 말하지 않는다. `agent-input` 은 모델을 실제로 호출한 live 평가에서만 생긴다.
  */
 export const contextEmptyState = ({
   scope,
@@ -177,10 +186,10 @@ export const contextEmptyState = ({
   const section = `${scope} context 측정`;
   if (scope === 'agent-input') {
     return {
-      ...notApplicableState(
-        'executor trace 가 있을 때만 의미가 있는 scope 라 아직 어느 수집기도 측정하지 않음. 다시 수집해도 생기지 않음.',
-      ),
-      title: `이 영역을 측정하는 수집기가 아직 없음 — ${section}`,
+      kind: 'unsupported',
+      title: `${runId} 에는 실제 입력이 없음 — ${section}`,
+      cause: `모델을 실제로 호출한 live 평가에서만 생김. 이 실행은 ${profile} profile 이라 모델을 호출하지 않았음 — 키 · 비용 · 결과는 위 안내 참고.`,
+      commands: [liveCommand('<제공자>')],
     };
   }
   const failedImport = evals.find((item) => item.import.context.status !== 'parsed')?.import

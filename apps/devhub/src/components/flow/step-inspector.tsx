@@ -14,7 +14,7 @@ import { Link } from 'react-router-dom';
 
 import type { StepInspection } from '@/lib/catalog/inspect-step';
 import { GAP_KIND } from '@/lib/catalog/labels';
-import { stepHref } from '@/lib/catalog/routes';
+import { evaluationHref, stepHref } from '@/lib/catalog/routes';
 
 import {
   countByRunner,
@@ -123,8 +123,8 @@ export const StepInspector = ({ inspection }: { inspection: StepInspection }) =>
             {evaluation && (
               <ListItem>
                 →{' '}
-                <Link to={evaluation.path} className={LINK}>
-                  평가 · {evaluation.label}
+                <Link to={evaluationHref(evaluation.id)} className={LINK}>
+                  평가 · {evaluation.title}
                 </Link>
               </ListItem>
             )}

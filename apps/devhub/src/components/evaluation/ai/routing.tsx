@@ -1,40 +1,39 @@
-import { DataTable } from '@berrypjh/devhub-ui';
+import { DataTable, Mono } from '@berrypjh/devhub-ui';
 import {
   CONFUSION_PREDICTED,
   type ConfusionMatrix,
   type EvalRun,
 } from '@berrypjh/observability-contracts';
 
-import {
-  type ConfusionCell,
-  confusionGrid,
-  importReason,
-  routingMatrix,
-} from '@/lib/evaluation/ai';
-import { notRunState } from '@/lib/evaluation/status';
+import { type ConfusionCell, confusionGrid, routingMatrix } from '@/lib/evaluation/ai';
+import { attemptName, failureTerm, PLATFORM_TERMS } from '@/lib/evaluation/glossary';
 
 import { Section } from '../section';
-import { StatusNotice } from '../status-notice';
 
 const cellTone = (cell: ConfusionCell) =>
   cell.count === 0 ? '' : cell.diagonal ? 'bg-background-success/15' : 'bg-background-error/15';
 
 const correctText = (value: boolean | null) =>
-  value === null ? '판정 없음' : value ? '일치' : '불일치';
+  value === null ? '보고 안 함' : value ? '맞음' : '틀림';
 
-/** expected 행 × predicted 열 heatmap. 칸의 글이 곧 값이라 표와 차트가 같은 요소다. */
+const platform = (value: string) => PLATFORM_TERMS[value] ?? value;
+
+/** 정답 플랫폼(행) × 고른 플랫폼(열). 칸의 글이 곧 값이라 표와 차트가 같은 요소다. */
 const ConfusionTable = ({ caption, matrix }: { caption: string; matrix: ConfusionMatrix }) => (
   <div className="flex flex-col gap-xs">
-    <DataTable caption={caption} headers={['expected \\ predicted', ...CONFUSION_PREDICTED]}>
+    <DataTable
+      caption={caption}
+      headers={['정답 ↓ · 고른 것 →', ...CONFUSION_PREDICTED.map(platform)]}
+    >
       {confusionGrid(matrix).map((row) => (
         <tr key={row.expected}>
-          <th scope="row">{row.expected}</th>
+          <th scope="row">{platform(row.expected)}</th>
           {row.cells.map((cell) => (
             <td key={cell.predicted} data-count={cell.count} className={cellTone(cell)}>
               {cell.count}
               {cell.count > 0 && (
                 <span className="typo-caption-small text-text-light">
-                  {cell.diagonal ? ' 일치' : ' 불일치'}
+                  {cell.diagonal ? ' 맞음' : ' 틀림'}
                 </span>
               )}
             </td>
@@ -43,84 +42,87 @@ const ConfusionTable = ({ caption, matrix }: { caption: string; matrix: Confusio
       ))}
     </DataTable>
     <p className="typo-body-small text-text-default">
-      {`total ${matrix.total} · correct ${matrix.correct} · unreported ${matrix.unreported} · accuracy ${
-        matrix.accuracy === null ? 'N/A' : `${(matrix.accuracy * 100).toFixed(1)}%`
+      {`${matrix.total}번 중 ${matrix.correct}번 맞음 · 보고 안 함 ${matrix.unreported}번 · 정확도 ${
+        matrix.accuracy === null ? '계산할 수 없음' : `${(matrix.accuracy * 100).toFixed(1)}%`
       }`}
     </p>
   </div>
 );
 
-/** resolver 의 matrix 하나와 variant 마다 채점한 trace 의 matrix, 그리고 틀리거나 미보고인 trace. */
+/**
+ * variant 마다 정답 플랫폼과 고른 플랫폼을 맞대 본 표, 규칙 기반 판정기의 같은 표(있을 때만),
+ * 그리고 틀렸거나 보고하지 않은 시도.
+ */
 export const Routing = ({ evalRun, variant }: { evalRun: EvalRun; variant?: string }) => {
   const variants = evalRun.variants.filter((item) => !variant || item.variant === variant);
   const resolver = routingMatrix(evalRun, 'deterministic-resolver', null);
   const failures = evalRun.traces.filter(
     (trace) => (!variant || trace.variant === variant) && trace.routing.platformCorrect !== true,
   );
+  const labels = new Map(evalRun.variants.map((item) => [item.variant, item.label]));
 
   return (
-    <Section title="Routing" anchor="routing">
+    <Section title="variant 별 플랫폼 선택" anchor="routing">
       <p className="typo-body-small break-keep text-text-light">
-        행은 기대 platform, 열은 예측 platform. 순서는 고정이고 both·unreported 를 숨기지 않음. 칸의
-        0 은 관측한 0 이고, 결과 자체가 없는 matrix 는 표 대신 따로 알림.
+        행은 과제의 정답 플랫폼, 열은 에이전트가 고른 플랫폼이다. 대각선(초록)이 맞은 시도,
+        나머지(빨강)가 틀린 시도다. "보고 안 함" 은 끝낼 때 고른 플랫폼을 말하지 않은 시도다.
       </p>
-      {resolver ? (
-        <ConfusionTable caption="Routing — deterministic-resolver" matrix={resolver} />
-      ) : (
-        <StatusNotice
-          level={3}
-          state={notRunState({
-            section: 'deterministic resolver routing',
-            runId: evalRun.sourceId,
-            reason: importReason('routing', evalRun.import.routing),
-            collectProfile: 'eval',
-            alternatives: null,
-          })}
-        />
-      )}
       {variants.map((item) => {
         const matrix = routingMatrix(evalRun, 'trace-grades', item.variant);
-        return matrix ? (
-          <ConfusionTable
-            key={item.variant}
-            caption={`Routing — trace-grades · ${item.variant}`}
-            matrix={matrix}
-          />
-        ) : (
-          <StatusNotice
-            key={item.variant}
-            level={3}
-            state={notRunState({
-              section: `${item.variant} 의 trace-grades routing`,
-              runId: evalRun.sourceId,
-              reason: '이 variant 의 채점한 trace routing 결과가 없음',
-              collectProfile: 'eval',
-              alternatives: null,
-            })}
-          />
+        return (
+          <Section key={item.variant} title={item.label} level={3}>
+            {matrix ? (
+              <ConfusionTable caption={`플랫폼 선택 — ${item.label}`} matrix={matrix} />
+            ) : (
+              <p className="typo-body-small text-text-default">
+                이 variant 의 플랫폼 선택 결과가 없음.
+              </p>
+            )}
+          </Section>
         );
       })}
-      {failures.length === 0 ? (
-        <p className="typo-body-small text-text-light">
-          routing 이 틀리거나 미보고인 trace 가 없음.
+
+      <Section title="틀렸거나 보고하지 않은 시도" level={3}>
+        {failures.length === 0 ? (
+          <p className="typo-body-small text-text-default">모든 시도가 플랫폼을 맞게 골랐음.</p>
+        ) : (
+          <DataTable
+            caption="플랫폼을 틀렸거나 보고하지 않은 시도"
+            headers={['시도', 'variant', '정답', '고른 플랫폼', '플랫폼', '패키지', '실패 원인']}
+          >
+            {failures.map((trace) => (
+              <tr key={trace.id}>
+                <th scope="row">{attemptName(trace)}</th>
+                <td>{labels.get(trace.variant) ?? trace.variant}</td>
+                <td>{platform(trace.expectedPlatform)}</td>
+                <td>{trace.selectedPlatform ? platform(trace.selectedPlatform) : '보고 안 함'}</td>
+                <td>{correctText(trace.routing.platformCorrect)}</td>
+                <td>{correctText(trace.routing.packageCorrect)}</td>
+                <td>
+                  {trace.success.failureCategory
+                    ? failureTerm(trace.success.failureCategory).label
+                    : '없음'}
+                </td>
+              </tr>
+            ))}
+          </DataTable>
+        )}
+      </Section>
+
+      <Section title="비교용: 규칙 기반 판정기" level={3}>
+        <p className="typo-body-small break-keep text-text-light">
+          모델 없이 과제 문장과 프로젝트 의존성만 보고 플랫폼을 정하는 판정기다. 에이전트가 이보다
+          못하면 자료나 안내가 부족하다는 뜻이다.
         </p>
-      ) : (
-        <DataTable
-          caption="Routing 실패·미보고 trace"
-          headers={['trace', 'expected', 'selected', 'platform', 'package', 'failure category']}
-        >
-          {failures.map((trace) => (
-            <tr key={trace.id}>
-              <th scope="row">{trace.id}</th>
-              <td>{trace.expectedPlatform}</td>
-              <td>{trace.selectedPlatform ?? '미보고 (unreported)'}</td>
-              <td>{correctText(trace.routing.platformCorrect)}</td>
-              <td>{correctText(trace.routing.packageCorrect)}</td>
-              <td>{trace.success.failureCategory ?? '없음'}</td>
-            </tr>
-          ))}
-        </DataTable>
-      )}
+        {resolver ? (
+          <ConfusionTable caption="플랫폼 선택 — 규칙 기반 판정기" matrix={resolver} />
+        ) : (
+          <p className="typo-body-small break-keep text-text-default">
+            이 실행에는 판정기 결과가 없음 — 판정기 결과(<Mono>routing.json</Mono>)를 평가 산출물
+            폴더에 함께 둘 때만 생김.
+          </p>
+        )}
+      </Section>
     </Section>
   );
 };

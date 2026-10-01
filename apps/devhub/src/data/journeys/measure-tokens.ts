@@ -107,14 +107,11 @@ export const measureTokens: Journey = {
       id: 'collect',
       intent: '평가 화면으로 가져옴',
       behavior:
-        'quality:collect 가 같은 등록부의 시나리오를 in-process 로 세어 저장하고 DevHub 로 내보냄',
+        'quality:core 가 같은 등록부의 시나리오를 in-process 로 세어 저장하고 DevHub 로 내보냄',
       context: 'workspace',
       owner: 'observability-collectors',
       status: 'implemented',
-      commands: [
-        'pnpm quality:collect --profile=core --run-id=<id>',
-        'pnpm quality:export --run-id=<id>',
-      ],
+      commands: ['pnpm quality:core'],
       source: [
         { path: 'tools/scripts/observability/cli.ts', symbol: 'MEASURE_TARGETS' },
         {
@@ -125,7 +122,7 @@ export const measureTokens: Journey = {
       tests: ['tools-vitest'],
       docs: ['observability-usage'],
       next: [],
-      evaluation: 'ai',
+      evaluation: 'context-tokens',
     },
   ],
 };

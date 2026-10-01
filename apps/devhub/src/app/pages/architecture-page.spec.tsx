@@ -8,7 +8,7 @@ import { catalog } from '@/data';
 import { architectureModel } from '@/lib/catalog/architecture';
 import { RELATION_KIND } from '@/lib/catalog/labels';
 
-import App from './app';
+import App from '../app';
 
 const model = architectureModel(catalog);
 

@@ -2,6 +2,7 @@ import type { Catalog } from '../domain/model';
 
 import { applications } from './applications';
 import { documents } from './documents';
+import { evaluations } from './evaluations';
 import { contexts, journeys } from './journeys';
 import { packages } from './packages';
 import { plugins } from './plugins';
@@ -24,4 +25,5 @@ export const catalog: Catalog = {
   tests,
   contexts,
   journeys,
+  evaluations,
 };

@@ -1,6 +1,7 @@
 import { catalog } from '../../data';
 import type {
   DocumentRef,
+  Evaluation,
   Journey,
   Package,
   PackageKind,
@@ -9,7 +10,14 @@ import type {
   RecordTopic,
 } from '../../domain/model';
 
-import { DOCUMENT_GROUP, JOURNEY_KIND, PACKAGE_KIND, PLUGIN_KIND, RECORD_TOPIC } from './labels';
+import {
+  DOCUMENT_GROUP,
+  EVALUATION_KIND,
+  JOURNEY_KIND,
+  PACKAGE_KIND,
+  PLUGIN_KIND,
+  RECORD_TOPIC,
+} from './labels';
 import { entityHref } from './routes';
 
 /**
@@ -19,7 +27,13 @@ import { entityHref } from './routes';
 
 export const PRODUCT_NAME = 'Shared Stack DevHub';
 
-export type SectionId = 'journeys' | 'packages' | 'plugins' | 'documents' | 'records';
+export type SectionId =
+  | 'journeys'
+  | 'evaluation'
+  | 'packages'
+  | 'plugins'
+  | 'documents'
+  | 'records';
 
 type EntityBase = {
   id: string;
@@ -32,6 +46,7 @@ type EntityBase = {
 
 export type Entity =
   | (EntityBase & { section: 'journeys'; record: Journey })
+  | (EntityBase & { section: 'evaluation'; record: Evaluation })
   | (EntityBase & { section: 'packages'; record: Package })
   | (EntityBase & { section: 'plugins'; record: Plugin })
   | (EntityBase & { section: 'documents'; record: DocumentRef })
@@ -79,6 +94,23 @@ export const SECTIONS: Section[] = [
           navLabel: record.title.replace(`${JOURNEY_KIND[kind]} · `, ''),
           href: hrefOf('journeys', record.id),
           group: JOURNEY_KIND[kind],
+          record,
+        })),
+    ),
+  },
+  {
+    id: 'evaluation',
+    title: '평가',
+    path: '/evaluation',
+    entities: (Object.keys(EVALUATION_KIND) as Evaluation['kind'][]).flatMap((kind) =>
+      catalog.evaluations
+        .filter((record) => record.kind === kind)
+        .map((record) => ({
+          section: 'evaluation' as const,
+          id: record.id,
+          label: record.title,
+          href: hrefOf('evaluation', record.id),
+          group: EVALUATION_KIND[kind],
           record,
         })),
     ),
@@ -153,7 +185,7 @@ export const SECTIONS: Section[] = [
 ];
 
 /** 이동해 가는 곳. 아이콘은 `components/ui/view-icons.ts` 가 `id` 로 고른다. */
-export type ViewId = 'overview' | 'architecture' | 'evaluation' | SectionId;
+export type ViewId = 'overview' | 'architecture' | SectionId;
 
 export type View = { id: 'overview' | 'architecture'; label: string; path: string };
 

@@ -121,7 +121,7 @@ const McpServer = ({ server }: { server: PluginMcpServer }) => (
     <p className="typo-body-small text-text-light">
       실행 <Code>{server.command}</Code>
     </p>
-    <DataTable caption={`${server.name} 도구`} headers={['도구', '제목']} hiddenCaption>
+    <DataTable caption={`${server.name} 도구`} headers={['도구', '제목']}>
       {server.tools.map((tool) => (
         <tr key={tool.name} id={pluginToolAnchor(tool.name)} tabIndex={-1}>
           <th scope="row">
@@ -153,7 +153,7 @@ const HookPolicy = ({ policy }: { policy: PluginHookPolicy }) => (
         <Keywords items={policy.exceptions} />
       </dd>
     </dl>
-    <DataTable caption="우회 수단" headers={['우회 수단', '해당 명령']} hiddenCaption>
+    <DataTable caption="우회 수단" headers={['우회 수단', '해당 명령']}>
       {policy.bypasses.map((bypass) => (
         <tr key={bypass.what}>
           <th scope="row">{bypass.what}</th>
@@ -199,7 +199,7 @@ const Hook = ({ hook }: { hook: PluginHook }) => (
  * 늘 켜지는 것과 소비 저장소가 고르는 것을 적용 칸이 나눈다.
  */
 const Rules = ({ plugin }: { plugin: Plugin }) => (
-  <DataTable caption="작업 규칙" headers={['규칙', 'id', '적용']} hiddenCaption>
+  <DataTable caption="작업 규칙" headers={['규칙', 'id', '적용']}>
     {plugin.rules.map((rule) => {
       const doc = catalog.documents.find((candidate) => candidate.path === rule.source.path);
       return (

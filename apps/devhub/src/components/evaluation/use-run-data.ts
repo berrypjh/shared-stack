@@ -7,8 +7,10 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import type { SummaryResult } from '@/lib/evaluation/client';
 import { parseQuery, type Query, type QuerySpec, queryString } from '@/lib/evaluation/query';
 import {
+  type CollectProfile,
   emptyState,
   loadErrorState,
+  noAreaRunState,
   queryErrorState,
   runNotFoundState,
   type ViewState,
@@ -16,17 +18,10 @@ import {
 
 import { useEvaluationClient } from './evaluation-provider';
 
-/**
- * 한 화면이 필요한 만큼만 읽는다 — `index` 는 목록만, `summary` 는 run 요약, `run` 은 run 전체.
- * 데이터는 run id 로만 다시 읽고 필터는 렌더에서 적용하므로, 필터를 바꿔도 컨트롤이 사라지지 않는다.
- */
-export type RunLevel = 'index' | 'summary' | 'run';
-
 type Loaded = {
   loading: boolean;
   view: ViewState | null;
   runIds: string[];
-  summary: RunSummary | null;
   run: RunArtifact | null;
   freshness: Freshness | null;
 };
@@ -35,7 +30,6 @@ const INITIAL: Loaded = {
   loading: true,
   view: null,
   runIds: [],
-  summary: null,
   run: null,
   freshness: null,
 };
@@ -48,7 +42,21 @@ export type RunData = Loaded & {
   reload: () => void;
 };
 
-export const useRunData = (level: RunLevel, spec: QuerySpec): RunData => {
+/**
+ * 평가 항목이 보는 영역. 요약에 그 영역이 있는 실행만 목록 · 기본값이 되고, 주소로 고른 실행은
+ * 영역이 없어도 목록에 남겨 왜 비었는지 보인다. 수집 명령은 이 영역을 담는 profile 로 준다.
+ */
+export type RunArea = {
+  has: (summary: RunSummary) => boolean;
+  section: string;
+  collectProfile: CollectProfile;
+};
+
+/**
+ * 고른 실행 하나를 run 전체로 읽는다. 데이터는 run id 로만 다시 읽고 필터는 렌더에서 적용하므로,
+ * 필터를 바꿔도 컨트롤이 사라지지 않는다.
+ */
+export const useRunData = (spec: QuerySpec, area: RunArea): RunData => {
   const client = useEvaluationClient();
   const [params] = useSearchParams();
   const navigate = useNavigate();
@@ -72,35 +80,39 @@ export const useRunData = (level: RunLevel, spec: QuerySpec): RunData => {
     void (async () => {
       const index = await client.index();
       if (index.status === 'empty' || (index.status === 'missing' && index.target === 'index')) {
-        return done({ ...INITIAL, loading: false, view: emptyState() });
+        return done({ ...INITIAL, loading: false, view: emptyState(area.collectProfile) });
       }
       if (index.status !== 'ready') {
-        return done({ ...INITIAL, loading: false, view: loadErrorState(index) });
+        return done({
+          ...INITIAL,
+          loading: false,
+          view: loadErrorState(index, undefined, area.collectProfile),
+        });
       }
-      const runIds = index.value.runs.map((run) => run.id);
+      const indexed = index.value.runs.map((run) => run.id);
+      if (runParam && !indexed.includes(runParam)) {
+        return done({
+          ...INITIAL,
+          loading: false,
+          runIds: indexed,
+          view: runNotFoundState(runParam, indexed),
+        });
+      }
+      const summaries = await Promise.all(indexed.map((id) => client.summary(id)));
+      const runIds = indexed.filter((id, i) => {
+        const summary = summaries[i];
+        return id === runParam || (summary.status === 'ready' && area.has(summary.value));
+      });
       const runId = runParam ?? runIds[runIds.length - 1];
-      if (!runIds.includes(runId)) {
-        return done({ ...INITIAL, loading: false, runIds, view: runNotFoundState(runId, runIds) });
-      }
-      if (level === 'index') return done({ ...INITIAL, loading: false, runIds });
-      if (level === 'summary') {
-        const summary = await client.summary(runId);
-        return summary.status === 'ready'
-          ? done({
-              runIds,
-              view: null,
-              run: null,
-              summary: summary.value,
-              freshness: client.freshness(summary.value.metadata),
-            })
-          : done({ ...INITIAL, loading: false, runIds, view: loadErrorState(summary, runId) });
+      if (!runId) {
+        const unreadable = indexed.filter((_, i) => summaries[i].status !== 'ready');
+        return done({ ...INITIAL, loading: false, view: noAreaRunState({ ...area, unreadable }) });
       }
       const run = await client.run(runId);
       return run.status === 'ready'
         ? done({
             runIds,
             view: null,
-            summary: null,
             run: run.value,
             freshness: client.freshness(run.value.metadata),
           })
@@ -110,7 +122,7 @@ export const useRunData = (level: RunLevel, spec: QuerySpec): RunData => {
     return () => {
       active = false;
     };
-  }, [client, level, runParam, queryOk, attempt]);
+  }, [client, area, runParam, queryOk, attempt]);
 
   const setQuery = useCallback(
     (next: Query, options?: { replace?: boolean }) =>

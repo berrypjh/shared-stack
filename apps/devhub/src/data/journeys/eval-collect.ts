@@ -20,5 +20,5 @@ export const collectStep = (files: string, from: string): JourneyStep => ({
   tests: ['tools-vitest'],
   docs: ['observability-usage'],
   next: [],
-  evaluation: 'ai',
+  evaluation: 'eval-scorecard',
 });

@@ -10,9 +10,8 @@ import type { ReactNode } from 'react';
 import { useLocation } from 'react-router-dom';
 
 import { catalog } from '@/data';
-import { type Section, SECTIONS, VIEWS } from '@/lib/catalog/entities';
+import { findSection, type Section, SECTIONS, VIEWS } from '@/lib/catalog/entities';
 import { queryString } from '@/lib/evaluation/query';
-import { EVALUATION_GROUP, EVALUATION_SCREENS, screenPath } from '@/lib/evaluation/screens';
 import { SNAPSHOT } from '@/lib/repository/current-snapshot';
 
 import { SnapshotSummary } from '../overview/snapshot-summary';
@@ -20,7 +19,7 @@ import { SECTION_ICON, VIEW_ICON } from '../ui/view-icons';
 
 import { GlobalSearch } from './global-search';
 
-/** 탐색기 맨 위의 섹션 없는 보기(개요 · 아키텍처). 평가는 하위 화면이 있어 아래 섹션으로 둔다. */
+/** 탐색기 맨 위의 섹션 없는 보기(개요 · 아키텍처). */
 const EXPLORER_VIEWS = VIEWS.map((view) => ({
   id: view.id,
   label: view.label,
@@ -59,36 +58,33 @@ const EXPLORER_SECTIONS: ExplorerSection[] = SECTIONS.map((section) => ({
   groups: groupsOf(section),
 }));
 
-/** 평가는 작업 흐름 바로 뒤에 선다. */
-const [JOURNEYS_SECTION, ...REST_SECTIONS] = EXPLORER_SECTIONS;
-
 /**
- * 평가의 하위 화면. 개요는 섹션 제목이 가리키고, 나머지는 접히는 묶음 하나에 `screens.ts` 순서대로 선다.
- * 평가 안에서는 고른 실행(`?run=`)을 화면을 옮겨도 이어 간다 — 필터는 화면마다 뜻이 달라 가져가지 않는다.
+ * 평가 항목에서 고른 실행(`?run=`)은 같은 묶음의 항목으로만 이어 간다 — 묶음마다 담은 실행이 달라서다.
+ * 필터는 항목마다 뜻이 달라 가져가지 않는다. 그 밖에서는 카탈로그에서 만든 섹션을 그대로 쓴다.
  */
-const useEvaluationSection = (): ExplorerSection => {
+const useExplorerSections = (): ExplorerSection[] => {
   const { pathname, search } = useLocation();
-  const run = pathname.startsWith(screenPath('overview'))
+  const evaluation = findSection('evaluation');
+  const run = pathname.startsWith(evaluation.path)
     ? (new URLSearchParams(search).get('run') ?? undefined)
     : undefined;
+  if (!run) return EXPLORER_SECTIONS;
   const suffix = queryString({ run });
-  const screens = EVALUATION_SCREENS.filter((screen) => screen.id !== 'overview');
-  return {
-    id: 'evaluation',
-    title: '평가',
-    href: `${screenPath('overview')}${suffix}`,
-    icon: VIEW_ICON.evaluation,
-    groups: [
-      {
-        title: EVALUATION_GROUP,
-        items: screens.map((screen) => ({
-          id: screen.id,
-          label: screen.label,
-          href: `${screen.path}${suffix}`,
-        })),
-      },
-    ],
-  };
+  return EXPLORER_SECTIONS.map((section) =>
+    section.id !== evaluation.id
+      ? section
+      : {
+          ...section,
+          groups: section.groups.map((group) =>
+            group.items.some((item) => item.href === pathname)
+              ? {
+                  ...group,
+                  items: group.items.map((item) => ({ ...item, href: `${item.href}${suffix}` })),
+                }
+              : group,
+          ),
+        },
+  );
 };
 
 /**
@@ -96,7 +92,7 @@ const useEvaluationSection = (): ExplorerSection => {
  * route 가 바뀌어도 셸은 그대로 남는다(레이아웃 route). `children` 은 page 가 그리는 `<main>` 과 `<aside>` 다.
  */
 export const DevHubShell = ({ children }: { children: ReactNode }) => {
-  const evaluation = useEvaluationSection();
+  const sections = useExplorerSections();
   return (
     <Shell
       topBar={
@@ -112,12 +108,7 @@ export const DevHubShell = ({ children }: { children: ReactNode }) => {
           search={<GlobalSearch />}
         />
       }
-      explorer={
-        <Explorer
-          views={EXPLORER_VIEWS}
-          sections={[JOURNEYS_SECTION, evaluation, ...REST_SECTIONS]}
-        />
-      }
+      explorer={<Explorer views={EXPLORER_VIEWS} sections={sections} />}
     >
       {children}
     </Shell>
