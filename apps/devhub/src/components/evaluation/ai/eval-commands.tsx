@@ -26,13 +26,9 @@ const NEEDS: Record<(typeof LIVE_PROVIDERS)[number]['id'], ReactNode> = {
   ),
 };
 
-/**
- * 소비자 평가를 다시 돌리는 명령. 평가 · 수집 · DevHub 로 내보내기까지 한 번에 하고, 끝나면 실행
- * 선택에 새 실행이 생긴다. 명령 버튼은 복사만 한다. 다른 안내 안에 넣을 때는 제목을 뺀다.
- */
-export const EvalCommands = ({ withTitle = true }: { withTitle?: boolean }) => (
-  <section aria-label="평가 돌리는 법" className="flex flex-col gap-sm">
-    {withTitle && <h2 className="typo-body-small-strong text-text-default">평가 돌리는 법</h2>}
+/** 실행 위치 · 키 안내와 제공자별 명령 표. */
+const CommandTable = () => (
+  <>
     <p className="typo-body-small break-keep text-text-light">
       저장소 루트에서 실행한다. 키는 루트 <Mono>.env</Mono> 나 환경변수에 두면 되고, 끝나면 위 실행
       선택에 새 실행이 생긴다.
@@ -59,5 +55,32 @@ export const EvalCommands = ({ withTitle = true }: { withTitle?: boolean }) => (
         </tr>
       ))}
     </DataTable>
+  </>
+);
+
+/**
+ * 소비자 평가를 다시 돌리는 명령. 평가 · 수집 · DevHub 로 내보내기까지 한 번에 하고, 끝나면 실행
+ * 선택에 새 실행이 생긴다. 명령 버튼은 복사만 한다. 본문 맨 아래에 접어 두고 `open` 일 때만 펼친
+ * 채로 시작한다. `children` 은 표 아래에 붙는 화면별 안내다.
+ */
+export const EvalCommands = ({
+  open,
+  title = '평가 돌리는 법',
+  children,
+}: {
+  open: boolean;
+  title?: string;
+  children?: ReactNode;
+}) => (
+  <section aria-label={title}>
+    <details open={open} className="rounded-md border border-stroke-light bg-background-surface">
+      <summary className="cursor-pointer px-md py-sm typo-body-small-strong text-text-default">
+        {title}
+      </summary>
+      <div className="flex flex-col gap-sm border-t border-stroke-light p-md">
+        <CommandTable />
+        {children}
+      </div>
+    </details>
   </section>
 );

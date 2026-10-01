@@ -84,18 +84,31 @@ describe('공통 상태 모델', () => {
 
   it('partial·stale 은 성공으로 뭉개지 않고 새로 수집하는 명령을 준다', () => {
     expect(partialState('run-a')).toMatchObject({ kind: 'partial' });
-    const stale = staleState(
-      { status: 'stale', reason: 'run source aaaaaaa 이 기준 bbbbbbb 과 다름' },
-      'core',
-    );
+    const stale = staleState({
+      freshness: { status: 'stale', reason: 'run source aaaaaaa 이 기준 bbbbbbb 과 다름' },
+      runSha: 'a'.repeat(40),
+      baseSha: 'b'.repeat(40),
+      collectProfile: 'core',
+    });
     expect(stale).toMatchObject({
       kind: 'stale',
+      title: '지금 코드와 다른 커밋에서 잰 실행',
       commands: ['pnpm quality:core'],
     });
-    expect(stale.cause).toContain('aaaaaaa');
-    expect(staleState({ status: 'unknown', reason: '비교할 기준 SHA 를 모름' }, 'eval').title).toBe(
-      'source 를 기준과 비교할 수 없음',
+    expect(stale.cause).toBe(
+      '이 실행은 aaaaaaa 에서 수집했고, 지금 화면은 bbbbbbb 기준입니다. 두 커밋 사이에 바뀐 코드는 값에 반영되지 않았습니다.',
     );
+    const unknown = staleState({
+      freshness: { status: 'unknown', reason: '비교할 기준 SHA 를 모름' },
+      runSha: 'a'.repeat(40),
+      baseSha: 'unknown',
+      collectProfile: null,
+    });
+    expect(unknown).toMatchObject({
+      title: 'source 를 기준과 비교할 수 없음',
+      cause: '비교할 기준 SHA 를 모름',
+      commands: [],
+    });
   });
 
   it('이 run 에 없는 영역은 unsupported 이고 그 영역을 가진 다른 run 을 알려준다', () => {

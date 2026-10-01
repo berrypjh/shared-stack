@@ -84,16 +84,18 @@ export const RunSummary = ({ evalRun }: { evalRun: EvalRun }) => {
     <Section title="이 실행">
       <p className="typo-body-small break-keep text-text-default">{runSentence(evalRun)}</p>
       {skipped.length > 0 && (
-        <div className="flex flex-col gap-2xs">
-          <p className="typo-body-small-strong text-text-default">{`실행하지 않은 variant ${skipped.length}개`}</p>
-          <List className="flex flex-col gap-2xs typo-body-small break-keep text-text-light">
+        <details className="rounded-md border border-stroke-light bg-background-surface">
+          <summary className="cursor-pointer px-md py-sm typo-body-small-strong text-text-default">
+            {`실행하지 않은 variant ${skipped.length}개`}
+          </summary>
+          <List className="flex flex-col gap-2xs border-t border-stroke-light p-md typo-body-small break-keep text-text-light">
             {skipped.map((item) => (
               <ListItem
                 key={item.variant}
               >{`${item.label ?? item.variant} — ${item.reason}`}</ListItem>
             ))}
           </List>
-        </div>
+        </details>
       )}
       {evalRun.notices.length > 0 && (
         <List className="flex flex-col gap-2xs typo-body-small break-keep text-text-default">

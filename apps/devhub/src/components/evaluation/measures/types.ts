@@ -12,3 +12,6 @@ export type MeasureProps = {
 
 /** 상세 칸 개요에 두는 이름 · 뜻 목록과 그 제목 ("표 컬럼" · "용어"). */
 export type Terms = { title: string; items: readonly TermItem[] };
+
+/** 이 화면이 답하는 질문 하나와 읽는 법 몇 줄. 용어의 정확한 뜻은 `Terms` 가 갖는다. */
+export type Guide = { question: string; points: string[] };

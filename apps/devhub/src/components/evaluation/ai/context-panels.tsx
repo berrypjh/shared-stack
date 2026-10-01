@@ -12,8 +12,6 @@ import { StatusNotice } from '../status-notice';
 import { TARGET_ROW } from '../use-hash-focus';
 import type { RunData } from '../use-run-data';
 
-import { AgentInputGuide } from './agent-input-guide';
-
 export const CONTEXT_PANELS = ['initial', 'routed', 'scenario', 'agent-input'] as const;
 type Panel = (typeof CONTEXT_PANELS)[number];
 
@@ -36,7 +34,7 @@ const PANEL: Record<Panel, { scope: ContextScope; label: string; lead: string }>
   'agent-input': {
     scope: 'agent-input',
     label: '실제 입력',
-    lead: 'live executor 가 보고한 실제 입력 token (agent-input).',
+    lead: 'live executor 가 보고한 실제 입력 token (agent-input). variant 마다 묶고 과제 · 시도마다 한 행이다.',
   },
 };
 
@@ -227,7 +225,6 @@ export const ContextPanels = ({ run, data }: { run: RunArtifact; data: RunData }
           </>
         )}
       </div>
-      {panel === 'agent-input' && <AgentInputGuide />}
       {inScope.length === 0 ? (
         <StatusNotice
           level={3}

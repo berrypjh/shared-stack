@@ -37,6 +37,13 @@ export default defineConfig(({ command, mode }) => ({
         ? (loadEnv(mode, __dirname, '')['DEVHUB_EDITOR'] ?? null)
         : null,
     ),
+    /**
+     * 평가 섹션을 싣는가. 평가 데이터(`public/observability`)는 커밋되지 않아 원격 배포에는 없다 —
+     * 배포 build 는 `DEVHUB_EVALUATION=off` 로 섹션 · route · 링크를 뺀다. 그 밖에는 싣는다.
+     */
+    __DEVHUB_EVALUATION__: JSON.stringify(
+      loadEnv(mode, __dirname, '')['DEVHUB_EVALUATION'] !== 'off',
+    ),
   },
   server: {
     port: 4400,

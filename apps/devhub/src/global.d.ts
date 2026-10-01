@@ -12,3 +12,6 @@ declare const __DEVHUB_REPOSITORY_ROOT__: string | null;
  * 없거나 빌드 · 테스트면 `null` 이고, 그때 링크는 vscode 로 연다.
  */
 declare const __DEVHUB_EDITOR__: string | null;
+
+/** 평가 섹션을 싣는가. build 의 `DEVHUB_EVALUATION=off` 일 때만 `false` 다(원격 배포). */
+declare const __DEVHUB_EVALUATION__: boolean;

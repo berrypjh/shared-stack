@@ -25,6 +25,9 @@
         },
         {
           "runtime": "git status --porcelain"
+        },
+        {
+          "env": "DEVHUB_EVALUATION"
         }
       ],
       "options": {

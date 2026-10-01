@@ -34,10 +34,15 @@ describe('소비자 평가 · 컨텍스트', () => {
     expect(table(SCORECARD)).toBeTruthy();
   });
 
-  it('이 화면이 답하는 질문을 데이터보다 먼저 보인다', async () => {
-    renderEvaluation('/evaluation/eval-scorecard?run=run-eval', files());
-    const guide = await main().findByRole('region', { name: '이 화면이 답하는 질문' });
-    expect(guide.textContent).toContain('해냈나');
+  it('이 화면이 답하는 질문은 본문이 아니라 옆 칸 개요에 둔다', async () => {
+    renderEvaluation('/evaluation/eval-routing?run=run-eval', files());
+    const inspector = within(screen.getByRole('complementary', { name: '상세 정보' }));
+    const overview = within(await inspector.findByRole('region', { name: /^개요/ }));
+    expect(overview.getByRole('region', { name: '이 화면이 답하는 질문' }).textContent).toContain(
+      '골랐나',
+    );
+    await main().findByRole('region', { name: '이 실행' });
+    expect(main().queryByRole('region', { name: '이 화면이 답하는 질문' })).toBeNull();
   });
 
   it('핵심 지표는 한국어 이름과 원본 분자/분모 · n 그대로다', async () => {
@@ -152,17 +157,13 @@ describe('소비자 평가 · 컨텍스트', () => {
     expect(rowIn('Context — react-ui', /^baseline/).textContent).toContain('package.json');
   });
 
-  it('실제 입력은 무엇 · 실행 · 결과 안내를 보이고, live 가 아닌 실행에는 없다고 쓰고 live 명령을 준다', async () => {
+  it('실제 입력은 재는 법을 맨 아래 접어 두고, live 가 아닌 실행에는 없다고 쓰고 live 명령을 준다', async () => {
     const { user } = renderEvaluation('/evaluation/context-tokens?run=run-eval', files());
     await main().findByRole('table', { name: 'Context — variant-initial' });
     await user.click(main().getByRole('button', { name: '실제 입력' }));
 
-    const guide = main().getByRole('region', { name: '실제 입력 안내' });
-    expect(
-      within(guide)
-        .getAllByRole('heading', { level: 3 })
-        .map((heading) => heading.textContent),
-    ).toEqual(['무엇인가', '어떻게 실행하나', '결과는 어떻게 나오나']);
+    const guide = main().getByRole('region', { name: '실제 입력 재는 법' });
+    expect(guide.querySelector('details')?.open).toBe(false);
     expect(guide.textContent).toContain('ANTHROPIC_API_KEY');
     expect(
       within(within(guide).getByRole('table', { name: '평가 돌리는 명령' }))
@@ -450,6 +451,15 @@ describe('소비자 평가 — 평가 돌리는 법', () => {
         '명령 복사: pnpm quality:eval:live --provider=local --model=<모델>',
       ]);
       expect(howTo.textContent).toContain('OLLAMA_CONTEXT_LENGTH=32768 ollama serve');
+      expect(howTo.querySelector('details')?.open).toBe(true);
     },
   );
+
+  it('고른 실행이 있으면 결과 아래에 접어 둔다', async () => {
+    renderEvaluation('/evaluation/eval-scorecard?run=run-eval', files());
+    const summary = await main().findByRole('region', { name: '이 실행' });
+    const howTo = main().getByRole('region', { name: '평가 돌리는 법' });
+    expect(howTo.querySelector('details')?.open).toBe(false);
+    expect(summary.compareDocumentPosition(howTo) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
 });

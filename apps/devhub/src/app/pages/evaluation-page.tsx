@@ -1,4 +1,4 @@
-import { createElement, useMemo } from 'react';
+import { createElement, useContext, useMemo } from 'react';
 
 import { Inspector, useDocumentTitle, WorkspaceFrame, WorkspaceHeader } from '@berrypjh/devhub-ui';
 
@@ -6,6 +6,7 @@ import { useParams } from 'react-router-dom';
 
 import { EntityNotFound, placeOf } from '@/components/entity/entity-not-found';
 import { EvaluationInspector } from '@/components/evaluation/evaluation-inspector';
+import { EvaluationSourceContext } from '@/components/evaluation/evaluation-provider';
 import { HAS_AREA, MEASURES } from '@/components/evaluation/measures';
 import { RunBar } from '@/components/evaluation/run-bar';
 import { StatusNotice } from '@/components/evaluation/status-notice';
@@ -16,7 +17,10 @@ import type { Evaluation } from '@/domain/model';
 import { findEntity, findSection } from '@/lib/catalog/entities';
 import { loadingState, partialState, staleState } from '@/lib/evaluation/status';
 
-/** partial · stale 실행은 값 위에 그 상태를 먼저 말해 성공처럼 두지 않는다. */
+/**
+ * 본문은 고른 실행에서 일어난 일, 옆 칸은 그것을 읽는 법과 출처다. partial · stale 실행은 값 위에
+ * 그 상태를 먼저 말해 성공처럼 두지 않는다. 돌리는 법은 실행이 없을 때만 펼쳐 둔다.
+ */
 const EvaluationView = ({ evaluation }: { evaluation: Evaluation }) => {
   const section = findSection('evaluation');
   const measure = MEASURES[evaluation.id];
@@ -29,6 +33,7 @@ const EvaluationView = ({ evaluation }: { evaluation: Evaluation }) => {
     [evaluation],
   );
   const data = useRunData(measure.spec, area);
+  const { expectedSha } = useContext(EvaluationSourceContext);
   const summaries = useSummaries(data.runIds);
   useHashFocus(data.run !== null);
   const alternatives = runsWith(summaries, HAS_AREA[evaluation.kind], data.run?.metadata.runId);
@@ -48,13 +53,28 @@ const EvaluationView = ({ evaluation }: { evaluation: Evaluation }) => {
           <StatusNotice state={partialState(data.run.metadata.runId)} />
         )}
         {data.run && data.freshness && data.freshness.status !== 'fresh' && (
-          <StatusNotice state={staleState(data.freshness, evaluation.collectProfile)} />
+          <StatusNotice
+            state={staleState({
+              freshness: data.freshness,
+              runSha: data.run.metadata.source.sha,
+              baseSha: expectedSha,
+              // 소비자 평가는 맨 아래 돌리는 법이 같은 명령을 갖는다.
+              collectProfile:
+                evaluation.collectProfile === 'eval' ? null : evaluation.collectProfile,
+            })}
+            compact
+          />
         )}
-        {measure.intro && createElement(measure.intro)}
         {data.run && createElement(measure.render, { run: data.run, data, alternatives })}
+        {measure.howTo && createElement(measure.howTo, { open: !data.run })}
       </WorkspaceFrame>
       <Inspector>
-        <EvaluationInspector evaluation={evaluation} data={data} terms={measure.terms} />
+        <EvaluationInspector
+          evaluation={evaluation}
+          data={data}
+          guide={measure.guide}
+          terms={measure.terms}
+        />
       </Inspector>
     </>
   );

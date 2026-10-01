@@ -3,19 +3,21 @@ import type { RunSummary } from '@berrypjh/observability-contracts';
 import type { EvaluationKind } from '@/domain/model';
 import type { QuerySpec } from '@/lib/evaluation/query';
 
+import { AgentInputHowTo } from '../ai/agent-input-guide';
 import { CONTEXT_COLUMNS, CONTEXT_PANELS } from '../ai/context-panels';
+import { EvalCommands } from '../ai/eval-commands';
 import { BUDGET_COLUMNS } from '../bundles/budget-section';
 import { TREESHAKE_COLUMNS } from '../bundles/treeshake-section';
 
 import { BundleBudget } from './bundle-budget';
 import { ContextTokens } from './context-tokens';
-import { EvalRetrieval, EvalRetrievalIntro } from './eval-retrieval';
-import { EvalRouting, EvalRoutingIntro } from './eval-routing';
-import { EvalScorecard, EvalScorecardIntro } from './eval-scorecard';
+import { EvalRetrieval, RETRIEVAL_GUIDE } from './eval-retrieval';
+import { EvalRouting, ROUTING_GUIDE } from './eval-routing';
+import { EvalScorecard } from './eval-scorecard';
 import { RETRIEVAL_TERMS, ROUTING_TERMS, SCORECARD_TERMS, VERIFICATION_TERMS } from './eval-terms';
-import { EvalVerification, EvalVerificationIntro } from './eval-verification';
+import { EvalVerification, VERIFICATION_GUIDE } from './eval-verification';
 import { Treeshake } from './treeshake';
-import type { MeasureProps, Terms } from './types';
+import type { Guide, MeasureProps, Terms } from './types';
 
 export type { MeasureProps } from './types';
 
@@ -26,8 +28,10 @@ type Measure = {
   /** 주소가 받는 키. 그 밖의 키는 주소 오류로 보인다. */
   spec: QuerySpec;
   render: (props: MeasureProps) => React.JSX.Element;
-  /** 실행이 없어도 보이는 머리 (이 화면이 답하는 질문 · 돌리는 법). */
-  intro?: () => React.JSX.Element;
+  /** 이 화면이 답하는 질문과 읽는 법. 상세 칸 개요에 보인다. */
+  guide?: Guide;
+  /** 평가를 다시 돌리는 법. 본문 맨 아래에 두고, 고른 실행이 있으면 접는다. */
+  howTo?: (props: { open: boolean }) => React.JSX.Element;
   /** 본문 표의 컬럼 · 용어 뜻. 상세 칸 개요에 보인다. */
   terms?: Terms;
 };
@@ -49,30 +53,34 @@ export const MEASURES: Record<string, Measure> = {
   'context-tokens': {
     spec: { keys: ['run', 'panel'], panels: CONTEXT_PANELS },
     render: ContextTokens,
+    howTo: AgentInputHowTo,
     terms: columns(CONTEXT_COLUMNS),
   },
   'eval-scorecard': {
     spec: EVAL_SPEC,
     render: EvalScorecard,
-    intro: EvalScorecardIntro,
+    howTo: EvalCommands,
     terms: terms(SCORECARD_TERMS),
   },
   'eval-routing': {
     spec: EVAL_SPEC,
     render: EvalRouting,
-    intro: EvalRoutingIntro,
+    guide: ROUTING_GUIDE,
+    howTo: EvalCommands,
     terms: terms(ROUTING_TERMS),
   },
   'eval-retrieval': {
     spec: EVAL_SPEC,
     render: EvalRetrieval,
-    intro: EvalRetrievalIntro,
+    guide: RETRIEVAL_GUIDE,
+    howTo: EvalCommands,
     terms: terms(RETRIEVAL_TERMS),
   },
   'eval-verification': {
     spec: EVAL_SPEC,
     render: EvalVerification,
-    intro: EvalVerificationIntro,
+    guide: VERIFICATION_GUIDE,
+    howTo: EvalCommands,
     terms: terms(VERIFICATION_TERMS),
   },
 };

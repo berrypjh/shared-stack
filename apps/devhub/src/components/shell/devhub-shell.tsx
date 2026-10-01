@@ -10,7 +10,7 @@ import type { ReactNode } from 'react';
 import { useLocation } from 'react-router-dom';
 
 import { catalog } from '@/data';
-import { findSection, type Section, SECTIONS, VIEWS } from '@/lib/catalog/entities';
+import { type Section, SECTIONS, VIEWS } from '@/lib/catalog/entities';
 import { queryString } from '@/lib/evaluation/query';
 import { SNAPSHOT } from '@/lib/repository/current-snapshot';
 
@@ -64,14 +64,15 @@ const EXPLORER_SECTIONS: ExplorerSection[] = SECTIONS.map((section) => ({
  */
 const useExplorerSections = (): ExplorerSection[] => {
   const { pathname, search } = useLocation();
-  const evaluation = findSection('evaluation');
-  const run = pathname.startsWith(evaluation.path)
-    ? (new URLSearchParams(search).get('run') ?? undefined)
-    : undefined;
+  const evaluation = SECTIONS.find((section) => section.id === 'evaluation');
+  const run =
+    evaluation && pathname.startsWith(evaluation.path)
+      ? (new URLSearchParams(search).get('run') ?? undefined)
+      : undefined;
   if (!run) return EXPLORER_SECTIONS;
   const suffix = queryString({ run });
   return EXPLORER_SECTIONS.map((section) =>
-    section.id !== evaluation.id
+    section.id !== 'evaluation'
       ? section
       : {
           ...section,

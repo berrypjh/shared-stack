@@ -79,110 +79,113 @@ export const RECORDS_NEWEST_FIRST: RecordRef[] = [...catalog.records].sort((a, b
   b.date.localeCompare(a.date),
 );
 
-export const SECTIONS: Section[] = [
-  {
-    id: 'journeys',
-    title: '작업 흐름',
-    path: '/journeys',
-    entities: (Object.keys(JOURNEY_KIND) as Journey['kind'][]).flatMap((kind) =>
-      catalog.journeys
-        .filter((record) => record.kind === kind)
-        .map((record) => ({
-          section: 'journeys' as const,
+/** 평가 섹션은 build 가 끌 수 있다(`__DEVHUB_EVALUATION__`). 꺼지면 탐색기 · route · 개요에서 함께 빠진다. */
+export const SECTIONS: Section[] = (
+  [
+    {
+      id: 'journeys',
+      title: '작업 흐름',
+      path: '/journeys',
+      entities: (Object.keys(JOURNEY_KIND) as Journey['kind'][]).flatMap((kind) =>
+        catalog.journeys
+          .filter((record) => record.kind === kind)
+          .map((record) => ({
+            section: 'journeys' as const,
+            id: record.id,
+            label: record.title,
+            navLabel: record.title.replace(`${JOURNEY_KIND[kind]} · `, ''),
+            href: hrefOf('journeys', record.id),
+            group: JOURNEY_KIND[kind],
+            record,
+          })),
+      ),
+    },
+    {
+      id: 'evaluation',
+      title: '평가',
+      path: '/evaluation',
+      entities: (Object.keys(EVALUATION_KIND) as Evaluation['kind'][]).flatMap((kind) =>
+        catalog.evaluations
+          .filter((record) => record.kind === kind)
+          .map((record) => ({
+            section: 'evaluation' as const,
+            id: record.id,
+            label: record.title,
+            href: hrefOf('evaluation', record.id),
+            group: EVALUATION_KIND[kind],
+            record,
+          })),
+      ),
+    },
+    {
+      id: 'records',
+      title: '기록',
+      path: '/records',
+      entities: (Object.keys(RECORD_TOPIC) as RecordTopic[]).flatMap((topic) =>
+        RECORDS_NEWEST_FIRST.filter((record) => record.topic === topic).map((record) => ({
+          section: 'records' as const,
           id: record.id,
           label: record.title,
-          navLabel: record.title.replace(`${JOURNEY_KIND[kind]} · `, ''),
-          href: hrefOf('journeys', record.id),
-          group: JOURNEY_KIND[kind],
+          href: hrefOf('records', record.id),
+          group: RECORD_TOPIC[topic],
           record,
         })),
-    ),
-  },
-  {
-    id: 'evaluation',
-    title: '평가',
-    path: '/evaluation',
-    entities: (Object.keys(EVALUATION_KIND) as Evaluation['kind'][]).flatMap((kind) =>
-      catalog.evaluations
-        .filter((record) => record.kind === kind)
-        .map((record) => ({
-          section: 'evaluation' as const,
-          id: record.id,
-          label: record.title,
-          href: hrefOf('evaluation', record.id),
-          group: EVALUATION_KIND[kind],
-          record,
-        })),
-    ),
-  },
-  {
-    id: 'records',
-    title: '기록',
-    path: '/records',
-    entities: (Object.keys(RECORD_TOPIC) as RecordTopic[]).flatMap((topic) =>
-      RECORDS_NEWEST_FIRST.filter((record) => record.topic === topic).map((record) => ({
-        section: 'records' as const,
-        id: record.id,
-        label: record.title,
-        href: hrefOf('records', record.id),
-        group: RECORD_TOPIC[topic],
-        record,
-      })),
-    ),
-  },
-  {
-    id: 'packages',
-    title: '패키지',
-    path: '/packages',
-    entities: PACKAGE_ORDER.flatMap((kind) =>
-      catalog.packages
-        .filter((record) => record.kind === kind)
-        .map((record) => ({
-          section: 'packages' as const,
-          id: record.id,
-          label: record.id,
-          href: hrefOf('packages', record.id),
-          group: PACKAGE_KIND[kind],
-          record,
-        })),
-    ),
-  },
-  {
-    id: 'plugins',
-    title: '플러그인',
-    path: '/plugins',
-    entities: (Object.keys(PLUGIN_KIND) as Plugin['kind'][]).flatMap((kind) =>
-      catalog.plugins
-        .filter((record) => record.kind === kind)
-        .map((record) => ({
-          section: 'plugins' as const,
-          id: record.id,
-          label: record.id,
-          href: hrefOf('plugins', record.id),
-          group: PLUGIN_KIND[kind],
-          record,
-        })),
-    ),
-  },
-  {
-    id: 'documents',
-    title: '문서',
-    path: '/documents',
-    entities: DOCUMENT_GROUP_ORDER.flatMap((title) =>
-      catalog.documents
-        .filter((record) => documentGroupOf(record.path) === title)
-        .map((record) => ({
-          section: 'documents' as const,
-          id: record.id,
-          label: record.path,
-          navLabel: record.path.slice(documentPlaceOf(record.path)?.[2].length),
-          href: hrefOf('documents', record.id),
-          group: title,
-          record,
-        })),
-    ),
-  },
-];
+      ),
+    },
+    {
+      id: 'packages',
+      title: '패키지',
+      path: '/packages',
+      entities: PACKAGE_ORDER.flatMap((kind) =>
+        catalog.packages
+          .filter((record) => record.kind === kind)
+          .map((record) => ({
+            section: 'packages' as const,
+            id: record.id,
+            label: record.id,
+            href: hrefOf('packages', record.id),
+            group: PACKAGE_KIND[kind],
+            record,
+          })),
+      ),
+    },
+    {
+      id: 'plugins',
+      title: '플러그인',
+      path: '/plugins',
+      entities: (Object.keys(PLUGIN_KIND) as Plugin['kind'][]).flatMap((kind) =>
+        catalog.plugins
+          .filter((record) => record.kind === kind)
+          .map((record) => ({
+            section: 'plugins' as const,
+            id: record.id,
+            label: record.id,
+            href: hrefOf('plugins', record.id),
+            group: PLUGIN_KIND[kind],
+            record,
+          })),
+      ),
+    },
+    {
+      id: 'documents',
+      title: '문서',
+      path: '/documents',
+      entities: DOCUMENT_GROUP_ORDER.flatMap((title) =>
+        catalog.documents
+          .filter((record) => documentGroupOf(record.path) === title)
+          .map((record) => ({
+            section: 'documents' as const,
+            id: record.id,
+            label: record.path,
+            navLabel: record.path.slice(documentPlaceOf(record.path)?.[2].length),
+            href: hrefOf('documents', record.id),
+            group: title,
+            record,
+          })),
+      ),
+    },
+  ] satisfies Section[]
+).filter((section) => section.id !== 'evaluation' || __DEVHUB_EVALUATION__);
 
 /** 이동해 가는 곳. 아이콘은 `components/ui/view-icons.ts` 가 `id` 로 고른다. */
 export type ViewId = 'overview' | 'architecture' | SectionId;

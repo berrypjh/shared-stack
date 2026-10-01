@@ -1,5 +1,7 @@
 import type { Freshness } from '@berrypjh/observability-contracts';
 
+import { shortSha } from './format';
+
 /**
  * 화면의 비정상 상태 한 벌. 어느 상태도 숫자나 성공으로 바꾸지 않고, 원인과 로컬에서 실행할
  * 명령을 준다. 명령은 복사할 글일 뿐 — 브라우저가 실행하는 endpoint 가 없다.
@@ -138,12 +140,31 @@ export const partialState = (runId: string): ViewState => ({
   commands: [],
 });
 
-export const staleState = (freshness: Freshness, collectProfile: CollectProfile): ViewState => ({
+/**
+ * 고른 실행이 지금 화면의 build 커밋과 다른 source 에서 나왔다. 두 커밋을 사람 말로 대고,
+ * `collectProfile` 이 null 이면(화면에 돌리는 법이 따로 있으면) 명령은 그쪽에 맡긴다.
+ */
+export const staleState = ({
+  freshness,
+  runSha,
+  baseSha,
+  collectProfile,
+}: {
+  freshness: Freshness;
+  runSha: string;
+  baseSha: string;
+  collectProfile: CollectProfile | null;
+}): ViewState => ({
   kind: 'stale',
   title:
-    freshness.status === 'stale' ? '기준 source 와 다른 실행' : 'source 를 기준과 비교할 수 없음',
-  cause: freshness.reason,
-  commands: [collectCommand(collectProfile)],
+    freshness.status === 'stale'
+      ? '지금 코드와 다른 커밋에서 잰 실행'
+      : 'source 를 기준과 비교할 수 없음',
+  cause:
+    freshness.status === 'stale'
+      ? `이 실행은 ${shortSha(runSha)} 에서 수집했고, 지금 화면은 ${shortSha(baseSha)} 기준입니다. 두 커밋 사이에 바뀐 코드는 값에 반영되지 않았습니다.`
+      : freshness.reason,
+  commands: collectProfile ? [collectCommand(collectProfile)] : [],
 });
 
 export const unsupportedState = ({

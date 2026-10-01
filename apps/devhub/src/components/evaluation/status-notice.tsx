@@ -18,10 +18,12 @@ const ICON: Record<ViewStateKind, string> = {
 export const StatusNotice = ({
   state,
   level = 2,
+  compact,
   children,
 }: {
   state: ViewState;
   level?: 2 | 3;
+  compact?: boolean;
   children?: ReactNode;
 }) => (
   <Notice
@@ -33,6 +35,7 @@ export const StatusNotice = ({
     commands={state.commands}
     tone={state.kind === 'error' ? 'error' : 'default'}
     level={level}
+    compact={compact}
   >
     {children}
   </Notice>

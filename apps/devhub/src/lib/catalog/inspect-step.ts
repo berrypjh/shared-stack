@@ -44,7 +44,9 @@ export const inspectStep = (
       const at = journey.steps.findIndex((s) => s.id === id);
       return at < 0 ? [] : [{ id, order: at + 1, intent: journey.steps[at].intent }];
     }),
-    evaluation: catalog.evaluations.find((item) => item.id === step.evaluation),
+    evaluation: __DEVHUB_EVALUATION__
+      ? catalog.evaluations.find((item) => item.id === step.evaluation)
+      : undefined,
     tests: step.tests.flatMap((id) => catalog.tests.find((s) => s.id === id) ?? []),
     documents: step.docs.flatMap((id) => catalog.documents.find((doc) => doc.id === id) ?? []),
     empty: {

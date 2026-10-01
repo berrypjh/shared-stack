@@ -131,7 +131,7 @@ describe('평가 항목', () => {
     expect(await run.findByText('일부만 수집')).toBeTruthy();
     expect(run.getByText('기준과 다름')).toBeTruthy();
     expect(main().getByText('일부만 수집된 실행')).toBeTruthy();
-    expect(main().getByText('기준 source 와 다른 실행')).toBeTruthy();
+    expect(main().getByText('지금 코드와 다른 커밋에서 잰 실행')).toBeTruthy();
   });
 
   it('이전 · 다음은 같은 묶음일 때만 고른 실행을 이어 간다', async () => {
@@ -221,7 +221,7 @@ describe('평가 항목 — 비정상 상태', () => {
             (table) =>
               table.getAttribute('aria-label') ?? table.querySelector('caption')?.textContent,
           ),
-      ).toEqual(id.startsWith('eval-') ? ['평가 돌리는 명령'] : []);
+      ).toEqual(MEASURES[id].howTo ? ['평가 돌리는 명령'] : []);
     },
   );
 });

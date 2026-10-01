@@ -4,6 +4,7 @@ import {
   InspectorHeader,
   InspectorSection,
   Pager,
+  QuestionGuide,
   TermList,
 } from '@berrypjh/devhub-ui';
 
@@ -21,7 +22,7 @@ import { queryString } from '@/lib/evaluation/query';
 
 import { SourceGroups, sourceSummary } from '../entity/inspector-parts';
 
-import type { Terms } from './measures/types';
+import type { Guide, Terms } from './measures/types';
 import type { RunData } from './use-run-data';
 
 const OVERVIEW = { id: 'evaluation-overview', title: '개요', icon: 'overview' } as const;
@@ -42,10 +43,13 @@ const reasonOf = (data: RunData) => {
 export const EvaluationInspector = ({
   evaluation,
   data,
+  guide,
   terms,
 }: {
   evaluation: Evaluation;
   data: RunData;
+  /** 이 화면이 답하는 질문과 읽는 법. 개요의 사실 아래, 용어 위에 둔다. */
+  guide?: Guide;
   /** 본문 표의 컬럼 · 용어 뜻. 작업 흐름 단계의 "출력 컬럼"처럼 개요 아래에 둔다. */
   terms?: Terms;
 }) => {
@@ -84,6 +88,11 @@ export const EvaluationInspector = ({
             { term: '요약', detail: evaluation.summary },
           ]}
         />
+        {guide && (
+          <div className="mt-md">
+            <QuestionGuide question={guide.question} points={guide.points} />
+          </div>
+        )}
         {terms && (
           <div className="mt-md flex flex-col gap-xs">
             <p className="typo-caption-small text-text-light">{terms.title}</p>
