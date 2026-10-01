@@ -19,7 +19,7 @@ const SCREENS = [
   '/plugins/berry-commit',
   '/plugins/berry-dev',
   '/documents/root-agents',
-  '/records/devhub-editorial-theme-pair',
+  '/records/react-ui-cascade-layers',
   '/evaluation',
   '/evaluation/bundles',
   '/evaluation/ai',
