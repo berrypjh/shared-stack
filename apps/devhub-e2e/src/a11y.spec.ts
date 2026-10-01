@@ -21,8 +21,13 @@ const SCREENS = [
   '/documents/root-agents',
   '/records/react-ui-cascade-layers',
   '/evaluation',
-  '/evaluation/bundles',
-  '/evaluation/ai',
+  '/evaluation/bundle-budget',
+  '/evaluation/treeshake',
+  '/evaluation/context-tokens',
+  '/evaluation/eval-scorecard',
+  '/evaluation/eval-routing',
+  '/evaluation/eval-retrieval',
+  '/evaluation/eval-verification',
 ];
 
 const VIEWPORTS = [

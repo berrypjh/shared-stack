@@ -12,7 +12,8 @@ const PAGES = [
   '/records/react-ui-cascade-layers',
   '/sources/tools/scripts/release/release-npm.ts',
   '/evaluation',
-  '/evaluation/bundles',
+  '/evaluation/bundle-budget',
+  '/evaluation/eval-verification',
 ];
 
 for (const width of [320, 390]) {
