@@ -154,6 +154,7 @@
       },
       "git": {
         "commit": true,
+        "commitMessage": "chore(release): publish {version} [skip ci]",
         "tag": true
       }
     },
