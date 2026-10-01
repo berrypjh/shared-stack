@@ -14,6 +14,7 @@ import type {
   VariantMetrics,
 } from '../../../evals/consumer/reporters/aggregate';
 import { buildConfusion, type ConfusionMatrix } from '../../../evals/consumer/reporters/confusion';
+import { LIVE_EXECUTOR_PATTERN } from '../../../evals/consumer/runner/live/providers';
 import type { GradedTrace } from '../../../evals/consumer/runner/trace';
 import type { VariantContext } from '../../../evals/consumer/variants/context';
 import { type VariantId, VARIANTS } from '../../../evals/consumer/variants/index';
@@ -36,6 +37,8 @@ export type EvalImport = {
   context: Imported<VariantContext[]>;
   /** 수집 시점의 `tools/evals/consumer/baseline/<split>.json`. 없음·깨짐·있음을 나눈다. */
   baseline: EvalBaselineFile;
+  /** live 평가가 실행하지 않은 variant (`live-skipped.json`). live 가 아니면 없다. */
+  skipped?: { variant: string; reason: string }[];
 };
 
 type ExecutorClass = (typeof EXECUTOR_CLASSES)[number];
@@ -54,6 +57,7 @@ const NO_LIVE_EXECUTOR = new Set<ExecutorClass>(['harness-smoke', 'scripted', 'u
 /** repair hook 을 주지 않는 executor (run.ts 의 smoke·replay·unavailable, 테스트용 scripted). */
 const NO_REPAIR_HOOK = new Set<ExecutorClass>([
   'harness-smoke',
+  'live',
   'scripted',
   'replay',
   'unavailable',
@@ -63,6 +67,8 @@ export const executorClassOf = (executor: string): ExecutorClass => {
   if (executor === 'smoke-scripted') return 'harness-smoke';
   if (executor === 'scripted' || executor === 'unavailable') return executor;
   if (/^replay\(.*\)$/.test(executor)) return 'replay';
+  // `anthropic-live` 는 제공자를 고르기 전의 이름 — 그때 수집한 산출물도 live 로 읽는다.
+  if (LIVE_EXECUTOR_PATTERN.test(executor) || executor === 'anthropic-live') return 'live';
   return 'unknown';
 };
 
@@ -108,6 +114,9 @@ const groupOf = (group: Record<string, Rate | Agg>) =>
 const variantOf = (metrics: VariantMetrics, executorClass: ExecutorClass) => ({
   variant: metrics.variant,
   label: metrics.label,
+  ...(VARIANTS[metrics.variant as VariantId] && {
+    description: VARIANTS[metrics.variant as VariantId].description,
+  }),
   tasks: metrics.tasks,
   trials: metrics.trials,
   primary: groupOf(metrics.primary),
@@ -445,6 +454,15 @@ export const normalizeEvalRun = (input: EvalImport): EvalRun => {
       variants.some((variant) => variant.repair === 'no-repair-hook'),
     ),
     variants,
+    ...(input.skipped && {
+      skippedVariants: input.skipped.map((item) => ({
+        variant: item.variant,
+        ...(VARIANTS[item.variant as VariantId] && {
+          label: VARIANTS[item.variant as VariantId].label,
+        }),
+        reason: clip(item.reason),
+      })),
+    }),
     routing,
     traceCount: traces ? traces.length : null,
     traces: traces ? traces.map(traceOf) : [],

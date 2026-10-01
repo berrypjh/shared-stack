@@ -126,3 +126,70 @@ describe('collectEval', () => {
     await expect(collect('tmp/llm-evals/empty')).rejects.toThrow(/no eval artifacts/);
   });
 });
+
+describe('collectEval — live 실행의 실제 입력', () => {
+  /** fixture 실행을 live executor 가 만든 것처럼 바꾸고, 한도로 뺀 variant 를 남긴다. */
+  const asLive = async (dir: string) => {
+    const summaryFile = path.join(dir, 'summary.json');
+    const summary = JSON.parse(await fs.readFile(summaryFile, 'utf8'));
+    await fs.writeFile(
+      summaryFile,
+      JSON.stringify({ ...summary, executor: 'anthropic-live', model: 'claude-test' }),
+    );
+    const tracesFile = path.join(dir, 'traces.jsonl');
+    const lines = (await fs.readFile(tracesFile, 'utf8')).trim().split('\n');
+    await fs.writeFile(
+      tracesFile,
+      `${lines
+        .map((line) =>
+          JSON.stringify({ ...JSON.parse(line), executor: 'anthropic-live', model: 'claude-test' }),
+        )
+        .join('\n')}\n`,
+    );
+    await fs.writeFile(
+      path.join(dir, 'live-skipped.json'),
+      JSON.stringify([
+        {
+          variant: 'full-source',
+          reason: '컨텍스트 한도 초과 — 첫 메시지 387,000 토큰 > 한도 200,000',
+        },
+      ]),
+    );
+  };
+
+  it('trial 마다 API 사용량을 실제 입력 행으로, 뺀 variant 는 이유 행으로 싣는다', async () => {
+    await asLive(evalDir('run-a'));
+    const { artifact } = await collect('tmp/llm-evals/run-a');
+    expect(artifact.evals[0].executorClass).toBe('live');
+    expect(artifact.evals[0].skippedVariants).toEqual([
+      {
+        variant: 'full-source',
+        label: 'Full Source',
+        reason: '컨텍스트 한도 초과 — 첫 메시지 387,000 토큰 > 한도 200,000',
+      },
+    ]);
+    expect(artifact.evals[0].variants.every((variant) => variant.description)).toBe(true);
+
+    const inputs = artifact.contexts.filter((row) => row.scope === 'agent-input');
+    expect(inputs).toHaveLength((artifact.evals[0].traceCount ?? 0) + 1);
+    const measured = inputs.filter((row) => row.availability === 'available');
+    expect(measured.every((row) => row.tokens === 1000 && row.chars === null)).toBe(true);
+    expect(measured[0]).toMatchObject({
+      provider: 'anthropic-messages-usage',
+      tokenModel: 'claude-test',
+      contentConstruction: 'executor-reported',
+    });
+    expect(measured[0].subject).toMatch(/^[a-z-]+::[a-z0-9-]+::1$/);
+    expect(inputs.at(-1)).toMatchObject({
+      subject: 'full-source',
+      availability: 'unavailable',
+      reasonCode: 'not-collected',
+      definition: { label: 'Full Source' },
+    });
+  });
+
+  it('live 가 아닌 실행은 실제 입력 행을 만들지 않는다 — smoke 의 고정값은 실측이 아니다', async () => {
+    const { artifact } = await collect('tmp/llm-evals/run-a');
+    expect(artifact.contexts.filter((row) => row.scope === 'agent-input')).toEqual([]);
+  });
+});

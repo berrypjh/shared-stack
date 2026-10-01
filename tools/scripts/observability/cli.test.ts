@@ -51,6 +51,36 @@ describe('parseArgs — 등록된 형태만 받는다', () => {
     });
   });
 
+  it('run 은 core · eval · eval-live 만 받고 run id 를 시각으로 만든다', () => {
+    const now = new Date(2026, 9, 1, 10, 15, 0);
+    expect(parseArgs(['run', '--profile=core'], now)).toEqual({
+      command: 'run',
+      profile: 'core',
+      runId: 'core-20261001-101500',
+      live: {},
+    });
+    expect(parseArgs(['run', '--profile=eval', '--run-id=my-eval'], now)).toEqual({
+      command: 'run',
+      profile: 'eval',
+      runId: 'my-eval',
+      live: {},
+    });
+    expect(parseArgs(['run', '--profile=eval-live'], now)).toEqual({
+      command: 'run',
+      profile: 'eval-live',
+      runId: 'eval-live-20261001-101500',
+      live: {},
+    });
+    expect(
+      parseArgs(['run', '--profile=eval-live', '--provider=local', '--model=qwen3:14b'], now),
+    ).toMatchObject({ live: { provider: 'local', model: 'qwen3:14b' } });
+    expect(() => parseArgs(['run', '--profile=eval', '--provider=local'], now)).toThrow(
+      CliUsageError,
+    );
+    expect(() => parseArgs(['run', '--profile=static'], now)).toThrow(CliUsageError);
+    expect(() => parseArgs(['run'], now)).toThrow(CliUsageError);
+  });
+
   it('export 는 run id 만 받는다', () => {
     expect(parseArgs(['export', '--run-id=local-static-01'])).toEqual({
       command: 'export',

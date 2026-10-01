@@ -6,15 +6,23 @@ import {
   SCHEMA_VERSION,
 } from '@berrypjh/observability-contracts';
 
+import { LIVE_SKIPPED_FILE } from '../../../evals/consumer/runner/live/preflight';
+import { VARIANTS } from '../../../evals/consumer/variants/index';
 import {
   EvalImportError,
   parseContextReport,
   parseEvalSummary,
   parseGradedTraces,
+  parseLiveSkipped,
   parseRoutingReport,
 } from '../adapters/eval';
-import { normalizeVariantContexts } from '../normalizers/context';
-import { type Imported, normalizeEvalRun } from '../normalizers/eval';
+import {
+  normalizeAgentInputs,
+  normalizeVariantContexts,
+  usageProviderOf,
+  variantDefinitions,
+} from '../normalizers/context';
+import { executorClassOf, type Imported, normalizeEvalRun } from '../normalizers/eval';
 import { ArtifactError, BoundaryError, readText, sha256 } from '../safe-fs';
 import { readSource, type StaticInput } from '../static';
 import type { RawFile } from '../store';
@@ -86,7 +94,8 @@ export const collectEval = async (
   );
   const routing = await readInput(root, input.from, 'routing.json', parseRoutingReport);
   const context = await readInput(root, input.from, 'context.json', parseContextReport);
-  const files = [summary, traces, routing, context];
+  const skipped = await readInput(root, input.from, LIVE_SKIPPED_FILE, parseLiveSkipped);
+  const files = [summary, traces, routing, context, skipped];
   if (files.every((file) => file.imported.status === 'missing')) {
     throw new ArtifactError(
       'missing',
@@ -95,6 +104,21 @@ export const collectEval = async (
   }
 
   const offline = summary.imported.status === 'missing' && traces.imported.status === 'missing';
+  // 평가 산출물에는 variant 정의가 없어 수집할 때의 정의를 붙인다.
+  const definitions = variantDefinitions(Object.values(VARIANTS));
+  const live =
+    summary.imported.status === 'parsed' &&
+    executorClassOf(summary.imported.value.executor) === 'live';
+  const agentInputs =
+    live && summary.imported.status === 'parsed' && traces.imported.status === 'parsed'
+      ? normalizeAgentInputs({
+          traces: traces.imported.value,
+          skipped: skipped.imported.status === 'parsed' ? skipped.imported.value : [],
+          model: summary.imported.value.model ?? 'unknown',
+          provider: usageProviderOf(summary.imported.value.executor),
+          definitions,
+        })
+      : [];
   const notRun = { status: 'not-run' as const, reason: OFFLINE_REASON };
   const evalRun = normalizeEvalRun({
     sourceId: `eval:${path.posix.basename(input.from)}`,
@@ -106,6 +130,7 @@ export const collectEval = async (
       summary.imported.status === 'parsed'
         ? await input.readBaseline(summary.imported.value.split)
         : { status: 'missing' },
+    ...(skipped.imported.status === 'parsed' && { skipped: skipped.imported.value }),
   });
 
   const source = await readSource(root, input.git, input.env);
@@ -128,13 +153,16 @@ export const collectEval = async (
     inventory: null,
     observations: [],
     bundles: [],
-    contexts:
-      context.imported.status === 'parsed'
+    contexts: [
+      ...(context.imported.status === 'parsed'
         ? normalizeVariantContexts({
             contexts: context.imported.value,
             tokenizerVersion: input.tokenizerVersion,
+            definitions,
           })
-        : [],
+        : []),
+      ...agentInputs,
+    ],
     evals: [evalRun],
   });
 
