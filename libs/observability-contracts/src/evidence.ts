@@ -29,6 +29,15 @@ const HOME_PATH = /\/(?:Users|home)\/[^/\s]+\//g;
 export const containsSecret = (text: string): boolean =>
   SECRET_PATTERNS.some((pattern) => pattern.test(text));
 
+/** 사람이 읽는 이름·ID. 제어 문자와 credential 형태를 담지 않는다. */
+export const safeText = (max: number) =>
+  z
+    .string()
+    .min(1)
+    .max(max)
+    .refine((text) => !/\p{Cc}/u.test(text), 'contains control characters')
+    .refine((text) => !containsSecret(text), 'contains credential-like text');
+
 /** 명령 출력 발췌를 공개 가능한 형태로. credential 을 가리고 홈 경로를 줄이고 길이를 제한한다. */
 export const sanitizeExcerpt = (text: string, max = EXCERPT_MAX): string => {
   let out = text.replace(ANSI_ESCAPE, '').replace(HOME_PATH, '~/');

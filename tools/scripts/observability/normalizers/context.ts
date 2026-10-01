@@ -3,9 +3,12 @@ import {
   contextMeasurementSchema,
   sanitizeExcerpt,
   type TOKEN_PROVIDERS,
+  type VariantDefinition,
 } from '@berrypjh/observability-contracts';
 
+import type { GradedTrace } from '../../../evals/consumer/runner/trace';
 import type { ContextSize, VariantContext } from '../../../evals/consumer/variants/context';
+import type { Variant } from '../../../evals/consumer/variants/index';
 
 export type Tokenizer = {
   provider: (typeof TOKEN_PROVIDERS)[number];
@@ -98,7 +101,21 @@ export const normalizePackageScenarios = ({
     });
   });
 
-type VariantInput = { contexts: VariantContext[]; tokenizerVersion: string };
+type VariantInput = {
+  contexts: VariantContext[];
+  tokenizerVersion: string;
+  /** variant id → 이름 · 설명. 없는 id 는 정의 없이 둔다. */
+  definitions: Record<string, VariantDefinition>;
+};
+
+/** consumer eval variant 의 이름 · 설명을 계약의 정의 모양으로. */
+export const variantDefinitions = (variants: Variant[]): Record<string, VariantDefinition> =>
+  Object.fromEntries(
+    variants.map((variant) => [
+      variant.id,
+      { label: variant.label, description: variant.description },
+    ]),
+  );
 
 const variantMeasurement = (
   id: string,
@@ -107,6 +124,7 @@ const variantMeasurement = (
   tokenModel: string,
   tokenizerVersion: string,
   size: ContextSize,
+  definition: VariantDefinition | undefined,
 ): ContextMeasurement =>
   contextMeasurementSchema.parse({
     id,
@@ -119,6 +137,7 @@ const variantMeasurement = (
     contentConstruction: 'eval-variant-context-join',
     files: size.files,
     missingPaths: size.missingPaths,
+    ...(definition && { definition }),
     ...sizeFields(size),
   });
 
@@ -129,6 +148,7 @@ const variantMeasurement = (
 export const normalizeVariantContexts = ({
   contexts,
   tokenizerVersion,
+  definitions,
 }: VariantInput): ContextMeasurement[] =>
   contexts.flatMap((context) => [
     variantMeasurement(
@@ -138,6 +158,7 @@ export const normalizeVariantContexts = ({
       context.tokenModel,
       tokenizerVersion,
       context,
+      definitions[context.variant],
     ),
     ...Object.entries(context.routed ?? {}).map(([platform, size]) =>
       variantMeasurement(
@@ -147,6 +168,100 @@ export const normalizeVariantContexts = ({
         context.tokenModel,
         tokenizerVersion,
         size,
+        definitions[context.variant],
       ),
     ),
   ]);
+
+/** live executor 가 남긴 trace 하나 · 실행하지 않은 variant 하나. */
+type AgentInputInput = {
+  traces: Pick<GradedTrace, 'variant' | 'taskId' | 'trial' | 'inputTokens'>[];
+  skipped: { variant: string; reason: string }[];
+  model: string;
+  /** 사용량을 보고한 API 형식. executor 이름(`live-openai` 등)에서 정한다. */
+  provider: UsageProvider;
+  definitions: Record<string, VariantDefinition>;
+};
+
+const USAGE_REASON = 'API 가 보고한 사용량 — tokenizer 버전을 알 수 없음';
+
+type UsageProvider = 'anthropic-messages-usage' | 'openai-chat-usage';
+
+/** live executor 이름에서 사용량을 보고한 API 형식을 정한다. */
+export const usageProviderOf = (executor: string): UsageProvider =>
+  executor === 'live-openai' ? 'openai-chat-usage' : 'anthropic-messages-usage';
+
+const agentInputRow = (
+  provider: UsageProvider,
+  subject: string,
+  variant: string,
+  model: string,
+  definitions: Record<string, VariantDefinition>,
+  size:
+    | { tokens: number }
+    | { tokens: null; reason: string; reasonCode: 'not-collected' | 'provider-error' },
+): ContextMeasurement =>
+  contextMeasurementSchema.parse({
+    id: `context.agent-input.${slug(subject)}.anthropic`,
+    scope: 'agent-input',
+    subject,
+    provider,
+    tokenModel: model,
+    tokenizerVersion: null,
+    tokenizerVersionReason: USAGE_REASON,
+    contentConstruction: 'executor-reported',
+    files: [],
+    missingPaths: [],
+    ...(definitions[variant] && { definition: definitions[variant] }),
+    ...(size.tokens === null
+      ? {
+          availability: 'unavailable',
+          chars: null,
+          tokens: null,
+          reason: size.reason,
+          reasonCode: size.reasonCode,
+        }
+      : {
+          availability: 'available',
+          chars: null,
+          tokens: size.tokens,
+          reason: null,
+          reasonCode: null,
+        }),
+  });
+
+/**
+ * live 실행의 실제 입력 토큰. trial 마다 한 행이고(`<variant>::<task>::<trial>`), 값은 executor 가
+ * 매 턴 API 사용량을 더한 것이다. 실행하지 않은 variant 는 0 이 아니라 이유가 있는 행으로 남는다.
+ */
+export const normalizeAgentInputs = ({
+  traces,
+  skipped,
+  model,
+  provider,
+  definitions,
+}: AgentInputInput): ContextMeasurement[] => [
+  ...traces.map((trace) =>
+    agentInputRow(
+      provider,
+      `${trace.variant}::${trace.taskId}::${trace.trial}`,
+      trace.variant,
+      model,
+      definitions,
+      trace.inputTokens === null
+        ? {
+            tokens: null,
+            reason: 'executor 가 입력 토큰을 보고하지 않았다',
+            reasonCode: 'provider-error',
+          }
+        : { tokens: trace.inputTokens },
+    ),
+  ),
+  ...skipped.map((item) =>
+    agentInputRow(provider, item.variant, item.variant, model, definitions, {
+      tokens: null,
+      reason: sanitizeExcerpt(item.reason, 400),
+      reasonCode: 'not-collected',
+    }),
+  ),
+];

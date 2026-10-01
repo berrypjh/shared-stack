@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 import { evidenceRefSchema } from './evidence.js';
-import { metricIdSchema, nonNegativeSchema, reasonSchema, scopeSchema } from './primitives.js';
+import { metricIdSchema, reasonSchema, scopeSchema } from './primitives.js';
 
 /** 값이 없는 이유의 종류. 어느 것도 0 이나 pass 로 바꾸지 않는다. */
 export const MISSING_AVAILABILITIES = [
@@ -20,16 +20,7 @@ export const AVAILABILITIES = ['available', ...MISSING_AVAILABILITIES] as const;
 /** 실측값을 해석한 판정. availability 와 별개의 축이다. */
 export const OUTCOMES = ['pass', 'fail', 'warn', 'info'] as const;
 
-export const DOMAINS = [
-  'test',
-  'bundle',
-  'context',
-  'eval',
-  'verification',
-  'a11y',
-  'browser',
-] as const;
-export const METRIC_DOMAINS = ['test', 'bundle', 'context', 'eval', 'a11y', 'browser'] as const;
+export const DOMAINS = ['bundle', 'context', 'eval'] as const;
 
 export const UNITS = [
   'count',
@@ -44,18 +35,14 @@ export const UNITS = [
 export type Availability = (typeof AVAILABILITIES)[number];
 export type Outcome = (typeof OUTCOMES)[number];
 export type Domain = (typeof DOMAINS)[number];
-export type MetricDomain = (typeof METRIC_DOMAINS)[number];
 export type Unit = (typeof UNITS)[number];
 
 /** domain 마다 의미 있는 unit. 목록 밖 unit 은 해석할 수 없으므로 거부한다. */
 export const DOMAIN_UNITS = {
-  test: ['count', 'ms', 'ratio'],
   bundle: ['bytes', 'bytes-delta'],
   context: ['tokens', 'tokens-delta', 'count'],
   eval: ['ratio', 'tokens', 'count', 'ms'],
-  a11y: ['count', 'ratio'],
-  browser: ['ms', 'count', 'ratio'],
-} as const satisfies Record<MetricDomain, readonly Unit[]>;
+} as const satisfies Record<Domain, readonly Unit[]>;
 
 const INTEGER_UNITS: readonly Unit[] = ['count', 'bytes', 'bytes-delta', 'tokens', 'tokens-delta'];
 const SIGNED_UNITS: readonly Unit[] = ['bytes-delta', 'tokens-delta'];
@@ -64,7 +51,7 @@ const evidenceListSchema = z.array(evidenceRefSchema).max(20);
 
 const metricBase = {
   id: metricIdSchema,
-  domain: z.enum(METRIC_DOMAINS),
+  domain: z.enum(DOMAINS),
   unit: z.enum(UNITS),
   scope: scopeSchema,
   evidence: evidenceListSchema,
@@ -116,67 +103,8 @@ export const metricObservationSchema = z
     if (issue) ctx.addIssue({ code: 'custom', path: ['value'], message: issue });
   });
 
-/** eval harness(`tools/evals/consumer/runner/schema.ts`)와 같은 어휘. 원본 상태를 그대로 보존한다. */
-export const VERIFICATION_KINDS = ['public-import', 'typecheck', 'test', 'build', 'lint'] as const;
-export const VERIFICATION_STATUSES = [
-  'passed',
-  'failed',
-  'not-run',
-  'unsupported',
-  'timeout',
-] as const;
-
-export type VerificationStatus = (typeof VERIFICATION_STATUSES)[number];
-
-/** 원본 상태가 정하는 availability·outcome. 이 표 밖의 조합은 거부한다. */
-export const VERIFICATION_MEANING = {
-  passed: { availability: 'available', outcome: 'pass' },
-  failed: { availability: 'available', outcome: 'fail' },
-  timeout: { availability: 'available', outcome: 'fail' },
-  'not-run': { availability: 'not-run', outcome: null },
-  unsupported: { availability: 'unsupported', outcome: null },
-} as const satisfies Record<
-  VerificationStatus,
-  { availability: Availability; outcome: Outcome | null }
->;
-
-export const verificationObservationSchema = z
-  .strictObject({
-    id: metricIdSchema,
-    domain: z.literal('verification'),
-    scope: scopeSchema,
-    kind: z.enum(VERIFICATION_KINDS),
-    status: z.enum(VERIFICATION_STATUSES),
-    availability: z.enum(['available', 'not-run', 'unsupported']),
-    outcome: z.enum(['pass', 'fail']).nullable(),
-    exitCode: z.number().int().nullable(),
-    durationMs: nonNegativeSchema.nullable(),
-    reason: reasonSchema.nullable(),
-    evidence: evidenceListSchema,
-  })
-  .superRefine((observation, ctx) => {
-    const meaning = VERIFICATION_MEANING[observation.status];
-    if (
-      observation.availability !== meaning.availability ||
-      observation.outcome !== meaning.outcome
-    ) {
-      ctx.addIssue({
-        code: 'custom',
-        path: ['status'],
-        message: `${observation.status} means ${meaning.availability}/${meaning.outcome}`,
-      });
-    }
-    if ((observation.availability === 'available') !== (observation.reason === null)) {
-      ctx.addIssue({
-        code: 'custom',
-        path: ['reason'],
-        message: 'a reason is required exactly when the check has no result',
-      });
-    }
-  });
-
-export const observationSchema = z.union([metricObservationSchema, verificationObservationSchema]);
+/** run 의 observation. 지금은 metric observation 한 종류다. */
+export const observationSchema = metricObservationSchema;
 
 export type MetricObservation = z.infer<typeof metricObservationSchema>;
-export type VerificationObservation = z.infer<typeof verificationObservationSchema>;
-export type Observation = z.infer<typeof observationSchema>;
+export type Observation = MetricObservation;

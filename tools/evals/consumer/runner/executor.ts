@@ -13,13 +13,13 @@ import type {
 /**
  * Agent executor boundary.
  *
- * 이 repository에는 programmatic LLM executor가 없다. 새 provider SDK나 agent
- * framework를 추가하지 않고, 두 가지 결정적 구현만 제공한다.
+ * provider SDK나 agent framework를 추가하지 않는다. 구현은 셋이다.
  *
  * - scripted: harness 단위 테스트용 in-memory executor
  * - replay:   외부에서 수집한 trace를 다시 채점하는 경로
+ * - live:     Anthropic Messages API를 fetch로 부르는 도구 루프 (`live/executor.ts`, API 키 필요)
  *
- * live 결과가 없을 때 가짜 completion을 만들지 않는다. 요청이 오면 throw한다.
+ * executor를 고르지 않으면 가짜 completion을 만들지 않는다. 요청이 오면 throw한다.
  */
 
 export type ExecutorRequest = {
@@ -123,7 +123,8 @@ export const unavailableExecutor: EvalExecutor = {
   model: null,
   run: async () => {
     throw new Error(
-      'no live executor is configured. pass --replay=<traces.jsonl> to grade recorded trials, ' +
+      'no executor is selected. pass --live (needs ANTHROPIC_API_KEY) to run the model, ' +
+        '--replay=<traces.jsonl> to grade recorded trials, ' +
         'or --context-only to measure variant context without an executor.',
     );
   },

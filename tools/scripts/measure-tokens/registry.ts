@@ -2,7 +2,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 
 /**
- * 패키지별 시나리오 등록부와 내용 구성. measure-tokens CLI(`shared.ts`)와 quality-lab 수집기가
+ * 패키지별 시나리오 등록부와 내용 구성. measure-tokens CLI(`shared.ts`)와 품질 관측 수집기가
  * 같은 파일 목록·같은 이어 붙이기로 token 을 세도록 여기 한 벌만 둔다.
  *
  * 새 패키지 추가는 여기 항목 추가만 하면 됨.
@@ -25,7 +25,6 @@ export const MEASURE_TARGETS = {
       ],
       'with-catalog': ['package.json', 'dist/tokens.json'],
       'catalog-only': ['dist/tokens.json'],
-      'agents+catalog': ['dist/AGENTS.md', 'dist/tokens.json'],
 
       // TSV 변형은 미채택 — 재평가 시 design-tokens lib에 `writeTokensTsv` 부활 후 주석 해제.
       // 'with-tsv': ['package.json', 'dist/tokens.tsv'],
@@ -36,9 +35,6 @@ export const MEASURE_TARGETS = {
     dir: 'libs/ui-core',
     scenarios: {
       baseline: ['package.json', 'README.md', 'dist/index.d.ts'],
-      'with-agents': ['package.json', 'dist/AGENTS.md'],
-      'agents-only': ['dist/AGENTS.md'],
-      'agents+tokens': ['dist/AGENTS.md', 'dist/tokens.json'],
       'tokens-only': ['dist/tokens.json'],
     } as Record<string, string[]>,
   },

@@ -108,7 +108,17 @@ describe('normalizeVariantContexts', () => {
     },
   ];
 
-  const measurements = normalizeVariantContexts({ contexts: CONTEXTS, tokenizerVersion: '1.0.22' });
+  const DEFINITIONS = {
+    'progressive-retrieval': {
+      label: 'Progressive Retrieval',
+      description: '문서 + 카탈로그로 시작',
+    },
+  };
+  const measurements = normalizeVariantContexts({
+    contexts: CONTEXTS,
+    tokenizerVersion: '1.0.22',
+    definitions: DEFINITIONS,
+  });
 
   it('initial 과 routed 를 다른 scope 로 나눈다 — routing 이 없으면 routed 행이 없다', () => {
     for (const measurement of measurements)
@@ -120,6 +130,17 @@ describe('normalizeVariantContexts', () => {
       ['context.variant-routed.progressive-retrieval.react-native.openai', 'variant-routed', 20393],
       ['context.variant-initial.full-source.openai', 'variant-initial', null],
     ]);
+  });
+
+  it('variant 정의를 initial · routed 행 모두에 싣고, 정의가 없는 variant 는 비워 둔다', () => {
+    expect(measurements.map((m) => m.definition?.label ?? null)).toEqual([
+      null,
+      'Progressive Retrieval',
+      'Progressive Retrieval',
+      'Progressive Retrieval',
+      null,
+    ]);
+    expect('definition' in measurements[0]).toBe(false);
   });
 
   it('eval 의 내용 구성은 measure-tokens 와 다르게 표시한다', () => {
@@ -137,7 +158,11 @@ describe('normalizeVariantContexts', () => {
   });
 
   it('tokenizer 가 다르면 같은 variant 라도 비교하지 않는다', () => {
-    const other = normalizeVariantContexts({ contexts: CONTEXTS, tokenizerVersion: '1.0.21' });
+    const other = normalizeVariantContexts({
+      contexts: CONTEXTS,
+      tokenizerVersion: '1.0.21',
+      definitions: DEFINITIONS,
+    });
     expect(compareContext(other[0], measurements[0])).toMatchObject({
       comparable: false,
       deltaTokens: null,

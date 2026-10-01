@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 368" role="img" width="640" height="368">
+  <title>rollup 이 styles.scss 를 번들에서 빼 컴포넌트 CSS 가 사라지던 것을, 별도 sass 스크립트가 컴파일하게 바꿈</title>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 1 L9 5 L0 9 z" fill="#667085" />
+    </marker>
+  </defs>
+  <style>
+    .head { font: 600 13px system-ui, sans-serif; fill: #475467; }
+    .file { font: 600 11px ui-monospace, SFMono-Regular, Menlo, monospace; fill: #475467; }
+    .code { font: 400 11px ui-monospace, SFMono-Regular, Menlo, monospace; fill: #101828; }
+    .note { font: 400 12px system-ui, sans-serif; fill: #475467; }
+    .error { fill: #B42318; font-weight: 600; }
+    .flow { fill: none; stroke: #667085; stroke-width: 1.5; }
+  </style>
+
+  <rect width="640" height="368" rx="12" fill="#FFFFFF" />
+  <text class="head" x="20" y="30">전 — rollup 이 CSS 도 맡음</text>
+  <text class="head" x="316" y="30">후 — CSS 는 별도 sass 스크립트</text>
+  <rect x="20" y="46" width="280" height="56" rx="8" fill="#F2F4F7" stroke="#D0D5DD" />
+  <text class="file" x="32" y="65">src/styles.ts</text>
+  <line x1="20" y1="74" x2="300" y2="74" stroke="#D0D5DD" />
+  <text class="code" x="32" y="92" xml:space="preserve">import &#x27;./styles.scss&#x27;;</text>
+  <path class="flow" d="M160 104 L160 140" marker-end="url(#arrow)" />
+  <text class="note" x="170" y="126">@nx/rollup 23 postcss</text>
+  <rect x="20" y="142" width="280" height="52" rx="8" fill="none" stroke="#B42318" stroke-opacity="0.6" stroke-dasharray="4 3" />
+  <text class="note error" x="32" y="164">side-effect import 라 빈 모듈이 되어</text>
+  <text class="note error" x="32" y="182">번들에서 빠짐 — CSS 도 함께 사라짐</text>
+  <path class="flow" d="M160 196 L160 228" marker-end="url(#arrow)" />
+  <rect x="20" y="230" width="280" height="88" rx="8" fill="#F2F4F7" stroke="#D0D5DD" />
+  <text class="file" x="32" y="249">dist/ — bundle-js 직후</text>
+  <line x1="20" y1="258" x2="300" y2="258" stroke="#D0D5DD" />
+  <text class="code" x="32" y="276" xml:space="preserve">index.esm.js · index.d.ts</text>
+  <text class="code" x="32" y="292" xml:space="preserve">components/ · theme/ · utils/ …</text>
+  <text class="code error" x="32" y="308" xml:space="preserve">index.css 없음</text>
+  <text class="note error" x="20" y="340">토큰을 붙이는 다음 단계가 읽을 파일이 없음</text>
+  <rect x="316" y="46" width="304" height="88" rx="8" fill="#F2F4F7" stroke="#D0D5DD" />
+  <text class="file" x="328" y="65">tools/scripts/build-react-ui-css.mjs</text>
+  <line x1="316" y1="74" x2="620" y2="74" stroke="#D0D5DD" />
+  <text class="code" x="328" y="92" xml:space="preserve">sass.compile(&#x27;src/styles.scss&#x27;)</text>
+  <text class="code" x="328" y="108" xml:space="preserve">→ autoprefixer</text>
+  <text class="code" x="328" y="124" xml:space="preserve">→ dist/index.css</text>
+  <path class="flow" d="M468 136 L468 172" marker-end="url(#arrow)" />
+  <text class="note" x="478" y="158">다음 단계가 토큰을 앞에 붙임</text>
+  <rect x="316" y="174" width="304" height="152" rx="8" fill="#F2F4F7" stroke="#D0D5DD" />
+  <text class="file" x="328" y="193">dist/index.css</text>
+  <line x1="316" y1="202" x2="620" y2="202" stroke="#D0D5DD" />
+  <rect x="322" y="272" width="292" height="49" rx="4" fill="#04785714" stroke="#047857" stroke-opacity="0.6" />
+  <text class="code" x="328" y="220" xml:space="preserve">@layer theme, base, components, utilities;</text>
+  <text class="code" x="328" y="236" xml:space="preserve">@layer theme {</text>
+  <text class="code" x="328" y="252" xml:space="preserve">  :root { --ds-… }</text>
+  <text class="code" x="328" y="268" xml:space="preserve">}</text>
+  <text class="code" x="328" y="284" xml:space="preserve">@layer components {</text>
+  <text class="code" x="328" y="300" xml:space="preserve">  .ui-button { … }</text>
+  <text class="code" x="328" y="316" xml:space="preserve">}</text>
+</svg>

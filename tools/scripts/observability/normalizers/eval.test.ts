@@ -3,6 +3,8 @@ import {
   type EvalRate,
   type EvalRun,
   publicRunArtifactSchema,
+  VERIFICATION_KINDS,
+  VERIFICATION_STATUSES,
 } from '@berrypjh/observability-contracts';
 
 import { describe, expect, it } from 'vitest';
@@ -10,6 +12,10 @@ import { describe, expect, it } from 'vitest';
 import { NO_BASELINE_MESSAGE } from '../../../evals/consumer/ci/compare';
 import { aggregateVariant } from '../../../evals/consumer/reporters/aggregate';
 import { buildConfusion } from '../../../evals/consumer/reporters/confusion';
+import {
+  VERIFICATION_KINDS as EVAL_VERIFICATION_KINDS,
+  VERIFICATION_STATUSES as EVAL_VERIFICATION_STATUSES,
+} from '../../../evals/consumer/runner/schema';
 import type { GradedTrace } from '../../../evals/consumer/runner/trace';
 import { VARIANTS } from '../../../evals/consumer/variants/index';
 import { runFixture } from '../__fixtures__/eval-run';
@@ -107,6 +113,11 @@ describe('false success — 명시적 true 주장 중 required 검증을 통과�
 });
 
 describe('verification', () => {
+  it('계약의 verification 어휘는 eval harness 와 같다', () => {
+    expect([...VERIFICATION_STATUSES]).toEqual([...EVAL_VERIFICATION_STATUSES]);
+    expect([...VERIFICATION_KINDS]).toEqual([...EVAL_VERIFICATION_KINDS]);
+  });
+
   it('RN test unsupported 를 상태·required·attempt·원인과 함께 보존한다', () => {
     const { verification } = traceOf(run, 'rn-use-theme-getcolor');
     expect(verification.unsupportedRequired).toEqual(['test']);

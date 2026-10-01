@@ -19,3 +19,6 @@ yarn.lock
 
 # 플러그인 번들 산출물
 plugins/*/dist
+
+# berry-dev standards 생성 rule — 고쳐 쓰면 harness:check 가 수정으로 본다
+.claude/rules/_generated

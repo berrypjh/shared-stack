@@ -55,7 +55,7 @@ describe('발췌', () => {
   it('credential 형태가 남은 발췌는 schema 가 거부한다', () => {
     const ref = {
       source: 'command',
-      commandId: 'test.quality-lab',
+      commandId: 'bundle.size-limit',
       exitCode: 1,
       excerpt: `auth ${token}`,
     };

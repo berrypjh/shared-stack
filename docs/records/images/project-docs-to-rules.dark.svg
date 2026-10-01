@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 254" role="img" width="640" height="254">
+  <title>폴더마다 있던 AGENTS.md · CLAUDE.md 를 .claude/rules path rule 로 모음</title>
+  <style>
+    .head { font: 600 13px system-ui, sans-serif; fill: #98A2B3; }
+    .bar { font: 500 12px system-ui, sans-serif; fill: #98A2B3; }
+    .file { font: 600 11px ui-monospace, SFMono-Regular, Menlo, monospace; fill: #98A2B3; }
+    .code { font: 400 11px ui-monospace, SFMono-Regular, Menlo, monospace; fill: #F2F4F7; }
+    .note { font: 400 12px system-ui, sans-serif; fill: #98A2B3; }
+    .dim { fill: #98A2B3; }
+    .error { fill: #F97066; font-weight: 600; }
+    .accent { fill: #4DBA85; font-weight: 600; }
+      .flow { fill: none; stroke: #98A2B3; stroke-width: 1.5; }
+  </style>
+
+  <rect width="640" height="254" rx="12" fill="#1D2939" />
+  <text class="head" x="20" y="30">전 — 폴더마다 지침 · 진입점</text>
+  <text class="head" x="330" y="30">후 — 지침은 .claude/rules 한 곳</text>
+  <rect x="20" y="46" width="290" height="168" rx="8" fill="#101828" stroke="#344054" />
+  <text class="file" x="32" y="65">프로젝트 폴더</text>
+  <line x1="20" y1="74" x2="310" y2="74" stroke="#344054" />
+  <text class="code" x="32" y="92" xml:space="preserve">apps/devhub/</text>
+  <text class="code error" x="32" y="108" xml:space="preserve">  AGENTS.md</text>
+  <text class="code error" x="32" y="124" xml:space="preserve">  CLAUDE.md      @AGENTS.md</text>
+  <text class="code" x="32" y="140" xml:space="preserve">libs/react-ui/</text>
+  <text class="code error" x="32" y="156" xml:space="preserve">  AGENTS.md</text>
+  <text class="code error" x="32" y="172" xml:space="preserve">  CLAUDE.md      @AGENTS.md</text>
+  <text class="code" x="32" y="188" xml:space="preserve">  AGENTS.consumer.md</text>
+  <text class="code" x="32" y="204" xml:space="preserve">  README.md</text>
+  <text class="note" x="20" y="236">하위 CLAUDE.md 12개가 모두 @AGENTS.md 한 줄</text>
+  <rect x="330" y="46" width="290" height="152" rx="8" fill="#101828" stroke="#344054" />
+  <text class="file" x="342" y="65">.claude/rules/</text>
+  <line x1="330" y1="74" x2="620" y2="74" stroke="#344054" />
+  <text class="code accent" x="342" y="92" xml:space="preserve">devhub.md     apps/devhub/**</text>
+  <text class="code accent" x="342" y="108" xml:space="preserve">react-ui.md   libs/react-ui/**</text>
+  <text class="code" x="342" y="124" xml:space="preserve">… 프로젝트 12개</text>
+  <text class="code" x="342" y="140" xml:space="preserve"></text>
+  <text class="code" x="342" y="156" xml:space="preserve">libs/react-ui/</text>
+  <text class="code" x="342" y="172" xml:space="preserve">  AGENTS.consumer.md → dist/AGENTS.md</text>
+  <text class="code" x="342" y="188" xml:space="preserve">  README.md          → npm</text>
+  <text class="note" x="330" y="220">폴더에는 배포되는 문서만 남음</text>
+</svg>

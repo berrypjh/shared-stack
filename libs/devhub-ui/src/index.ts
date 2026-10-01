@@ -1,0 +1,120 @@
+/**
+ * DevHub 공용 UI. 저장소마다 있는 DevHub 앱(shared-stack · snapdone)이 같은 셸 · 그림 · 문서 화면을
+ * 쓰기 위한 것이다. 카탈로그(무엇을 보여 줄지)는 앱이 갖고, 여기는 어떻게 보여 줄지만 있다.
+ * 라우터는 `DevHubProvider` 로 주입한다 — Next 와 react-router 가 같은 컴포넌트를 쓴다.
+ */
+export { type CanvasEdge, CanvasEdges } from './canvas/canvas-edges';
+export { CanvasViewport, type LegendItem, openModal } from './canvas/canvas-viewport';
+export { usePanZoom } from './canvas/use-pan-zoom';
+export { ViewSwitch } from './canvas/view-switch';
+export {
+  clampZoom,
+  fitView,
+  MAX_ZOOM,
+  MIN_ZOOM,
+  panBy,
+  type Rect,
+  revealRect,
+  type Size,
+  type View,
+  zoomAt,
+} from './canvas/viewport';
+export { type Bar, BarChart, type BarGroup } from './chart/bar-chart';
+export { CommandList } from './doc/command-list';
+export { CopyButton } from './doc/copy-button';
+export { CopyCommand } from './doc/copy-command';
+export { DocContent, type RenderLink, type ResolveImage } from './doc/doc-content';
+export { DocToc } from './doc/doc-toc';
+export {
+  DocumentColumn,
+  DocumentHead,
+  DocumentLayout,
+  DocumentSection,
+} from './doc/document-layout';
+export { type RemoteView, SourceActions } from './doc/source-actions';
+export { type TermItem, TermList } from './doc/term-list';
+export { type Fact, Facts } from './entity/facts';
+export { FileLine, FileList } from './entity/file-line';
+export { InspectorHeader } from './entity/inspector-header';
+export {
+  Empty,
+  InspectorContents,
+  InspectorSection,
+  type InspectorSectionMeta,
+} from './entity/inspector-section';
+export { Pager, type PagerItem } from './entity/pager';
+export { RecordMeta } from './entity/record-meta';
+export { type Inline, inlineText, parseInline } from './markdown/inline';
+export { anchorsOf, bodyOf, type OutlineItem, outlineOf } from './markdown/outline';
+export { type Block, type ListItem, parseMarkdown } from './markdown/parse';
+export { slug } from './markdown/slug';
+export { FilterEmpty } from './notice/filter-empty';
+export { NotFound } from './notice/not-found';
+export { QuestionGuide } from './notice/question-guide';
+export { StatusNotice } from './notice/status-notice';
+export {
+  type DevHubConfig,
+  type DevHubLinkProps,
+  type DevHubLocation,
+  DevHubProvider,
+  type DevHubRouter,
+  useDevHub,
+  useDevHubLink,
+  useDevHubLocation,
+  useDevHubNavigate,
+} from './provider/devhub-provider';
+export {
+  GlobalSearch,
+  type GlobalSearchProps,
+  type SearchSuggestion,
+} from './search/global-search';
+export {
+  buildIndex,
+  search,
+  type SearchEntry,
+  type SearchIndex,
+  type SearchResult,
+  tierOf,
+  TIERS,
+  topResults,
+} from './search/rank';
+export { isMac, isSearchShortcut, resultStatus, shortcutOf } from './search/shortcut';
+export { basename, normalize, stem, tokensOf } from './search/text';
+export { DevHubShell } from './shell/devhub-shell';
+export {
+  Explorer,
+  type ExplorerGroup,
+  type ExplorerItem,
+  type ExplorerSection,
+  type ExplorerView,
+} from './shell/explorer';
+export { ExplorerDrawerProvider, ExplorerPane, ExplorerToggle } from './shell/explorer-drawer';
+export { Inspector } from './shell/inspector';
+export { TopBar } from './shell/top-bar';
+export { useDocumentTitle } from './shell/use-document-title';
+export { useRouteFocus } from './shell/use-route-focus';
+export {
+  INSPECTOR_ID,
+  MAIN_CONTENT_ID,
+  WorkspaceFrame,
+  WorkspaceHeader,
+  WorkspaceSection,
+} from './shell/workspace';
+export { WorkspaceSubsection } from './shell/workspace-subsection';
+export {
+  applyTheme,
+  createThemeScript,
+  currentTheme,
+  DEFAULT_THEME_PAIR,
+  subscribeTheme,
+  THEME_KEY,
+  type ThemeMode,
+  type ThemePair,
+  themeScript,
+} from './theme/theme';
+export { ThemeSwitch } from './theme/theme-switch';
+export { DataTable } from './ui/data-table';
+export { Icon, type IconName } from './ui/icon';
+export { LabeledSelect } from './ui/labeled-select';
+export { Mono, NamedCode } from './ui/mono';
+export { StatusLabel } from './ui/status-label';

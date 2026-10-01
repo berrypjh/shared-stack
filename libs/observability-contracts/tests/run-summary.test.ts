@@ -9,9 +9,8 @@ import {
   summarizeRun,
 } from '../src/index.js';
 
-import { packageSurface } from './design-system-fixtures.js';
 import { evalRun } from './eval-fixtures.js';
-import { artifact, available, HASH, missing, testSummary, verification } from './fixtures.js';
+import { artifact, available, HASH, missing } from './fixtures.js';
 import { sizeLimitMeasurement } from './measurement-fixtures.js';
 
 const summarize = (overrides: Record<string, unknown> = {}) =>
@@ -28,20 +27,13 @@ describe('summarizeRun — 화면이 run 전체를 받기 전에 읽는 요약',
 
   it('영역마다 담긴 행 수만 센다 — 값을 다시 계산하지 않는다', () => {
     const summary = summarize({
-      tests: [testSummary()],
       bundles: [sizeLimitMeasurement()],
       evals: [evalRun()],
-      packageSurfaces: [packageSurface()],
     });
     expect(summary.sections).toEqual({
-      tests: 1,
-      testCases: 1,
       bundles: 1,
       contexts: 0,
       evals: 1,
-      designSystem: false,
-      packageSurfaces: 1,
-      accessibility: 0,
     });
   });
 
@@ -51,32 +43,13 @@ describe('summarizeRun — 화면이 run 전체를 받기 전에 읽는 요약',
         available(),
         missing('not-run'),
         available({
-          id: 'test.react-ui',
-          domain: 'test',
+          id: 'eval.consumer-smoke',
+          domain: 'eval',
           unit: 'ratio',
+          scope: 'tools/evals/consumer',
           value: 0.5,
           denominator: 2,
           outcome: 'fail',
-        }),
-        verification({
-          id: 'typecheck.quality-lab',
-          status: 'failed',
-          outcome: 'fail',
-          exitCode: 2,
-        }),
-      ],
-      tests: [
-        testSummary({
-          execution: {
-            status: 'failed',
-            commandId: 'test.react-ui',
-            exitCode: 1,
-            timeoutMs: 600000,
-            excerpt: null,
-            reason: null,
-          },
-          outcome: null,
-          outcomeReason: 'exit 1 로 끝나 판정하지 않는다',
         }),
       ],
       bundles: [
@@ -94,22 +67,10 @@ describe('summarizeRun — 화면이 run 전체를 받기 전에 읽는 요약',
     });
     expect(summary.failures).toEqual([
       {
-        domain: 'test',
-        id: 'test.react-ui',
-        scope: '@berrypjh/react-ui',
-        reason: 'test.react-ui 의 원본 판정이 fail 이다',
-      },
-      {
-        domain: 'verification',
-        id: 'typecheck.quality-lab',
-        scope: '@berrypjh/quality-lab',
-        reason: 'typecheck failed (exit 2)',
-      },
-      {
-        domain: 'test',
-        id: 'vitest:@berrypjh/react-ui',
-        scope: '@berrypjh/react-ui',
-        reason: '실행이 failed 로 끝났다 (exit 1) — exit 1 로 끝나 판정하지 않는다',
+        domain: 'eval',
+        id: 'eval.consumer-smoke',
+        scope: 'tools/evals/consumer',
+        reason: 'eval.consumer-smoke 의 원본 판정이 fail 이다',
       },
       {
         domain: 'bundle',
@@ -118,33 +79,6 @@ describe('summarizeRun — 화면이 run 전체를 받기 전에 읽는 요약',
         reason: '@berrypjh/react-ui — cx only: 757 B 초과 (한도 11 KB)',
       },
     ]);
-  });
-
-  it('package 표면의 partial·복사본 불일치·catalog drift 를 싣는다', () => {
-    const base = packageSurface();
-    const [index, tokens] = base.emitted;
-    const summary = summarize({
-      packageSurfaces: [
-        packageSurface({
-          emitted: [index, { ...tokens, status: 'missing' }],
-          build: 'partial',
-          tokensCopy: { ...base.tokensCopy, identicalToDesignTokens: false },
-          catalog: { ...base.catalog, regenerated: 'differs' },
-        }),
-      ],
-    });
-    expect(summary.failures).toEqual(
-      [
-        '@berrypjh/react-native-ui build partial — 산출물 1/2 개만 있다',
-        '@berrypjh/react-native-ui libs/react-native-ui/dist/tokens.json 이 design-tokens 원본과 다르다',
-        '@berrypjh/react-native-ui catalog 재생성 결과가 dist 와 다르다',
-      ].map((reason) => ({
-        domain: 'package-surface',
-        id: '@berrypjh/react-native-ui',
-        scope: '@berrypjh/react-native-ui',
-        reason,
-      })),
-    );
   });
 
   it('eval 은 executor 종류와 notice 만 요약한다 — 성공률을 요약하지 않는다', () => {

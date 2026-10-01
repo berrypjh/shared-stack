@@ -11,8 +11,8 @@ import { useProbeValues } from '../verification/useProbes';
 export const VerifyPage = () => {
   const theme = useCurrentTheme();
   const values = useProbeValues(CONTRAST_VARS);
-  // 접근성은 현재 화면에 적용된 프로필 기준으로 본다.
-  const current = values?.default ?? null;
+  // 접근성은 현재 화면에 적용된 테마 기준으로 본다. probe 는 테마 이름으로 값을 갖는다.
+  const current = values?.[theme] ?? null;
 
   return (
     <Page
@@ -53,7 +53,9 @@ export const VerifyPage = () => {
                 const bg = current?.[c.bg] ?? '';
                 const ratio = fg && bg ? contrastRatio(fg, bg) : null;
                 const exempt = c.need === 0;
-                const ok = ratio !== null && ratio >= c.need;
+                // 값을 읽지 못한 것은 미달이 아니라 측정 불가다 — 측정 실패를 대비 회귀로 보이지 않는다.
+                const measured = ratio !== null;
+                const ok = measured && ratio >= c.need;
                 return (
                   <tr key={c.label} data-testid={`contrast-${c.label}`}>
                     <th scope="row" className="py-md pr-lg text-text-default font-regular">
@@ -75,6 +77,8 @@ export const VerifyPage = () => {
                     <td className="py-md text-right text-xxsm">
                       {exempt ? (
                         <span className="text-text-light">면제</span>
+                      ) : !measured ? (
+                        <span className="text-text-light">측정 불가</span>
                       ) : (
                         <span className={ok ? 'text-success-su700' : 'text-error-er700'}>
                           {ok ? '통과' : '미달'}

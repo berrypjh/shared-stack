@@ -1,0 +1,91 @@
+import { createElement } from 'react';
+
+import { Outlet, Route, Routes } from 'react-router-dom';
+
+import { EvaluationProvider } from '@/components/evaluation/evaluation-provider';
+import { DevHubShell } from '@/components/shell/devhub-shell';
+import { type SectionId, SECTIONS } from '@/lib/catalog/entities';
+
+import { ArchitecturePage } from './pages/architecture-page';
+import { DocumentPage } from './pages/document-page';
+import { EvaluationPage } from './pages/evaluation-page';
+import { JourneyPage } from './pages/journey-page';
+import { RouteNotFound } from './pages/not-found-page';
+import { OverviewPage } from './pages/overview-page';
+import { PackagePage } from './pages/package-page';
+import { PluginPage } from './pages/plugin-page';
+import { RecordPage } from './pages/record-page';
+import { SectionPage } from './pages/section-page';
+import { SourcePage } from './pages/source-page';
+
+/** 섹션마다의 항목 화면. */
+const DETAIL: Record<Exclude<SectionId, 'journeys'>, () => React.JSX.Element> = {
+  evaluation: EvaluationPage,
+  packages: PackagePage,
+  plugins: PluginPage,
+  documents: DocumentPage,
+  records: RecordPage,
+};
+
+/** 평가 항목 사이를 옮겨도 읽은 실행을 다시 받지 않도록 client 를 섹션 route 에 하나 둔다. */
+const EvaluationRoutes = () => (
+  <EvaluationProvider>
+    <Outlet />
+  </EvaluationProvider>
+);
+
+/** 셸은 레이아웃 route 라 이동해도 남는다. page 는 `<main>` 과 `<aside>` 를 그린다. */
+const ShellLayout = () => (
+  <DevHubShell>
+    <Outlet />
+  </DevHubShell>
+);
+
+/**
+ * URL 이 선택의 정본이다.
+ *
+ * ```
+ * /                         개요
+ * /journeys                 작업 흐름 목록
+ * /journeys/<id>[/steps/<stepId>]  흐름 그림 · 목록 — 단계 선택이 바뀌어도 화면은 남는다
+ * /sources/<경로>[#symbol-이름]  저장소 경로 하나 — 인용하는 곳 · symbol
+ * /evaluation[/<id>]        평가 항목 — 고른 실행(?run=)의 공개 JSON 을 계약으로 검증해 보인다
+ * /architecture[/<id>]      구조 그림 · 목록 — 노드 선택이 바뀌어도 화면은 남는다. 앱 · 도구는 여기가 자기 화면이다
+ * /<section>                섹션 항목 (evaluation · packages · plugins · documents · records)
+ * /<section>/<id>           항목 하나 — 카탈로그에 없는 ID 는 "카탈로그에 없는 항목"
+ * 그 밖                      "없는 화면"
+ * ```
+ */
+export const AppRoutes = () => (
+  <Routes>
+    <Route element={<ShellLayout />}>
+      <Route index element={<OverviewPage />} />
+      <Route path="architecture" element={<ArchitecturePage />}>
+        <Route index element={null} />
+        <Route path=":nodeId" element={null} />
+      </Route>
+      <Route path="journeys">
+        <Route index element={<SectionPage sectionId="journeys" />} />
+        <Route path=":id" element={<JourneyPage />}>
+          <Route index element={null} />
+          <Route path="steps/:stepId" element={null} />
+        </Route>
+      </Route>
+      {SECTIONS.map(
+        ({ id }) =>
+          id !== 'journeys' && (
+            <Route
+              key={id}
+              path={id}
+              element={id === 'evaluation' ? <EvaluationRoutes /> : undefined}
+            >
+              <Route index element={<SectionPage sectionId={id} />} />
+              <Route path=":id" element={createElement(DETAIL[id])} />
+            </Route>
+          ),
+      )}
+      <Route path="sources/*" element={<SourcePage />} />
+      <Route path="*" element={<RouteNotFound />} />
+    </Route>
+  </Routes>
+);

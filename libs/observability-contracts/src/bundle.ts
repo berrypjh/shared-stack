@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { safeText } from './evidence.js';
 import { MISSING_AVAILABILITIES } from './observation.js';
 import {
   countSchema,
@@ -9,7 +10,6 @@ import {
   scopeSchema,
   sha256Schema,
 } from './primitives.js';
-import { safeText } from './test-summary.js';
 
 /** `budget` 은 한도가 있는 게이트, `diagnostic` 은 보고만 하는 진단 값이다. */
 export const BUNDLE_ROLES = ['budget', 'diagnostic'] as const;

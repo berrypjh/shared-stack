@@ -10,11 +10,11 @@ pnpm add -D @berrypjh/tsconfig
 
 ### 시나리오별 베이스
 
-| 파일           | 용도                                                          |
-| -------------- | ------------------------------------------------------------- |
-| `base.json`    | 공통 strict 옵션. 직접 extends하기보다 시나리오별 베이스 사용 |
-| `next.json`    | Next.js · 번들러 기반 앱용 (`moduleResolution: bundler`)      |
-| `library.json` | npm 배포 라이브러리용 (`moduleResolution: nodenext`)          |
+| 파일           | 용도                                                             |
+| -------------- | ---------------------------------------------------------------- |
+| `base.json`    | 공통 strict 옵션. 직접 extends하지 않고 시나리오별 베이스를 쓴다 |
+| `next.json`    | Next.js · 번들러 기반 앱용 (`moduleResolution: bundler`)         |
+| `library.json` | npm 배포 라이브러리용 (`moduleResolution: nodenext`)             |
 
 ### 예시
 

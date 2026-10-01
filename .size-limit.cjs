@@ -35,22 +35,22 @@ module.exports = [
   reactUi('Stack only', '{ Stack }', '410 B'),
   reactUi('Button only', '{ Button }', '1.52 KB'),
   reactUi('ThemeProvider only', '{ ThemeProvider }', '210 B'),
-  reactUi('themes registry only', '{ themes }', '150 B'),
-  reactUi('Web tokens (Light)', '{ Web }', '3.37 KB'),
+  reactUi('themes registry only', '{ themes }', '182 B'),
+  reactUi('Web tokens (Light)', '{ Web }', '3.96 KB'),
   reactUi('* (full)', '*', '18.3 KB'),
 
   // react-native-ui: displayName 을 쓰지 않아 import 에 따라 값이 실제로 달라진다.
   // 그래서 공개 Button 계열(Button·IconButton·Fab)은 따로따로 검사한다. 내부용 ButtonBase 는 뺀다.
   // Input 계열은 RN 에서만 검사한다. Plain·Filled·Boxed 는 공유 InputBase 때문에 값이 같아서
   // PlainInput 하나만 둔다. TextField 는 합성 계층이라 값이 달라서 따로 둔다.
-  reactNativeUi('themes registry only', '{ themes }', '3.7 KB'),
+  reactNativeUi('themes registry only', '{ themes }', '3.9 KB'),
   reactNativeUi('getColor only', '{ getColor }', '4.1 KB'),
   reactNativeUi('Box only', '{ Box }', '5.1 KB'),
   reactNativeUi('Button only', '{ Button }', '5.6 KB'),
   reactNativeUi('IconButton only', '{ IconButton }', '5.0 KB'),
   reactNativeUi('Fab only', '{ Fab }', '5.3 KB'),
-  reactNativeUi('ThemeProvider only', '{ ThemeProvider }', '3.8 KB'),
-  reactNativeUi('Native tokens (Light)', '{ Native }', '3.7 KB'),
+  reactNativeUi('ThemeProvider only', '{ ThemeProvider }', '4.1 KB'),
+  reactNativeUi('Native tokens (Light)', '{ Native }', '3.9 KB'),
   reactNativeUi('PlainInput only', '{ PlainInput }', '6.2 KB'),
   reactNativeUi('TextField only', '{ TextField }', '7.5 KB'),
   reactNativeUi('* (full)', '*', '16.7 KB'),

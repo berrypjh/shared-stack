@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 246" role="img" width="640" height="246">
+  <title>단일 번들은 디렉티브가 사라져 서버에서 깨지고, 모듈당 한 파일은 client 모듈 첫 줄에만 'use client' 가 붙음</title>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 1 L9 5 L0 9 z" fill="#98A2B3" />
+    </marker>
+  </defs>
+  <style>
+    .head { font: 600 13px system-ui, sans-serif; fill: #98A2B3; }
+    .file { font: 600 11.5px ui-monospace, SFMono-Regular, Menlo, monospace; fill: #98A2B3; }
+    .code { font: 400 11px ui-monospace, SFMono-Regular, Menlo, monospace; fill: #F2F4F7; }
+    .note { font: 400 12px system-ui, sans-serif; fill: #98A2B3; }
+    .dim { fill: #98A2B3; }
+    .error { fill: #F97066; font-weight: 600; }
+    .accent { fill: #4DBA85; font-weight: 700; }
+    .flow { fill: none; stroke: #98A2B3; stroke-width: 1.5; }
+  </style>
+
+  <rect width="640" height="246" rx="12" fill="#1D2939" />
+  <text class="head" x="20" y="30">전 — 단일 번들</text>
+  <text class="head" x="320" y="30">후 — 모듈당 한 파일(preserveModules)</text>
+  <rect x="20" y="46" width="280" height="88" rx="8" fill="#101828" stroke="#344054" />
+  <text class="file" x="32" y="65">dist/index.esm.js</text>
+  <line x1="20" y1="74" x2="300" y2="74" stroke="#344054" />
+  <text class="code" x="32" y="92" xml:space="preserve">Button · cx · themes · …</text>
+  <text class="code" x="32" y="108" xml:space="preserve">FormControlContext (createContext)</text>
+  <text class="code dim" x="32" y="124" xml:space="preserve">&#x27;use client&#x27; 없음 — rollup 이 지움</text>
+  <path class="flow" d="M160 136 L160 168" marker-end="url(#arrow)" />
+  <text class="note" x="170" y="156">서버 컴포넌트에서 import</text>
+  <rect x="20" y="172" width="280" height="52" rx="8" fill="none" stroke="#F97066" stroke-opacity="0.6" />
+  <text class="code error" x="32" y="194">createContext only works in</text>
+  <text class="code error" x="32" y="211">Client Components</text>
+  <rect x="320" y="46" width="300" height="72" rx="8" fill="#101828" stroke="#344054" />
+  <text class="file" x="332" y="65">components/button/Button.esm.js</text>
+  <line x1="320" y1="74" x2="620" y2="74" stroke="#344054" />
+  <rect x="326" y="80" width="288" height="17" rx="4" fill="#4DBA851F" stroke="#4DBA85" stroke-opacity="0.6" />
+  <text class="code accent" x="332" y="92" xml:space="preserve">&#x27;use client&#x27;;</text>
+  <text class="code" x="332" y="108" xml:space="preserve">import { jsxs } from &#x27;react/jsx-runtime&#x27;;</text>
+  <rect x="320" y="134" width="300" height="72" rx="8" fill="#101828" stroke="#344054" />
+  <text class="file" x="332" y="153">utils/cx.esm.js</text>
+  <line x1="320" y1="162" x2="620" y2="162" stroke="#344054" />
+  <text class="code dim" x="332" y="180" xml:space="preserve">/**</text>
+  <text class="code dim" x="332" y="196" xml:space="preserve"> * 조건부 className 결합 …</text>
+  <text class="note" x="320" y="228">디렉티브 없음 — 서버 컴포넌트가 그대로 import</text>
+</svg>

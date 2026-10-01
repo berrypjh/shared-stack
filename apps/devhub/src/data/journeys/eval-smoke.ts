@@ -1,0 +1,88 @@
+import type { Journey } from '../../domain/model';
+
+/** 소비자 평가 중 PR 마다 도는 결정적 smoke. 유료 모델 호출이 없다. */
+export const evalSmoke: Journey = {
+  id: 'eval-smoke',
+  kind: 'eval',
+  title: '소비자 평가 · PR smoke',
+  goal: '모델 호출 없이 결정적 불변식(schema · 카탈로그 drift · harness 테스트 · typecheck · smoke)만으로 PR 의 회귀를 막음',
+  steps: [
+    {
+      id: 'pr',
+      intent: 'PR 을 엶',
+      behavior: 'pr-check 의 consumer-eval job 이 format · lint 뒤에 돔',
+      context: 'ci',
+      owner: 'consumer-eval',
+      status: 'implemented',
+      source: [{ path: '.github/workflows/pr-check.yml', symbol: 'consumer-eval:' }],
+      tests: [],
+      docs: [],
+      next: ['build'],
+    },
+    {
+      id: 'build',
+      intent: '라이브러리를 빌드함',
+      behavior: 'build:libs 가 선언과 소비자 카탈로그를 만듦. dist 는 커밋하지 않아 매번 만듦',
+      context: 'ci',
+      owner: 'consumer-eval',
+      status: 'implemented',
+      source: [
+        {
+          path: '.github/workflows/pr-check.yml',
+          symbol: 'Build libs (declarations + generated catalog)',
+        },
+      ],
+      tests: [],
+      docs: [],
+      next: ['check'],
+    },
+    {
+      id: 'check',
+      intent: 'harness 를 검사함',
+      behavior:
+        'tools:check 가 tools 의 타입과 테스트를 돌리고, 빌드가 쓴 카탈로그와 재생성 결과를 대조',
+      context: 'ci',
+      owner: 'consumer-eval',
+      status: 'implemented',
+      commands: ['pnpm tools:check'],
+      source: [
+        { path: '.github/workflows/pr-check.yml', symbol: 'pnpm run tools:check' },
+        { path: 'tools/scripts/generate-consumer-catalog/catalog.test.ts' },
+      ],
+      tests: ['tools-vitest'],
+      docs: [],
+      next: ['smoke'],
+    },
+    {
+      id: 'smoke',
+      intent: '평가 파이프라인을 결정적으로 돌림',
+      behavior: 'scripted executor 가 고정 task 4개로 검증 · 채점 · report 까지 지남',
+      context: 'ci',
+      owner: 'consumer-eval',
+      status: 'implemented',
+      commands: ['pnpm eval:consumer:smoke'],
+      options: [{ flag: '--smoke', meaning: '고정 task 4개를 scripted executor 로 결정적 실행' }],
+      source: [
+        { path: '.github/workflows/pr-check.yml', symbol: 'pnpm run eval:consumer:smoke' },
+        { path: 'tools/evals/consumer/runner/run.ts', symbol: 'args.smoke' },
+        { path: 'tools/evals/consumer/ci/smoke-fixture.ts', symbol: 'SMOKE_TASK_IDS' },
+        { path: 'tools/evals/consumer/runner/executor.ts', symbol: 'createScriptedExecutor' },
+      ],
+      tests: ['tools-vitest'],
+      docs: [],
+      next: ['upload'],
+    },
+    {
+      id: 'upload',
+      intent: 'report 를 올림',
+      behavior: 'tmp/llm-evals/pr-smoke 를 CI 아티팩트 consumer-eval-smoke 로 올림',
+      context: 'ci',
+      owner: 'consumer-eval',
+      status: 'implemented',
+      source: [{ path: '.github/workflows/pr-check.yml', symbol: 'consumer-eval-smoke' }],
+      tests: [],
+      docs: [],
+      next: [],
+    },
+  ],
+};

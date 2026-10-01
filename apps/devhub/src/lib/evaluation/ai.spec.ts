@@ -1,0 +1,195 @@
+import { evalRunSchema } from '@berrypjh/observability-contracts';
+
+import {
+  evalRun,
+  offlineEvalRun,
+  RESOLVER_MATRIX,
+  RN_UNSUPPORTED,
+} from '../../test/evaluation/evals';
+
+import {
+  confusionGrid,
+  contextEmptyState,
+  executorTag,
+  metricText,
+  PRIMARY_KEYS,
+  retrievalText,
+  routingMatrix,
+  verificationCounts,
+} from './ai';
+
+const run = evalRunSchema.parse(evalRun());
+const byVariant = (id: string) => {
+  const found = run.variants.find((variant) => variant.variant === id);
+  if (!found) throw new Error(`no variant ${id}`);
+  return found;
+};
+
+describe('primary metric — 원본 이름·분자·분모·n 그대로', () => {
+  it('primary key 순서를 contracts registry 에서 읽는다', () => {
+    expect(PRIMARY_KEYS).toEqual([
+      'verifiedTaskSuccessRate',
+      'routingAccuracy',
+      'requiredEvidenceRecallAtK',
+      'medianInputTokens',
+      'falseSuccessRate',
+    ]);
+  });
+
+  it('rate 는 백분율과 분자/분모를 함께 쓴다', () => {
+    const { primary } = byVariant('progressive-with-repair');
+    expect(metricText(primary.verifiedTaskSuccessRate, 'rate')).toBe('50.0% (2/4)');
+  });
+
+  it('false success 분모는 명시적으로 주장한 trial 수다 — trial 전체가 아니다', () => {
+    expect(metricText(byVariant('progressive-with-repair').primary.falseSuccessRate, 'rate')).toBe(
+      '33.3% (1/3)',
+    );
+    expect(metricText(byVariant('consumer-docs').primary.falseSuccessRate, 'rate')).toBe(
+      '100.0% (3/3)',
+    );
+  });
+
+  it('aggregate 는 n 을, tokens 는 단위를 붙인다', () => {
+    const { primary } = byVariant('consumer-docs');
+    expect(metricText(primary.medianInputTokens, 'tokens')).toBe('1,000 tokens (n=4)');
+    expect(metricText(primary.requiredEvidenceRecallAtK, 'mean')).toBe('0.83 (n=3)');
+    expect(metricText(primary.requiredEvidenceRecallAtK, 'percent')).toBe('83.3% (n=3)');
+  });
+
+  it('값이 없으면 0 이 아니라 N/A 와 원본 이유다', () => {
+    const { secondary } = byVariant('consumer-docs');
+    expect(metricText(secondary.noToolCorrectness, 'rate')).toBe('N/A — 분모 0 (0/0)');
+    expect(metricText(secondary.toolCallsPerSuccessfulTask, 'mean')).toBe('N/A — 표본 없음 (n=0)');
+  });
+});
+
+describe('executorTag — caption 의 출처 이름', () => {
+  it('parsed summary 의 executor 이름을 그대로 쓴다', () => {
+    expect(executorTag(run)).toBe('smoke-scripted');
+  });
+
+  it('origin 이 없는 실행에서 이름을 지어내지 않는다', () => {
+    expect(() => executorTag(evalRunSchema.parse(offlineEvalRun()))).toThrow(
+      'eval:offline 에 origin 이 없다 — variant 는 parsed summary 에서만 온다',
+    );
+  });
+});
+
+describe('confusionGrid — expected 4행 × predicted 5열 고정', () => {
+  const grid = confusionGrid(RESOLVER_MATRIX);
+
+  it('행·열 순서를 바꾸지 않고 both·unreported 를 숨기지 않는다', () => {
+    expect(grid.map((row) => row.expected)).toEqual(['web', 'react-native', 'both', 'none']);
+    expect(grid[0].cells.map((cell) => cell.predicted)).toEqual([
+      'web',
+      'react-native',
+      'none',
+      'both',
+      'unreported',
+    ]);
+    const both = grid[2];
+    expect(both.cells.map((cell) => cell.count)).toEqual([0, 0, 0, 1, 1]);
+    expect(both.rowTotal).toBe(2);
+  });
+
+  it('관측된 0 은 0 이고 대각선을 표시한다 — 새 비율을 만들지 않는다', () => {
+    const web = grid[0];
+    expect(web.cells[1]).toEqual({
+      expected: 'web',
+      predicted: 'react-native',
+      count: 0,
+      diagonal: false,
+    });
+    expect(web.cells[0]).toMatchObject({ count: 15, diagonal: true });
+  });
+
+  it('관측 0 인 행과 routing 결과 자체가 없는 경우를 구분한다', () => {
+    const traceMatrix = routingMatrix(run, 'trace-grades', 'consumer-docs');
+    if (!traceMatrix) throw new Error('trace-grades matrix 가 없다');
+    const traceGrid = confusionGrid(traceMatrix);
+    expect(traceGrid[2]).toMatchObject({ expected: 'both', rowTotal: 0 });
+    expect(traceGrid[0].cells[4]).toMatchObject({ predicted: 'unreported', count: 1 });
+    expect(routingMatrix(run, 'trace-grades', 'unknown-variant')).toBeNull();
+    expect(routingMatrix(run, 'deterministic-resolver', null)?.total).toBe(37);
+  });
+});
+
+describe('retrieval', () => {
+  it('필요한 근거가 없는 과제는 찾은 수 · 순서가 N/A 다', () => {
+    const noUi = run.traces.find((trace) => trace.taskId === 'no-ui-date-format');
+    expect(noUi && retrievalText(noUi.retrieval)).toEqual({
+      hits: 'N/A — 필요한 근거 없음',
+      firstHitRank: 'N/A',
+    });
+  });
+
+  it('찾은 수 / 필요한 수와 원본 recall, 처음 찾은 순서를 그대로 쓴다', () => {
+    const helper = run.traces.find(
+      (trace) => trace.id === 'consumer-docs::web-textfield-helper::1',
+    );
+    expect(helper && retrievalText(helper.retrieval)).toEqual({
+      hits: '2 / 4 (50.0%)',
+      firstHitRank: '2번째',
+    });
+  });
+});
+
+describe('verificationCounts — kind × status (verification run 수)', () => {
+  it('unsupported 는 통과가 아닌 자기 칸에 센다', () => {
+    const traces = run.traces.filter((trace) => trace.variant === 'progressive-with-repair');
+    const counts = verificationCounts(traces);
+    expect(counts.test).toEqual({ passed: 3, failed: 0, 'not-run': 0, unsupported: 1, timeout: 0 });
+    expect(counts.typecheck.passed).toBe(4);
+    expect(counts.build).toEqual({
+      passed: 0,
+      failed: 0,
+      'not-run': 0,
+      unsupported: 0,
+      timeout: 0,
+    });
+  });
+
+  it('실행하지 않고 보고만 한 variant 에는 run 이 없다', () => {
+    const counts = verificationCounts(
+      run.traces.filter((trace) => trace.variant === 'consumer-docs'),
+    );
+    expect(Object.values(counts).every((row) => Object.values(row).every((n) => n === 0))).toBe(
+      true,
+    );
+    expect(RN_UNSUPPORTED).toContain('jsdom');
+  });
+});
+
+describe('contextEmptyState — scope 에 행이 없을 때', () => {
+  const noContext = evalRunSchema.parse({
+    ...evalRun(),
+    import: { ...evalRun().import, context: { status: 'missing', reason: 'context.json 이 없다' } },
+  });
+  const of = (scope: Parameters<typeof contextEmptyState>[0]['scope'], evals = [run]) =>
+    contextEmptyState({ scope, runId: 'run-eval', profile: 'eval', evals });
+
+  it('agent-input 은 live 평가에서만 생긴다고 쓰고 live 명령을 준다', () => {
+    const state = of('agent-input', [noContext]);
+    expect(state).toMatchObject({
+      kind: 'unsupported',
+      title: 'run-eval 에는 실제 입력이 없음 — agent-input context 측정',
+      commands: ['pnpm quality:eval:live --provider=<제공자> --model=<모델>'],
+    });
+    expect(state.cause).toContain('모델을 실제로 호출한 live 평가에서만 생김');
+  });
+
+  it('variant scope 는 context import 실패 이유를 쓴다', () => {
+    expect(of('variant-routed', [noContext])).toMatchObject({
+      kind: 'unsupported',
+      title: 'run-eval 는 이 영역을 실행하지 않았음 — variant-routed context 측정',
+      cause: expect.stringContaining('context report import missing — context.json 이 없다'),
+    });
+  });
+
+  it('package-scenario 는 core profile 수집 명령을 준다', () => {
+    const state = of('package-scenario');
+    expect(state.title).toBe('run-eval 에는 이 영역이 없음 — package-scenario context 측정');
+    expect(state.commands).toEqual(['pnpm quality:core']);
+  });
+});

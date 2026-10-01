@@ -8,7 +8,8 @@ on:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  # 배포 도중 취소되면 tag · 패키지가 반만 남는다. 뒤 실행은 앞 실행이 끝나기를 기다린다.
+  cancel-in-progress: false
 
 jobs:
   release:

@@ -20,6 +20,8 @@ const DEFAULT_TOKENS_BY_MODE = {
   ember: Native.Ember.tokens,
   frost: Native.Frost.tokens,
   midnight: Native.Midnight.tokens,
+  ivory: Native.Ivory.tokens,
+  charcoal: Native.Charcoal.tokens,
 } satisfies Record<ThemeName, RNTokens>;
 
 export interface ThemeProviderProps {

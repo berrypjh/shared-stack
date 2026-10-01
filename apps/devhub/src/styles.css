@@ -1,0 +1,9 @@
+/* @import 는 다른 규칙보다 앞에 온다 — 뒤에 두면 postcss-import 가 조용히 버린다. */
+@import 'tailwindcss';
+/* 글자 묶음 · devhub-code · color-scheme · body · :focus-visible 은 devhub-ui 가 갖는다. */
+@import '@berrypjh/devhub-ui/styles.css';
+
+@config '../tailwind.config.js';
+
+/* 라이브러리 컴포넌트가 쓰는 Tailwind 클래스는 dist 를 훑어야 생성된다(node_modules 는 자동 탐지에서 빠진다). */
+@source '../node_modules/@berrypjh/devhub-ui/dist';

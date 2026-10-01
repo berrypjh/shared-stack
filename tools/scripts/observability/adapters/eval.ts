@@ -277,3 +277,11 @@ export const parseRoutingReport = (
 /** `--context-only --json` 출력. */
 export const parseContextReport = (text: string, label: string): VariantContext[] =>
   parseWith(contextReportSchema, text, label, 'context-only report').contexts;
+
+const liveSkippedSchema = z.array(
+  z.strictObject({ variant: z.string().min(1), reason: z.string().min(1).max(500) }),
+);
+
+/** live 실행이 컨텍스트 한도 등으로 실행하지 않은 variant 와 이유 (`live-skipped.json`). */
+export const parseLiveSkipped = (text: string, label: string) =>
+  parseWith(liveSkippedSchema, text, label, 'live skipped variants');

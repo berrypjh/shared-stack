@@ -243,6 +243,8 @@ describe('tokensByMode', () => {
     ember: Native.Ember.tokens,
     frost: Native.Frost.tokens,
     midnight: Native.Midnight.tokens,
+    ivory: Native.Ivory.tokens,
+    charcoal: Native.Charcoal.tokens,
   } satisfies Record<ThemeName, RNTokens>;
 
   /** `toHaveTextContent` 는 문자열을 정규식으로 읽습니다 — `|` 를 넣지 말고 전체를 비교합니다. */

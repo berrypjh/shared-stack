@@ -19,8 +19,8 @@ describe('parseArgs — 등록된 형태만 받는다', () => {
         'collect',
         '--profile=core',
         '--run-id=local-quality-01',
-        '--import=test.react-ui:tmp/quality-lab/imports/react-ui.json',
-        '--import=bundle.size-limit:tmp/quality-lab/imports/size-limit.json',
+        '--import=bundle.treeshake.react-ui:tmp/observability/imports/treeshake.json',
+        '--import=bundle.size-limit:tmp/observability/imports/size-limit.json',
         '--only-imports',
       ]),
     ).toEqual({
@@ -28,8 +28,8 @@ describe('parseArgs — 등록된 형태만 받는다', () => {
       profile: 'core',
       runId: 'local-quality-01',
       imports: {
-        'test.react-ui': 'tmp/quality-lab/imports/react-ui.json',
-        'bundle.size-limit': 'tmp/quality-lab/imports/size-limit.json',
+        'bundle.treeshake.react-ui': 'tmp/observability/imports/treeshake.json',
+        'bundle.size-limit': 'tmp/observability/imports/size-limit.json',
       },
       onlyImports: true,
     });
@@ -49,6 +49,36 @@ describe('parseArgs — 등록된 형태만 받는다', () => {
       runId: 'local-eval-01',
       from: 'tmp/llm-evals/pr-smoke',
     });
+  });
+
+  it('run 은 core · eval · eval-live 만 받고 run id 를 시각으로 만든다', () => {
+    const now = new Date(2026, 9, 1, 10, 15, 0);
+    expect(parseArgs(['run', '--profile=core'], now)).toEqual({
+      command: 'run',
+      profile: 'core',
+      runId: 'core-20261001-101500',
+      live: {},
+    });
+    expect(parseArgs(['run', '--profile=eval', '--run-id=my-eval'], now)).toEqual({
+      command: 'run',
+      profile: 'eval',
+      runId: 'my-eval',
+      live: {},
+    });
+    expect(parseArgs(['run', '--profile=eval-live'], now)).toEqual({
+      command: 'run',
+      profile: 'eval-live',
+      runId: 'eval-live-20261001-101500',
+      live: {},
+    });
+    expect(
+      parseArgs(['run', '--profile=eval-live', '--provider=local', '--model=qwen3:14b'], now),
+    ).toMatchObject({ live: { provider: 'local', model: 'qwen3:14b' } });
+    expect(() => parseArgs(['run', '--profile=eval', '--provider=local'], now)).toThrow(
+      CliUsageError,
+    );
+    expect(() => parseArgs(['run', '--profile=static'], now)).toThrow(CliUsageError);
+    expect(() => parseArgs(['run'], now)).toThrow(CliUsageError);
   });
 
   it('export 는 run id 만 받는다', () => {
@@ -75,16 +105,7 @@ describe('parseArgs — 등록된 형태만 받는다', () => {
         'collect',
         '--profile=static',
         '--run-id=a',
-        '--import=test.react-ui:tmp/quality-lab/imports/a.json',
-      ],
-    ],
-    [['collect', '--profile=core', '--run-id=a', '--import=rm -rf:tmp/quality-lab/imports/a.json']],
-    [
-      [
-        'collect',
-        '--profile=core',
-        '--run-id=a',
-        '--import=eval.consumer-smoke:tmp/quality-lab/imports/a.json',
+        '--import=bundle.size-limit:tmp/observability/imports/a.json',
       ],
     ],
     [
@@ -92,7 +113,7 @@ describe('parseArgs — 등록된 형태만 받는다', () => {
         'collect',
         '--profile=core',
         '--run-id=a',
-        '--import=test.react-ui:libs/react-ui/package.json',
+        '--import=rm -rf:tmp/observability/imports/a.json',
       ],
     ],
     [
@@ -100,13 +121,37 @@ describe('parseArgs — 등록된 형태만 받는다', () => {
         'collect',
         '--profile=core',
         '--run-id=a',
-        '--import=test.react-ui:tmp/quality-lab/imports/a.json',
-        '--import=test.react-ui:tmp/quality-lab/imports/b.json',
+        '--import=eval.consumer-smoke:tmp/observability/imports/a.json',
+      ],
+    ],
+    [
+      [
+        'collect',
+        '--profile=core',
+        '--run-id=a',
+        '--import=test.react-ui:tmp/observability/imports/a.json',
+      ],
+    ],
+    [
+      [
+        'collect',
+        '--profile=core',
+        '--run-id=a',
+        '--import=bundle.size-limit:libs/react-ui/package.json',
+      ],
+    ],
+    [
+      [
+        'collect',
+        '--profile=core',
+        '--run-id=a',
+        '--import=bundle.size-limit:tmp/observability/imports/a.json',
+        '--import=bundle.size-limit:tmp/observability/imports/b.json',
       ],
     ],
     [['collect', '--profile=core', '--run-id=a', '--only-imports=yes']],
     [['collect', '--profile=eval', '--run-id=a']],
-    [['collect', '--profile=eval', '--run-id=a', '--from=tmp/quality-lab/runs']],
+    [['collect', '--profile=eval', '--run-id=a', '--from=tmp/observability/runs']],
     [['collect', '--profile=eval', '--run-id=a', '--from=tmp/llm-evals']],
     [
       [

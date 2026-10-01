@@ -1,0 +1,18 @@
+{
+  "description": "secret 파일을 Bash 로 우회해서 읽는 명령을 막는다",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node",
+            "args": ["${CLAUDE_PLUGIN_ROOT}/scripts/guard-secrets.mjs"],
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 280" role="img" width="640" height="280">
+  <title>레이어 밖 컴포넌트 규칙이 소비자 유틸을 이기던 것을, @layer components 로 옮겨 유틸이 이기게 함</title>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 1 L9 5 L0 9 z" fill="#667085" />
+    </marker>
+  </defs>
+  <style>
+    .head { font: 600 13px system-ui, sans-serif; fill: #475467; }
+    .title { font: 600 11.5px system-ui, sans-serif; fill: #475467; }
+    .code { font: 400 11px ui-monospace, SFMono-Regular, Menlo, monospace; fill: #101828; }
+    .note { font: 400 11px system-ui, sans-serif; fill: #475467; }
+    .tag { font: 700 11.5px system-ui, sans-serif; }
+    .error { fill: #B42318; }
+    .accent { fill: #047857; }
+    .flow { fill: none; stroke: #667085; stroke-width: 1.5; }
+  </style>
+
+  <rect width="640" height="280" rx="12" fill="#FFFFFF" />
+  <text class="head" x="44" y="30">전 — react-ui CSS 가 레이어 밖</text>
+  <text class="head" x="354" y="30">후 — 컴포넌트 규칙은 @layer components</text>
+  <path class="flow" d="M24 250 L24 62" marker-end="url(#arrow)" />
+  <text class="note" x="24" y="54" text-anchor="middle">높음</text>
+  <text class="note" x="24" y="266" text-anchor="middle">낮음</text>
+  <rect x="44" y="46" width="266" height="46" rx="8" fill="#B4231812" stroke="#B42318" stroke-dasharray="4 3" />
+  <text class="title" x="56" y="65">레이어 밖 — react-ui</text>
+  <text class="code" x="56" y="82">.ui-list { padding: 0 }</text>
+  <text class="tag error" x="298" y="65" text-anchor="end">이김</text>
+  <rect x="44" y="102" width="266" height="46" rx="8" fill="#F2F4F7" stroke="#D0D5DD" />
+  <text class="title" x="56" y="121">@layer utilities — 소비자</text>
+  <text class="code" x="56" y="138">.pl-3 { padding-left: … }</text>
+  <text class="tag error" x="298" y="121" text-anchor="end">무시됨</text>
+  <rect x="44" y="158" width="266" height="46" rx="8" fill="#F2F4F7" stroke="#D0D5DD" />
+  <text class="title" x="56" y="177">@layer base · theme — Tailwind</text>
+  <rect x="354" y="46" width="266" height="46" rx="8" fill="#04785714" stroke="#047857" />
+  <text class="title" x="366" y="65">@layer utilities — 소비자</text>
+  <text class="code" x="366" y="82">.pl-3 { padding-left: … }</text>
+  <text class="tag accent" x="608" y="65" text-anchor="end">이김</text>
+  <rect x="354" y="102" width="266" height="46" rx="8" fill="#F2F4F7" stroke="#D0D5DD" />
+  <text class="title" x="366" y="121">@layer components — react-ui</text>
+  <text class="code" x="366" y="138">.ui-list { padding: 0 }</text>
+  <rect x="354" y="158" width="266" height="46" rx="8" fill="#F2F4F7" stroke="#D0D5DD" />
+  <text class="title" x="366" y="177">@layer base</text>
+  <rect x="354" y="214" width="266" height="46" rx="8" fill="#F2F4F7" stroke="#D0D5DD" />
+  <text class="title" x="366" y="233">@layer theme — 토큰</text>
+  <text class="code" x="366" y="250">:root { --ds-… }</text>
+</svg>

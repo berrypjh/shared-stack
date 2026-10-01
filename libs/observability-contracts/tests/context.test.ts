@@ -25,6 +25,33 @@ describe('ContextMeasurement', () => {
     ]);
   });
 
+  it('variant 정의는 패키지 시나리오가 아닌 scope 에만 두고, 없어도(이전 실행) 통과한다', () => {
+    const definition = {
+      label: 'Catalog + Routing',
+      description: '라우팅된 패키지 자료만 읽는다.',
+    };
+    const variant = { scope: 'variant-routed', subject: 'catalog-with-routing@web' };
+    expect(ok(contextMeasurement({ ...variant, definition }))).toBe(true);
+    expect(ok(contextMeasurement(variant))).toBe(true);
+    expect(ok(contextMeasurement({ definition }))).toBe(false);
+    expect(ok(contextMeasurement({ ...variant, definition: { label: 'x' } }))).toBe(false);
+  });
+
+  it('API 가 보고한 실제 입력은 글자 수 없이 둘 수 있고, 센 값은 글자 수가 있어야 한다', () => {
+    const reported = {
+      scope: 'agent-input',
+      subject: 'consumer-docs::web-button-loading::1',
+      provider: 'anthropic-messages-usage',
+      tokenizerVersion: null,
+      tokenizerVersionReason: 'API 가 보고한 사용량 — tokenizer 버전을 알 수 없음',
+      contentConstruction: 'executor-reported',
+      files: [],
+      chars: null,
+    };
+    expect(ok(contextMeasurement(reported))).toBe(true);
+    expect(ok(contextMeasurement({ chars: null }))).toBe(false);
+  });
+
   it('실측 0 token 은 값이고, available 인데 null 이면 거부한다', () => {
     expect(ok(contextMeasurement({ chars: 0, tokens: 0 }))).toBe(true);
     expect(ok(contextMeasurement({ tokens: null }))).toBe(false);

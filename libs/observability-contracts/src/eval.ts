@@ -1,9 +1,7 @@
 import { z } from 'zod';
 
-import { excerptSchema } from './evidence.js';
-import { VERIFICATION_KINDS, VERIFICATION_STATUSES } from './observation.js';
+import { excerptSchema, safeText } from './evidence.js';
 import { countSchema, gitShaSchema, isoTimeSchema, orUnknown, reasonSchema } from './primitives.js';
-import { safeText } from './test-summary.js';
 
 /**
  * consumer eval (`tools/evals/consumer`) 의 summary·trace 를 화면으로 옮기는 계약.
@@ -11,6 +9,18 @@ import { safeText } from './test-summary.js';
  */
 
 export const EVAL_AXES = ['correctness', 'routing', 'context', 'verification'] as const;
+
+/** eval harness(`tools/evals/consumer/runner/schema.ts`)와 같은 trace 검증 어휘. 원본 상태를 그대로 보존한다. */
+export const VERIFICATION_KINDS = ['public-import', 'typecheck', 'test', 'build', 'lint'] as const;
+export const VERIFICATION_STATUSES = [
+  'passed',
+  'failed',
+  'not-run',
+  'unsupported',
+  'timeout',
+] as const;
+
+export type VerificationStatus = (typeof VERIFICATION_STATUSES)[number];
 
 /**
  * 값이 없는 이유. `zero-denominator`·`no-samples` 는 원본 분모·n 에서 확인한 것이고,
@@ -150,6 +160,8 @@ export const evalVariantSchema = z
   .strictObject({
     variant: slugSchema,
     label: safeText(100),
+    /** 수집할 때의 variant 설명. 이 필드가 생기기 전에 수집한 실행에는 없다. */
+    description: safeText(300).optional(),
     tasks: countSchema,
     /** variant 의 전체 시행 수 (task 수 × task 당 반복). */
     trials: countSchema,
@@ -383,6 +395,7 @@ export const EVAL_NOTICE_CODES = [
 
 export const EXECUTOR_CLASSES = [
   'harness-smoke',
+  'live',
   'scripted',
   'replay',
   'unavailable',
@@ -542,6 +555,16 @@ export const evalRunSchema = z
     }),
     notices: z.array(z.strictObject({ code: z.enum(EVAL_NOTICE_CODES), message: reasonSchema })),
     variants: z.array(evalVariantSchema),
+    /** live 평가가 실행 전 점검(컨텍스트 한도 등)으로 실행하지 않은 variant 와 이유. */
+    skippedVariants: z
+      .array(
+        z.strictObject({
+          variant: slugSchema,
+          label: safeText(100).optional(),
+          reason: reasonSchema,
+        }),
+      )
+      .optional(),
     routing: z.array(
       z.strictObject({
         source: z.enum(['trace-grades', 'deterministic-resolver']),

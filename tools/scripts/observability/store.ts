@@ -29,7 +29,7 @@ import {
 export { LockedError } from './safe-fs';
 
 /** 수집 run 저장소. `.gitignore` 의 `tmp` 가 덮으므로 source control 에 들어가지 않는다. */
-export const STORE_ROOT = 'tmp/quality-lab';
+export const STORE_ROOT = 'tmp/observability';
 
 const INDEX = 'index.json';
 

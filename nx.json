@@ -122,6 +122,7 @@
   "release": {
     "projects": [
       "@berrypjh/react-ui",
+      "@berrypjh/devhub-ui",
       "@berrypjh/ui-core",
       "@berrypjh/design-tokens",
       "@berrypjh/react-native-ui",
@@ -153,6 +154,7 @@
       },
       "git": {
         "commit": true,
+        "commitMessage": "chore(release): publish {version} [skip ci]",
         "tag": true
       }
     },
@@ -177,7 +179,9 @@
       "inputs": [
         "default",
         "^production",
-        { "externalDependencies": ["storybook", "@storybook/test-runner"] }
+        {
+          "externalDependencies": ["storybook", "@storybook/test-runner"]
+        }
       ]
     },
     "test": {

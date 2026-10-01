@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "repository": "https://github.com/berrypjh/shared-stack",
+  "commit": "<checkout 한 shared-stack 의 git rev-parse HEAD — 40자 전체>",
+  "plugin": "berry-dev",
+  "version": "<그 checkout 의 plugins/berry-dev/.claude-plugin/plugin.json version>"
+}

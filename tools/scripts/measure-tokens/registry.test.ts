@@ -7,7 +7,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { findMissingFiles, MEASURE_TARGETS, readScenarioFiles } from './registry';
 
 /**
- * shared.ts 에서 옮긴 등록부와 내용 구성의 characterization. CLI 와 quality-lab 수집기가 같은
+ * shared.ts 에서 옮긴 등록부와 내용 구성의 characterization. CLI 와 품질 관측 수집기가 같은
  * 파일 목록·같은 이어 붙이기로 token 을 세야 두 숫자가 같은 측정이다.
  */
 describe('MEASURE_TARGETS', () => {
@@ -34,10 +34,13 @@ describe('MEASURE_TARGETS', () => {
       'agents+api-catalog': ['dist/AGENTS.md', 'dist/llm-catalog.json'],
       'api-catalog-only': ['dist/llm-catalog.json'],
     });
-    expect(MEASURE_TARGETS['design-tokens'].scenarios['agents+catalog']).toEqual([
-      'dist/AGENTS.md',
-      'dist/tokens.json',
-    ]);
+  });
+
+  it('private 패키지는 만들지 않는 dist/AGENTS.md 를 읽지 않는다', () => {
+    for (const name of ['design-tokens', 'ui-core'] as const) {
+      const files = Object.values(MEASURE_TARGETS[name].scenarios).flat();
+      expect(files).not.toContain('dist/AGENTS.md');
+    }
   });
 });
 

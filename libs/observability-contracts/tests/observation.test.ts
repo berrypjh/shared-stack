@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
-import { AVAILABILITIES, observationSchema, VERIFICATION_STATUSES } from '../src/index.js';
+import { AVAILABILITIES, observationSchema } from '../src/index.js';
 
-import { available, missing, verification } from './fixtures.js';
+import { available, missing } from './fixtures.js';
 
 const ok = (input: unknown) => observationSchema.safeParse(input).success;
 const MISSING = AVAILABILITIES.filter((a) => a !== 'available');
@@ -48,7 +48,7 @@ describe('숫자', () => {
   it('count·bytes·tokens 는 비음수 정수다', () => {
     expect(ok(available({ value: -1 }))).toBe(false);
     expect(ok(available({ value: 1.5 }))).toBe(false);
-    expect(ok(available({ domain: 'test', unit: 'count', value: 3 }))).toBe(true);
+    expect(ok(available({ domain: 'context', unit: 'count', value: 3 }))).toBe(true);
     expect(ok(available({ domain: 'context', unit: 'tokens', value: -3 }))).toBe(false);
   });
 
@@ -58,8 +58,8 @@ describe('숫자', () => {
   });
 
   it('ms 는 비음수 소수다', () => {
-    expect(ok(available({ domain: 'test', unit: 'ms', value: 12.5 }))).toBe(true);
-    expect(ok(available({ domain: 'test', unit: 'ms', value: -0.1 }))).toBe(false);
+    expect(ok(available({ domain: 'eval', unit: 'ms', value: 12.5 }))).toBe(true);
+    expect(ok(available({ domain: 'eval', unit: 'ms', value: -0.1 }))).toBe(false);
   });
 
   describe('ratio 는 분모와 함께 온다', () => {
@@ -93,53 +93,9 @@ describe('알 수 없는 입력', () => {
 
   it('알 수 없는 domain·availability·필드는 거부한다', () => {
     expect(ok(available({ domain: 'perf' }))).toBe(false);
+    expect(ok(available({ domain: 'test', unit: 'count' }))).toBe(false);
+    expect(ok(available({ domain: 'browser', unit: 'ms' }))).toBe(false);
     expect(ok(missing('skipped'))).toBe(false);
     expect(ok({ ...available(), rawTrace: 'x' })).toBe(false);
-  });
-});
-
-describe('verification 은 원본 5상태를 보존한다', () => {
-  it('eval harness 와 같은 다섯 상태다', () => {
-    expect([...VERIFICATION_STATUSES]).toEqual([
-      'passed',
-      'failed',
-      'not-run',
-      'unsupported',
-      'timeout',
-    ]);
-  });
-
-  it.each([
-    ['passed', 'available', 'pass', null],
-    ['failed', 'available', 'fail', null],
-    ['timeout', 'available', 'fail', null],
-    ['not-run', 'not-run', null, '실행하지 않았다'],
-    ['unsupported', 'unsupported', null, '이 harness 가 지원하지 않는다'],
-  ])('%s → %s / %s', (status, availability, outcome, reason) => {
-    const input = verification({
-      status,
-      availability,
-      outcome,
-      reason,
-      exitCode: null,
-      durationMs: null,
-    });
-    expect(observationSchema.parse(input)).toMatchObject({ status, availability, outcome });
-  });
-
-  it('unsupported·not-run·timeout 을 pass 로 둘 수 없다', () => {
-    expect(
-      ok(verification({ status: 'unsupported', availability: 'available', outcome: 'pass' })),
-    ).toBe(false);
-    expect(
-      ok(verification({ status: 'not-run', availability: 'available', outcome: 'pass' })),
-    ).toBe(false);
-    expect(ok(verification({ status: 'timeout', outcome: 'pass' }))).toBe(false);
-  });
-
-  it('실행하지 않은 verification 은 이유가 필요하다', () => {
-    expect(
-      ok(verification({ status: 'not-run', availability: 'not-run', outcome: null, reason: null })),
-    ).toBe(false);
   });
 });

@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 278" role="img" width="640" height="278">
+  <title>패키지에 동봉한 CLI 로 심볼을 찾은 실제 출력(일부 필드 생략)</title>
+  <style>
+    .head { font: 600 13px system-ui, sans-serif; fill: #475467; }
+    .bar { font: 500 12px system-ui, sans-serif; fill: #475467; }
+    .file { font: 600 11px ui-monospace, SFMono-Regular, Menlo, monospace; fill: #475467; }
+    .code { font: 400 11px ui-monospace, SFMono-Regular, Menlo, monospace; fill: #101828; }
+    .note { font: 400 12px system-ui, sans-serif; fill: #475467; }
+    .dim { fill: #475467; }
+    .error { fill: #B42318; font-weight: 600; }
+    .accent { fill: #047857; font-weight: 600; }
+  </style>
+
+  <rect width="640" height="278" rx="12" fill="#FFFFFF" stroke="#D0D5DD" />
+  <path d="M0 12 a12 12 0 0 1 12 -12 h616 a12 12 0 0 1 12 12 v22 h-640 z" fill="#F2F4F7" />
+  <line x1="0" y1="34" x2="640" y2="34" stroke="#D0D5DD" />
+  <circle cx="20" cy="17" r="5" fill="#D0D5DD" />
+  <circle cx="38" cy="17" r="5" fill="#D0D5DD" />
+  <circle cx="56" cy="17" r="5" fill="#D0D5DD" />
+  <text class="bar" x="320" y="21" text-anchor="middle">소비자 저장소 — 설치된 dist/cli.mjs 가 옆 파일을 읽음</text>
+  <text class="code dim" x="20" y="60" xml:space="preserve">$ npx @berrypjh/react-ui find button --limit=3</text>
+  <text class="code " x="20" y="85" xml:space="preserve">{</text>
+  <text class="code " x="20" y="102" xml:space="preserve">  &quot;query&quot;: &quot;button&quot;,</text>
+  <text class="code " x="20" y="119" xml:space="preserve">  &quot;hits&quot;: [</text>
+  <text class="code accent" x="20" y="136" xml:space="preserve">    { &quot;symbol&quot;: &quot;Button&quot;, &quot;kind&quot;: &quot;component&quot;, &quot;importFrom&quot;: &quot;@berrypjh/react-ui&quot;, … },</text>
+  <text class="code " x="20" y="153" xml:space="preserve">    { &quot;symbol&quot;: &quot;ButtonAutoAnchorProps&quot;, &quot;kind&quot;: &quot;type&quot;, … },</text>
+  <text class="code " x="20" y="170" xml:space="preserve">    { &quot;symbol&quot;: &quot;ButtonBase&quot;, &quot;kind&quot;: &quot;component&quot;, … }</text>
+  <text class="code " x="20" y="187" xml:space="preserve">  ],</text>
+  <text class="code " x="20" y="204" xml:space="preserve">  &quot;matchCount&quot;: 25,</text>
+  <text class="code " x="20" y="221" xml:space="preserve">  &quot;returned&quot;: 3,</text>
+  <text class="code " x="20" y="238" xml:space="preserve">  &quot;truncated&quot;: true</text>
+  <text class="code " x="20" y="255" xml:space="preserve">}</text>
+</svg>

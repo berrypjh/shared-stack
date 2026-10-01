@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
+import { safeText } from './evidence.js';
 import { MISSING_AVAILABILITIES } from './observation.js';
 import { countSchema, metricIdSchema, reasonSchema, relativePathSchema } from './primitives.js';
-import { safeText } from './test-summary.js';
 
 /**
  * - `package-scenario`: measure-tokens 의 패키지별 시나리오 (정적 파일 묶음)
@@ -16,7 +16,16 @@ export const CONTEXT_SCOPES = [
   'variant-routed',
   'agent-input',
 ] as const;
-export const TOKEN_PROVIDERS = ['openai-tiktoken-local', 'anthropic-count-tokens'] as const;
+/**
+ * `*-usage` 는 API 응답의 사용량(usage) — 세지 않고 API 가 보고한 값이다. `anthropic-messages-usage` 는
+ * Anthropic Messages 형식으로 보고한 값이라 같은 형식을 받는 로컬 서버(Ollama)의 보고도 여기 든다.
+ */
+export const TOKEN_PROVIDERS = [
+  'openai-tiktoken-local',
+  'anthropic-count-tokens',
+  'anthropic-messages-usage',
+  'openai-chat-usage',
+] as const;
 
 /** 파일을 이어 붙이는 방식이 다르면 같은 파일이어도 token 수가 다르다. */
 export const CONTENT_CONSTRUCTIONS = [
@@ -32,6 +41,18 @@ export const CONTEXT_REASON_CODES = [
   'not-collected',
 ] as const;
 
+/**
+ * 측정 당시의 variant 정의(consumer eval `VARIANTS` 의 이름과 설명). 화면이 이름만으로는 알 수 없는
+ * 뜻을 보이게 한다. variant 를 재는 scope(variant-* · agent-input)에만 있고, 이 필드가 생기기 전에
+ * 수집한 실행에는 없다.
+ */
+export const variantDefinitionSchema = z.strictObject({
+  label: safeText(80),
+  description: safeText(300),
+});
+
+export type VariantDefinition = z.infer<typeof variantDefinitionSchema>;
+
 const contextBase = {
   id: metricIdSchema,
   scope: z.enum(CONTEXT_SCOPES),
@@ -44,12 +65,14 @@ const contextBase = {
   files: z.array(relativePathSchema),
   /** 선언됐지만 없는 경로 (spec 원문). 하나라도 있으면 부분 합계를 두지 않는다. */
   missingPaths: z.array(z.string().min(1).max(300)),
+  definition: variantDefinitionSchema.optional(),
 };
 
 const availableContextSchema = z.strictObject({
   ...contextBase,
   availability: z.literal('available'),
-  chars: countSchema,
+  /** executor 가 보고한 값은 내용을 보지 못해 글자 수가 없다. */
+  chars: countSchema.nullable(),
   tokens: countSchema,
   reason: z.null(),
   reasonCode: z.null(),
@@ -72,6 +95,24 @@ export const contextMeasurementSchema = z
         code: 'custom',
         path: ['tokenizerVersion'],
         message: 'give the tokenizer version, or null with a reason',
+      });
+    }
+    if (measurement.definition && measurement.scope === 'package-scenario') {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['definition'],
+        message: 'a variant definition does not belong to package scenarios',
+      });
+    }
+    if (
+      measurement.availability === 'available' &&
+      measurement.chars === null &&
+      measurement.contentConstruction !== 'executor-reported'
+    ) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['chars'],
+        message: 'only executor-reported tokens may come without chars',
       });
     }
     const hasMissing = measurement.missingPaths.length > 0;

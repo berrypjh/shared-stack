@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 452" role="img" width="640" height="452">
+  <title>test: 블록을 vite.config.mts 에서 vitest.config.mts 로 옮기고 test target 을 project.json 에 직접 적음</title>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 1 L9 5 L0 9 z" fill="#98A2B3" />
+    </marker>
+    <marker id="arrow-accent" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 1 L9 5 L0 9 z" fill="#4DBA85" />
+    </marker>
+  </defs>
+  <style>
+    .head { font: 600 13px system-ui, sans-serif; fill: #98A2B3; }
+    .file { font: 600 12px ui-monospace, SFMono-Regular, Menlo, monospace; fill: #98A2B3; }
+    .code { font: 400 11.5px ui-monospace, SFMono-Regular, Menlo, monospace; fill: #F2F4F7; }
+    .note { font: 400 12px system-ui, sans-serif; fill: #98A2B3; }
+    .alert { font: 600 12px system-ui, sans-serif; fill: #F97066; }
+    .flow { fill: none; stroke: #98A2B3; stroke-width: 1.5; }
+    .move-label { font: 600 11px system-ui, sans-serif; fill: #4DBA85; paint-order: stroke; stroke: #1D2939; stroke-width: 4px; }
+    .move { fill: none; stroke: #4DBA85; stroke-width: 1.5; stroke-dasharray: 4 3; }
+  </style>
+
+  <rect width="640" height="452" rx="12" fill="#1D2939" />
+  <text class="head" x="20" y="30">전 — vite.config.mts 하나에 build · test</text>
+  <text class="head" x="340" y="30">후 — test 설정과 target 을 따로 둠</text>
+  <rect x="20" y="46" width="280" height="56" rx="8" fill="#101828" stroke="#344054" />
+  <text class="file" x="32" y="65">nx.json</text>
+  <line x1="20" y1="74" x2="300" y2="74" stroke="#344054" />
+  <text class="code" x="32" y="92" xml:space="preserve">&quot;plugin&quot;: &quot;@nx/vitest&quot;</text>
+  <rect x="20" y="136" width="280" height="168" rx="8" fill="#101828" stroke="#344054" />
+  <text class="file" x="32" y="155">libs/react-ui/vite.config.mts</text>
+  <line x1="20" y1="164" x2="300" y2="164" stroke="#344054" />
+  <rect x="26" y="218" width="268" height="65" rx="4" fill="#F970661F" stroke="#F97066" stroke-opacity="0.6" />
+  <text class="code" x="32" y="182" xml:space="preserve">export default defineConfig(() =&gt; ({</text>
+  <text class="code" x="32" y="198" xml:space="preserve">  root: __dirname,</text>
+  <text class="code" x="32" y="214" xml:space="preserve">  plugins: [react()],</text>
+  <text class="code" x="32" y="230" xml:space="preserve">  test: {</text>
+  <text class="code" x="32" y="246" xml:space="preserve">    environment: &#x27;jsdom&#x27;,</text>
+  <text class="code" x="32" y="262" xml:space="preserve">    …</text>
+  <text class="code" x="32" y="278" xml:space="preserve">  },</text>
+  <text class="code" x="32" y="294" xml:space="preserve">}));</text>
+  <path class="flow" d="M160 104 L160 134" marker-end="url(#arrow)" />
+  <text class="note" x="170" y="126">평가해 test target 추론</text>
+  <text class="alert" x="20" y="326">이 평가 중 그래프 생성 실패</text>
+  <rect x="340" y="46" width="280" height="72" rx="8" fill="#101828" stroke="#344054" />
+  <text class="file" x="352" y="65">nx.json</text>
+  <line x1="340" y1="74" x2="620" y2="74" stroke="#344054" />
+  <text class="code" x="352" y="92" xml:space="preserve">&quot;exclude&quot;: [</text>
+  <text class="code" x="352" y="108" xml:space="preserve">  &quot;libs/react-ui/vite.config.mts&quot;, …</text>
+  <rect x="340" y="136" width="280" height="104" rx="8" fill="#101828" stroke="#344054" />
+  <text class="file" x="352" y="155">libs/react-ui/project.json</text>
+  <line x1="340" y1="164" x2="620" y2="164" stroke="#344054" />
+  <text class="code" x="352" y="182" xml:space="preserve">&quot;test&quot;: {</text>
+  <text class="code" x="352" y="198" xml:space="preserve">  &quot;executor&quot;: &quot;@nx/vitest:test&quot;,</text>
+  <text class="code" x="352" y="214" xml:space="preserve">  &quot;configFile&quot;:</text>
+  <text class="code" x="352" y="230" xml:space="preserve">    &quot;libs/react-ui/vitest.config.mts&quot;</text>
+  <rect x="340" y="280" width="280" height="152" rx="8" fill="#101828" stroke="#344054" />
+  <text class="file" x="352" y="299">libs/react-ui/vitest.config.mts</text>
+  <line x1="340" y1="308" x2="620" y2="308" stroke="#344054" />
+  <rect x="346" y="346" width="268" height="65" rx="4" fill="#4DBA851F" stroke="#4DBA85" stroke-opacity="0.6" />
+  <text class="code" x="352" y="326" xml:space="preserve">export default defineConfig({</text>
+  <text class="code" x="352" y="342" xml:space="preserve">  plugins: [react()],</text>
+  <text class="code" x="352" y="358" xml:space="preserve">  test: {</text>
+  <text class="code" x="352" y="374" xml:space="preserve">    environment: &#x27;jsdom&#x27;,</text>
+  <text class="code" x="352" y="390" xml:space="preserve">    …</text>
+  <text class="code" x="352" y="406" xml:space="preserve">  },</text>
+  <text class="code" x="352" y="422" xml:space="preserve">});</text>
+  <path class="flow" d="M480 242 L480 278" marker-end="url(#arrow)" />
+  <text class="note" x="490" y="264">configFile</text>
+  <path class="move" d="M300 246 C 322 246, 318 374, 338 374" marker-end="url(#arrow-accent)" />
+  <text class="move-label" x="320" y="314" text-anchor="middle">test: 이동</text>
+</svg>

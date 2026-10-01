@@ -1,16 +1,13 @@
 @import 'tailwindcss';
 @config '../tailwind.config.js';
 
-:root {
-  --demo-canvas: var(--ds-neutral-ne200);
-}
-
-[data-theme='dark'] {
-  --demo-canvas: #0a0f1a;
-}
-
-[data-theme='sepia'] {
-  --demo-canvas: var(--ds-neutral-ne300);
+/*
+ * 셸 바깥 캔버스. 테마 루트(`[data-theme]`)에서 선언해야 그 테마의 값으로 계산된다 —
+ * `:root` 에서 선언하면 `<html>` 의 light 값으로 굳고, 자식은 식이 아니라 그 값을 물려받는다.
+ * 페이지 배경을 본문색 쪽으로 조금 옮겨, 밝은 테마는 조금 어둡게 · 어두운 테마는 조금 밝게 셸과 갈린다.
+ */
+[data-theme] {
+  --demo-canvas: color-mix(in srgb, var(--ds-background-default) 92%, var(--ds-text-default));
 }
 
 body {

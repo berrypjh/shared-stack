@@ -1,0 +1,12 @@
+/*
+ * Storybook 전용 Tailwind entry. 앱의 `styles.css`(apps/devhub)와 같은 모양이다 —
+ * 이 패키지는 소비될 때 Tailwind 를 스스로 돌리지 않고 앱이 돈다. 여기서는 컴포넌트를 눈으로 보기 위해
+ * 같은 순서를 흉내 낸다: import 가 먼저(postcss-import 가 뒤에 둔 것은 버린다), 그다음 `@utility` 가
+ * 있는 devhub-ui 자신의 styles.css, 그다음 preset(`@config`), 마지막으로 소스 훑기(`@source`).
+ */
+@import 'tailwindcss';
+@import '../src/styles.css';
+
+@config '../tailwind.config.js';
+
+@source '../src';

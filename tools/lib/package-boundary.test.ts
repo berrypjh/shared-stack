@@ -2,7 +2,6 @@
  * 게시되는 두 패키지(`react-ui`, `react-native-ui`)의 exports map ↔ 빌드 산출물 대조.
  *
  * ui-core는 `libs/ui-core/src/packageSurface.test.ts`가 자기 패키지 안에서 같은 검사를 한다.
- * 렌더러 두 개를 여기 두는 이유는 `react-native-ui`에 test target이 없기 때문이다 —
  * 이 파일은 `pnpm tools:check`로 돌고 CI의 consumer-eval job이 실행한다.
  *
  * dist가 없으면 통과가 아니라 실패다. 산출물을 검사하는 것이 목적이기 때문.
@@ -43,6 +42,12 @@ const PUBLISHED: Published[] = [
       'dist/AGENTS.md',
       'dist/cli.mjs',
     ],
+  },
+  {
+    id: '@berrypjh/devhub-ui',
+    root: 'libs/devhub-ui',
+    subpaths: ['.', './styles.css'],
+    artifacts: ['dist/index.d.ts', 'dist/index.js', 'dist/styles.css'],
   },
   {
     id: '@berrypjh/react-native-ui',
@@ -270,6 +275,7 @@ describe('게시되는 선언은 private 패키지를 요구하지 않는다', (
   it.each([
     ['@berrypjh/react-native-ui', 'libs/react-native-ui/dist/index.d.ts'],
     ['@berrypjh/react-ui', 'libs/react-ui/dist/types/index.d.ts'],
+    ['@berrypjh/devhub-ui', 'libs/devhub-ui/dist/index.d.ts'],
   ])('%s 선언에 private import 가 없다', async (_id, relative) => {
     const text = await fs.readFile(path.join(REPO_ROOT, relative), 'utf8');
     const offenders = text
@@ -283,6 +289,7 @@ describe('게시되는 선언은 private 패키지를 요구하지 않는다', (
   it.each([
     ['@berrypjh/react-native-ui', 'libs/react-native-ui/dist/index.d.ts'],
     ['@berrypjh/react-ui', 'libs/react-ui/dist/types/index.d.ts'],
+    ['@berrypjh/devhub-ui', 'libs/devhub-ui/dist/index.d.ts'],
   ])('%s 선언에 로컬 절대 경로가 없다', async (_id, relative) => {
     const text = await fs.readFile(path.join(REPO_ROOT, relative), 'utf8');
 

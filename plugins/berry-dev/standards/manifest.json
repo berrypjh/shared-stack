@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "rules": [
+    { "id": "core", "source": "rules/core.md", "scope": "core" },
+    { "id": "berry-consumer", "source": "rules/berry-consumer.md", "scope": "optional" },
+    { "id": "cross-runtime-pure", "source": "rules/cross-runtime-pure.md", "scope": "optional" },
+    { "id": "docs-ko", "source": "rules/docs-ko.md", "scope": "optional" },
+    { "id": "ko-ui", "source": "rules/ko-ui.md", "scope": "optional" }
+  ]
+}

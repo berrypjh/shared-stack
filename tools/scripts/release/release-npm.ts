@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 
 import { releaseChangelog, releasePublish, releaseVersion } from 'nx/release';
 
-import { hasReleaseFeature, toReleaseScopes } from './release-bump';
+import { hasBreakingChange, hasReleaseFeature, toReleaseScopes } from './release-bump';
 
 /**
  * 직전 release tag 이후 commit log를 주어진 format으로 가져옵니다. tag가 없으면 빈 문자열입니다.
@@ -22,13 +22,13 @@ const getLogSinceLastTag = (format: string): string => {
 };
 
 /**
- * 직전 release tag 이후 commit 본문에 BREAKING CHANGE footer가 있는지 확인합니다.
+ * 직전 release tag 이후 commit에 breaking change(`!` 또는 BREAKING CHANGE footer)가 있는지 확인합니다.
  *
  * nx release의 conventionalCommits scope 매칭은 full npm name(@scope/pkg)을 요구하지만,
  * 현재 프로젝트 commit scope는 short name(react-ui 등)이라 자동 매칭이 안 되므로, 여기서 직접 감지해 major 강제 여부를 결정합니다.
  */
 const hasBreakingChangeSinceLastTag = (): boolean =>
-  /^BREAKING CHANGE:/m.test(getLogSinceLastTag('%B'));
+  hasBreakingChange(getLogSinceLastTag('%B%x00').split('\0'));
 
 /**
  * 직전 release tag 이후 릴리즈 대상 scope의 feat commit이 있는지 확인합니다.
@@ -67,13 +67,8 @@ const main = async () => {
     preid: isBeta ? 'beta' : undefined,
   });
 
-  await releaseChangelog({
-    versionData: projectsVersionData,
-    version: workspaceVersion,
-    releaseGraph,
-    firstRelease: isFirstRelease,
-  });
-
+  // publish 를 먼저 한다. changelog 단계가 tag · push · GitHub Release 를 만들기 때문에, 그 뒤에 publish 가
+  // 실패하면 다시 돌려도 "직전 tag 이후 변경 없음" 이라 배포할 길이 없다. 이미 나간 버전은 publish 가 건너뛴다.
   const publishResult = await releasePublish({
     releaseGraph,
     registry: 'https://npm.pkg.github.com',
@@ -83,8 +78,19 @@ const main = async () => {
   });
 
   const allOk = Object.values(publishResult).every((result) => result.code === 0);
+  if (!allOk) {
+    console.error('publish 실패 — tag · changelog 를 push 하지 않습니다. 고친 뒤 다시 실행하세요.');
+    process.exit(1);
+  }
 
-  process.exit(allOk ? 0 : 1);
+  await releaseChangelog({
+    versionData: projectsVersionData,
+    version: workspaceVersion,
+    releaseGraph,
+    firstRelease: isFirstRelease,
+  });
+
+  process.exit(0);
 };
 
 main().catch((error) => {

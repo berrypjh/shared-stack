@@ -17,6 +17,7 @@ import {
   normalizePackageScenarios,
   normalizeVariantContexts,
   type PackageScenarioResult,
+  variantDefinitions,
 } from '../normalizers/context';
 
 /** 설치된 tiktoken 버전. tiktoken 의 exports 가 `package.json` 을 막아 require 대신 파일을 읽는다. */
@@ -85,5 +86,9 @@ export const collectVariantContexts = async ({
 }): Promise<ContextMeasurement[]> => {
   const contexts = [];
   for (const variant of variants) contexts.push(await measureVariantContext(variant));
-  return normalizeVariantContexts({ contexts, tokenizerVersion });
+  return normalizeVariantContexts({
+    contexts,
+    tokenizerVersion,
+    definitions: variantDefinitions(variants),
+  });
 };

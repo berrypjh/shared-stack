@@ -97,6 +97,7 @@ describe('RunArtifact', () => {
 
   it('알 수 없는 top-level 필드는 거부한다', () => {
     expect(runArtifactSchema.safeParse({ ...artifact(), rawTrace: [] }).success).toBe(false);
+    expect(runArtifactSchema.safeParse({ ...artifact(), tests: [] }).success).toBe(false);
   });
 
   it('공개 artifact 는 raw evidence 를 담을 수 없다', () => {

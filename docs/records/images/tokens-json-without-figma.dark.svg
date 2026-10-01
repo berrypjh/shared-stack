@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 254" role="img" width="640" height="254">
+  <title>Figma export 한 파일을 테마 · 카테고리별 JSON 으로 나눔</title>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 1 L9 5 L0 9 z" fill="#98A2B3" />
+    </marker>
+  </defs>
+  <style>
+    .head { font: 600 13px system-ui, sans-serif; fill: #98A2B3; }
+    .file { font: 600 11px ui-monospace, SFMono-Regular, Menlo, monospace; fill: #98A2B3; }
+    .code { font: 400 11px ui-monospace, SFMono-Regular, Menlo, monospace; fill: #F2F4F7; }
+    .note { font: 400 12px system-ui, sans-serif; fill: #98A2B3; }
+    .dim { fill: #98A2B3; }
+    .accent { fill: #4DBA85; font-weight: 600; }
+    .flow { fill: none; stroke: #98A2B3; stroke-width: 1.5; }
+  </style>
+
+  <rect width="640" height="254" rx="12" fill="#1D2939" />
+  <text class="head" x="20" y="30">전 — Figma export 한 파일</text>
+  <text class="head" x="330" y="30">후 — 테마 · 카테고리별 JSON</text>
+  <rect x="20" y="46" width="290" height="168" rx="8" fill="#101828" stroke="#344054" />
+  <text class="file" x="32" y="65">tokens/data.json</text>
+  <line x1="20" y1="74" x2="310" y2="74" stroke="#344054" />
+  <text class="code" x="32" y="92" xml:space="preserve">{</text>
+  <text class="code" x="32" y="108" xml:space="preserve">  &quot;values&quot;: {</text>
+  <text class="code" x="32" y="124" xml:space="preserve">    &quot;global&quot;: { … },</text>
+  <text class="code" x="32" y="140" xml:space="preserve">    &quot;dark&quot;: { … }</text>
+  <text class="code" x="32" y="156" xml:space="preserve">  },</text>
+  <text class="code" x="32" y="172" xml:space="preserve">  &quot;$metadata&quot;: { … },</text>
+  <text class="code" x="32" y="188" xml:space="preserve">  &quot;$themes&quot;: []</text>
+  <text class="code" x="32" y="204" xml:space="preserve">}</text>
+  <text class="note" x="20" y="236">build 전에 splitAndMerge · deepMerge 로 테마를 나눔</text>
+  <rect x="330" y="46" width="290" height="168" rx="8" fill="#101828" stroke="#344054" />
+  <text class="file" x="342" y="65">tokens/</text>
+  <line x1="330" y1="74" x2="620" y2="74" stroke="#344054" />
+  <rect x="336" y="176" width="278" height="33" rx="4" fill="#4DBA851F" stroke="#4DBA85" stroke-opacity="0.6" />
+  <text class="code" x="342" y="92" xml:space="preserve">light/</text>
+  <text class="code" x="342" y="108" xml:space="preserve">  border.json · borderWidth.json</text>
+  <text class="code" x="342" y="124" xml:space="preserve">  color.json · component.json</text>
+  <text class="code" x="342" y="140" xml:space="preserve">  elevation.json · radius.json</text>
+  <text class="code" x="342" y="156" xml:space="preserve">  shadow.json · spacing.json</text>
+  <text class="code" x="342" y="172" xml:space="preserve">  typography.json</text>
+  <text class="code accent" x="342" y="188" xml:space="preserve">dark/</text>
+  <text class="code accent" x="342" y="204" xml:space="preserve">  color.json</text>
+  <text class="note" x="330" y="236">dark 는 light 에 덮어쓸 색만(override)</text>
+</svg>

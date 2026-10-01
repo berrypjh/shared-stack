@@ -99,6 +99,7 @@ describe('collectVariantContexts', () => {
       scope: 'variant-initial',
       tokens: measured.tokens,
       files: measured.files,
+      definition: { label: variant.label, description: variant.description },
     });
     expect(measurements.filter((m) => m.scope === 'variant-routed').map((m) => m.tokens)).toEqual(
       Object.values(measured.routed ?? {}).map((size) => size.tokens),

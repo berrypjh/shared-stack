@@ -1,0 +1,205 @@
+import type { Tool } from '../domain/model';
+
+/** `tools/` 와 `plugins/` 아래 전부. Nx 프로젝트가 아니어서 `nx affected` 에 걸리지 않는 것이 대부분이다. */
+export const tools: Tool[] = [
+  {
+    id: 'consumer-catalog-generator',
+    name: '소비자 API 카탈로그 생성기',
+    root: 'tools/scripts/generate-consumer-catalog',
+    rootKind: 'directory',
+    platform: 'node',
+    purpose: '빌드된 선언에서 react-ui · react-native-ui 의 dist/llm-catalog.json 을 만듦',
+    docs: [],
+    source: [{ path: 'tools/scripts/generate-consumer-catalog/index.ts' }],
+  },
+  {
+    id: 'consumer-retrieval',
+    name: 'consumer-retrieval',
+    root: 'tools/consumer-retrieval',
+    rootKind: 'directory',
+    platform: 'node',
+    purpose:
+      '플랫폼 → 패키지 → 심볼 → 토큰으로 좁히는 결정적 resolver. 배포 패키지의 dist/cli.mjs 로도 번들됨',
+    docs: [],
+    source: [
+      { path: 'tools/consumer-retrieval/cli.ts' },
+      { path: 'tools/consumer-retrieval/package-cli.ts' },
+    ],
+  },
+  {
+    id: 'consumer-eval',
+    name: 'consumer eval',
+    root: 'tools/evals/consumer',
+    rootKind: 'directory',
+    platform: 'node',
+    purpose:
+      '같은 dataset · 같은 결정적 grader 로 "무엇을 읽혔을 때 소비자 작업이 맞는가"를 비교하는 평가 harness',
+    docs: ['tools-readme'],
+    source: [{ path: 'tools/evals/consumer/runner/run.ts' }],
+    gaps: [
+      {
+        kind: 'unsupported',
+        note: 'programmatic LLM executor 가 없음. dev · test split 은 수집된 trace 를 replay 할 때만 채점함',
+        evidence: [
+          { path: 'tools/evals/consumer/runner/executor.ts', symbol: 'unavailableExecutor' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'observability-collectors',
+    name: '품질 관측 수집기',
+    root: 'tools/scripts/observability',
+    rootKind: 'directory',
+    platform: 'node',
+    purpose:
+      '품질 결과를 수집해 계약으로 검증한 JSON 을 DevHub 의 public 경로로 export 함 — 평가 화면이 읽음',
+    docs: ['observability-architecture'],
+    source: [
+      { path: 'tools/scripts/observability/cli.ts' },
+      { path: 'tools/scripts/observability/export.ts', symbol: 'PUBLIC_ROOT' },
+    ],
+  },
+  {
+    id: 'release-scripts',
+    name: '릴리스 스크립트',
+    root: 'tools/scripts/release',
+    rootKind: 'directory',
+    platform: 'node',
+    purpose:
+      'nx release 로 공개 패키지의 버전 · changelog · 배포를 함(로컬 registry 또는 GitHub Packages)',
+    docs: [],
+    source: [
+      { path: 'tools/scripts/release/release-npm.ts' },
+      { path: 'tools/scripts/release/release-local.ts' },
+    ],
+  },
+  {
+    id: 'token-measurement',
+    name: '토큰 측정',
+    root: 'tools/scripts/measure-tokens',
+    rootKind: 'directory',
+    platform: 'node',
+    purpose: '에이전트가 패키지를 분석할 때 읽는 입력 토큰 수를 시나리오별로 잼',
+    docs: ['tools-readme'],
+    source: [{ path: 'tools/scripts/measure-tokens/all.ts' }],
+    gaps: [
+      {
+        kind: 'doc-code-mismatch',
+        note: 'claude.ts · openai.ts 의 사용법은 pnpm tokens:measure:claude · tokens:measure:openai 를 안내하지만 그런 루트 script 는 없음',
+        evidence: [
+          { path: 'tools/scripts/measure-tokens/claude.ts', symbol: 'pnpm tokens:measure:claude' },
+          { path: 'tools/scripts/measure-tokens/openai.ts', symbol: 'pnpm tokens:measure:openai' },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'treeshake-check',
+    name: 'treeshake',
+    root: 'tools/scripts/treeshake',
+    rootKind: 'directory',
+    platform: 'node',
+    purpose: '심볼 하나만 import 한 entry 를 번들해 트리셰이킹 효과를 byte 로 잼',
+    docs: ['tools-readme'],
+    source: [{ path: 'tools/scripts/treeshake/check.ts' }],
+  },
+  {
+    id: 'react-ui-css-build',
+    name: 'react-ui CSS 빌드',
+    root: 'tools/scripts/build-react-ui-css.mjs',
+    rootKind: 'file',
+    platform: 'node',
+    purpose: 'react-ui 의 SCSS 를 sass · autoprefixer 로 dist/index.css 로 만듦',
+    docs: ['react-ui-agents'],
+    source: [{ path: 'tools/scripts/build-react-ui-css.mjs' }],
+  },
+  {
+    id: 'eas-build-post-install',
+    name: 'EAS post-install',
+    root: 'tools/scripts/eas-build-post-install.mjs',
+    rootKind: 'file',
+    platform: 'node',
+    purpose: 'demo-mobile 의 EAS 빌드에서 설치 뒤에 도는 스크립트',
+    docs: [],
+    source: [
+      { path: 'tools/scripts/eas-build-post-install.mjs' },
+      { path: 'apps/demo-mobile/package.json', symbol: 'eas-build-post-install' },
+    ],
+  },
+  {
+    id: 'claude-harness',
+    name: 'Claude harness 검사',
+    root: 'tools/scripts/claude-harness',
+    rootKind: 'directory',
+    platform: 'node',
+    purpose:
+      'berry-dev 플러그인의 standards sync · check, secret guard hook, skill 구조를 실제 파일로 확인하는 테스트 묶음',
+    docs: ['berry-dev-readme'],
+    source: [
+      { path: 'tools/scripts/claude-harness/standards.test.ts' },
+      { path: 'tools/scripts/claude-harness/guard.test.ts' },
+      { path: 'tools/scripts/claude-harness/structure.test.ts' },
+    ],
+  },
+  {
+    id: 'tools-lib',
+    name: '도구 공용 헬퍼',
+    root: 'tools/lib',
+    rootKind: 'directory',
+    platform: 'node',
+    purpose: '토큰 카운트 · exports map 해석처럼 여러 도구가 함께 쓰는 헬퍼',
+    docs: [],
+    source: [{ path: 'tools/lib/token-count.ts' }, { path: 'tools/lib/package-exports.ts' }],
+  },
+  {
+    id: 'berry-commit',
+    name: 'berry-commit',
+    root: 'plugins/berry-commit',
+    rootKind: 'directory',
+    platform: 'node',
+    purpose:
+      'staged 변경을 scope 별로 나눠 Conventional Commits 메시지를 제안하는 Claude Code 플러그인(skill + MCP 서버)',
+    nxProject: 'commit-mcp',
+    packageName: 'commit-mcp',
+    packageManifest: { path: 'plugins/berry-commit/package.json' },
+    visibility: 'internal',
+    docs: ['berry-commit-readme'],
+    source: [
+      { path: 'plugins/berry-commit/src/index.ts' },
+      { path: 'plugins/berry-commit/skills/commit-scope/SKILL.md' },
+      { path: '.claude-plugin/marketplace.json' },
+    ],
+    gaps: [
+      {
+        kind: 'no-test',
+        note: '테스트 파일이 없음. project.json 에는 build · typecheck 만 있음',
+        evidence: [{ path: 'plugins/berry-commit/project.json' }],
+      },
+    ],
+  },
+  {
+    id: 'berry-dev',
+    name: 'berry-dev',
+    root: 'plugins/berry-dev',
+    rootKind: 'directory',
+    platform: 'node',
+    purpose:
+      '여러 저장소가 같은 Claude Code 작업 규칙을 쓰도록 standards rule 원본 · sync · check CLI · 검증 · UI 검수 skill · secret guard hook 을 주는 플러그인',
+    docs: [
+      'berry-dev-readme',
+      'harness-profile',
+      'standards-core',
+      'standards-berry-consumer',
+      'standards-cross-runtime-pure',
+      'standards-docs-ko',
+      'standards-ko-ui',
+    ],
+    source: [
+      { path: 'plugins/berry-dev/.claude-plugin/plugin.json' },
+      { path: 'plugins/berry-dev/scripts/standards.mjs' },
+      { path: 'plugins/berry-dev/hooks/hooks.json' },
+      { path: '.claude-plugin/marketplace.json' },
+    ],
+  },
+];

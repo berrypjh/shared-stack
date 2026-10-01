@@ -1,0 +1,264 @@
+'use client';
+
+import { Fragment, type ReactNode, useEffect } from 'react';
+
+import { Table, TableScroll, VisuallyHidden } from '@berrypjh/react-ui';
+
+import type { Inline } from '../markdown/inline';
+import type { Block, ListItem } from '../markdown/parse';
+import { Icon } from '../ui/icon';
+
+import { markAnchor } from './anchor-flash';
+import { CopyButton } from './copy-button';
+
+/** 문서에 적힌 링크 하나를 그린다. 어디로 갈지(앱 안 문서 · 저장소 파일 · 밖)는 앱이 정한다. */
+export type RenderLink = (href: string, children: ReactNode) => ReactNode;
+
+/** 문서에 적힌 그림 경로를 브라우저가 불러올 주소로. 모르는 경로면 `undefined` — 그림 대신 설명만 남는다. */
+export type ResolveImage = (src: string) => string | undefined;
+
+type Context = { renderLink: RenderLink; caption: string; resolveImage?: ResolveImage };
+
+const Inlines = ({ nodes, renderLink }: { nodes: Inline[]; renderLink: RenderLink }) =>
+  nodes.map((node, index) => {
+    switch (node.kind) {
+      case 'text':
+        return <Fragment key={index}>{node.text}</Fragment>;
+      case 'image':
+        return <Fragment key={index}>{node.alt}</Fragment>;
+      case 'code':
+        return <code key={index}>{node.text}</code>;
+      case 'strong':
+        return (
+          <strong key={index}>
+            <Inlines nodes={node.children} renderLink={renderLink} />
+          </strong>
+        );
+      case 'em':
+        return (
+          <em key={index}>
+            <Inlines nodes={node.children} renderLink={renderLink} />
+          </em>
+        );
+      default: // link
+        return (
+          <Fragment key={index}>
+            {renderLink(node.href, <Inlines nodes={node.children} renderLink={renderLink} />)}
+          </Fragment>
+        );
+    }
+  });
+
+const HEADING = {
+  2: 'mt-2xl border-t border-stroke-light pt-xl typo-heading-h5',
+  3: 'mt-xl typo-body-medium-strong',
+  4: 'mt-lg typo-body-small-strong',
+} as const;
+
+/**
+ * 절 제목. `id` 는 GitHub 앵커와 같고, 주소의 `#…` 로 오면 포커스를 받는다.
+ * 위치를 공유할 `#` 링크가 붙는데, hover · 키보드 포커스일 때만 보인다.
+ */
+const Heading = ({
+  block,
+  renderLink,
+}: {
+  block: Extract<Block, { kind: 'heading' }>;
+  renderLink: RenderLink;
+}) => {
+  const level = block.level <= 2 ? 2 : block.level === 3 ? 3 : 4;
+  const Tag = `h${level}` as const;
+  return (
+    <Tag
+      id={block.id}
+      tabIndex={-1}
+      aria-labelledby={`${block.id}:title`}
+      className={`group ${HEADING[level]}`}
+    >
+      {/* 글줄. 도착 표식은 제목 위 구분선 · 여백이 아니라 이 줄에만 칠한다. */}
+      <span className="devhub-heading-line flex items-baseline gap-sm">
+        {/* 제목의 이름은 이 글자뿐이다 — 옆 `#` 링크의 숨은 글이 섞이지 않게. slug 에는 `:` 가 없다. */}
+        <span id={`${block.id}:title`}>
+          <Inlines nodes={block.inline} renderLink={renderLink} />
+        </span>
+        <a
+          href={`#${block.id}`}
+          data-plain
+          className="text-text-light opacity-0 group-hover:opacity-100 focus-visible:opacity-100"
+        >
+          <Icon name="hash" />
+          <VisuallyHidden>{block.text} 절 링크</VisuallyHidden>
+        </a>
+      </span>
+    </Tag>
+  );
+};
+
+const CodeBlock = ({ lang, text }: { lang: string; text: string }) => (
+  <div className="overflow-hidden rounded-md border border-stroke-light bg-background-default">
+    <div className="flex items-center justify-between border-b border-stroke-light px-md py-xs">
+      <span className="typo-caption-small text-text-light">{lang || '코드'}</span>
+      <CopyButton text={text} label={`${lang || '코드'} 블록 복사`} />
+    </div>
+    <pre className="devhub-code overflow-x-auto p-md">
+      <code>{text}</code>
+    </pre>
+  </div>
+);
+
+/** 문서가 참조하는 그림. 설명(alt)은 캡션으로도 보인다 — 그림만 있는 자리를 만들지 않는다. */
+const DocImage = ({
+  block,
+  resolveImage,
+}: {
+  block: Extract<Block, { kind: 'image' }>;
+  resolveImage?: ResolveImage;
+}) => {
+  const url = resolveImage?.(block.src);
+  if (!url) return <p>{block.alt}</p>;
+  return (
+    <figure className="flex flex-col items-center gap-sm">
+      <img
+        src={url}
+        alt={block.alt}
+        className="h-auto w-full max-w-[36rem] rounded-md border border-stroke-light"
+      />
+      <figcaption className="typo-caption-small text-text-light">{block.alt}</figcaption>
+    </figure>
+  );
+};
+
+/** 체크 목록의 칸은 글리프와 숨은 글로 — 입력처럼 보이지만 조작할 수 없는 것을 만들지 않는다. */
+const ItemBody = ({ item, context }: { item: ListItem; context: Context }) => {
+  const [first] = item.blocks;
+  const body =
+    item.blocks.length === 1 && first.kind === 'paragraph' ? (
+      <Inlines nodes={first.inline} renderLink={context.renderLink} />
+    ) : (
+      <Blocks blocks={item.blocks} context={context} />
+    );
+  if (item.checked === undefined) return body;
+  return (
+    <>
+      <span aria-hidden="true">{item.checked ? '☑ ' : '☐ '}</span>
+      <VisuallyHidden>{item.checked ? '완료: ' : '할 일: '}</VisuallyHidden>
+      {body}
+    </>
+  );
+};
+
+const Blocks = ({ blocks, context }: { blocks: Block[]; context: Context }): ReactNode => {
+  let caption = context.caption;
+  const { renderLink } = context;
+  return blocks.map((block, index) => {
+    switch (block.kind) {
+      case 'heading':
+        caption = block.text;
+        return <Heading key={index} block={block} renderLink={renderLink} />;
+      case 'paragraph':
+        return (
+          <p key={index}>
+            <Inlines nodes={block.inline} renderLink={renderLink} />
+          </p>
+        );
+      case 'list': {
+        const List = block.ordered ? 'ol' : 'ul';
+        return (
+          <List key={index} start={block.ordered ? block.start : undefined}>
+            {block.items.map((item, i) => (
+              <li key={i} className={item.checked === undefined ? '' : 'list-none -ml-md'}>
+                <ItemBody item={item} context={{ ...context, caption }} />
+              </li>
+            ))}
+          </List>
+        );
+      }
+      case 'table':
+        return (
+          <TableScroll
+            key={index}
+            label={`표: ${caption}`}
+            className="rounded-md border border-stroke-light"
+          >
+            <Table hiddenCaption>
+              <caption>{caption}</caption>
+              <thead>
+                <tr>
+                  {block.head.map((cell, i) => (
+                    <th key={i} scope="col">
+                      <Inlines nodes={cell} renderLink={renderLink} />
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {block.rows.map((row, r) => (
+                  <tr key={r}>
+                    {row.map((cell, c) => (
+                      <td key={c}>
+                        <Inlines nodes={cell} renderLink={renderLink} />
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          </TableScroll>
+        );
+      case 'image':
+        return <DocImage key={index} block={block} resolveImage={context.resolveImage} />;
+      case 'code':
+        return <CodeBlock key={index} lang={block.lang} text={block.text} />;
+      case 'quote':
+        return (
+          <blockquote
+            key={index}
+            className="rounded-md border-l-4 border-stroke-primary bg-(--ds-background-selected) px-lg py-md"
+          >
+            <Blocks blocks={block.blocks} context={{ ...context, caption }} />
+          </blockquote>
+        );
+      default: // rule
+        return <hr key={index} className="border-stroke-light" />;
+    }
+  });
+};
+
+/**
+ * 저장소 문서 한 편을 읽기 화면으로. HTML 을 주입하지 않는다 — 모든 글은 React 텍스트 노드다.
+ * 불러온 뒤 `hash` 가 있으면 그 절로 간다(불러오기 전에는 그 제목이 아직 없다).
+ * `hash` 가 가리키는 제목은 도착할 때마다 잠깐 물들인다(`devhub-prose [data-anchor-flash]`).
+ */
+export const DocContent = ({
+  blocks,
+  title,
+  renderLink,
+  resolveImage,
+  hash = '',
+}: {
+  blocks: Block[];
+  /** 표 캡션의 기본값. 절 제목이 나오면 그 제목으로 바뀐다. */
+  title: string;
+  renderLink: RenderLink;
+  /** 그림 경로를 주소로. 없으면 그림은 설명 글로만 보인다. */
+  resolveImage?: ResolveImage;
+  /** 주소의 `#…`. 앱의 라우터에서 읽어 넘긴다. */
+  hash?: string;
+}) => {
+  useEffect(() => {
+    if (!hash) return;
+    const target = document.getElementById(decodeURIComponent(hash.slice(1)));
+    target?.scrollIntoView?.({ block: 'start' });
+    target?.focus({ preventScroll: true });
+    // 불러온 직후 한 번만. 같은 문서 안의 `#` 이동은 useRouteFocus 가 맡는다.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [blocks]);
+  useEffect(() => {
+    markAnchor(document, hash);
+  }, [blocks, hash]);
+  return (
+    <article className="devhub-prose max-w-[46rem] min-w-0">
+      <Blocks blocks={blocks} context={{ renderLink, caption: title, resolveImage }} />
+    </article>
+  );
+};

@@ -15,7 +15,7 @@
  *
  * 사용:
  *   pnpm treeshake <target> [symbol] [symbol] ...
- *   pnpm treeshake <target> [symbol]... --json   # scenario 별 raw·gzip 또는 오류 (quality-lab 수집용)
+ *   pnpm treeshake <target> [symbol]... --json   # scenario 별 raw·gzip 또는 오류 (품질 관측 수집용)
  *
  * 예:
  *   pnpm treeshake react-ui Button

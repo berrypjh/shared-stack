@@ -6,11 +6,9 @@ import path from 'node:path';
 import { promisify } from 'node:util';
 
 import {
-  type DesignSystem,
   type Inventory,
   isoTimeSchema,
   type Observation,
-  type PackageSurface,
   type RunArtifact,
   runArtifactSchema,
   type RunSource,
@@ -204,38 +202,18 @@ export const readToolVersions = (root: string, env: NodeJS.ProcessEnv): Record<s
 
 const NOT_RUN_REASON = 'static profile 은 정의만 읽고 명령을 실행하지 않습니다';
 
-const notRun = (command: CommandSpec): Observation => {
-  const evidence = [
-    { source: 'command' as const, commandId: command.id, exitCode: null, excerpt: null },
-  ];
-  if (command.domain === 'verification') {
-    return {
-      id: command.id,
-      domain: 'verification',
-      scope: command.scope,
-      kind: command.kind,
-      status: 'not-run',
-      availability: 'not-run',
-      outcome: null,
-      exitCode: null,
-      durationMs: null,
-      reason: NOT_RUN_REASON,
-      evidence,
-    };
-  }
-  return {
-    id: command.id,
-    domain: command.domain,
-    unit: command.unit,
-    scope: command.scope,
-    availability: 'not-run',
-    value: null,
-    denominator: null,
-    outcome: null,
-    reason: NOT_RUN_REASON,
-    evidence,
-  };
-};
+const notRun = (command: CommandSpec): Observation => ({
+  id: command.id,
+  domain: command.domain,
+  unit: command.unit,
+  scope: command.scope,
+  availability: 'not-run',
+  value: null,
+  denominator: null,
+  outcome: null,
+  reason: NOT_RUN_REASON,
+  evidence: [{ source: 'command', commandId: command.id, exitCode: null, excerpt: null }],
+});
 
 export type StaticInput = {
   workspaceRoot: string;
@@ -246,20 +224,16 @@ export type StaticInput = {
   toolVersions: Record<string, string>;
 };
 
-export type DesignEvidence = { designSystem: DesignSystem; packageSurfaces: PackageSurface[] };
-
 /**
  * static profile. 정의를 읽어 inventory 로 남기고, 등록 명령은 전부 not-run 으로 기록한다.
  * 수집기 코드는 측정 대상과 같은 checkout 에서 돌므로 collection SHA 는 source SHA 와 같다.
- * `collectDesign` 은 source·산출물을 읽기만 한다 — 주지 않으면 design 근거는 수집하지 않은 것이다.
  */
 export const collectStatic = async (
-  input: StaticInput & { collectDesign?: () => Promise<DesignEvidence> },
+  input: StaticInput,
 ): Promise<{ artifact: RunArtifact; raw: RawFile[] }> => {
   const startedAt = input.now().toISOString();
   const source = await readSource(input.workspaceRoot, input.git, input.env);
   const inventory = await readInventory(input.workspaceRoot);
-  const design = input.collectDesign ? await input.collectDesign() : null;
 
   const artifact = runArtifactSchema.parse({
     metadata: {
@@ -275,12 +249,9 @@ export const collectStatic = async (
     },
     inventory,
     observations: COMMANDS.map(notRun),
-    tests: [],
     bundles: [],
     contexts: [],
     evals: [],
-    designSystem: design?.designSystem ?? null,
-    packageSurfaces: design?.packageSurfaces ?? [],
   });
 
   const inputs = { workflows: inventory.workflows, lockfileHash: source.lockfileHash };

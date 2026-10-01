@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 270" role="img" width="640" height="270">
+  <title>같은 토큰을 설명형 객체와 slim 배열로 — 반복되는 키가 사라짐</title>
+  <style>
+    .head { font: 600 13px system-ui, sans-serif; fill: #475467; }
+    .bar { font: 500 12px system-ui, sans-serif; fill: #475467; }
+    .file { font: 600 11px ui-monospace, SFMono-Regular, Menlo, monospace; fill: #475467; }
+    .code { font: 400 11px ui-monospace, SFMono-Regular, Menlo, monospace; fill: #101828; }
+    .note { font: 400 12px system-ui, sans-serif; fill: #475467; }
+    .dim { fill: #475467; }
+    .error { fill: #B42318; font-weight: 600; }
+    .accent { fill: #047857; font-weight: 600; }
+  </style>
+
+  <rect width="640" height="270" rx="12" fill="#FFFFFF" />
+  <text class="head" x="20" y="30">1차 — 설명형 객체</text>
+  <text class="head" x="330" y="30">slim — 경로별 배열 한 줄</text>
+  <rect x="20" y="46" width="296" height="184" rx="8" fill="#F2F4F7" stroke="#D0D5DD" />
+  <text class="file" x="32" y="65">dist/tokens.json</text>
+  <line x1="20" y1="74" x2="316" y2="74" stroke="#D0D5DD" />
+  <rect x="26" y="96" width="284" height="17" rx="4" fill="#B4231812" stroke="#B42318" stroke-opacity="0.6" />
+  <rect x="26" y="128" width="284" height="17" rx="4" fill="#B4231812" stroke="#B42318" stroke-opacity="0.6" />
+  <rect x="26" y="144" width="284" height="49" rx="4" fill="#B4231812" stroke="#B42318" stroke-opacity="0.6" />
+  <text class="code" x="32" y="92" xml:space="preserve">&quot;color.primary.pr500&quot;: {</text>
+  <text class="code" x="32" y="108" xml:space="preserve">  &quot;type&quot;: &quot;color&quot;,</text>
+  <text class="code" x="32" y="124" xml:space="preserve">  &quot;cssVar&quot;: &quot;--ds-primary-pr500&quot;,</text>
+  <text class="code" x="32" y="140" xml:space="preserve">  &quot;values&quot;: {</text>
+  <text class="code" x="32" y="156" xml:space="preserve">    &quot;light&quot;: &quot;#10B981&quot;,</text>
+  <text class="code" x="32" y="172" xml:space="preserve">    &quot;dark&quot;: &quot;#25A567&quot;,</text>
+  <text class="code" x="32" y="188" xml:space="preserve">    &quot;sepia&quot;: &quot;#2EA351&quot;</text>
+  <text class="code" x="32" y="204" xml:space="preserve">  }</text>
+  <text class="code" x="32" y="220" xml:space="preserve">},</text>
+  <text class="note" x="20" y="252">키 · 테마 이름 · 들여쓰기가 토큰마다 되풀이</text>
+  <rect x="330" y="46" width="290" height="184" rx="8" fill="#F2F4F7" stroke="#D0D5DD" />
+  <text class="file" x="342" y="65">dist/tokens.json</text>
+  <line x1="330" y1="74" x2="620" y2="74" stroke="#D0D5DD" />
+  <rect x="336" y="144" width="278" height="49" rx="4" fill="#04785714" stroke="#047857" stroke-opacity="0.6" />
+  <text class="code" x="342" y="92" xml:space="preserve">&quot;schema&quot;: &quot;tokens[path] =</text>
+  <text class="code" x="342" y="108" xml:space="preserve">  [cssVar, ...valuesInThemesOrder]&quot;,</text>
+  <text class="code" x="342" y="124" xml:space="preserve">&quot;themes&quot;: [&quot;light&quot;, &quot;dark&quot;, &quot;sepia&quot;],</text>
+  <text class="code" x="342" y="140" xml:space="preserve">&quot;tokens&quot;: {</text>
+  <text class="code" x="342" y="156" xml:space="preserve">  &quot;color.primary.pr500&quot;:</text>
+  <text class="code" x="342" y="172" xml:space="preserve">    [&quot;--ds-primary-pr500&quot;,</text>
+  <text class="code" x="342" y="188" xml:space="preserve">     &quot;#10B981&quot;, &quot;#25A567&quot;, &quot;#2EA351&quot;],</text>
+  <text class="code" x="342" y="204" xml:space="preserve">  …</text>
+  <text class="code" x="342" y="220" xml:space="preserve">}</text>
+  <text class="note" x="330" y="252">테마는 순서로, 토큰 하나는 한 줄</text>
+</svg>

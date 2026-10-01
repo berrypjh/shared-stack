@@ -1,0 +1,251 @@
+/*
+ * DevHub 공통 스타일. 앱의 Tailwind entry 가 `@import '@berrypjh/devhub-ui/styles.css'` 로 들인다 —
+ * `@utility` 는 Tailwind 가 해석하므로 일반 CSS 로 불러오면 안 된다. 값은 모두 react-ui 의 `--ds-*` 토큰이다.
+ */
+
+/* 글자 묶음. 공용 합성 토큰을 그대로 한 유틸로 묶는다. */
+@utility typo-heading-h5 {
+  font-family: var(--ds-heading-h5-font-family);
+  font-size: var(--ds-heading-h5-font-size);
+  font-weight: var(--ds-heading-h5-font-weight);
+  line-height: var(--ds-heading-h5-line-height);
+  letter-spacing: var(--ds-heading-h5-letter-spacing);
+}
+
+/* 문서 본문 글자. `.devhub-prose` 와 같은 값이라 markdown 이 아닌 문서형 화면도 같은 크기로 읽힌다. */
+@utility typo-paragraph-default {
+  font-size: var(--ds-paragraph-default-font-size);
+  line-height: var(--ds-paragraph-default-line-height);
+  letter-spacing: var(--ds-paragraph-default-letter-spacing);
+}
+
+@utility typo-body-medium-strong {
+  font-family: var(--ds-body-medium-strong-font-family);
+  font-size: var(--ds-body-medium-strong-font-size);
+  font-weight: var(--ds-body-medium-strong-font-weight);
+  line-height: var(--ds-body-medium-strong-line-height);
+  letter-spacing: var(--ds-body-medium-strong-letter-spacing);
+}
+
+@utility typo-body-small {
+  font-family: var(--ds-body-small-font-family);
+  font-size: var(--ds-body-small-font-size);
+  font-weight: var(--ds-body-small-font-weight);
+  line-height: var(--ds-body-small-line-height);
+  letter-spacing: var(--ds-body-small-letter-spacing);
+}
+
+@utility typo-body-small-strong {
+  font-family: var(--ds-body-small-strong-font-family);
+  font-size: var(--ds-body-small-strong-font-size);
+  font-weight: var(--ds-body-small-strong-font-weight);
+  line-height: var(--ds-body-small-strong-line-height);
+  letter-spacing: var(--ds-body-small-strong-letter-spacing);
+}
+
+@utility typo-caption-small {
+  font-family: var(--ds-caption-small-font-family);
+  font-size: var(--ds-caption-small-font-size);
+  font-weight: var(--ds-caption-small-font-weight);
+  line-height: var(--ds-caption-small-line-height);
+  letter-spacing: var(--ds-caption-small-letter-spacing);
+}
+
+/* 경로 · 심볼 · 명령용. 공용 monospace 토큰이 없어서 Tailwind 의 스택을 쓴다. */
+@utility devhub-code {
+  font-family: var(--font-mono);
+  font-size: var(--ds-caption-small-font-size);
+  line-height: var(--ds-caption-small-line-height);
+  overflow-wrap: anywhere;
+}
+
+/* 그림 영역의 옅은 격자. 공용 stroke 토큰으로 그린다. */
+@utility devhub-grid {
+  background-image:
+    linear-gradient(var(--ds-stroke-light) 1px, transparent 1px),
+    linear-gradient(90deg, var(--ds-stroke-light) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* 토큰은 data-theme 로 바뀌지만 color-scheme 은 없다. 기본 입력 · 스크롤바가 따라오게 한다. */
+:root {
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
+
+/* lg 미만에서 상단 바(min-h-14 + 테두리)가 위에 붙는다. 앵커 이동이 그 아래에 닿게 한다. */
+@media (width < 64rem) {
+  :root {
+    scroll-padding-top: 3.75rem;
+  }
+}
+
+body {
+  background-color: var(--ds-background-default);
+  color: var(--ds-text-default);
+  font-family: var(--ds-body-small-font-family);
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+/*
+ * Editorial 토큰 테마(ivory · charcoal)에서만 쓰는 모양. 셸의 `devhub-*` 훅 클래스에 걸고 값은 모두 토큰이다 —
+ * 기본 짝(light · dark)에서는 아무것도 매칭되지 않는다. 캔버스(`default`) 위에 각이 작은 평평한 면(`surface`)을 두고,
+ * 위계는 색이 아니라 제목 크기와 여백으로 만든다. 레이어 밖이라 같은 요소의 Tailwind 유틸보다 앞선다.
+ */
+:root:is([data-theme='ivory'], [data-theme='charcoal']) {
+  .devhub-workspace {
+    background-color: var(--ds-background-default);
+  }
+
+  /* 제목과 첫 구역 사이를 가는 선과 여백으로 나눈다. */
+  .devhub-workspace-header {
+    padding-bottom: var(--ds-spacing-xl);
+    border-bottom: var(--ds-semantic-border-divider) solid var(--ds-stroke-light);
+  }
+
+  /* 기존 heading 토큰의 크기를 빌리고 무게는 절제한다. 좁은 칸에서는 한 단계 작다. */
+  .devhub-page-title {
+    font-size: var(--ds-heading-h4-font-size);
+    line-height: var(--ds-heading-h4-line-height);
+    letter-spacing: var(--ds-heading-h4-letter-spacing);
+    font-weight: var(--ds-font-weight-semi-bold);
+    text-wrap: balance;
+  }
+
+  @media (width >= 64rem) {
+    .devhub-page-title {
+      font-size: var(--ds-heading-h3-font-size);
+      line-height: var(--ds-heading-h3-line-height);
+      letter-spacing: var(--ds-heading-h3-letter-spacing);
+    }
+  }
+
+  .devhub-section {
+    border-radius: var(--ds-radius-xs);
+  }
+
+  /* 그림 영역은 조작면이라 테두리 · 배경은 그대로 두고 각만 구역에 맞춰 줄인다. */
+  .devhub-canvas {
+    border-radius: var(--ds-radius-sm);
+  }
+
+  /* 구역 이름은 작은 라벨이다. 본문 행보다 작지만 색은 본문색이라 행 라벨(`text-light`)과 섞이지 않는다. */
+  .devhub-section-title {
+    font-size: var(--ds-caption-small-font-size);
+    line-height: var(--ds-caption-small-line-height);
+    font-weight: var(--ds-font-weight-semi-bold);
+  }
+
+  /* 선택은 옅은 틴트 대신 중립 면. hover(`background-default`)와 다른 면이고 굵기도 다르다. */
+  .devhub-explorer-item {
+    border-radius: var(--ds-radius-xs);
+  }
+
+  .devhub-explorer-item[aria-current='page'] {
+    background-color: var(--ds-stroke-light);
+  }
+}
+
+/* 저장소 문서(DocContent)를 읽기 좋은 글자로. 토큰만 쓰고, 유틸이 여전히 우선한다. */
+@layer components {
+  .devhub-prose {
+    color: var(--ds-text-default);
+    font-size: var(--ds-paragraph-default-font-size);
+    line-height: var(--ds-paragraph-default-line-height);
+    letter-spacing: var(--ds-paragraph-default-letter-spacing);
+    overflow-wrap: break-word;
+  }
+
+  .devhub-prose > * + * {
+    margin-top: var(--ds-spacing-lg);
+  }
+
+  .devhub-prose strong {
+    font-weight: var(--ds-font-weight-semi-bold);
+  }
+
+  .devhub-prose a:not([data-plain]) {
+    color: var(--ds-text-link);
+    text-decoration: underline;
+    text-underline-offset: var(--ds-spacing-2xs);
+  }
+
+  .devhub-prose :not(pre) > code {
+    font-family: var(--font-mono);
+    font-size: 0.875em;
+    padding: 0 var(--ds-spacing-2xs);
+    border-radius: var(--ds-radius-xs);
+    background-color: var(--ds-field-surface-subtle);
+  }
+
+  .devhub-prose ul {
+    list-style: disc;
+    padding-left: 1.25rem;
+  }
+
+  .devhub-prose ol {
+    list-style: decimal;
+    padding-left: 1.5rem;
+  }
+
+  .devhub-prose li + li,
+  .devhub-prose li > * + * {
+    margin-top: var(--ds-spacing-xs);
+  }
+
+  .devhub-prose [id] {
+    scroll-margin-top: var(--ds-spacing-xl);
+  }
+
+  /* 주소로 도착한 제목은 포커스를 받지만 조작할 것이 아니다. 테두리 대신 아래 표식이 도착을 알린다. */
+  .devhub-prose [tabindex='-1']:focus-visible {
+    outline: none;
+  }
+
+  /*
+   * 링크가 도착한 제목은 어디에 닿았는지 알리고, 보일 만큼 머문 뒤 물러난다. 표식은 `:target` 이 아니라
+   * DocContent 가 붙인다(라우터는 pushState 로 움직인다). selected 토큰은 옅어 한 줄에서 알아보기 어려워
+   * 같은 색의 농도를 직접 섞고, 그림자로 글 밖 여백까지 물들인다 — 그림자는 아무것도 밀지 않는다.
+   * 제목은 위 구분선 · 여백을 빼고 글줄(`devhub-heading-line`)에만 칠한다.
+   */
+  .devhub-prose [data-anchor-flash]:not(:has(> .devhub-heading-line)),
+  .devhub-prose [data-anchor-flash] > .devhub-heading-line {
+    --devhub-anchor-tint: rgb(var(--ds-background-selected-rgb) / 0.3);
+    border-radius: var(--ds-radius-xs);
+    animation: devhub-anchor-flash 2.4s ease-out both;
+  }
+
+  @keyframes devhub-anchor-flash {
+    0%,
+    55% {
+      background-color: var(--devhub-anchor-tint);
+      box-shadow: 0 0 0 0.4rem var(--devhub-anchor-tint);
+    }
+    100% {
+      background-color: transparent;
+      box-shadow: 0 0 0 0.4rem transparent;
+    }
+  }
+
+  /* 움직임을 줄여 달라고 한 사람에게는 사라지는 효과 없이 표식이 그대로 남는다. */
+  @media (prefers-reduced-motion: reduce) {
+    .devhub-prose [data-anchor-flash]:not(:has(> .devhub-heading-line)),
+    .devhub-prose [data-anchor-flash] > .devhub-heading-line {
+      animation: none;
+      background-color: var(--devhub-anchor-tint);
+      box-shadow: 0 0 0 0.4rem var(--devhub-anchor-tint);
+    }
+  }
+}
+
+/* 앱이 그리는 요소의 포커스 링. base 층이라 react-ui 컴포넌트의 자체 포커스 규칙(components 층)이 이긴다. */
+@layer base {
+  :focus-visible {
+    outline: var(--ds-semantic-border-default) solid var(--ds-stroke-primary);
+    outline-offset: 2px;
+  }
+}
