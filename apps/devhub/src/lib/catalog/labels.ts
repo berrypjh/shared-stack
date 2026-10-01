@@ -7,6 +7,7 @@ import type {
   Plugin,
   PluginRule,
   RecordRef,
+  RecordTopic,
   Relation,
   StepStatus,
   Visibility,
@@ -70,10 +71,10 @@ export const STEP_STATUS: Record<StepStatus, { label: string; glyph: string }> =
 
 /** 작업 흐름의 묶음. 이 순서가 탐색기 순서다. */
 export const JOURNEY_KIND: Record<Journey['kind'], string> = {
-  dev: '개발',
   package: '패키지',
   measure: '측정',
   eval: '소비자 평가',
+  dev: '개발',
 };
 
 /** 플러그인의 묶음. 이 순서가 탐색기 순서다. */
@@ -87,6 +88,18 @@ export const RECORD_KIND: Record<RecordRef['kind'], string> = {
   decision: '설계 결정',
   fix: '문제 해결',
   implementation: '구현',
+};
+
+/** 기록의 분야. 이 순서가 탐색기 순서다. */
+export const RECORD_TOPIC: Record<RecordTopic, string> = {
+  structure: '패키지 구조',
+  build: '빌드',
+  tokens: '디자인 토큰',
+  component: '컴포넌트',
+  a11y: '접근성',
+  test: '테스트',
+  ai: 'AI 소비',
+  harness: '작업 규칙',
 };
 
 /**

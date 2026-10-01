@@ -21,10 +21,6 @@ export { contexts } from './contexts';
 
 /** 저장소가 증명하는 흐름. */
 export const journeys: Journey[] = [
-  commit,
-  standardsSync,
-  prCheck,
-  mobileBuild,
   release,
   tokenBuild,
   storybookPublish,
@@ -37,4 +33,8 @@ export const journeys: Journey[] = [
   evalRouting,
   evalSmoke,
   evalRun,
+  prCheck,
+  standardsSync,
+  commit,
+  mobileBuild,
 ];

@@ -3,7 +3,7 @@ import { Facts, InspectorHeader, InspectorSection, Pager } from '@berrypjh/devhu
 import { catalog } from '@/data';
 import type { RecordRef } from '@/domain/model';
 import { RECORDS_NEWEST_FIRST } from '@/lib/catalog/entities';
-import { RECORD_KIND } from '@/lib/catalog/labels';
+import { RECORD_KIND, RECORD_TOPIC } from '@/lib/catalog/labels';
 import { recordHref } from '@/lib/catalog/routes';
 
 import {
@@ -45,6 +45,7 @@ export const RecordInspector = ({ record }: { record: RecordRef }) => {
       <InspectorSection {...OVERVIEW}>
         <Facts
           facts={[
+            { term: '분야', detail: RECORD_TOPIC[record.topic] },
             { term: '종류', detail: RECORD_KIND[record.kind] },
             { term: '날짜', detail: <time dateTime={record.date}>{record.date}</time> },
             { term: '요약', detail: record.summary },

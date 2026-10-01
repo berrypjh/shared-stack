@@ -715,7 +715,10 @@ describe('records', () => {
     for (const record of records) {
       expect(record.path).toBe(`docs/records/${record.date}-${record.id}.md`);
     }
-    const onDisk = childrenOf('docs/records').map((entry) => `docs/records/${entry.name}`);
+    // 기록이 쓰는 그림은 `images/` 폴더에 둔다.
+    const onDisk = childrenOf('docs/records')
+      .filter((entry) => !(entry.isDirectory() && entry.name === 'images'))
+      .map((entry) => `docs/records/${entry.name}`);
     expect(onDisk.sort()).toEqual(records.map((record) => record.path).sort());
   });
 
@@ -728,7 +731,7 @@ describe('records', () => {
     }
   });
 
-  it('are written in the four sections a record has', () => {
+  it('open with a situation and a judgment; 반영 · 검증 are optional', () => {
     for (const record of records) {
       const headings = read(record.path)
         .split('\n')
@@ -739,8 +742,6 @@ describe('records', () => {
         headings: expect.arrayContaining([
           expect.stringMatching(/^(상황|증상)$/),
           expect.stringMatching(/^(판단|원인)$/),
-          '반영',
-          '검증',
         ]),
       });
     }

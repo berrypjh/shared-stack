@@ -6,9 +6,10 @@ import type {
   PackageKind,
   Plugin,
   RecordRef,
+  RecordTopic,
 } from '../../domain/model';
 
-import { DOCUMENT_GROUP, JOURNEY_KIND, PACKAGE_KIND, PLUGIN_KIND, RECORD_KIND } from './labels';
+import { DOCUMENT_GROUP, JOURNEY_KIND, PACKAGE_KIND, PLUGIN_KIND, RECORD_TOPIC } from './labels';
 import { entityHref } from './routes';
 
 /**
@@ -86,13 +87,13 @@ export const SECTIONS: Section[] = [
     id: 'records',
     title: '기록',
     path: '/records',
-    entities: (Object.keys(RECORD_KIND) as RecordRef['kind'][]).flatMap((kind) =>
-      RECORDS_NEWEST_FIRST.filter((record) => record.kind === kind).map((record) => ({
+    entities: (Object.keys(RECORD_TOPIC) as RecordTopic[]).flatMap((topic) =>
+      RECORDS_NEWEST_FIRST.filter((record) => record.topic === topic).map((record) => ({
         section: 'records' as const,
         id: record.id,
         label: record.title,
         href: hrefOf('records', record.id),
-        group: RECORD_KIND[kind],
+        group: RECORD_TOPIC[topic],
         record,
       })),
     ),

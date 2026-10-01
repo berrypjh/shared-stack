@@ -277,6 +277,17 @@ export type DocumentRef = {
   readonly brokenLinks?: readonly BrokenLink[];
 };
 
+/** 기록이 다루는 분야. */
+export type RecordTopic =
+  | 'structure'
+  | 'build'
+  | 'tokens'
+  | 'component'
+  | 'a11y'
+  | 'test'
+  | 'ai'
+  | 'harness';
+
 /**
  * 개발 기록의 날짜별 한 항목: 내린 결정 · 고친 문제 · 들어간 작업.
  * 기록은 한 번 쓰고 고쳐 쓰지 않는다 — 뒤집힌 결정은 새 기록이 된다.
@@ -288,6 +299,8 @@ export type RecordRef = {
   /** 기록의 `#` 제목, 그대로. */
   readonly title: string;
   readonly kind: 'decision' | 'fix' | 'implementation';
+  /** 무엇에 관한 기록인가. 탐색기 묶음이고, 이름과 순서는 `RECORD_TOPIC`. */
+  readonly topic: RecordTopic;
   /** 작업이 있었던 날, `YYYY-MM-DD`. 파일 이름에도 같은 날짜가 들어간다. */
   readonly date: string;
   /** 목록에 보이는 한 줄: 열어 보지 않고도 가져가는 요지. */
