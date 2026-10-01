@@ -119,6 +119,8 @@ pnpm quality:eval:live --provider=local --model=qwen3:14b  # 소비자 평가 �
 
 제공자별 키 · 한도 · 로컬 준비는 [docs/observability/usage.md](docs/observability/usage.md).
 
+demo-web과 DevHub는 Vercel 프로젝트를 하나씩 두어 배포한다. Root Directory를 `apps/demo-web` · `apps/devhub`로 정하면 각자의 `vercel.json`을 읽는다. 평가 데이터는 커밋되지 않아 DevHub 배포 build는 `DEVHUB_EVALUATION=off`로 "평가" 섹션을 뺀다.
+
 ### 데모 앱
 
 두 데모는 라이브러리를 **실제 앱으로 통합했을 때** 무엇이 살아 있는지 확인한다. 컴포넌트 상태 탐색과 시각 회귀는 Storybook이 맡는다.

@@ -44,6 +44,7 @@ Vite + React. shared-stack의 구조와 근거(패키지 · 앱 · 도구 · 문
 - **검색 항목은 카탈로그에서 유도한다.** 항목은 `lib/search/entries.ts`, 순위는 devhub-ui `search/rank.ts`다
 - **평가 항목 목록은 `data/evaluations.ts`가 정본이다.** 화면은 `components/evaluation/measures`의 `MEASURES`가 항목마다 하나씩 갖는다. 번들 · 컨텍스트 · 소비자 평가처럼 이 저장소만 재는 것만 싣는다. CI · 테스트가 이미 알려 주는 것(test · lint · build · 접근성 · 토큰 대비)은 싣지 않는다
 - **비교는 사람이 고른 실행과의 report-only diff뿐이다.** 최신 실행을 자동 baseline으로 삼지 않고, 합산 점수 같은 새 파생값을 만들지 않는다
+- **배포본에는 평가가 없다.** 평가 데이터(`public/observability`)는 커밋되지 않아서, Vercel build(`apps/devhub/vercel.json`)는 `DEVHUB_EVALUATION=off`로 섹션 · route · 단계의 평가 링크를 함께 뺀다. 평가로 가는 새 링크는 `SECTIONS`나 `__DEVHUB_EVALUATION__`을 거친다
 - **명령 버튼은 복사만 한다.** 수집 · export는 Node가 한다. 화면은 평가 묶음의 한 줄 명령(`pnpm quality:core` · `quality:eval`)만 보인다
 
 ## 구조
