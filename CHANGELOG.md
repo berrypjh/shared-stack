@@ -1,3 +1,37 @@
+## 1.2.0 (2026-10-01)
+
+### 🚀 Features
+
+- **berry-dev:** 공통 rule 원본과 sync·check CLI를 담은 berry-dev plugin 추가 ([fb04ec4](https://github.com/berrypjh/shared-stack/commit/fb04ec4))
+- **design-tokens:** ivory · charcoal 테마 추가 ([e0dceb9](https://github.com/berrypjh/shared-stack/commit/e0dceb9))
+- **devhub:** 저장소 구조와 근거를 탐색하는 devhub 앱 추가 ([93350c4](https://github.com/berrypjh/shared-stack/commit/93350c4))
+- **devhub:** 패키지 화면에 설정 규칙 표 추가, 애플리케이션 화면 삭제 ([f55892e](https://github.com/berrypjh/shared-stack/commit/f55892e))
+- **devhub:** quality-lab 화면을 옮긴 평가(/evaluation) 섹션 추가 ([bd203cd](https://github.com/berrypjh/shared-stack/commit/bd203cd))
+- **devhub:** 플러그인 섹션 추가, 평가 디자인 시스템 · 접근성 화면 제거 ([8435a86](https://github.com/berrypjh/shared-stack/commit/8435a86))
+- **devhub:** 작업 흐름 15개 추가, 단계 상세에 예시 명령 · 옵션 · 출력 표시 ([fb9f4df](https://github.com/berrypjh/shared-stack/commit/fb9f4df))
+- **devhub:** 기록을 분야별로 묶고 문서 그림을 테마별로 표시 ([4869bcb](https://github.com/berrypjh/shared-stack/commit/4869bcb))
+- **devhub:** Vercel 배포에서 평가 섹션을 빼고 평가 화면의 안내 · 경고 배치를 정리 ([793ccf4](https://github.com/berrypjh/shared-stack/commit/793ccf4))
+- **devhub-ui:** DevHub 공용 셸·캔버스·markdown·검색·테마 패키지 추가 ([e92bc95](https://github.com/berrypjh/shared-stack/commit/e92bc95))
+- **devhub-ui:** 탐색기 묶음을 접고 펴는 기능과 모두 열기·닫기 토글 추가 ([8e866c5](https://github.com/berrypjh/shared-stack/commit/8e866c5))
+- **devhub-ui:** quality-lab의 BarChart · DataTable을 공용 컴포넌트로 옮김 ([468c9e3](https://github.com/berrypjh/shared-stack/commit/468c9e3))
+- **devhub-ui:** 테마 짝 지정과 문서 · 상세 정보 공용 컴포넌트 추가 ([a85a7e7](https://github.com/berrypjh/shared-stack/commit/a85a7e7))
+- **devhub-ui:** CommandList · TermList 컴포넌트 추가 ([2da5d1b](https://github.com/berrypjh/shared-stack/commit/2da5d1b))
+- **devhub-ui:** markdown 그림 블록과 DocContent resolveImage 추가 ([75be841](https://github.com/berrypjh/shared-stack/commit/75be841))
+- **devhub-ui:** 상태 안내 · 명령 복사 · 선택 상자 등 공용 컴포넌트 추가 ([59b369e](https://github.com/berrypjh/shared-stack/commit/59b369e))
+- **devhub-ui:** StatusNotice에 값을 가리지 않는 한 줄 compact 모드를 추가 ([0a6b3f4](https://github.com/berrypjh/shared-stack/commit/0a6b3f4))
+- **evals:** 모델 API를 실제로 부르는 live executor 추가 ([cc5f393](https://github.com/berrypjh/shared-stack/commit/cc5f393))
+- **lib:** Anthropic Messages · OpenAI Chat Completions fetch 호출 헬퍼 추가 ([85e7c85](https://github.com/berrypjh/shared-stack/commit/85e7c85))
+- **observability-contracts:** live 평가의 API 사용량 · variant 정의 · 건너뛴 variant 계약 추가 ([536bf29](https://github.com/berrypjh/shared-stack/commit/536bf29))
+- **react-native-ui:** ThemeProvider에 ivory · charcoal 테마 연결 ([b7348cd](https://github.com/berrypjh/shared-stack/commit/b7348cd))
+- **scripts:** 품질 관측 run 명령 추가, live 평가의 실제 입력 수집 ([bdc6f11](https://github.com/berrypjh/shared-stack/commit/bdc6f11))
+
+### 🩹 Fixes
+
+- **demo-web:** 접근성 대비 표가 현재 테마 값으로 재도록 수정 ([49a1b32](https://github.com/berrypjh/shared-stack/commit/49a1b32))
+- **root:** build:libs에 devhub-ui를 넣어 CI 패키지 경계 테스트가 dist를 찾게 함 ([c506381](https://github.com/berrypjh/shared-stack/commit/c506381))
+- **scripts:** private 패키지 토큰 측정에서 없는 dist/AGENTS.md 시나리오 제거 ([4028eba](https://github.com/berrypjh/shared-stack/commit/4028eba))
+- **scripts:** 릴리스에서 ! 표기 breaking change를 감지하고 publish를 changelog보다 먼저 실행 ([d7f0ff8](https://github.com/berrypjh/shared-stack/commit/d7f0ff8))
+
 ## 1.1.2 (2026-09-15)
 
 ### 🩹 Fixes
