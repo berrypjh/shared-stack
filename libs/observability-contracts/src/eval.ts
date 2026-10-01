@@ -160,6 +160,8 @@ export const evalVariantSchema = z
   .strictObject({
     variant: slugSchema,
     label: safeText(100),
+    /** 수집할 때의 variant 설명. 이 필드가 생기기 전에 수집한 실행에는 없다. */
+    description: safeText(300).optional(),
     tasks: countSchema,
     /** variant 의 전체 시행 수 (task 수 × task 당 반복). */
     trials: countSchema,
@@ -393,6 +395,7 @@ export const EVAL_NOTICE_CODES = [
 
 export const EXECUTOR_CLASSES = [
   'harness-smoke',
+  'live',
   'scripted',
   'replay',
   'unavailable',
@@ -552,6 +555,16 @@ export const evalRunSchema = z
     }),
     notices: z.array(z.strictObject({ code: z.enum(EVAL_NOTICE_CODES), message: reasonSchema })),
     variants: z.array(evalVariantSchema),
+    /** live 평가가 실행 전 점검(컨텍스트 한도 등)으로 실행하지 않은 variant 와 이유. */
+    skippedVariants: z
+      .array(
+        z.strictObject({
+          variant: slugSchema,
+          label: safeText(100).optional(),
+          reason: reasonSchema,
+        }),
+      )
+      .optional(),
     routing: z.array(
       z.strictObject({
         source: z.enum(['trace-grades', 'deterministic-resolver']),
