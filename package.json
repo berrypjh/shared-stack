@@ -7,7 +7,7 @@
     "build-storybook": "nx build-storybook @berrypjh/react-ui",
     "build-storybook:devhub-ui": "nx build-storybook @berrypjh/devhub-ui",
     "build:apps": "nx run-many -t build --projects=@berrypjh/demo-web,@berrypjh/demo-mobile",
-    "build:libs": "nx run-many -t build --projects=@berrypjh/design-tokens,@berrypjh/ui-core,@berrypjh/react-ui,@berrypjh/react-native-ui",
+    "build:libs": "nx run-many -t build --projects=@berrypjh/design-tokens,@berrypjh/ui-core,@berrypjh/react-ui,@berrypjh/react-native-ui,@berrypjh/devhub-ui",
     "build:libs:web": "nx run-many -t build --projects=@berrypjh/design-tokens,@berrypjh/ui-core,@berrypjh/react-ui",
     "build:mcp:commit": "nx run commit-mcp:build",
     "catalog:gen": "tsx tools/scripts/generate-consumer-catalog/index.ts",

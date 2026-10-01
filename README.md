@@ -139,14 +139,14 @@ pnpm test
 pnpm build
 ```
 
-| 명령                 | 하는 일                                                                          |
-| -------------------- | -------------------------------------------------------------------------------- |
-| `pnpm build:libs`    | 라이브러리만 빌드 (`design-tokens` · `ui-core` · `react-ui` · `react-native-ui`) |
-| `pnpm tokens:build`  | 디자인 토큰 빌드                                                                 |
-| `pnpm tools:check`   | `tools/` 타입 검사 + 테스트. **Nx affected가 닿지 않는 영역**                    |
-| `pnpm harness:check` | 커밋된 생성 rule이 원본과 같은지                                                 |
-| `pnpm size`          | 번들 크기 검사 (size-limit). `build:libs`가 먼저 필요                            |
-| `pnpm release:local` | 로컬 레지스트리로 릴리스                                                         |
+| 명령                 | 하는 일                                                                                        |
+| -------------------- | ---------------------------------------------------------------------------------------------- |
+| `pnpm build:libs`    | 라이브러리만 빌드 (`design-tokens` · `ui-core` · `react-ui` · `react-native-ui` · `devhub-ui`) |
+| `pnpm tokens:build`  | 디자인 토큰 빌드                                                                               |
+| `pnpm tools:check`   | `tools/` 타입 검사 + 테스트. **Nx affected가 닿지 않는 영역**                                  |
+| `pnpm harness:check` | 커밋된 생성 rule이 원본과 같은지                                                               |
+| `pnpm size`          | 번들 크기 검사 (size-limit). `build:libs`가 먼저 필요                                          |
+| `pnpm release:local` | 로컬 레지스트리로 릴리스                                                                       |
 
 조회 · 측정 · 평가 · 품질 수집 같은 도구 명령은 [tools/README.md](tools/README.md). PR에서 무엇이 도는지와 AI 세션에서 실행할 수 없는 것은 [.claude/harness.profile.md](.claude/harness.profile.md).
 
