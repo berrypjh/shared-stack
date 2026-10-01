@@ -36,3 +36,15 @@ export const Error: Story = {
     tone: 'error',
   },
 };
+
+/** 값을 가리지 않는 경고 한 줄 — 실행 선택 바로 아래처럼 값 위에 둘 때. */
+export const Compact: Story = {
+  args: {
+    kind: 'stale',
+    kindLabel: '기준과 다른 source',
+    icon: '⟳',
+    title: '기준 source 와 다른 실행',
+    cause: 'run source 11ce3d1 이 기준 d7f0ff8 과 다릅니다',
+    compact: true,
+  },
+};
