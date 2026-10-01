@@ -15,8 +15,8 @@ const task = dev[0];
 const req = { runId: 'r', split: 'dev' as const, task, variant: 'consumer-docs', trial: 1 };
 
 describe('executor boundary', () => {
-  it('never fabricates a result when no live executor exists', async () => {
-    await expect(unavailableExecutor.run(req)).rejects.toThrow(/no live executor is configured/);
+  it('never fabricates a result when no executor is selected', async () => {
+    await expect(unavailableExecutor.run(req)).rejects.toThrow(/no executor is selected/);
   });
 
   it('fails loudly on an unregistered scripted combination', async () => {

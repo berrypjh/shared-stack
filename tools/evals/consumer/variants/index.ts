@@ -78,7 +78,8 @@ export const VARIANTS: Record<VariantId, Variant> = {
   'full-source': {
     id: 'full-source',
     label: 'Full Source',
-    description: 'lib source 전체를 초기 컨텍스트로 준다. correctness ceiling 기준선.',
+    description:
+      'lib source 전체를 처음부터 준다 — 자료가 모자라서 틀리는 일이 없을 때 얼마나 맞히는지 보는 상한 기준선.',
     contextPaths: [
       'libs/ui-core/src/**',
       'libs/react-ui/src/**',
@@ -98,7 +99,7 @@ export const VARIANTS: Record<VariantId, Variant> = {
   'consumer-docs': {
     id: 'consumer-docs',
     label: 'Consumer Docs',
-    description: 'AGENTS.consumer.md 중심의 compact 컨텍스트.',
+    description: '패키지 사용 안내(AGENTS.consumer.md)와 package.json 만 주는 작은 컨텍스트.',
     contextPaths: [
       'libs/react-ui/AGENTS.consumer.md',
       'libs/react-native-ui/AGENTS.consumer.md',
@@ -111,7 +112,7 @@ export const VARIANTS: Record<VariantId, Variant> = {
     id: 'current-discovery',
     label: 'Current Discovery',
     description:
-      '현재 소비자가 실제로 하는 discovery — package manifest + README + 번들 declaration + token catalog.',
+      '지금 소비자가 패키지를 알아보는 방식 그대로 — package.json · README · 빌드된 타입 선언 · 토큰 목록(tokens.json)을 읽는다.',
     contextPaths: [
       'libs/react-ui/package.json',
       'libs/react-ui/README.md',
@@ -134,7 +135,7 @@ export const VARIANTS: Record<VariantId, Variant> = {
   'current-with-catalog': {
     id: 'current-with-catalog',
     label: 'Current + Catalog',
-    description: 'Current Discovery + 빌드 생성 llm-catalog.json.',
+    description: 'Current Discovery 에 빌드가 만든 API 카탈로그(llm-catalog.json)를 더한다.',
     contextPaths: VARIANTS_D1_PATHS,
     allowedCapabilities: [
       'read-package-manifest',
@@ -150,7 +151,8 @@ export const VARIANTS: Record<VariantId, Variant> = {
   'catalog-with-routing': {
     id: 'catalog-with-routing',
     label: 'Catalog + Routing',
-    description: 'D1 + deterministic platform routing — 라우팅된 패키지 자료만 읽는다.',
+    description:
+      'Current + Catalog 에 플랫폼 라우팅을 더한다 — 고른 플랫폼의 패키지 자료만 읽는다.',
     contextPaths: VARIANTS_D1_PATHS,
     routedContextPaths: {
       web: [
@@ -183,7 +185,8 @@ export const VARIANTS: Record<VariantId, Variant> = {
   'progressive-retrieval': {
     id: 'progressive-retrieval',
     label: 'Progressive Retrieval',
-    description: 'D2 + progressive lookup — 초기 컨텍스트는 문서 + 카탈로그, 나머지는 표적 조회.',
+    description:
+      'Catalog + Routing 에서 처음엔 문서 + 카탈로그만 주고, 나머지는 필요할 때 찾아 읽는다.',
     contextPaths: PROGRESSIVE_PATHS,
     routedContextPaths: PROGRESSIVE_ROUTED,
     allowedCapabilities: PROGRESSIVE_CAPABILITIES,
@@ -193,7 +196,8 @@ export const VARIANTS: Record<VariantId, Variant> = {
   'progressive-with-verification': {
     id: 'progressive-with-verification',
     label: 'Progressive + Verification',
-    description: 'D3 + required verification 실행 (관찰만, 자동 수정 없음).',
+    description:
+      'Progressive Retrieval 에 필수 검증 실행을 더한다 — 결과를 보기만 하고 고치지 않는다.',
     contextPaths: PROGRESSIVE_PATHS,
     routedContextPaths: PROGRESSIVE_ROUTED,
     allowedCapabilities: [...PROGRESSIVE_CAPABILITIES, 'run-verification'],
@@ -202,7 +206,8 @@ export const VARIANTS: Record<VariantId, Variant> = {
   'progressive-with-repair': {
     id: 'progressive-with-repair',
     label: 'Progressive + Repair',
-    description: 'D4 + 실패 근거만 읽고 최소 수정 후 가장 작은 check 재실행 (시도 상한 있음).',
+    description:
+      'Progressive + Verification 에 최소 수정을 더한다 — 실패 근거만 읽고 고친 뒤 가장 작은 검사를 다시 돌린다(시도 횟수 제한).',
     contextPaths: PROGRESSIVE_PATHS,
     routedContextPaths: PROGRESSIVE_ROUTED,
     allowedCapabilities: [...PROGRESSIVE_CAPABILITIES, 'run-verification', 'repair'],

@@ -10,6 +10,10 @@ import { renderMarkdown } from '../reporters/markdown';
 import type { VariantContext } from '../variants/context';
 import { VARIANT_IDS } from '../variants/index';
 
+import { createLiveExecutor } from './live/executor';
+import { anthropicCounter, estimateCounter, LIVE_SKIPPED_FILE, preflight } from './live/preflight';
+import { PROVIDER_IDS, type ProviderId, PROVIDERS } from './live/providers';
+import { loadDataset } from './dataset';
 import { createReplayExecutor, type EvalExecutor, unavailableExecutor } from './executor';
 import { measureContexts, resolveRouting, type RoutingReport } from './offline';
 import { REPO_ROOT } from './paths';
@@ -21,8 +25,11 @@ import { readTraces } from './trace';
  * Consumer eval runner.
  *
  *   node --import tsx tools/evals/consumer/runner/run.ts --split=dev --replay=<traces.jsonl>
+ *   node --import tsx tools/evals/consumer/runner/run.ts --live --provider=claude|openai|local --model=<id>
+ *     [--base-url=<url>] [--context-limit=<토큰>] [--all-tasks]   (claude · openai 는 API 키 필요)
  *
- * live executor가 없으면 실패한다. 가짜 baseline을 만들지 않는다.
+ * executor(smoke · live · replay)를 고르지 않으면 실패한다. 가짜 baseline을 만들지 않는다.
+ * `--live` 는 기본으로 smoke 과제만 돌리고, 첫 메시지가 컨텍스트 한도를 넘는 variant 는 빼고 이유를 남긴다.
  * `--context-only`는 executor 없이 variant 초기 컨텍스트만 실측한다.
  */
 
@@ -118,36 +125,85 @@ const main = async (): Promise<void> => {
   const outDir = path.resolve(REPO_ROOT, str(args, 'out', 'tmp/llm-evals'), runId);
 
   const smoke = Boolean(args.smoke);
+  const live = Boolean(args.live);
   const replay = typeof args.replay === 'string' ? args.replay : null;
-  const executor: EvalExecutor = smoke
-    ? {
-        name: 'smoke-scripted',
-        model: null,
-        run: async ({ task }) => smokeOutcome(task),
-      }
-    : replay
+  const listed = str(args, 'tasks', '').split(',').filter(Boolean);
+  // live 는 호출마다 비용이 들어 기본을 smoke 과제로 둔다. 전체는 --all-tasks 로 연다.
+  const taskIds =
+    smoke || (live && listed.length === 0 && !args['all-tasks'])
+      ? SMOKE_TASK_IDS
+      : listed.length > 0
+        ? listed
+        : undefined;
+
+  let runVariants = variantIds;
+  let skipped: { variant: string; reason: string }[] = [];
+  let executor: EvalExecutor;
+  if (smoke) {
+    executor = { name: 'smoke-scripted', model: null, run: async ({ task }) => smokeOutcome(task) };
+  } else if (live) {
+    // 제공자 · 모델은 기본값 없이 늘 고른다 — 어떤 모델로 돌렸는지가 명령에 드러나게.
+    const providerId = str(args, 'provider', '') as ProviderId;
+    const model = str(args, 'model', '');
+    if (!PROVIDER_IDS.includes(providerId) || !model) {
+      throw new Error(
+        `--live 는 --provider(${PROVIDER_IDS.join(' · ')})와 --model 이 필요하다 (예: --provider=local --model=qwen3:14b)`,
+      );
+    }
+    const provider: (typeof PROVIDERS)[ProviderId] = PROVIDERS[providerId];
+    const apiKey = provider.keyEnv ? (process.env[provider.keyEnv] ?? null) : null;
+    if (provider.keyEnv && !apiKey) {
+      throw new Error(
+        `--provider=${providerId} 는 ${provider.keyEnv} 가 필요하다 (루트 환경 파일 또는 환경변수)`,
+      );
+    }
+    const baseUrl = str(args, 'base-url', provider.baseUrl);
+    const limit = Number(str(args, 'context-limit', String(provider.contextLimit)));
+    if (!Number.isInteger(limit) || limit < 1)
+      throw new Error('--context-limit must be a positive int');
+    const all = await loadDataset(split);
+    const tasks = taskIds ? all.filter((task) => taskIds.includes(task.taskId)) : all;
+    const exact = provider.count === 'anthropic' && apiKey;
+    console.error(
+      `live: ${providerId} · ${model} · ${baseUrl} · 컨텍스트 한도 ${limit} · 과제 ${tasks.length}개`,
+    );
+    ({ runnable: runVariants, skipped } = await preflight({
+      variantIds,
+      tasks,
+      limit,
+      count: exact ? anthropicCounter(apiKey, model) : estimateCounter,
+      estimated: !exact,
+    }));
+    for (const item of skipped) console.error(`skip ${item.variant}: ${item.reason}`);
+    if (runVariants.length === 0) throw new Error('실행할 수 있는 variant 가 없다');
+    executor = createLiveExecutor({ provider: providerId, model, apiKey, baseUrl });
+  } else {
+    executor = replay
       ? createReplayExecutor(await readTraces(path.resolve(REPO_ROOT, replay)))
       : unavailableExecutor;
+  }
 
   const result = await runEval({
     split,
     trials,
-    variantIds,
+    variantIds: runVariants,
     executor,
     k: Number(str(args, 'k', String(DEFAULT_K))),
     gitSha: gitSha(),
     ref: process.env.GITHUB_REF ?? null,
     compareBaseline: Boolean(args['compare-baseline']),
-    taskIds: smoke
-      ? SMOKE_TASK_IDS
-      : str(args, 'tasks', '')
-        ? str(args, 'tasks', '').split(',').filter(Boolean)
-        : undefined,
+    taskIds,
     runId,
     createdAt: new Date().toISOString(),
   });
 
   await writeRunArtifacts(outDir, result);
+  if (live) {
+    await fs.writeFile(
+      path.join(outDir, LIVE_SKIPPED_FILE),
+      `${JSON.stringify(skipped, null, 2)}\n`,
+    );
+  }
 
   if (args['write-baseline']) {
     if (!result.summary.conditions) throw new Error('cannot write a baseline without conditions');

@@ -54,7 +54,13 @@ const expand = async (spec: string): Promise<{ files: string[]; missing: string[
   return { files: isDir ? await walk(target) : [target], missing: [] };
 };
 
-const measurePaths = async (specs: string[]): Promise<ContextSize> => {
+/**
+ * 경로 spec 을 펼쳐 이어 붙인 내용. 측정과 live executor 가 같은 내용을 쓰도록 여기 한 벌만 둔다.
+ * 없는 경로가 하나라도 있으면 `content` 는 null 이다 — 부분 내용을 전체인 척하지 않는다.
+ */
+export const readContextFiles = async (
+  specs: string[],
+): Promise<{ files: string[]; missingPaths: string[]; content: string | null }> => {
   const files: string[] = [];
   const missingPaths: string[] = [];
   for (const spec of specs) {
@@ -62,19 +68,18 @@ const measurePaths = async (specs: string[]): Promise<ContextSize> => {
     files.push(...r.files);
     missingPaths.push(...r.missing);
   }
-  const relative = files.map((f) => path.relative(REPO_ROOT, f));
+  const content =
+    missingPaths.length > 0
+      ? null
+      : (await Promise.all(files.map((f) => fs.readFile(f, 'utf8')))).join('\n');
+  return { files: files.map((f) => path.relative(REPO_ROOT, f)), missingPaths, content };
+};
 
-  if (missingPaths.length > 0) {
-    return { files: relative, missingPaths, chars: null, tokens: null };
-  }
-
-  const content = (await Promise.all(files.map((f) => fs.readFile(f, 'utf8')))).join('\n');
-  return {
-    files: relative,
-    missingPaths,
-    chars: content.length,
-    tokens: countOpenAITokens(content),
-  };
+const measurePaths = async (specs: string[]): Promise<ContextSize> => {
+  const { files, missingPaths, content } = await readContextFiles(specs);
+  return content === null
+    ? { files, missingPaths, chars: null, tokens: null }
+    : { files, missingPaths, chars: content.length, tokens: countOpenAITokens(content) };
 };
 
 /** variant의 initial context를 실제 파일에서 측정한다. 추정값을 쓰지 않는다. */
