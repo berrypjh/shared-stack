@@ -42,16 +42,16 @@ Vite + React. shared-stack의 구조와 근거(패키지 · 앱 · 도구 · 문
 
 - **명령 · CI 카탈로그를 두지 않는다.** 매니페스트와 `.github/workflows`가 정본이라 옮겨 적으면 어긋난다
 - **검색 항목은 카탈로그에서 유도한다.** 항목은 `lib/search/entries.ts`, 순위는 devhub-ui `search/rank.ts`다
-- **평가 화면 목록은 `lib/evaluation/screens.ts`가 정본이다.** 번들 · AI 평가처럼 이 저장소만 재는 것만 싣는다. CI · 테스트가 이미 알려 주는 것(test · lint · build · 접근성 · 토큰 대비)은 싣지 않는다
+- **평가 항목 목록은 `data/evaluations.ts`가 정본이다.** 화면은 `components/evaluation/measures`의 `MEASURES`가 항목마다 하나씩 갖는다. 번들 · 컨텍스트 · 소비자 평가처럼 이 저장소만 재는 것만 싣는다. CI · 테스트가 이미 알려 주는 것(test · lint · build · 접근성 · 토큰 대비)은 싣지 않는다
 - **비교는 사람이 고른 실행과의 report-only diff뿐이다.** 최신 실행을 자동 baseline으로 삼지 않고, 합산 점수 같은 새 파생값을 만들지 않는다
-- **명령 버튼은 복사만 한다.** 수집 · export는 Node(`pnpm quality:collect` · `quality:export`)가 한다
+- **명령 버튼은 복사만 한다.** 수집 · export는 Node가 한다. 화면은 평가 묶음의 한 줄 명령(`pnpm quality:core` · `quality:eval`)만 보인다
 
 ## 구조
 
 - `src/data` — 카탈로그(저장소 사실). `catalog.spec.ts`가 디스크 · 매니페스트와 대조한다
 - `src/domain` — 카탈로그 타입과 관계 유도
 - `src/lib` — 순수 로직. Node 전용은 `lib/repository/snapshot.ts`뿐이다
-- `src/app` — route 조립, 화면 하나에 파일 하나. `components` — 저장소 사실에 묶인 화면 조각
+- `src/app` — 앱 · route 조립(`app.tsx` · `router.tsx`)과 앱 전체를 보는 테스트. `src/app/pages` — 화면 하나에 파일 하나와 그 테스트. `components` — 저장소 사실에 묶인 화면 조각
 
 ## 검증
 

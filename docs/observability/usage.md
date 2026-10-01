@@ -1,6 +1,6 @@
 # 품질 관측 사용법
 
-> **한 줄 요약** — bundle · context · AI 평가 결과를 Node CLI로 모아(`quality:collect`) 공개 JSON으로 내보내고(`quality:export`) DevHub "평가" 섹션(`/evaluation`)에서 보는 절차.
+> **한 줄 요약** — bundle · context · AI 평가 결과를 Node CLI로 모아 공개 JSON으로 내보내고 DevHub "평가" 섹션(`/evaluation`)에서 보는 절차. 보통은 `pnpm quality:core` · `pnpm quality:eval` 한 줄이면 된다. 모델을 실제로 호출하는 평가는 `pnpm quality:eval:live`(키 · 비용 필요).
 
 - **구조 · 수집기 · 검증 · 제약** — [architecture.md](architecture.md)
 - **metric 의미 · 단위 · 비교 조건** — [metrics.md](metrics.md)
@@ -19,7 +19,31 @@ pnpm build:libs     # design-tokens · ui-core · react-ui · react-native-ui di
 - **선행 build** — `quality:collect` · `quality:export`는 먼저 `@berrypjh/observability-contracts`를 build. `nx serve` · `build` · `test`는 `^build`로 contracts · react-ui · devhub-ui를 먼저 build
 - **dist 최신화** — core 수집기는 lib를 다시 build하지 않음. dist가 오래되면 오래된 값을 잼
 
-## 수집
+## 한 줄로 수집하기
+
+| DevHub 묶음             | 명령                     | 하는 일                                                                                                       |
+| ----------------------- | ------------------------ | ------------------------------------------------------------------------------------------------------------- |
+| 번들 · 컨텍스트         | `pnpm quality:core`      | core 수집 → DevHub로 내보내기                                                                                 |
+| 소비자 평가             | `pnpm quality:eval`      | smoke 평가(고정 입력, 외부 호출 없음) → eval 수집 → DevHub로 내보내기                                         |
+| 소비자 평가 · 실제 입력 | `pnpm quality:eval:live` | 모델을 실제로 호출하는 live 평가 → eval 수집 → DevHub로 내보내기. 컨텍스트 토큰의 "실제 입력"이 여기서만 생김 |
+
+- **run ID** — `<profile>-<날짜>-<시각>`(이 컴퓨터 시각)으로 자동. 이름을 정하려면 `pnpm quality:core --run-id=<id>`
+- **smoke만** — `quality:eval`은 smoke 평가만 돌림. dev · test 평가 결과는 아래 세부 명령으로 가져옴
+- **live** — `quality:eval:live --provider=<제공자> --model=<모델>`. 제공자 · 모델은 기본값 없이 늘 고름
+  - 기본: smoke 과제 × 모든 variant × trial 1, 과제당 최대 12턴. 주소는 `--base-url`, 한도는 `--context-limit`
+  - 실행 전에 첫 메시지를 세어 한도를 넘는 variant는 실행하지 않고 `live-skipped.json`에 이유를 남김
+  - 로컬(Ollama)은 컨텍스트를 넘는 입력을 오류 없이 자름. 첫 턴 입력이 추정보다 크게 작으면 실행을 멈추고 이유를 알림 — Ollama를 `OLLAMA_CONTEXT_LENGTH`를 한도 이상으로 해서 띄워야 함
+
+| 제공자   | `--provider` | 키                  | 모델                                     | 기본 한도 | 실행 전 점검                |
+| -------- | ------------ | ------------------- | ---------------------------------------- | --------- | --------------------------- |
+| Claude   | `claude`     | `ANTHROPIC_API_KEY` | `--model` 필수 (예: `claude-sonnet-5-5`) | 200,000   | count_tokens(무료)로 정확히 |
+| OpenAI   | `openai`     | `OPENAI_API_KEY`    | `--model` 필수                           | 128,000   | tiktoken 추정               |
+| 로컬 LLM | `local`      | 없음                | `--model` 필수 (예: `qwen3:14b`)         | 32,768    | tiktoken 추정 · 잘림 감지   |
+
+- 도구는 variant가 허용한 capability만(파일 읽기 · 플랫폼 판정 · 심볼 조회 · 토큰 조회 · 파일 쓰기 · 끝내기). `grep-workspace` 도구와 repair 단계는 아직 없음
+- 과제 전체는 harness를 `--live --all-tasks`로 돌린 뒤 `quality:collect --profile=eval --from=...`
+
+## 수집 (세부 옵션)
 
 | profile  | 명령                                                                           | 비용                                                                |
 | -------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------------- |
@@ -77,13 +101,18 @@ pnpm quality:export --run-id=<id>
 pnpm dev:devhub     # nx serve @berrypjh/devhub → http://localhost:4400/evaluation
 ```
 
-| 화면    | 경로                  | 내용                                                     |
-| ------- | --------------------- | -------------------------------------------------------- |
-| 개요    | `/evaluation`         | 실행 하나의 번들 · 컨텍스트 · 평가를 독립 카드로         |
-| 번들    | `/evaluation/bundles` | size-limit budget · treeshake 진단. `?base=`로 실행 비교 |
-| AI 평가 | `/evaluation/ai`      | eval metric · 분자 · 분모 · n · executor 출처            |
+| 묶음        | 항목            | 경로                            | 내용                                                |
+| ----------- | --------------- | ------------------------------- | --------------------------------------------------- |
+| 번들        | 번들 budget     | `/evaluation/bundle-budget`     | size-limit 크기 · 한도. `?base=`로 실행 비교        |
+| 번들        | 트리셰이킹 진단 | `/evaluation/treeshake`         | 심볼 하나만 import 한 번들의 raw · gzip 크기        |
+| 컨텍스트    | 컨텍스트 토큰   | `/evaluation/context-tokens`    | 소비자가 읽는 입력의 토큰 수. `?panel=`로 범위 고름 |
+| 소비자 평가 | 성적표          | `/evaluation/eval-scorecard`    | executor 출처 · variant × primary metric            |
+| 소비자 평가 | 라우팅          | `/evaluation/eval-routing`      | 플랫폼 판단 정확도 · expected × predicted 표        |
+| 소비자 평가 | 검색            | `/evaluation/eval-retrieval`    | required evidence recall · trace 별 hit             |
+| 소비자 평가 | 검증            | `/evaluation/eval-verification` | 검증된 성공률 · 거짓 성공률 · kind × status         |
 
-- **실행 고르기** — `?run=<id>`. 번들 화면만 `?base=<id>`로 고른 실행과 report-only diff
+- **항목 목록** — `apps/devhub/src/data/evaluations.ts`. `/evaluation`은 항목 목록, 옆 칸은 고른 실행의 상태 · source · 스냅샷 비교
+- **실행 고르기** — `?run=<id>`. 목록에는 그 항목의 영역이 있는 실행만 오고 기본은 그중 마지막. 같은 묶음의 항목으로만 이어 감. 번들 budget만 `?base=<id>`로 고른 실행과 report-only diff
 - **명령 없음** — 브라우저는 명령을 실행하지 않음. 명령 버튼은 복사만
 
 ## 산출물 위치

@@ -109,6 +109,16 @@ pnpm storybook      # Storybook
 pnpm dev:devhub     # DevHub (평가 화면 포함)
 ```
 
+DevHub "평가"에 보일 데이터는 따로 만든다. 저장소 루트에서 실행하면 수집 · 내보내기까지 한 번에 한다.
+
+```bash
+pnpm quality:core                                          # 번들 · 컨텍스트
+pnpm quality:eval                                          # 소비자 평가 — 모델 없이 평가 도구만 확인
+pnpm quality:eval:live --provider=local --model=qwen3:14b  # 소비자 평가 — 모델로 실제로 (claude · openai · local)
+```
+
+제공자별 키 · 한도 · 로컬 준비는 [docs/observability/usage.md](docs/observability/usage.md).
+
 ### 데모 앱
 
 두 데모는 라이브러리를 **실제 앱으로 통합했을 때** 무엇이 살아 있는지 확인한다. 컴포넌트 상태 탐색과 시각 회귀는 Storybook이 맡는다.

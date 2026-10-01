@@ -36,33 +36,34 @@
 
 ## context — `contexts[]` (core)
 
-| 항목             | 내용                                                                                                                                      |
-| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| ID               | `context.<scope>.<subject>.<provider>`                                                                                                    |
-| scope            | `package-scenario` (measure-tokens 등록부) · `variant-initial` · `variant-routed` (consumer eval variant) · `agent-input` (수집 안 함)    |
-| provider · model | 수집기는 `openai-tiktoken-local` · 기본 `gpt-4o`. tokenizer 버전은 설치된 `tiktoken` package.json                                         |
-| 구성             | `measure-tokens-read-files` · `eval-variant-context-join` · `executor-reported`                                                           |
-| 없음             | `missing-input`(파일 하나라도 없으면 부분 합계 없이 null + `missingPaths`) · `provider-not-selected` · `provider-error` · `not-collected` |
-| 비교 조건        | scope · provider · tokenModel · tokenizerVersion · contentConstruction                                                                    |
+| 항목             | 내용                                                                                                                                                                                                                                                                                                 |
+| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ID               | `context.<scope>.<subject>.<provider>`                                                                                                                                                                                                                                                               |
+| scope            | `package-scenario` (measure-tokens 등록부) · `variant-initial` · `variant-routed` (consumer eval variant) · `agent-input` (live 평가의 실제 입력 — trial 마다 API 사용량의 턴 합계, `anthropic-messages-usage`(Claude · 로컬) 또는 `openai-chat-usage`(OpenAI) · `executor-reported` · 글자 수 없음) |
+| provider · model | 수집기는 `openai-tiktoken-local` · 기본 `gpt-4o`. tokenizer 버전은 설치된 `tiktoken` package.json                                                                                                                                                                                                    |
+| 구성             | `measure-tokens-read-files` · `eval-variant-context-join` · `executor-reported`                                                                                                                                                                                                                      |
+| variant 정의     | variant scope 행의 `definition`(이름 · 설명). 수집할 때 consumer eval `VARIANTS`에서 가져옴. 이 필드 전에 수집한 실행에는 없음                                                                                                                                                                       |
+| 없음             | `missing-input`(파일 하나라도 없으면 부분 합계 없이 null + `missingPaths`) · `provider-not-selected` · `provider-error` · `not-collected`                                                                                                                                                            |
+| 비교 조건        | scope · provider · tokenModel · tokenizerVersion · contentConstruction                                                                                                                                                                                                                               |
 
 ## eval — `evals[]` (eval)
 
-| 항목               | 내용                                                                                                                                                                |
-| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| source             | `eval:<tmp/llm-evals 디렉터리>`의 `summary.json` · `traces.jsonl` · `routing.json` · `context.json`                                                                 |
-| import 상태        | 파일마다 `parsed` · `missing` · `invalid` · `not-run` (+ 이유)                                                                                                      |
-| origin             | runId · createdAt · split · gitSha · executor · model · harnessVersion · K · taskCount · trialsPerTask · conditions                                                 |
-| executorClass      | `harness-smoke` · `scripted` · `replay` · `unavailable` · `unknown`                                                                                                 |
-| primary            | `verifiedTaskSuccessRate` (rate) · `routingAccuracy` (rate) · `requiredEvidenceRecallAtK` (aggregate) · `medianInputTokens` (aggregate) · `falseSuccessRate` (rate) |
-| rate               | value = numerator ÷ denominator. 분모 0 → `null` + `zero-denominator`                                                                                               |
-| aggregate          | value + n. n 0 → `null` + `no-samples`, 원본 null → `source-null`                                                                                                   |
-| false success      | 분모 = 명시적 true · false 주장만 (unknown · null 제외)                                                                                                             |
-| retrieval          | required evidence 없는 task는 recall · RR이 N/A이고 평균의 n에서 빠짐. evidence 중복과 tool call 중복은 따로                                                        |
-| routing            | expected(web · react-native · both · none) × predicted(+ `unreported`) 4×5. `trace-grades`(variant 별)와 `deterministic-resolver`를 섞지 않음                       |
-| verification       | `verificationAuthority`: `executor-reported` / `harness-executed` (D4 · D5 variant). repair: `not-in-variant` · `no-repair-hook` · `unknown`                        |
-| notice             | `harness-smoke` · `no-live-executor` · `no-baseline` · `baseline-not-requested` · `unsupported-required-check` · `replay-without-repair-hook` · `partial-import`    |
-| 만들지 않는 metric | `wrongPlatformRate` · `hitRate` · `stddev` · `confidenceInterval` · `passAt1`                                                                                       |
-| 원래 비교          | `originalComparison`: `source` summary/baseline-file, `status` `no-baseline` · `corrupt-baseline`(이유) · `compared`(comparable · warnings)                         |
+| 항목               | 내용                                                                                                                                                                                   |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| source             | `eval:<tmp/llm-evals 디렉터리>`의 `summary.json` · `traces.jsonl` · `routing.json` · `context.json`                                                                                    |
+| import 상태        | 파일마다 `parsed` · `missing` · `invalid` · `not-run` (+ 이유)                                                                                                                         |
+| origin             | runId · createdAt · split · gitSha · executor · model · harnessVersion · K · taskCount · trialsPerTask · conditions                                                                    |
+| executorClass      | `harness-smoke` · `live` · `scripted` · `replay` · `unavailable` · `unknown`                                                                                                           |
+| primary            | `verifiedTaskSuccessRate` (rate) · `routingAccuracy` (rate) · `requiredEvidenceRecallAtK` (aggregate) · `medianInputTokens` (aggregate) · `falseSuccessRate` (rate)                    |
+| rate               | value = numerator ÷ denominator. 분모 0 → `null` + `zero-denominator`                                                                                                                  |
+| aggregate          | value + n. n 0 → `null` + `no-samples`, 원본 null → `source-null`                                                                                                                      |
+| false success      | 분모 = 명시적 true · false 주장만 (unknown · null 제외)                                                                                                                                |
+| retrieval          | required evidence 없는 task는 recall · RR이 N/A이고 평균의 n에서 빠짐. evidence 중복과 tool call 중복은 따로                                                                           |
+| routing            | expected(web · react-native · both · none) × predicted(+ `unreported`) 4×5. `trace-grades`(variant 별)와 `deterministic-resolver`를 섞지 않음                                          |
+| verification       | `verificationAuthority`: `executor-reported` / `harness-executed` (Progressive + Verification · Progressive + Repair variant). repair: `not-in-variant` · `no-repair-hook` · `unknown` |
+| notice             | `harness-smoke` · `no-live-executor` · `no-baseline` · `baseline-not-requested` · `unsupported-required-check` · `replay-without-repair-hook` · `partial-import`                       |
+| 만들지 않는 metric | `wrongPlatformRate` · `hitRate` · `stddev` · `confidenceInterval` · `passAt1`                                                                                                          |
+| 원래 비교          | `originalComparison`: `source` summary/baseline-file, `status` `no-baseline` · `corrupt-baseline`(이유) · `compared`(comparable · warnings)                                            |
 
 - **비공개** — held-out(`test` split) trace의 gold evidence · 발췌와 변경 파일 내용
 

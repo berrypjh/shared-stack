@@ -22,17 +22,18 @@
 
 대부분 빌드된 라이브러리를 읽으므로 먼저 `pnpm build:libs`를 돌린다.
 
-| 명령                                                                                                      | 하는 일                                                          |
-| --------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
-| `pnpm ui:lookup`                                                                                          | 플랫폼 · 심볼 · 토큰 조회                                        |
-| `pnpm catalog:gen`                                                                                        | 소비자 API 카탈로그 생성. 두 UI 패키지 build가 자동 호출         |
-| `pnpm eval:consumer:context` · `pnpm eval:consumer:routing`                                               | executor 없이 컨텍스트 · routing만 측정                          |
-| `pnpm eval:consumer:smoke`                                                                                | 모델 호출 없는 결정적 smoke (PR CI)                              |
-| `pnpm eval:consumer:dev` · `pnpm eval:consumer:test`                                                      | 전체 평가. live executor가 없어 `--replay=<traces.jsonl>`이 필요 |
-| `pnpm react-ui:measure` · `pnpm react-native-ui:measure` · `pnpm ui-core:measure` · `pnpm tokens:measure` | 토큰 측정                                                        |
-| `pnpm treeshake <target> [symbol...]`                                                                     | tree-shaking 진단                                                |
-| `pnpm quality:collect` · `pnpm quality:export`                                                            | 품질 관측 수집 · DevHub로 내보내기                               |
-| `pnpm release:local`                                                                                      | 로컬 레지스트리로 릴리스                                         |
+| 명령                                                                                                      | 하는 일                                                                                                                          |
+| --------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `pnpm ui:lookup`                                                                                          | 플랫폼 · 심볼 · 토큰 조회                                                                                                        |
+| `pnpm catalog:gen`                                                                                        | 소비자 API 카탈로그 생성. 두 UI 패키지 build가 자동 호출                                                                         |
+| `pnpm eval:consumer:context` · `pnpm eval:consumer:routing`                                               | executor 없이 컨텍스트 · routing만 측정                                                                                          |
+| `pnpm eval:consumer:smoke`                                                                                | 모델 호출 없는 결정적 smoke (PR CI)                                                                                              |
+| `pnpm eval:consumer:dev` · `pnpm eval:consumer:test`                                                      | 전체 평가. `--live --provider=...`(Claude · OpenAI · 로컬) 또는 `--replay=<traces.jsonl>`이 필요                                 |
+| `pnpm react-ui:measure` · `pnpm react-native-ui:measure` · `pnpm ui-core:measure` · `pnpm tokens:measure` | 토큰 측정                                                                                                                        |
+| `pnpm treeshake <target> [symbol...]`                                                                     | tree-shaking 진단                                                                                                                |
+| `pnpm quality:core` · `pnpm quality:eval` · `pnpm quality:eval:live`                                      | 품질 관측 수집 → DevHub로 내보내기 한 번에 (run id 자동). `:live`는 모델을 실제로 호출 (`--provider` 로 claude · openai · local) |
+| `pnpm quality:collect` · `pnpm quality:export`                                                            | 수집 · 내보내기를 옵션과 함께 따로                                                                                               |
+| `pnpm release:local`                                                                                      | 로컬 레지스트리로 릴리스                                                                                                         |
 
 Anthropic 토큰 수는 `ANTHROPIC_API_KEY`가 있을 때만 잰다. 측정 스크립트가 루트 `.env`를 읽는다(예시는 `.env.example`).
 

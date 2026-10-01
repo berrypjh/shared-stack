@@ -107,18 +107,18 @@ apps/devhub/public/observability/
 
 저장소 root에서 실행.
 
-| gate         | 명령                                                  | 무엇을 막나                                                                                             |
-| ------------ | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| 계약 build   | `pnpm nx build @berrypjh/observability-contracts`     | tools · DevHub가 읽는 dist                                                                              |
-| 계약 type    | `pnpm nx typecheck @berrypjh/observability-contracts` | lib가 zod 외 의존(Node · DOM)을 쓰는 것                                                                 |
-| 계약 test    | `pnpm nx test @berrypjh/observability-contracts`      | schema refinement · 요약 의미                                                                           |
-| tools        | `pnpm tools:check`                                    | collector · adapter · normalizer · store · export. `tools/`는 Nx project가 아니라 affected가 닿지 않음  |
-| DevHub test  | `pnpm nx test @berrypjh/devhub`                       | 평가 화면 동작 · 상태 표시 · 탐색기                                                                     |
-| DevHub type  | `pnpm nx typecheck @berrypjh/devhub`                  | app + spec                                                                                              |
-| DevHub lint  | `pnpm nx lint @berrypjh/devhub`                       | jsx-a11y 포함                                                                                           |
-| DevHub build | `pnpm nx build @berrypjh/devhub`                      | production bundle (react-ui · devhub-ui dist 해석)                                                      |
-| E2E type     | `pnpm nx typecheck @berrypjh/devhub-e2e`              |                                                                                                         |
-| E2E          | `pnpm nx e2e @berrypjh/devhub-e2e`                    | `evaluation.spec.ts`(하위 화면 이동 · 포커스 · `?run=` 유지), `a11y.spec.ts`(axe), `responsive.spec.ts` |
+| gate         | 명령                                                  | 무엇을 막나                                                                                            |
+| ------------ | ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| 계약 build   | `pnpm nx build @berrypjh/observability-contracts`     | tools · DevHub가 읽는 dist                                                                             |
+| 계약 type    | `pnpm nx typecheck @berrypjh/observability-contracts` | lib가 zod 외 의존(Node · DOM)을 쓰는 것                                                                |
+| 계약 test    | `pnpm nx test @berrypjh/observability-contracts`      | schema refinement · 요약 의미                                                                          |
+| tools        | `pnpm tools:check`                                    | collector · adapter · normalizer · store · export. `tools/`는 Nx project가 아니라 affected가 닿지 않음 |
+| DevHub test  | `pnpm nx test @berrypjh/devhub`                       | 평가 항목 동작 · 상태 표시 · 탐색기                                                                    |
+| DevHub type  | `pnpm nx typecheck @berrypjh/devhub`                  | app + spec                                                                                             |
+| DevHub lint  | `pnpm nx lint @berrypjh/devhub`                       | jsx-a11y 포함                                                                                          |
+| DevHub build | `pnpm nx build @berrypjh/devhub`                      | production bundle (react-ui · devhub-ui dist 해석)                                                     |
+| E2E type     | `pnpm nx typecheck @berrypjh/devhub-e2e`              |                                                                                                        |
+| E2E          | `pnpm nx e2e @berrypjh/devhub-e2e`                    | `evaluation.spec.ts`(항목 이동 · 포커스 · `?run=` 유지), `a11y.spec.ts`(axe), `responsive.spec.ts`     |
 
 - **E2E 데이터** — `apps/devhub-e2e`는 앱 소스를 import하지 않음. 계약으로 만든 fixture를 `page.route`로만 주입
 - **react-ui 해석** — DevHub `vite.config.mts`는 `nxViteTsPaths`를 두지 않아 react-ui를 package exports(dist)로 읽음
@@ -128,14 +128,14 @@ apps/devhub/public/observability/
 
 경로는 `apps/devhub/src/` 기준.
 
-| 상태                                   | 대표 test                                                                                       |
-| -------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| not-applicable · unsupported · not-run | `lib/evaluation/status.spec.ts`, `lib/evaluation/ai.spec.ts`, `app/evaluation-ai-page.spec.tsx` |
-| unsupported (번들)                     | `app/evaluation-bundles-page.spec.tsx`                                                          |
-| timeout                                | `lib/evaluation/ai.spec.ts` (eval trace 검증 timeout)                                           |
-| invalid · missing                      | `lib/evaluation/client.spec.ts`                                                                 |
-| stale · partial                        | `app/evaluation-overview-page.spec.tsx`, `lib/evaluation/status.spec.ts`                        |
-| not-measured                           | `lib/evaluation/format.spec.ts`                                                                 |
+| 상태                                   | 대표 test                                                                                                     |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| not-applicable · unsupported · not-run | `lib/evaluation/status.spec.ts`, `lib/evaluation/ai.spec.ts`, `components/evaluation/measures/evals.spec.tsx` |
+| unsupported (번들)                     | `components/evaluation/measures/bundles.spec.tsx`                                                             |
+| timeout                                | `lib/evaluation/ai.spec.ts` (eval trace 검증 timeout)                                                         |
+| invalid · missing                      | `lib/evaluation/client.spec.ts`                                                                               |
+| stale · partial                        | `app/pages/evaluation-page.spec.tsx`, `lib/evaluation/status.spec.ts`                                         |
+| not-measured                           | `lib/evaluation/format.spec.ts`                                                                               |
 
 ## 알려진 제약
 
