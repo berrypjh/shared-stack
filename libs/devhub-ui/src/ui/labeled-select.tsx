@@ -1,16 +1,23 @@
+'use client';
+
 import { useId } from 'react';
 
-/** 보이는 label 이 이름인 native select. 현재 값이 목록에 없으면 그 값을 선택 불가로 보여 준다. */
+/**
+ * 보이는 label 이 이름인 native select. 현재 값이 목록에 없으면 그 값을 선택 불가로 보여 준다 —
+ * 값이 비었으면 `placeholder` 를 쓴다.
+ */
 export const LabeledSelect = ({
   label,
   value,
   options,
   onChange,
+  placeholder = '선택',
 }: {
   label: string;
   value: string;
   options: { value: string; label: string }[];
   onChange: (value: string) => void;
+  placeholder?: string;
 }) => {
   const id = useId();
   const known = options.some((option) => option.value === value);
@@ -27,7 +34,7 @@ export const LabeledSelect = ({
       >
         {!known && (
           <option value={value} disabled>
-            {value || '선택'}
+            {value || placeholder}
           </option>
         )}
         {options.map((option) => (

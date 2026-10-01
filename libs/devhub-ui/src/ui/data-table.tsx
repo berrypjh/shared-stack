@@ -5,12 +5,13 @@ import type { ReactNode } from 'react';
 /**
  * 머리 행이 있는 데이터 표. caption 이 표의 이름이고, `TableScroll` 의 label 이 키보드로
  * 스크롤하는 영역의 이름이다. 행 머리는 호출자가 `<th scope="row">` 로 준다.
- * 바로 위의 보이는 제목이 이미 표를 부르면 `hiddenCaption` 으로 caption 을 시각만 숨긴다 — 이름은 남는다.
+ * caption 은 기본으로 시각만 숨긴다 — 표 위의 제목이 이미 표를 부르고, 이름은 보조기술에 남는다.
+ * 보이게 하려면 `hiddenCaption={false}`.
  */
 export const DataTable = ({
   caption,
   headers,
-  hiddenCaption = false,
+  hiddenCaption = true,
   children,
 }: {
   caption: string;

@@ -73,6 +73,7 @@ const BarRow = ({ bar }: { bar: Bar }) => {
 /**
  * 가로 막대. 막대마다 이름과 값 글이 보이고, 값이 없으면 0 막대나 빈 track 을 그리지 않는다.
  * 같은 데이터의 표는 호출자가 둔다 — SVG 는 장식이라 보조기술에 숨긴다.
+ * 묶음 이름은 묶음이 둘 이상일 때만 보인다. 하나면 제목과 같은 말이라 `aria-label` 로만 둔다.
  */
 export const BarChart = ({
   title,
@@ -108,9 +109,11 @@ export const BarChart = ({
           aria-label={group.label}
           className="flex flex-col gap-xs"
         >
-          <span aria-hidden="true" className="typo-caption-small text-text-light">
-            {group.label}
-          </span>
+          {groups.length > 1 && (
+            <span aria-hidden="true" className="typo-caption-small text-text-light">
+              {group.label}
+            </span>
+          )}
           <List className="flex flex-col gap-xs">
             {group.bars.map((bar) => (
               <BarRow key={bar.key} bar={bar} />

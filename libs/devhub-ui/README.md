@@ -1,6 +1,6 @@
 # @berrypjh/devhub-ui
 
-저장소마다 두는 내부 도구 DevHub의 공용 화면. 셸(상단 바 · 탐색기 · 작업 영역 · 상세 정보), 이동 · 확대 그림, 막대 차트(`BarChart`) · 데이터 표(`DataTable`), 저장소 markdown 렌더러, 검색 순위, 테마, 아이콘을 담는다. 카탈로그(무엇을 보여 줄지)는 각 저장소의 DevHub 앱이 갖는다.
+저장소마다 두는 내부 도구 DevHub의 공용 화면. 셸(상단 바 · 탐색기 · 작업 영역 · 상세 정보), 이동 · 확대 그림, 막대 차트(`BarChart`) · 데이터 표(`DataTable`), 상태 안내(`StatusNotice` · `QuestionGuide` · `NotFound` · `FilterEmpty`) · 명령 복사(`CopyCommand`), 저장소 markdown 렌더러, 검색 순위, 테마, 아이콘을 담는다. 카탈로그(무엇을 보여 줄지)는 각 저장소의 DevHub 앱이 갖는다.
 
 ## 설치
 

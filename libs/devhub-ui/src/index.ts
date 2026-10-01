@@ -22,6 +22,7 @@ export {
 export { type Bar, BarChart, type BarGroup } from './chart/bar-chart';
 export { CommandList } from './doc/command-list';
 export { CopyButton } from './doc/copy-button';
+export { CopyCommand } from './doc/copy-command';
 export { DocContent, type RenderLink, type ResolveImage } from './doc/doc-content';
 export { DocToc } from './doc/doc-toc';
 export {
@@ -47,6 +48,10 @@ export { type Inline, inlineText, parseInline } from './markdown/inline';
 export { anchorsOf, bodyOf, type OutlineItem, outlineOf } from './markdown/outline';
 export { type Block, type ListItem, parseMarkdown } from './markdown/parse';
 export { slug } from './markdown/slug';
+export { FilterEmpty } from './notice/filter-empty';
+export { NotFound } from './notice/not-found';
+export { QuestionGuide } from './notice/question-guide';
+export { StatusNotice } from './notice/status-notice';
 export {
   type DevHubConfig,
   type DevHubLinkProps,
@@ -95,6 +100,7 @@ export {
   WorkspaceHeader,
   WorkspaceSection,
 } from './shell/workspace';
+export { WorkspaceSubsection } from './shell/workspace-subsection';
 export {
   applyTheme,
   createThemeScript,
@@ -109,3 +115,6 @@ export {
 export { ThemeSwitch } from './theme/theme-switch';
 export { DataTable } from './ui/data-table';
 export { Icon, type IconName } from './ui/icon';
+export { LabeledSelect } from './ui/labeled-select';
+export { Mono, NamedCode } from './ui/mono';
+export { StatusLabel } from './ui/status-label';
