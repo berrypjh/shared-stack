@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 220" role="img" width="640" height="220">
+  <title>포커스된 입력을 disabled 로 바꿨다가 다시 켜면 포커스 표시가 되살아난다</title>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 1 L9 5 L0 9 z" fill="#475467" />
+    </marker>
+  </defs>
+  <style>
+    .step { font: 600 13px system-ui, sans-serif; fill: #98A2B3; }
+    .label { font: 500 13px system-ui, sans-serif; }
+    .value { font: 400 15px system-ui, sans-serif; }
+    .note { font: 400 12px system-ui, sans-serif; fill: #98A2B3; }
+    .alert { font: 600 12px system-ui, sans-serif; fill: #F97066; }
+    .flow { fill: none; stroke: #475467; stroke-width: 1.5; }
+  </style>
+
+  <rect width="640" height="220" rx="12" fill="#1D2939" />
+
+  <text class="step" x="24" y="34">1. 입력에 포커스</text>
+  <text class="label" x="24" y="72" fill="#4DBA85">이름</text>
+  <rect x="24" y="82" width="168" height="44" rx="8" fill="none" stroke="#4DBA85" stroke-width="2" />
+  <text class="value" x="38" y="109" fill="#F2F4F7">홍길동</text>
+  <text class="note" x="24" y="152">테두리 2px · 라벨 primary</text>
+
+  <path class="flow" d="M200 104 L234 104" marker-end="url(#arrow)" />
+
+  <text class="step" x="236" y="34">2. disabled</text>
+  <text class="label" x="236" y="72" fill="#8791A3">이름</text>
+  <rect x="236" y="82" width="168" height="44" rx="8" fill="#101828" stroke="#8791A3" stroke-width="1" />
+  <text class="value" x="250" y="109" fill="#8791A3">홍길동</text>
+  <text class="note" x="236" y="152">blur 없음 · focus state 남음</text>
+
+  <path class="flow" d="M412 104 L446 104" marker-end="url(#arrow)" />
+
+  <text class="step" x="448" y="34">3. 다시 켬</text>
+  <text class="label" x="448" y="72" fill="#4DBA85">이름</text>
+  <rect x="448" y="82" width="168" height="44" rx="8" fill="none" stroke="#4DBA85" stroke-width="2" />
+  <text class="value" x="462" y="109" fill="#F2F4F7">홍길동</text>
+  <text class="alert" x="448" y="152">누르지 않았는데 포커스 표시</text>
+
+  <text class="note" x="24" y="196">react-native-ui TextField(boxed) · Dark 테마 토큰 색</text>
+</svg>

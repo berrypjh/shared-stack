@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 220" role="img" width="640" height="220">
+  <title>Nx 가 프로젝트 그래프를 만들다 @nx/vitest 플러그인에서 실패한다</title>
+  <style>
+    .bar { font: 500 12px system-ui, sans-serif; fill: #98A2B3; }
+    .mono { font: 400 12.5px ui-monospace, SFMono-Regular, Menlo, monospace; fill: #F2F4F7; }
+    .dim { fill: #98A2B3; }
+    .error { fill: #F97066; font-weight: 600; }
+  </style>
+
+  <rect width="640" height="220" rx="12" fill="#1D2939" stroke="#344054" />
+  <path d="M0 12 a12 12 0 0 1 12 -12 h616 a12 12 0 0 1 12 12 v22 h-640 z" fill="#101828" />
+  <line x1="0" y1="34" x2="640" y2="34" stroke="#344054" />
+  <circle cx="20" cy="17" r="5" fill="#344054" />
+  <circle cx="38" cy="17" r="5" fill="#344054" />
+  <circle cx="56" cy="17" r="5" fill="#344054" />
+  <text class="bar" x="320" y="21" text-anchor="middle">shared-stack — Node v22.17.0 · @nx/vitest 22.3.3 · vitest 4.0.17</text>
+
+  <text class="mono" x="20" y="66"><tspan class="error">NX</tspan><tspan x="52">Failed to process project graph.</tspan></text>
+  <text class="mono" x="20" y="100">An error occurred while processing files for the @nx/vitest plugin</text>
+  <text class="mono dim" x="20" y="120">(Defined at nx.json#plugins[2]).</text>
+  <text class="mono" x="36" y="152">- libs/react-ui/vite.config.mts:</text>
+  <text class="mono error" x="52" y="172">Unexpected module status 0. Cannot require() ES Module</text>
+  <text class="mono error" x="52" y="192">... vitest/dist/node.js because it is not yet fully loaded.</text>
+</svg>

@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 286" role="img" width="640" height="286">
+  <title>dev 서버 명령은 사유와 함께 deny, test 명령은 그대로 통과 — guard hook 실제 출력</title>
+  <style>
+    .head { font: 600 13px system-ui, sans-serif; fill: #475467; }
+    .bar { font: 500 12px system-ui, sans-serif; fill: #475467; }
+    .file { font: 600 11px ui-monospace, SFMono-Regular, Menlo, monospace; fill: #475467; }
+    .code { font: 400 11px ui-monospace, SFMono-Regular, Menlo, monospace; fill: #101828; }
+    .note { font: 400 12px system-ui, sans-serif; fill: #475467; }
+    .dim { fill: #475467; }
+    .error { fill: #B42318; font-weight: 600; }
+    .accent { fill: #047857; font-weight: 600; }
+      .flow { fill: none; stroke: #667085; stroke-width: 1.5; }
+  </style>
+
+  <rect width="640" height="286" rx="12" fill="#FFFFFF" stroke="#D0D5DD" />
+  <path d="M0 12 a12 12 0 0 1 12 -12 h616 a12 12 0 0 1 12 12 v22 h-640 z" fill="#F2F4F7" />
+  <line x1="0" y1="34" x2="640" y2="34" stroke="#D0D5DD" />
+  <circle cx="20" cy="17" r="5" fill="#D0D5DD" />
+  <circle cx="38" cy="17" r="5" fill="#D0D5DD" />
+  <circle cx="56" cy="17" r="5" fill="#D0D5DD" />
+  <text class="bar" x="320" y="21" text-anchor="middle">shared-stack — 2026-10-01 실제 출력</text>
+  <text class="code dim" x="20" y="60" xml:space="preserve">$ echo &#x27;{&quot;tool_input&quot;:{&quot;command&quot;:&quot;pnpm nx serve @berrypjh/devhub&quot;}}&#x27; \</text>
+  <text class="code dim" x="20" y="77" xml:space="preserve">    | node .claude/hooks/guard-bash.mjs</text>
+  <text class="code " x="20" y="102" xml:space="preserve">{ &quot;hookSpecificOutput&quot;: {</text>
+  <text class="code " x="20" y="119" xml:space="preserve">    &quot;hookEventName&quot;: &quot;PreToolUse&quot;,</text>
+  <text class="code error" x="20" y="136" xml:space="preserve">    &quot;permissionDecision&quot;: &quot;deny&quot;,</text>
+  <text class="code " x="20" y="153" xml:space="preserve">    &quot;permissionDecisionReason&quot;: &quot;이 환경에서는 실행할 수 없습니다 — dev 서버</text>
+  <text class="code " x="20" y="170" xml:space="preserve">      (Vite, Storybook, Expo, local registry)는 포트 바인딩이 차단됩니다.</text>
+  <text class="code accent" x="20" y="187" xml:space="preserve">      사용자에게 직접 실행을 요청하고, 결과를 받기 전까지 검증했다고</text>
+  <text class="code accent" x="20" y="204" xml:space="preserve">      보고하지 마세요.&quot; } }</text>
+  <text class="code dim" x="20" y="229" xml:space="preserve">$ echo &#x27;{&quot;tool_input&quot;:{&quot;command&quot;:&quot;pnpm nx test @berrypjh/devhub&quot;}}&#x27; \</text>
+  <text class="code dim" x="20" y="246" xml:space="preserve">    | node .claude/hooks/guard-bash.mjs</text>
+  <text class="code " x="20" y="263" xml:space="preserve">(출력 없음 — 통과)</text>
+</svg>

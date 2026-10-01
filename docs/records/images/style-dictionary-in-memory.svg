@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 278" role="img" width="640" height="278">
+  <title>Style Dictionary 의 destination 출력을 걷어내고 in-memory 사전을 generator 가 씀</title>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 1 L9 5 L0 9 z" fill="#667085" />
+    </marker>
+  </defs>
+  <style>
+    .head { font: 600 13px system-ui, sans-serif; fill: #475467; }
+    .file { font: 600 11px ui-monospace, SFMono-Regular, Menlo, monospace; fill: #475467; }
+    .code { font: 400 11px ui-monospace, SFMono-Regular, Menlo, monospace; fill: #101828; }
+    .note { font: 400 12px system-ui, sans-serif; fill: #475467; }
+    .dim { fill: #475467; }
+    .accent { fill: #047857; font-weight: 600; }
+    .flow { fill: none; stroke: #667085; stroke-width: 1.5; }
+  </style>
+
+  <rect width="640" height="278" rx="12" fill="#FFFFFF" />
+  <text class="head" x="20" y="30">전 — Style Dictionary 가 파일까지 씀</text>
+  <text class="head" x="330" y="30">후 — 사전만 받고 파일은 직접 씀</text>
+  <rect x="20" y="46" width="290" height="136" rx="8" fill="#F2F4F7" stroke="#D0D5DD" />
+  <text class="file" x="32" y="65">sd/config.ts — makeSdConfig</text>
+  <line x1="20" y1="74" x2="310" y2="74" stroke="#D0D5DD" />
+  <text class="code" x="32" y="92" xml:space="preserve">platforms: {</text>
+  <text class="code" x="32" y="108" xml:space="preserve">  css:  { destination: &quot;variables.css&quot; },</text>
+  <text class="code" x="32" y="124" xml:space="preserve">  json: { destination: &quot;tokens.json&quot; },</text>
+  <text class="code" x="32" y="140" xml:space="preserve">  web:  { destination: &quot;tokens.ts&quot; },</text>
+  <text class="code" x="32" y="156" xml:space="preserve">  rn:   { destination: &quot;tokens.ts&quot; },</text>
+  <text class="code" x="32" y="172" xml:space="preserve">}</text>
+  <text class="note" x="20" y="204">테마마다 source → platform → destination</text>
+  <rect x="330" y="46" width="290" height="72" rx="8" fill="#F2F4F7" stroke="#D0D5DD" />
+  <text class="file" x="342" y="65">lib/sd.ts — buildThemeDictionaries</text>
+  <line x1="330" y1="74" x2="620" y2="74" stroke="#D0D5DD" />
+  <rect x="336" y="80" width="278" height="33" rx="4" fill="#04785714" stroke="#047857" stroke-opacity="0.6" />
+  <text class="code" x="342" y="92" xml:space="preserve">web: await sd.getPlatformTokens(&#x27;web&#x27;),</text>
+  <text class="code" x="342" y="108" xml:space="preserve">rn:  await sd.getPlatformTokens(&#x27;rn&#x27;),</text>
+  <path class="flow" d="M475 120 L475 152" marker-end="url(#arrow)" />
+  <text class="note" x="485" y="140">in-memory 사전</text>
+  <rect x="330" y="154" width="290" height="104" rx="8" fill="#F2F4F7" stroke="#D0D5DD" />
+  <text class="file" x="342" y="173">lib/pipeline.ts — generator</text>
+  <line x1="330" y1="182" x2="620" y2="182" stroke="#D0D5DD" />
+  <text class="code" x="342" y="200" xml:space="preserve">writeCss(builds, cssDir)</text>
+  <text class="code" x="342" y="216" xml:space="preserve">writeTsTokens(builds, generatedDir)</text>
+  <text class="code" x="342" y="232" xml:space="preserve">writeTailwindPreset(builds, …)</text>
+  <text class="code" x="342" y="248" xml:space="preserve">writeTokensJson(builds, catalogFile)</text>
+</svg>

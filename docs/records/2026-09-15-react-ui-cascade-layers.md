@@ -10,22 +10,31 @@
 
 ## 판단
 
-- **컴포넌트 규칙은 `components` 레이어** — 소비자 유틸(`utilities`)이 이기고, preflight(`base`)는 컴포넌트를 덮지 않음
-- **레이어 순서는 라이브러리가 먼저 선언** — `@layer theme, base, components, utilities;` 를 `styles.scss` 맨 앞에 둠. 소비자가 `styles.css` 를 Tailwind 보다 먼저 불러도 순서가 같음
-- **토큰은 `theme` 레이어** — `build-js` 가 ui-core 토큰 CSS 를 `@layer theme { … }` 으로 감싸 앞에 붙이고, 그 뒤로 밀려 무효가 된 `@charset` 을 지움
-- **SCSS 로드는 `styles.scss` 가 소유** — `meta.load-css` 로 `@layer components` 블록 안에 나열. 공유 base(`button-base` · `input-base`)가 먼저, 나머지는 알파벳 순. `styles.ts` 는 side-effect 진입점만 남김
-- **`VisuallyHidden` 의 `'use client'` 제거** — hook 없는 컴포넌트라 서버에서 그대로 실행 가능
+react-ui CSS 를 Tailwind v4 와 같은 레이어 순서 안에 넣음.
+
+| 판단                                     | 이유                                                                                                                                  |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| **컴포넌트 규칙은 `components` 레이어**  | 소비자 유틸(`utilities`)이 이기고, preflight(`base`)는 컴포넌트를 덮지 않음                                                           |
+| **레이어 순서는 라이브러리가 먼저 선언** | `@layer theme, base, components, utilities;` 를 `styles.scss` 맨 앞에. 소비자가 `styles.css` 를 Tailwind 보다 먼저 불러도 순서가 같음 |
+| **토큰은 `theme` 레이어**                | `build-js` 가 ui-core 토큰 CSS 를 `@layer theme { … }` 으로 감싸 앞에 붙이고, 그 뒤로 밀려 무효가 된 `@charset` 을 지움               |
+| **SCSS 로드는 `styles.scss` 가 소유**    | `meta.load-css` 로 `@layer components` 블록 안에 나열. 공유 base(`button-base` · `input-base`)가 먼저, 나머지는 알파벳 순             |
+
+![레이어 밖 컴포넌트 규칙이 소비자 유틸을 이기던 것을, @layer components 로 옮겨 유틸이 이기게 함](images/react-ui-cascade-layers.svg)
+
+**특정도가 아니라 레이어 순서로 — 소비자 유틸 > 컴포넌트 > base > 토큰.**
 
 ## 반영
 
-- `libs/react-ui/src/styles.scss` — 레이어 순서 선언과 `@layer components` 안의 `meta.load-css` 목록
-- `libs/react-ui/src/styles.ts` — `import './styles.scss'` 하나
-- `libs/react-ui/project.json` `build-js` — 토큰을 `@layer theme` 으로 감싸고 `@charset` 제거
-- `libs/react-ui/AGENTS.consumer.md` "스타일 덮어쓰기 (cascade layer)" — 소비자 규칙과 Chip 색 CSS 변수 확장점
-- `libs/react-ui/AGENTS.md` Gotcha 와 변경 체크리스트 — 새 컴포넌트 규칙이 레이어 안에 드는지
+- **레이어 선언 · SCSS 로드** — `libs/react-ui/src/styles.scss` 에 레이어 순서와 `@layer components` 안의 `meta.load-css` 목록. `styles.ts` 는 `import './styles.scss'` 하나만
+- **토큰 레이어** — `libs/react-ui/project.json` `build-js` 가 토큰을 `@layer theme` 으로 감싸고 `@charset` 제거
+- **문서** — `AGENTS.consumer.md` "스타일 덮어쓰기 (cascade layer)" 에 소비자 규칙과 Chip 색 CSS 변수 확장점, `AGENTS.md` Gotcha 와 변경 체크리스트에 새 컴포넌트 규칙이 레이어 안에 드는지
 
 ## 검증
 
 - `dist/index.css` 첫 줄이 `@layer theme, base, components, utilities;` 인지 확인. 레이어 순서를 검사하는 자동 테스트는 없음
 - 소비자 `className` 이 실제로 이기는지는 `demo-web` 에서 눈으로 확인 — 그 앱이 Tailwind preset 과 CSS cascade 를 확인하는 자리
 - 이 결정 다음 날 rollup 업그레이드로 CSS 가 아예 나오지 않는 문제가 생겨 [별도 스크립트로 분리](2026-09-16-react-ui-css-build-script.md)
+
+## 참고자료
+
+- [Adding component classes](https://tailwindcss.com/docs/adding-custom-styles#adding-component-classes) — Tailwind CSS. 카드 · 버튼 같은 재사용 클래스는 `components` 레이어에 둠. 여기 둔 스타일은 필요할 때 유틸리티 클래스로 쉽게 덮어씀
