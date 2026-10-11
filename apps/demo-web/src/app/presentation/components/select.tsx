@@ -9,6 +9,7 @@ import {
   type PreviewScenario,
   type ScenarioOverrides,
 } from '../model';
+import { usePreviewSurface } from '../previewSurface';
 
 /**
  * `Select` 는 단독 컴포넌트가 아니라 `FormControl` + `InputLabel` + `Select` 조합이다 —
@@ -76,7 +77,7 @@ const data: ComponentPresentationData<SelectScenarioProps> = {
   label: 'Select',
   path: '/components/select',
   group: 'components',
-  lead: 'Select는 드롭다운 리스트에서 옵션을 선택할 수 있는 컴포넌트입니다.',
+  lead: '드롭다운 리스트에서 옵션을 선택하는 컴포넌트',
   defaultScenarioId: 'variant-boxed',
   sections: [
     {
@@ -163,7 +164,7 @@ const data: ComponentPresentationData<SelectScenarioProps> = {
       },
     ],
     notes: [
-      '드롭다운 패널의 그림자는 합성 shadow 변수를 쓴다. 생성 CSS 에는 있지만 token catalog 에는 그 합성 변수에 대응하는 row 가 없어(낱개 `shadow.lg.*` 만 있다) binding 으로 걸지 않았다.',
+      '드롭다운 패널의 그림자는 합성 shadow 변수 사용. 생성 CSS 에는 있지만 token catalog 에는 그 합성 변수에 대응하는 row 가 없어(낱개 `shadow.lg.*` 만 있음) binding 으로 걸지 않음',
     ],
   },
   comparison: {
@@ -203,7 +204,7 @@ const data: ComponentPresentationData<SelectScenarioProps> = {
       interactiveOnly: ['hover'],
     },
     notes: [
-      'Select 에는 controlled `open` prop 이 있지만 이 fixture 가 들고 있지 않아 열린 상태를 persistent cell 로 만들지 않는다.',
+      'Select 에는 controlled `open` prop 이 있지만 이 fixture 가 들고 있지 않아 열린 상태를 persistent cell 로 만들지 않음',
     ],
   },
 };
@@ -211,17 +212,29 @@ const data: ComponentPresentationData<SelectScenarioProps> = {
 /** 전체 폭 example 만 placeholder 문구가 다르다 — 기존 페이지 문구를 그대로 유지한다. */
 const placeholderOf = (id: string) => (id === 'full-width' ? 'Choose an option' : 'Choose...');
 
+/**
+ * 비교 표 안에서는 목록을 열지 않는다 — 목록은 라이브러리가 띄우므로 칸 높이에 들어가지 않고
+ * 표의 스크롤 영역 안에서 잘린다 (`previewSurface`). `open={false}` 는 controlled 라 눌러도 열리지
+ * 않고, 포커스와 접근 가능한 이름은 그대로 남는다. 열어 보는 것은 Canvas 가 맡는다.
+ */
+const FruitSelect = ({ placeholder }: { placeholder: string }) => {
+  const inMatrix = usePreviewSurface() === 'matrix';
+  return (
+    <Select placeholder={placeholder} open={inMatrix ? false : undefined}>
+      {FRUITS.map((f) => (
+        <MenuItem key={f} value={f}>
+          {f}
+        </MenuItem>
+      ))}
+    </Select>
+  );
+};
+
 const render = ({ id, label, props, helperText }: SelectScenario): ReactNode => {
   const control = (
     <FormControl {...props}>
       <InputLabel>{label}</InputLabel>
-      <Select placeholder={placeholderOf(id)}>
-        {FRUITS.map((f) => (
-          <MenuItem key={f} value={f}>
-            {f}
-          </MenuItem>
-        ))}
-      </Select>
+      <FruitSelect placeholder={placeholderOf(id)} />
       {helperText && <FormHelperText>{helperText}</FormHelperText>}
     </FormControl>
   );

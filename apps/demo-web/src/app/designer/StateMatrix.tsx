@@ -3,6 +3,7 @@ import { Table, TableScroll } from '@berrypjh/react-ui';
 import type { ReactNode } from 'react';
 
 import type { ScenarioOverrides, StateMatrixMeta } from '../presentation/model';
+import { PreviewSurfaceContext } from '../presentation/previewSurface';
 import { Section } from '../shell/ui';
 
 /**
@@ -28,40 +29,42 @@ export const StateMatrix = ({
   return (
     <Section
       title="State Matrix"
-      note={`${baseScenarioId} scenario 를 기준으로 prop 으로 재현되는 상태만 비교한다`}
+      note={`${baseScenarioId} scenario 기준, prop 으로 재현되는 상태만 비교`}
     >
-      <TableScroll label={`${componentLabel} state 비교 표`}>
-        <Table hiddenCaption data-testid="state-matrix">
-          <caption>{componentLabel} — 열마다 하나의 prop 상태</caption>
-          <thead>
-            <tr className="text-text-light text-xxsm">
-              {states.map((state) => (
-                <th
-                  key={state.id}
-                  scope="col"
-                  className="text-left font-semiBold p-md whitespace-nowrap"
-                >
-                  {state.label}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            <tr className="border-t border-stroke-light">
-              {states.map((state) => (
-                <td key={state.id} className="p-md align-middle">
-                  {renderScenario(baseScenarioId, state.props)}
-                </td>
-              ))}
-            </tr>
-          </tbody>
-        </Table>
-      </TableScroll>
+      <PreviewSurfaceContext value="matrix">
+        <TableScroll label={`${componentLabel} state 비교 표`}>
+          <Table hiddenCaption data-testid="state-matrix">
+            <caption>{componentLabel} — 열마다 하나의 prop 상태</caption>
+            <thead>
+              <tr className="text-text-light text-xxsm">
+                {states.map((state) => (
+                  <th
+                    key={state.id}
+                    scope="col"
+                    className="text-left font-semiBold p-md whitespace-nowrap"
+                  >
+                    {state.label}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              <tr className="border-t border-stroke-light">
+                {states.map((state) => (
+                  <td key={state.id} className="p-md align-middle">
+                    {renderScenario(baseScenarioId, state.props)}
+                  </td>
+                ))}
+              </tr>
+            </tbody>
+          </Table>
+        </TableScroll>
+      </PreviewSurfaceContext>
 
       {interactiveOnly && interactiveOnly.length > 0 && (
         <p className="text-text-light text-xxsm mt-lg break-keep" data-testid="interactive-only">
-          Interactive state ({interactiveOnly.join(' · ')}) — 스타일시트 pseudo-class 로만 존재해서
-          이 MVP 에서는 고정 preview 로 재현하지 않는다. 실제 컴포넌트에 마우스·키보드로 확인한다.
+          Interactive state ({interactiveOnly.join(' · ')}) — 스타일시트 pseudo-class 로만 존재해 이
+          MVP 에서는 고정 preview 로 재현하지 않음. 실제 컴포넌트에서 마우스·키보드로 확인 필요
         </p>
       )}
     </Section>

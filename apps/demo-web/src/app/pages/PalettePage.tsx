@@ -55,8 +55,8 @@ const Chip = ({
         ) : (
           <span role="status">
             {resolved.reason === 'unknown-theme'
-              ? `이 테마(${theme})는 catalog 에 없다`
-              : '이 테마에 값이 없다'}
+              ? `이 테마(${theme})는 catalog 에 없음`
+              : '이 테마에 값 없음'}
           </span>
         )
       }
@@ -88,12 +88,12 @@ export const PalettePage = () => {
   return (
     <Page
       title="Palette"
-      lead="통합 컬러 스케일 및 토큰. 값은 현재 테마 기준이다"
+      lead="통합 컬러 스케일 및 토큰. 값은 현재 테마 기준"
       testId="palette-page"
     >
       <Section
         title="Primitive 램프"
-        note="단계가 있는 원시 색. 컴포넌트는 이것을 직접 참조하지 않고 시맨틱을 거친다"
+        note="단계가 있는 원시 색. 컴포넌트는 직접 참조하지 않고 시맨틱을 거침"
       >
         <div className="flex flex-col gap-xl" data-testid="palette-ramps">
           {rampsOf(families).map((family) => (
@@ -102,7 +102,7 @@ export const PalettePage = () => {
         </div>
       </Section>
 
-      <Section title="시맨틱 역할" note="컴포넌트가 실제로 참조하는 색. 역할 이름이 쓰임을 말한다">
+      <Section title="시맨틱 역할" note="컴포넌트가 실제로 참조하는 색. 역할 이름이 곧 쓰임">
         <div className="flex flex-col gap-xl" data-testid="palette-semantic">
           {semanticOf(families).map((family) => (
             <Family key={family.name} family={family} theme={theme} />

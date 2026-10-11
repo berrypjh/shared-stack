@@ -97,7 +97,7 @@ const data: ComponentPresentationData<SearchFieldScenarioProps> = {
   label: 'SearchField',
   path: '/components/search-field',
   group: 'components',
-  lead: 'SearchField는 자동완성 검색을 제공하는 입력 필드입니다.',
+  lead: '자동완성 검색을 제공하는 입력 필드',
   defaultScenarioId: 'suggestions',
   sections: [
     {
@@ -109,7 +109,7 @@ const data: ComponentPresentationData<SearchFieldScenarioProps> = {
     {
       id: 'suggestions',
       label: 'With Suggestions',
-      note: '타이핑하면 추천 검색어가 표시됩니다.',
+      note: '타이핑하면 추천 검색어 표시',
       scenarioIds: ['suggestions'],
     },
     {
@@ -193,8 +193,8 @@ const data: ComponentPresentationData<SearchFieldScenarioProps> = {
       interactiveOnly: ['hover', 'focus'],
     },
     notes: [
-      'SearchField 는 FormControl 을 감싸지 않아 `focused` prop 이 공개되지 않는다 — TextField 와 달리 포커스 상태를 강제할 수 없다.',
-      'size 는 공개 prop 이지만 이 화면의 curated example 이 아직 쓰지 않는다.',
+      'SearchField 는 FormControl 을 감싸지 않아 `focused` prop 이 공개되지 않음 — TextField 와 달리 포커스 상태 강제 불가',
+      'size 는 공개 prop 이지만 이 화면의 curated example 에서는 아직 쓰지 않음',
     ],
   },
 };

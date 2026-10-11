@@ -184,7 +184,7 @@ const data: ComponentPresentationData<IconButtonScenarioProps> = {
   label: 'IconButton',
   path: '/components/icon-button',
   group: 'components',
-  lead: '아이콘만 포함하는 버튼으로, 일반적이거나 상황에 따른 액션에 사용됩니다.',
+  lead: '아이콘만 포함하는 버튼. 일반 액션이나 상황에 따른 액션에 사용',
   defaultScenarioId: 'color-heart-primary',
   sections: [
     {
@@ -213,7 +213,7 @@ const data: ComponentPresentationData<IconButtonScenarioProps> = {
     {
       id: 'edge',
       label: 'Edge Alignment',
-      note: "edge='start'와 edge='end'는 각 면의 패딩을 줄입니다",
+      note: "edge='start'와 edge='end'는 각 면의 패딩을 줄임",
       scenarioIds: ['edge-row'],
     },
   ],
@@ -273,7 +273,7 @@ const data: ComponentPresentationData<IconButtonScenarioProps> = {
       interactiveOnly: ['hover', 'focus-visible', 'active'],
     },
     notes: [
-      'catalog 에는 `variant` 가 있지만 icon-button 스타일시트가 그 축을 구현하지 않는다 — API 에 있다는 이유로 비교 축에 넣지 않는다.',
+      'catalog 에는 `variant` 가 있지만 icon-button 스타일시트가 그 축을 구현하지 않음 — API 에 있다는 이유로 비교 축에 넣지 않음',
     ],
   },
 };

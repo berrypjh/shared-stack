@@ -193,7 +193,7 @@ const data: ComponentPresentationData<FabScenarioProps> = {
       { id: 'press', label: '눌림 이동', tokenIds: ['component.pressedOffset'] },
     ],
     notes: [
-      'size·shape 별 지름과 여백 token 은 `fab.scss` 에 더 있지만 아직 역할별로 정리하지 않았다.',
+      'size·shape 별 지름과 여백 token 은 `fab.scss` 에 더 있지만 아직 역할별로 정리하지 않음',
     ],
   },
   comparison: {

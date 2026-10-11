@@ -38,6 +38,8 @@ export type ScenarioMeta = {
   id: string;
   label: string;
   sectionId: string;
+  /** Properties Inspector 가 "지금 scenario 값"을 보여 줄 때 읽는다. 타입 검사는 `PreviewScenario` 가 한다. */
+  props?: ScenarioOverrides;
 };
 
 /**

@@ -181,7 +181,7 @@ export const ScalesPage = () => {
   return (
     <Page
       title="Scales"
-      lead="간격 · 모서리 · 테두리 · 글자 · 그림자 · 움직임 토큰. 값은 현재 테마 기준이다"
+      lead="간격 · 모서리 · 테두리 · 글자 · 그림자 · 움직임 토큰. 값은 현재 테마 기준"
       testId="scales-page"
     >
       {SCALE_SECTIONS.map((section) => (

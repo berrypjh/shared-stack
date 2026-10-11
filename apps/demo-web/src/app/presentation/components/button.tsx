@@ -152,7 +152,7 @@ const buttonData: ComponentPresentationData<ButtonScenarioProps> = {
   label: 'Button',
   path: '/components/button',
   group: 'components',
-  lead: '버튼은 사용자가 작업을 수행하거나 선택을 할 수 있도록 하는 UI 요소입니다.',
+  lead: '사용자가 작업을 수행하거나 선택하게 하는 UI 요소',
   defaultScenarioId: 'variant-contained',
   sections: [
     {
@@ -279,8 +279,8 @@ const buttonData: ComponentPresentationData<ButtonScenarioProps> = {
       },
     ],
     notes: [
-      '스타일시트에는 error 색 계열도 있지만 Button 의 공개 `color` 는 primary·secondary 뿐이라 공개 API 로 도달할 수 없다 — 그래서 싣지 않는다.',
-      '포커스 링 token 은 실제로 선언돼 있지만 `:focus-visible` 일 때만 보인다.',
+      '스타일시트에는 error 색 계열도 있지만 Button 의 공개 `color` 는 primary·secondary 뿐이라 공개 API 로 도달 불가 — 그래서 싣지 않음',
+      '포커스 링 token 은 실제로 선언돼 있지만 `:focus-visible` 일 때만 보임',
     ],
   },
   comparison: {
@@ -318,7 +318,7 @@ const buttonData: ComponentPresentationData<ButtonScenarioProps> = {
       interactiveOnly: ['hover', 'focus-visible', 'active'],
     },
     notes: [
-      'hover · focus-visible · active 는 button-base 스타일시트의 pseudo-class 다. 강제할 공개 prop 이 없어 persistent cell 을 만들지 않는다.',
+      'hover · focus-visible · active 는 button-base 스타일시트의 pseudo-class. 강제할 공개 prop 이 없어 persistent cell 을 만들지 않음',
     ],
   },
 };

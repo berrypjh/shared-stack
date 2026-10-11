@@ -43,41 +43,41 @@ const data: ComponentPresentationData<DividerScenarioProps> = {
   label: 'Divider',
   path: '/components/divider',
   group: 'layout',
-  lead: '내용을 가르는 선. 두께와 색은 토큰이 정한다',
+  lead: '내용을 가르는 선. 두께와 색은 토큰이 결정',
   defaultScenarioId: 'horizontal',
   sections: [
     {
       id: 'default',
       label: '기본값은 가로선',
-      note: 'orientation 을 주지 않으면 horizontal 이다. <hr> 로 렌더되어 native separator 시맨틱을 그대로 가진다',
+      note: 'orientation 을 주지 않으면 horizontal. <hr> 로 렌더되어 native separator 시맨틱을 그대로 가짐',
       surface: 'panel',
       scenarioIds: ['horizontal'],
     },
     {
       id: 'spacing',
-      label: '여백은 Divider 가 갖지 않는다',
-      note: '선 위아래 간격은 Stack 의 gap 이 만든다. Divider 에 여백을 두면 gap 과 더해져 소비자가 두 곳을 맞춰야 한다',
+      label: 'Divider 밖의 여백',
+      note: '선 위아래 간격은 Stack 의 gap 이 담당. Divider 에 여백을 두면 gap 과 더해져 소비자가 두 곳을 맞춰야 함',
       surface: 'panel',
       scenarioIds: ['spacing-tight', 'spacing-loose'],
     },
     {
       id: 'vertical',
       label: '세로선',
-      note: '가로 Stack 안에서 형제 높이만큼 늘어난다. 높이를 주지 않는다 — align-self: stretch 가 형제를 따라간다',
+      note: '가로 Stack 안에서 형제 높이만큼 늘어남. 높이 지정 없음 — align-self: stretch 가 형제를 따라감',
       surface: 'panel',
       scenarioIds: ['vertical'],
     },
     {
       id: 'semantics',
-      label: '시각과 시맨틱은 다른 결정이다',
-      note: '두 선은 화면에서 완전히 같다. 다른 것은 보조 기술에 보이는 구조뿐이다 — 아래 둘을 스크린리더로 읽어 보면 갈린다',
+      label: '시각과 시맨틱의 분리',
+      note: '두 선은 화면에서 완전히 같음. 다른 것은 보조 기술에 보이는 구조뿐 — 아래 둘을 스크린리더로 읽으면 갈림',
       surface: 'panel',
       scenarioIds: ['semantics'],
     },
     {
       id: 'tokens',
       label: '토큰',
-      note: '두께는 semanticBorder.divider, 색은 stroke.light 다. 굵기·색 prop 이 없는 것은 의도다 — 토큰 밖으로 나가는 길을 만들지 않는다',
+      note: '두께는 semanticBorder.divider, 색은 stroke.light. 굵기·색 prop 이 없는 것은 의도 — 토큰 밖으로 나가는 길을 만들지 않음',
       surface: 'panel',
       scenarioIds: ['tokens'],
     },
@@ -92,17 +92,15 @@ const data: ComponentPresentationData<DividerScenarioProps> = {
         tokenIds: ['borderWidth.semantic.divider', 'color.stroke.light'],
       },
     ],
-    notes: [
-      'Divider 는 여백 token 을 갖지 않는다 — 선 주변 간격은 소비자가 `Stack` 의 gap 으로 준다.',
-    ],
+    notes: ['Divider 는 여백 token 없음 — 선 주변 간격은 소비자가 `Stack` 의 gap 으로 지정'],
   },
   comparison: {
     catalogSymbol: 'Divider',
     // 비교 축을 만들지 않는다. 이유를 빈 matrix 대신 사실로 적는다.
     properties: [],
     notes: [
-      'orientation 은 부모 Stack 의 축과 함께 뜻을 갖는다 — 세로선을 column Stack 에 넣으면 높이를 잃는다. prop grid 로 곱하면 잘못된 조합이 되므로 curated scenario 비교를 쓴다.',
-      'decorative 는 접근성 트리만 바꾼다. 두 cell 이 화면에서 완전히 같아 보이므로 시각 State Matrix 로 만들지 않는다.',
+      'orientation 은 부모 Stack 의 축과 함께 뜻을 가짐 — 세로선을 column Stack 에 넣으면 높이를 잃음. prop grid 로 곱하면 잘못된 조합이 되므로 curated scenario 비교 사용',
+      'decorative 는 접근성 트리만 바꿈. 두 cell 이 화면에서 완전히 같아 보이므로 시각 State Matrix 로 만들지 않음',
     ],
   },
 };
@@ -122,7 +120,7 @@ const render = ({ id, props }: DividerScenario): ReactNode => {
         <Stack gap="2xl">
           <Text>gap=&quot;2xl&quot; — 넉넉하게</Text>
           <Divider />
-          <Text>선 자체는 똑같다</Text>
+          <Text>선 자체는 동일</Text>
         </Stack>
       );
     case 'vertical':
@@ -139,15 +137,15 @@ const render = ({ id, props }: DividerScenario): ReactNode => {
       return (
         <Stack gap="lg">
           <Text>
-            기본 — 구분자로 읽힌다 <Mono>&lt;hr&gt;</Mono>
+            기본 — 구분자로 읽힘 <Mono>&lt;hr&gt;</Mono>
           </Text>
           <Divider />
           <Text>
-            decorative — 시맨틱을 끈다 <Mono>role=&quot;presentation&quot;</Mono>
+            decorative — 시맨틱 끔 <Mono>role=&quot;presentation&quot;</Mono>
           </Text>
           <Divider decorative />
           <Text>
-            카드 테두리·행 경계처럼 순수 장식이면 접근성 트리에 구분자를 하나 더 만들 이유가 없다.
+            카드 테두리·행 경계처럼 순수 장식이면 접근성 트리에 구분자를 하나 더 만들 이유 없음
           </Text>
         </Stack>
       );
@@ -159,17 +157,16 @@ const render = ({ id, props }: DividerScenario): ReactNode => {
           </Text>
           <Divider />
           <Text>
-            위 테마 셀렉터를 바꾸면 이 선의 색이 따라 움직인다. 등록된 7개 테마 전부에 두 토큰이
-            있다.
+            위 테마 셀렉터를 바꾸면 이 선의 색도 따라 바뀜. 등록된 7개 테마 전부에 두 토큰이 있음
           </Text>
         </Stack>
       );
     default:
       return (
         <Stack gap="lg">
-          <Text>위쪽 문단입니다.</Text>
+          <Text>위쪽 문단</Text>
           <Divider {...props} />
-          <Text>아래쪽 문단입니다.</Text>
+          <Text>아래쪽 문단</Text>
         </Stack>
       );
   }

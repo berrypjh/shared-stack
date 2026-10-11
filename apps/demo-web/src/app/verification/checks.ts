@@ -85,7 +85,7 @@ const result = (
 export const runChecks = (base: Probe, other: Probe): CheckResult[] => [
   result(
     'themed',
-    '테마를 바꾸면 CSS 변수가 함께 바뀝니다',
+    '테마 전환 시 CSS 변수도 함께 전환',
     'tokens/<theme> → 테마별 CSS 블록',
     !sameColor(base.vars[THEMED] ?? '', other.vars[THEMED] ?? ''),
     measured(base.vars[THEMED] ?? '', other.vars[THEMED] ?? ''),
@@ -94,7 +94,7 @@ export const runChecks = (base: Probe, other: Probe): CheckResult[] => [
   ),
   result(
     'shared',
-    '테마가 덮어쓰지 않은 토큰은 base 값을 유지합니다',
+    '테마가 덮어쓰지 않은 토큰은 base 값 유지',
     'light 풀세트 → 테마별 deep-merge',
     sameColor(base.vars[SHARED] ?? '', other.vars[SHARED] ?? ''),
     measured(base.vars[SHARED] ?? '', other.vars[SHARED] ?? ''),
@@ -103,7 +103,7 @@ export const runChecks = (base: Probe, other: Probe): CheckResult[] => [
   ),
   result(
     'derived',
-    '파생 RGB 채널이 색을 따릅니다',
+    '파생 RGB 채널이 색과 일치',
     'genCss RGB 파생',
     (other.vars[DERIVED] ?? '').trim() === toChannels(other.vars[THEMED] ?? ''),
     measured(other.vars[DERIVED] ?? '', other.vars[THEMED] ?? ''),
@@ -112,7 +112,7 @@ export const runChecks = (base: Probe, other: Probe): CheckResult[] => [
   ),
   result(
     'react-ui',
-    '실제 React UI 컴포넌트가 토큰을 소비합니다',
+    '실제 React UI 컴포넌트의 토큰 소비',
     'CSS variable → react-ui SCSS → rendered element',
     sameColor(other.buttonBg, other.vars[BUTTON] ?? ''),
     measured(other.buttonBg, other.vars[BUTTON] ?? ''),
@@ -121,7 +121,7 @@ export const runChecks = (base: Probe, other: Probe): CheckResult[] => [
   ),
   result(
     'tailwind',
-    'Shared Tailwind 유틸리티가 토큰을 따릅니다',
+    'Shared Tailwind 유틸리티의 토큰 반영',
     'RGB 채널 변수 → Tailwind preset → utility class',
     sameColor(other.tailwindBg, other.vars[THEMED] ?? ''),
     measured(other.tailwindBg, other.vars[THEMED] ?? ''),
