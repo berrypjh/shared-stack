@@ -1,3 +1,13 @@
+## 1.2.1 (2026-10-11)
+
+### 🚀 Features
+
+- **demo-web:** Designer Inspector 를 패널 독으로 재배치하고 비교 표 · 접근성 표시를 다듬음 ([4b1dde7](https://github.com/berrypjh/shared-stack/commit/4b1dde7))
+
+### 🩹 Fixes
+
+- **react-ui:** TableScroll 의 효과 없는 overflow-y 선언을 지우고 세로 잘림을 문서화 ([81daad3](https://github.com/berrypjh/shared-stack/commit/81daad3))
+
 ## 1.2.0 (2026-10-01)
 
 ### 🚀 Features
