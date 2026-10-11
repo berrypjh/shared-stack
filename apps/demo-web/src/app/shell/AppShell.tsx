@@ -92,7 +92,7 @@ const Sidebar = () => {
       않았다. 블록은 sidebar 의 surface 위에 default 를 얹어 만들고, 현재 항목은 반대로
       surface 로 되돌려 블록 밖으로 튀어나온 것처럼 보이게 한다. 세 테마 모두 두 색이 다르다.
     */}
-      <div className="flex-1 overflow-y-auto px-xs py-md flex flex-col gap-md">
+      <div className="flex-1 overflow-y-auto px-xs pt-md pb-6xl flex flex-col gap-md">
         {groups.map((group, i) => (
           <div
             key={group.label ?? `g${i}`}
@@ -115,7 +115,8 @@ const Sidebar = () => {
                     end={item.end}
                     className={({ isActive }) =>
                       [
-                        'block px-md py-md text-xsm no-underline border-l-2 transition-colors',
+                        // 묶음 블록이 둥근 모서리 때문에 overflow 를 자르므로, 포커스 outline 은 안쪽에 그린다.
+                        'block px-md py-md text-xsm no-underline border-l-2 transition-colors -outline-offset-2',
                         // 현재 항목은 브랜드 색조, 호버는 중립적으로 한 단계 밝히기만 한다.
                         // 둘이 같은 배경이면 스쳐 지나가는 행이 선택된 것처럼 보인다.
                         // selected 는 8% 알파라 Tailwind 유틸(-rgb 파생)로는 알파가 날아간다. 변수를 그대로 쓴다.
@@ -135,7 +136,7 @@ const Sidebar = () => {
 
         {noMatches && (
           <p role="status" className="px-md py-sm text-text-light text-xxsm">
-            일치하는 컴포넌트가 없습니다.
+            일치하는 컴포넌트 없음
           </p>
         )}
       </div>
@@ -248,7 +249,7 @@ export const AppShell = ({
             않고 순차 포커스 시작점만 바꾼다. `scroll-mt` 는 52px sticky 헤더가 대상을 덮지
             않게 한다 (WCAG 2.4.11) — 헤더 높이는 앱이 알고 라이브러리는 모른다.
           */}
-          <main id="main" tabIndex={-1} className="flex-1 min-w-0 py-xl scroll-mt-[52px]">
+          <main id="main" tabIndex={-1} className="flex-1 min-w-0 pt-xl pb-6xl scroll-mt-[52px]">
             {/* 좌우 여백은 react-deep-dive-zone 의 PageContainer 와 같은 규약을 쓴다. */}
             <div className="mx-auto w-full max-w-[1200px] px-lg sm:px-xl lg:px-2xl">{children}</div>
           </main>

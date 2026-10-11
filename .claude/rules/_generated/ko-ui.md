@@ -1,6 +1,7 @@
 ---
 paths:
   - "apps/devhub/src/**"
+  - "apps/demo-web/src/**"
 ---
 <!-- berry-dev/standards format 1 | Source: berry-dev/standards/rules/ko-ui.md | Plugin: berry-dev@0.1.0 | Do not edit. Run: pnpm harness:sync -->
 

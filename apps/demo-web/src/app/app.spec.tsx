@@ -3,6 +3,8 @@ import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
+import indexHtml from '../../index.html?raw';
+
 import { GROUP_LABELS, PRESENTATION_GROUPS } from './presentation/model';
 import { allPresentations } from './presentation/registry';
 import { resolveToken } from './presentation/tokenCatalog';
@@ -68,6 +70,11 @@ describe('shell 유지', () => {
     const main = document.getElementById('main');
     expect(main?.tagName).toBe('MAIN');
     expect(main?.getAttribute('tabindex')).toBe('-1');
+  });
+
+  /** `<base href="/">` 가 있으면 `#main` 이 `/#main` 으로 해석돼 건너뛰기가 개요로 이동한다. */
+  it('index.html 에 base 가 없어 #main 이 현재 경로에 머문다', () => {
+    expect(indexHtml).not.toMatch(/<base\b/i);
   });
 
   it('mobile drawer 가 경로 이동 후 닫힌다', async () => {
@@ -350,10 +357,75 @@ describe('State Matrix', () => {
     expect(openCell).toBeTruthy();
   });
 
+  /** 표는 고정 비교다 — 열 이름과 다른 상태로 바뀌면 안 된다. */
+  it('Popover 의 닫힘 칸은 눌러도 열리지 않는다', async () => {
+    at('/components/popover');
+    // 첫 열이 닫힘이다 — 정의의 states 순서를 따른다.
+    const [closedCell] = matrix().getAllByRole('cell');
+    await userEvent.click(within(closedCell).getByRole('button'));
+    expect(closedCell.querySelector('[aria-expanded="true"]')).toBeNull();
+  });
+
+  /** Select 목록은 라이브러리가 띄우므로 표의 스크롤 영역 안에서 잘린다 — 표 안에서는 열지 않는다. */
+  it.each(['variant-matrix', 'state-matrix'])(
+    'Select 는 %s 안에서 목록을 열지 않는다',
+    async (id) => {
+      at('/components/select');
+      const [combobox] = within(screen.getByTestId(id)).getAllByRole('combobox');
+      await userEvent.click(combobox);
+      expect(combobox.getAttribute('aria-expanded')).toBe('false');
+    },
+  );
+
+  /** 떠 있는 패널은 칸 높이에 들어가지 않아 표의 스크롤 영역 안에서 잘린다. */
+  it('Popover 의 열린 패널은 표 안에서 띄우지 않는다', () => {
+    at('/components/popover');
+    const panel = within(screen.getByTestId('state-matrix'))
+      .getAllByRole('cell')
+      .map((c) => c.querySelector('.ui-popover-panel'))
+      .find(Boolean);
+    expect(panel?.className).not.toContain('absolute');
+  });
+
   it('state prop 이 없는 컴포넌트는 State Matrix 가 없다', () => {
     at('/components/stack');
     expect(screen.queryByTestId('state-matrix')).toBeNull();
     expect(screen.getByTestId('variant-matrix')).toBeTruthy();
+  });
+});
+
+/** 모양은 같고 보조 기술에 보이는 구조만 바뀌는 prop 을 Canvas 아래에서 보여 준다. */
+describe('Canvas 접근성 정보', () => {
+  const a11y = () => screen.getByTestId('canvas-a11y').textContent ?? '';
+
+  it('Popover 를 Dialog 로 바꾸고 열면 role 과 포커스가 드러난다', async () => {
+    at('/components/popover');
+    expect(a11y()).toContain('aria-expanded=false');
+    expect(a11y()).not.toContain('role=dialog');
+
+    const properties = within(screen.getByTestId('properties-inspector'));
+    await userEvent.click(
+      within(properties.getByRole('group', { name: 'Semantics' })).getByRole('button', {
+        name: 'Dialog',
+      }),
+    );
+    expect(a11y()).toContain('aria-haspopup=dialog');
+
+    const canvas = within(screen.getByTestId('designer-canvas'));
+    await userEvent.click(canvas.getByRole('button', { name: '도움말 열기' }));
+    expect(a11y()).toContain('role=dialog');
+    expect(a11y()).not.toContain('Canvas 밖');
+  });
+
+  it('Divider 의 decorative 는 role=presentation 으로 드러난다', async () => {
+    at('/components/divider');
+    await userEvent.click(
+      within(screen.getByRole('group', { name: 'Scenario' })).getByRole('button', {
+        name: '기본 · decorative',
+      }),
+    );
+    expect(a11y()).toContain('hr');
+    expect(a11y()).toContain('role=presentation');
   });
 });
 
@@ -457,6 +529,24 @@ describe('Properties Inspector', () => {
     expect(canvas().getByRole('button')).toHaveProperty('disabled', false);
   });
 
+  /** 무엇을 덮어쓰는지 알 수 있게, 각 property 아래에 scenario 가 정한 값을 적는다. */
+  it('scenario 가 정한 값을 보여 주고, 정하지 않은 값은 미지정으로 적는다', async () => {
+    at('/components/button');
+    const style = inspector().getByRole('group', { name: 'Style' });
+    expect(style.getAttribute('aria-describedby')).toBeTruthy();
+    expect(document.getElementById(style.getAttribute('aria-describedby') ?? '')?.textContent).toBe(
+      'scenario: Contained',
+    );
+    const size = inspector().getByRole('group', { name: 'Size' });
+    expect(
+      document.getElementById(size.getAttribute('aria-describedby') ?? '')?.textContent,
+    ).toContain('미지정');
+    expect(screen.getByTestId('toggles-scenario').textContent).toContain('미지정');
+
+    await userEvent.click(scenarios().getByRole('button', { name: 'Loading End' }));
+    expect(screen.getByTestId('toggles-scenario').textContent).toContain('Loading 켜짐');
+  });
+
   it('property 를 선언하지 않은 컴포넌트는 그 사실을 알린다', () => {
     at('/components/divider');
     expect(inspector().getByRole('status')).toBeTruthy();
@@ -537,7 +627,7 @@ describe('Token Inspector', () => {
     );
 
     expect(await navigator.clipboard.readText()).toBe('color.primaryBtn.default');
-    expect(status().textContent).toContain('복사했습니다');
+    expect(status().textContent).toContain('복사 완료');
     expect(status().getAttribute('aria-live')).toBe('polite');
   });
 
@@ -586,8 +676,8 @@ describe('Token Inspector', () => {
       await userEvent.click(
         inspector().getByRole('button', { name: 'component.pressedOffset 이름 복사' }),
       );
-      expect(status().textContent).toContain('복사하지 못했습니다');
-      expect(status().textContent).not.toContain('복사했습니다');
+      expect(status().textContent).toContain('복사 실패');
+      expect(status().textContent).not.toContain('복사 완료');
     } finally {
       Object.defineProperty(navigator, 'clipboard', { value: original, configurable: true });
     }

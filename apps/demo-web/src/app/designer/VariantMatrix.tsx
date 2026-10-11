@@ -3,6 +3,7 @@ import { Table, TableScroll } from '@berrypjh/react-ui';
 import type { ReactNode } from 'react';
 
 import type { ScenarioOverrides, VariantMatrixMeta } from '../presentation/model';
+import { PreviewSurfaceContext } from '../presentation/previewSurface';
 import { Section } from '../shell/ui';
 
 /**
@@ -35,64 +36,66 @@ export const VariantMatrix = ({
   return (
     <Section
       title="Variant Matrix"
-      note={`${baseScenarioId} scenario 를 기준으로 ${
+      note={`${baseScenarioId} scenario 기준, ${
         rows ? `${columns.label} × ${rows.label}` : columns.label
-      } 를 비교한다`}
+      } 비교`}
     >
-      <TableScroll label={`${componentLabel} variant 비교 표`}>
-        <Table hiddenCaption data-testid="variant-matrix">
-          <caption>{caption}</caption>
-          <thead>
-            <tr className="text-text-light text-xxsm">
-              {/* 행 머리 열의 빈 칸. 행 축 이름을 여기 둔다. */}
-              <th scope="col" className="text-left font-semiBold p-md whitespace-nowrap">
-                {rows ? `${rows.label} ↓` : ''}
-              </th>
-              {columns.options.map((option) => (
-                <th
-                  key={option.id}
-                  scope="col"
-                  className="text-left font-semiBold p-md whitespace-nowrap"
-                >
-                  {option.label}
+      <PreviewSurfaceContext value="matrix">
+        <TableScroll label={`${componentLabel} variant 비교 표`}>
+          <Table hiddenCaption data-testid="variant-matrix">
+            <caption>{caption}</caption>
+            <thead>
+              <tr className="text-text-light text-xxsm">
+                {/* 행 머리 열의 빈 칸. 행 축 이름을 여기 둔다. */}
+                <th scope="col" className="text-left font-semiBold p-md whitespace-nowrap">
+                  {rows ? `${rows.label} ↓` : ''}
                 </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {rows ? (
-              rows.options.map((row) => (
-                <tr key={row.id} className="border-t border-stroke-light">
+                {columns.options.map((option) => (
                   <th
-                    scope="row"
-                    className="text-left text-text-light text-xxsm font-semiBold p-md whitespace-nowrap"
+                    key={option.id}
+                    scope="col"
+                    className="text-left font-semiBold p-md whitespace-nowrap"
                   >
-                    {row.label}
+                    {option.label}
                   </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {rows ? (
+                rows.options.map((row) => (
+                  <tr key={row.id} className="border-t border-stroke-light">
+                    <th
+                      scope="row"
+                      className="text-left text-text-light text-xxsm font-semiBold p-md whitespace-nowrap"
+                    >
+                      {row.label}
+                    </th>
+                    {columns.options.map((column) => (
+                      // 두 축의 값만 덮어쓴다. 세 번째 축을 끼워 넣지 않는다.
+                      <td key={column.id} className="p-md align-middle">
+                        {renderScenario(baseScenarioId, {
+                          [rows.prop]: row.value,
+                          [columns.prop]: column.value,
+                        })}
+                      </td>
+                    ))}
+                  </tr>
+                ))
+              ) : (
+                <tr className="border-t border-stroke-light">
+                  <th scope="row" className="p-md" />
                   {columns.options.map((column) => (
-                    // 두 축의 값만 덮어쓴다. 세 번째 축을 끼워 넣지 않는다.
                     <td key={column.id} className="p-md align-middle">
-                      {renderScenario(baseScenarioId, {
-                        [rows.prop]: row.value,
-                        [columns.prop]: column.value,
-                      })}
+                      {renderScenario(baseScenarioId, { [columns.prop]: column.value })}
                     </td>
                   ))}
                 </tr>
-              ))
-            ) : (
-              <tr className="border-t border-stroke-light">
-                <th scope="row" className="p-md" />
-                {columns.options.map((column) => (
-                  <td key={column.id} className="p-md align-middle">
-                    {renderScenario(baseScenarioId, { [columns.prop]: column.value })}
-                  </td>
-                ))}
-              </tr>
-            )}
-          </tbody>
-        </Table>
-      </TableScroll>
+              )}
+            </tbody>
+          </Table>
+        </TableScroll>
+      </PreviewSurfaceContext>
     </Section>
   );
 };

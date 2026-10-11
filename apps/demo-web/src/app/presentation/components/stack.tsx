@@ -106,39 +106,39 @@ const data: ComponentPresentationData<StackScenarioProps> = {
     {
       id: 'default',
       label: '기본값은 세로 쌓기',
-      note: 'direction 을 주지 않으면 column 이다. CSS flex 기본값은 row 라서, 렌더러가 세로 축을 명시한다',
+      note: 'direction 을 주지 않으면 column. CSS flex 기본값은 row 라서 렌더러가 세로 축을 명시',
       scenarioIds: ['default-column'],
     },
     {
       id: 'gap',
       label: 'gap',
-      note: 'spacing 토큰 이름이거나 원시 숫자(px). Box 의 여백과 같은 값 도메인이다',
+      note: 'spacing 토큰 이름이거나 원시 숫자(px). Box 의 여백과 같은 값 도메인',
       scenarioIds: ['gap-xs', 'gap-xl', 'gap-px'],
     },
     {
       id: 'align',
       label: 'align',
-      note: '교차 축 정렬. 주지 않으면 stretch — 자식이 축을 꽉 채운다',
+      note: '교차 축 정렬. 주지 않으면 stretch — 자식이 축을 꽉 채움',
       scenarioIds: ['align-center', 'align-stretch'],
     },
     {
       id: 'justify',
       label: 'justify',
-      note: '주축 분배. between 은 남은 공간을 자식 사이로 보낸다',
+      note: '주축 분배. between 은 남은 공간을 자식 사이에 배분',
       surface: 'panel',
       scenarioIds: ['justify-between'],
     },
     {
       id: 'wrap',
       label: 'wrap',
-      note: '주지 않으면 한 줄에 밀어 넣는다. gap 은 줄 사이에도 같은 값으로 적용된다',
+      note: '주지 않으면 한 줄에 밀어 넣음. gap 은 줄 사이에도 같은 값으로 적용',
       surface: 'panel',
       scenarioIds: ['wrap'],
     },
     {
       id: 'with-box',
-      label: 'Box 와 겹쳐 쓴다',
-      note: 'Stack 은 Box 를 상속하지 않는다 — 면이 필요하면 두 컴포넌트를 겹친다',
+      label: 'Box 와 겹쳐 쓰기',
+      note: 'Stack 은 Box 를 상속하지 않음 — 면이 필요하면 두 컴포넌트를 겹침',
       scenarioIds: ['with-box'],
     },
   ],
@@ -151,7 +151,7 @@ const data: ComponentPresentationData<StackScenarioProps> = {
     */
     bindings: [],
     notes: [
-      'Stack 에는 컴포넌트 stylesheet 가 없다 — `gap` prop 값을 런타임에 spacing token 으로 변환해 inline style 로 넣으므로, 선언된 고정 token 집합이 없다.',
+      'Stack 에는 컴포넌트 stylesheet 없음 — `gap` prop 값을 런타임에 spacing token 으로 변환해 inline style 로 넣으므로 선언된 고정 token 집합 없음',
     ],
   },
   comparison: {
@@ -188,9 +188,7 @@ const data: ComponentPresentationData<StackScenarioProps> = {
       },
       rows: { id: 'align', label: 'Cross axis', prop: 'align', options: ALIGN_OPTIONS },
     },
-    notes: [
-      'Stack 에는 state prop 이 없다 — 배치만 하는 컴포넌트라 State Matrix 를 만들지 않는다.',
-    ],
+    notes: ['Stack 에는 state prop 없음 — 배치만 하는 컴포넌트라 State Matrix 를 만들지 않음'],
   },
 };
 
@@ -278,18 +276,26 @@ const childrenOf = (id: string): ReactNode => {
 /** 폭을 묶어야 뜻이 드러나는 scenario. */
 const NARROW_SCENARIOS = new Set(['justify-between', 'wrap']);
 
+/**
+ * Canvas 는 flex 라서 그대로 두면 Stack 이 내용 폭으로 줄어든다. 그러면 남는 공간이 없어
+ * justify · align 을 바꿔도 화면이 움직이지 않는다. 배치 컴포넌트이므로 폭을 다 쓰게 한다.
+ */
+const Full = ({ children }: { children: ReactNode }) => <div className="w-full">{children}</div>;
+
 const render = ({ id, props }: StackScenario): ReactNode => {
   const stack = <Stack {...props}>{childrenOf(id)}</Stack>;
 
   if (id === 'with-box') {
     return (
-      <Box bg="background.default" radius="md" p="lg">
-        {stack}
-      </Box>
+      <Full>
+        <Box bg="background.default" radius="md" p="lg">
+          {stack}
+        </Box>
+      </Full>
     );
   }
 
-  return NARROW_SCENARIOS.has(id) ? <Narrow>{stack}</Narrow> : stack;
+  return NARROW_SCENARIOS.has(id) ? <Narrow>{stack}</Narrow> : <Full>{stack}</Full>;
 };
 
 export const stackPresentation = {

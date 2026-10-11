@@ -239,8 +239,8 @@ const data: ComponentPresentationData<TextFieldScenarioProps> = {
       interactiveOnly: ['hover'],
     },
     notes: [
-      'focused 는 FormControl 의 공개 prop 이다 — InputBase 가 `formControl.focused` 를 자기 포커스 상태보다 먼저 쓰므로 persistent cell 로 재현된다.',
-      'hover 는 boxed/filled input 스타일시트의 pseudo-class 뿐이라 강제할 수 없다.',
+      'focused 는 FormControl 의 공개 prop — InputBase 가 `formControl.focused` 를 자기 포커스 상태보다 먼저 쓰므로 persistent cell 로 재현',
+      'hover 는 boxed/filled input 스타일시트의 pseudo-class 뿐이라 강제 불가',
     ],
   },
 };

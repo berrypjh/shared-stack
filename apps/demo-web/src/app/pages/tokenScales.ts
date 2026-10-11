@@ -43,7 +43,7 @@ export type ScaleMember = { key: string; ids: readonly string[] };
 export const SCALE_SECTIONS: readonly ScaleSection[] = [
   {
     title: 'Spacing',
-    note: '여백과 간격. 막대 길이가 실제 값이다',
+    note: '여백과 간격. 막대 길이가 실제 값',
     families: [{ prefix: 'spacing', preview: 'length' }],
   },
   {
@@ -62,7 +62,7 @@ export const SCALE_SECTIONS: readonly ScaleSection[] = [
   },
   {
     title: 'Typography',
-    note: '글자 스케일과 그것을 조합한 글자 스타일. 스타일은 합성 토큰이라 단일 변수가 없다',
+    note: '글자 스케일과 그것을 조합한 글자 스타일. 스타일은 합성 토큰이라 단일 변수 없음',
     families: [
       { prefix: 'typography.fontSize', label: 'fontSize', preview: 'fontSize' },
       { prefix: 'typography.fontWeight', label: 'fontWeight', preview: 'fontWeight' },
@@ -80,7 +80,7 @@ export const SCALE_SECTIONS: readonly ScaleSection[] = [
   },
   {
     title: 'Elevation',
-    note: '층을 합성한 그림자. 합성 토큰이라 단일 변수가 없다',
+    note: '층을 합성한 그림자. 합성 토큰이라 단일 변수 없음',
     families: [
       { prefix: 'shadow', label: 'shadow', preview: 'shadow', composite: true, sortBy: 'blur' },
       {

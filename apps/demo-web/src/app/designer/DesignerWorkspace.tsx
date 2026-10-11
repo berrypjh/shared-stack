@@ -108,6 +108,7 @@ const DesignerSession = ({
       onPropertyChange={setOverride}
       onReset={() => setOverrides({})}
       scenarioId={active?.id}
+      scenarioProps={active?.props}
       stateIds={activeStateIds}
       theme={theme}
     />
@@ -117,11 +118,18 @@ const DesignerSession = ({
     /*
       Canvas | Inspector. Inspector 는 고정 폭이고 Canvas 가 남은 폭을 전부 받는다 —
       비율로 나누면 창이 좁아질 때 Canvas 가 먼저 줄어든다.
+
+      Inspector 는 Figma 의 오른쪽 패널처럼 화면에 붙어 있고(sticky) 자기 안에서만 스크롤한다.
+      토큰이 많아도 페이지가 Inspector 길이만큼 늘어나지 않고, 본문을 내려도 Properties 가
+      화면에 남는다. 52px 는 AppShell sticky 헤더 높이, xl · 6xl 은 `<main>` 의 위 · 아래 여백이다 —
+      높이가 아래 여백을 넘으면 페이지 끝에서 패널이 위로 밀려 Properties 가 헤더 밑에 가린다.
     */
     return (
-      <div className="flex gap-xl" data-testid="designer-wide">
+      <div className="flex items-start gap-xl" data-testid="designer-wide">
         <div className="flex-1 min-w-0">{canvas}</div>
-        <div className="w-[300px] shrink-0">{inspector}</div>
+        <div className="w-[300px] shrink-0 sticky top-[calc(52px_+_var(--ds-spacing-xl))] h-[calc(100vh_-_52px_-_var(--ds-spacing-xl)_-_var(--ds-spacing-6xl))] flex flex-col bg-background-surface border border-stroke-default rounded-md overflow-hidden">
+          {inspector}
+        </div>
       </div>
     );
   }

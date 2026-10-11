@@ -99,11 +99,7 @@ export const TokensPage = () => {
   }, [query, category]);
 
   return (
-    <Page
-      testId="tokens-page"
-      title="Tokens"
-      lead="이름이나 CSS 변수로 찾습니다. 값은 현재 테마 기준입니다."
-    >
+    <Page testId="tokens-page" title="Tokens" lead="이름이나 CSS 변수로 검색. 값은 현재 테마 기준">
       <Section title="검색" note={`${rows.length} / ${ALL.length}개`}>
         <div className="flex flex-wrap gap-lg items-center mb-lg">
           <div className="flex-1 min-w-[240px]">
@@ -153,7 +149,7 @@ export const TokensPage = () => {
 
         {rows.length === 0 ? (
           <p className="text-text-light text-xsm py-2xl text-center">
-            일치하는 토큰이 없습니다. 다른 이름으로 찾아보세요.
+            일치하는 토큰 없음. 다른 이름으로 검색 필요
           </p>
         ) : (
           <TableScroll label="토큰 목록 표">
@@ -202,9 +198,7 @@ export const TokensPage = () => {
           </TableScroll>
         )}
         {rows.length > 300 && (
-          <p className="text-text-light text-xxsm mt-lg">
-            상위 300개만 보여줍니다. 검색어를 좁혀 주세요.
-          </p>
+          <p className="text-text-light text-xxsm mt-lg">상위 300개만 표시. 검색어 좁히기 필요</p>
         )}
       </Section>
     </Page>

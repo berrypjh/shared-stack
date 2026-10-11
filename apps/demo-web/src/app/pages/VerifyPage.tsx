@@ -18,13 +18,13 @@ export const VerifyPage = () => {
     <Page
       testId="verify-page"
       title="Runtime"
-      lead="이 실행 환경에서 Shared Stack 통합이 살아 있는지 확인합니다."
+      lead="이 실행 환경에서 Shared Stack 통합이 살아 있는지 확인"
     >
-      <Section title="통합 계약" note="Default와 Sample을 동시에 측정합니다">
+      <Section title="통합 계약" note="Default와 Sample 동시 측정">
         <RuntimeVerification theme={theme} />
       </Section>
 
-      <Section title="접근성" note="브라우저가 계산한 값으로 WCAG 2.1 대비를 다시 잽니다">
+      <Section title="접근성" note="브라우저가 계산한 값으로 WCAG 2.1 대비 재측정">
         <TableScroll label="WCAG 대비 측정 결과 표">
           <Table hiddenCaption>
             <caption>브라우저가 계산한 값으로 다시 잰 WCAG 2.1 대비 측정 결과</caption>

@@ -4,6 +4,7 @@ import type { PropertyOverrides, ScenarioMeta } from '../presentation/model';
 import type { WebPresentation } from '../presentation/registry';
 import { Panel, Section } from '../shell/ui';
 
+import { CanvasA11y } from './CanvasA11y';
 import { StateMatrix } from './StateMatrix';
 import { VariantMatrix } from './VariantMatrix';
 
@@ -62,12 +63,14 @@ export const DesignerCanvas = ({
             : undefined
         }
       >
-        <Panel
-          testId="designer-canvas"
-          className="flex flex-wrap gap-lg items-center min-h-[180px]"
-        >
-          {active ? renderScenario(active.id, overrides) : null}
-        </Panel>
+        <CanvasA11y>
+          <Panel
+            testId="designer-canvas"
+            className="flex flex-wrap gap-lg items-center min-h-[180px]"
+          >
+            {active ? renderScenario(active.id, overrides) : null}
+          </Panel>
+        </CanvasA11y>
       </Section>
 
       {comparison?.variantMatrix && (
@@ -104,7 +107,7 @@ export const DesignerCanvas = ({
 
       {!comparison && (
         <p role="status" className="text-text-light text-xsm break-keep">
-          이 컴포넌트는 아직 비교 metadata 를 선언하지 않았다.
+          이 컴포넌트는 아직 비교 metadata 를 선언하지 않음
         </p>
       )}
     </div>
