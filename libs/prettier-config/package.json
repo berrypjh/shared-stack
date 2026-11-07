@@ -1,6 +1,11 @@
 {
   "name": "@berrypjh/prettier-config",
   "version": "1.2.1",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/berrypjh/shared-stack.git",
+    "directory": "libs/prettier-config"
+  },
   "license": "MIT",
   "main": "./index.js",
   "files": [
