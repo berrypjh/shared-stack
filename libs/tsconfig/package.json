@@ -1,6 +1,11 @@
 {
   "name": "@berrypjh/tsconfig",
   "version": "1.2.1",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/berrypjh/shared-stack.git",
+    "directory": "libs/tsconfig"
+  },
   "license": "MIT",
   "files": [
     "base.json",
