@@ -1,6 +1,11 @@
 {
   "name": "@berrypjh/eslint-config",
   "version": "1.2.1",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/berrypjh/shared-stack.git",
+    "directory": "libs/eslint-config"
+  },
   "license": "MIT",
   "type": "module",
   "exports": {

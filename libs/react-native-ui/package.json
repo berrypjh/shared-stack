@@ -1,6 +1,11 @@
 {
   "name": "@berrypjh/react-native-ui",
   "version": "1.2.1",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/berrypjh/shared-stack.git",
+    "directory": "libs/react-native-ui"
+  },
   "sideEffects": false,
   "main": "./dist/index.esm.js",
   "module": "./dist/index.esm.js",
