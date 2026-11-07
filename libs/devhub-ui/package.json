@@ -1,6 +1,11 @@
 {
   "name": "@berrypjh/devhub-ui",
   "version": "1.2.1",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/berrypjh/shared-stack.git",
+    "directory": "libs/devhub-ui"
+  },
   "type": "module",
   "sideEffects": [
     "**/*.css"
