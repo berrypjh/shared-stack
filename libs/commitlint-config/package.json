@@ -1,6 +1,11 @@
 {
   "name": "@berrypjh/commitlint-config",
   "version": "1.2.1",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/berrypjh/shared-stack.git",
+    "directory": "libs/commitlint-config"
+  },
   "license": "MIT",
   "main": "./index.js",
   "files": [
